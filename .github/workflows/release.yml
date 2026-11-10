@@ -87,20 +87,38 @@ jobs:
         with:
           packages-dir: python/dist/opencloning-db/
 
+  # npm trusted publishing (OIDC): no token. Each package has a trusted publisher on npmjs.com for
+  # OpenCloning/OpenCloning + release.yml. Provenance attestations are added automatically.
   publish-npm:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-js
-      # Topological, so dependencies are published before their dependents.
-      # workspace:* ranges are replaced by the released version at publish time.
+      - name: Install npm with trusted publishing support (>= 11.5.1)
+        run: npm install -g npm@^11.5.1
+      # Trusted publishing needs the npm CLI, but npm does not understand yarn's workspace:* ranges.
+      # So each package is packed by yarn (replaces workspace:* by the real versions, runs prepack),
+      # then the tarball is published by npm. Topological order: dependencies before dependents.
+      # Already-published versions are skipped, so a failed run can be re-run.
       - name: Publish @opencloning/* packages
         working-directory: js
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn workspaces foreach --all --no-private --topological npm publish --access public --tolerate-republish
+        run: |
+          set -euo pipefail
+          for dir in $(yarn workspaces foreach --all --no-private --topological exec pwd | grep '^/'); do
+            name=$(node -p "require('$dir/package.json').name")
+            version=$(node -p "require('$dir/package.json').version")
+            if npm view "$name@$version" version > /dev/null 2>&1; then
+              echo "$name@$version is already published, skipping"
+              continue
+            fi
+            (cd "$dir" && yarn pack --out "$RUNNER_TEMP/package.tgz")
+            npm publish "$RUNNER_TEMP/package.tgz" --access public
+          done
 
   # ---------------------------------------------------------------------------
   # Docker images

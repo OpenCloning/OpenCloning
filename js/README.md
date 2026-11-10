@@ -219,8 +219,4 @@ The whole monorepo is released together, with a single version, by [release-plea
 * Every push to `master` updates a release PR with the version bumps and `CHANGELOG.md`.
 * Merging that PR publishes the `@opencloning/*` npm packages, the Python packages, the Docker images and the Netlify site.
 
-To publish the npm packages manually:
-
-```
-YARN_NPM_AUTH_TOKEN=<> yarn workspaces foreach --all --no-private --topological npm publish --access public --tolerate-republish
-```
+The npm packages are published with [trusted publishing](https://docs.npmjs.com/trusted-publishers) (no token): each package on npmjs.com trusts `release.yml` in this repository. If publishing fails, re-run the `publish-npm` job of the release workflow; versions that are already on npm are skipped.
