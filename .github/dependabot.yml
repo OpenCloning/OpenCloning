@@ -1,13 +1,39 @@
+# Commit prefixes make the PR titles conventional commits (required by semantic-pr-title.yml):
+# runtime dependencies use `deps` (a patch release, listed under "Dependencies" by release-please),
+# dev dependencies use `chore` (no release).
+# Minor and patch updates are grouped into one PR per ecosystem; major updates get their own PRs.
 version: 2
 updates:
   # Python dependencies (uv workspace in python/)
   - package-ecosystem: "uv"
     directory: "/python"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "chore"
+    groups:
+      python-minor-patch:
+        update-types: ["minor", "patch"]
 
-  # Base images of the backend Dockerfile
-  - package-ecosystem: "docker"
-    directory: "/python/docker"
+  # JS dependencies (yarn workspaces in js/: all apps/* and packages/*)
+  - package-ecosystem: "npm"
+    directory: "/js"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "chore"
+    groups:
+      js-minor-patch:
+        update-types: ["minor", "patch"]
+
+  # Base images of the Dockerfiles
+  - package-ecosystem: "docker"
+    directories:
+      - "/python/docker"
+      - "/js"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
