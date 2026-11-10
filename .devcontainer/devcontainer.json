@@ -11,6 +11,7 @@
   "forwardPorts": [
     8000,
     8001,
+    8002,
     3000
   ],
   "portsAttributes": {
@@ -20,17 +21,26 @@
     "8001": {
       "label": "db API"
     },
+    "8002": {
+      "label": "MCP server"
+    },
     "3000": {
-      "label": "frontend API"
+      "label": "opencloning frontend"
     }
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "anthropic.claude-code",
-        "ms-python.python",
         "redhat.vscode-yaml",
         "timonwong.shellcheck",
+        // python/
+        "ms-python.python",
+        "samuelcolvin.jinjahtml",
+        // js/
+        "dbaeumer.vscode-eslint",
+        "shelex.vscode-cy-helper",
+        "vitest.explorer"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/opt/venv/bin/python",
@@ -43,10 +53,11 @@
     "SSH_AUTH_SOCK": ""
   },
   "workspaceFolder": "/workspace",
-  "initializeCommand": "git submodule update --init --remote || echo 'Reference repos not updated; using current versions'",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/check-isolation.sh",
   "postAttachCommand": "/usr/local/bin/check-isolation.sh",
-  // Runs before the firewall exists; seeding is destructive, so it stays manual
-  // "postCreateCommand": "uv sync --frozen && uv run opencloning-cli db migrate",
+  // Runs before the firewall exists. Installs the workspace packages (deps are already in the image)
+  // and the JS deps; the node_modules volume takes dev ownership from the image directory.
+  // DB migrations/seeding stay manual: cd python && uv run opencloning-cli db migrate
+  "postCreateCommand": "cd /workspace/python && uv sync --frozen && cd /workspace/js && yarn install --immutable && yarn cypress install",
   "waitFor": "postStartCommand"
 }

@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: opencloning_dev
     volumes:
       - pgdata:/var/lib/postgresql
-      - ../docker/postgres/init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql:ro
+      - ../python/docker/postgres/init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -38,8 +38,10 @@ services:
     # Local dev defaults (DB URL, OIDC test mode, origins...), so shells don't need to source it.
     # Changes need a container rebuild; sourcing .env.dev in a shell still overrides for that shell.
     env_file:
-      - ../.env.dev
+      - ../python/.env.dev
     environment:
+      # .env.dev has a path relative to python/; make it work from any directory
+      ALEMBIC_CFG: /workspace/python/packages/opencloning-db/alembic.ini
       CLAUDE_CONFIG_DIR: /home/dev/.claude
       CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
       DISABLE_AUTOUPDATER: "1"
@@ -47,6 +49,8 @@ services:
       - ..:/workspace:cached
       - ../.git:/workspace/.git:ro
       # - ./:/workspace/.devcontainer:ro
+      # Keep Linux node_modules (esbuild, rollup binaries) separate from any host install
+      - node_modules:/workspace/js/node_modules
       - bashhistory:/commandhistory
       - claude-config:/home/dev/.claude
     tmpfs:
@@ -54,5 +58,6 @@ services:
 
 volumes:
   pgdata:
+  node_modules:
   bashhistory:
   claude-config:

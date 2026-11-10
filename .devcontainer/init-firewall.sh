@@ -106,10 +106,12 @@ add_domain() {
     done < <(echo "$ips")
 }
 
-# Tooling: Claude Code, VS Code, Python packages
+# Tooling: Claude Code, VS Code, Python and npm/Yarn packages
 echo adding domains for tooling
 for domain in \
     "registry.npmjs.org" \
+    "registry.yarnpkg.com" \
+    "repo.yarnpkg.com" \
     "api.anthropic.com" \
     "sentry.io" \
     "statsig.com" \

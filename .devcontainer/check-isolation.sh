@@ -18,6 +18,8 @@ check "PyPI files reachable"                'curl -sS -m 10 -o /dev/null https:/
 check "NCBI reachable"                      'curl -sS -m 10 -o /dev/null https://eutils.ncbi.nlm.nih.gov'
 check "postgres sidecar reachable"          'pg_isready -h localhost -p 5432'
 check "Claude Code installed"               'claude --version'
+check "python venv available"               '/opt/venv/bin/python --version'
+check "node and yarn available"             'node --version && yarn --version'
 check "bw not installed"                    '! command -v bw'
 check ".git is read-only"                   '! touch /workspace/.git/write-test'
 # check ".devcontainer read-only"             '! touch /workspace/.devcontainer/write-test'
