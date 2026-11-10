@@ -1,0 +1,104 @@
+# Git hooks for the whole monorepo. Hooks run from the repo root, so paths are relative to it.
+# Install once (from anywhere in the repo): cd python && uv run pre-commit install
+
+# Yarn-managed files: whitespace in .patch files is significant, so no hook may touch them
+exclude: ^js/\.yarn/|\.patch$
+
+repos:
+  # --- General ---------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: double-quote-string-fixer
+
+  # --- python/ ---------------------------------------------------------------
+  - repo: https://github.com/psf/black
+    rev: 26.10.1
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.5.0
+    hooks:
+      - id: flake8
+        # flake8 only reads its config from the working directory
+        args: [--config=python/.flake8]
+  - repo: local
+    hooks:
+      # Remove metadata changes from notebooks to avoid diff contamination
+      - id: nbstripout
+        name: nbstripout with keep-output
+        entry: |
+          python -m nbstripout --keep-output $@
+        language: system
+        files: ^python/.*\.ipynb$
+        exclude: ^python/packages/opencloning/tests/
+      # httpx2 is only imported in http_client.py
+      - id: httpx-import-check
+        name: httpx-import-check
+        entry: python python/scripts/check_httpx_imports.py
+        language: system
+        files: ^python/.*\.py$
+        exclude: ^python/(packages/opencloning/tests|scripts)/
+      # primer3 is only imported in primer3_functions.py, to centralize how its settings are handled
+      - id: primer3-import-check
+        name: primer3-import-check
+        entry: python python/scripts/check_primer3_imports.py
+        language: system
+        files: ^python/.*\.py$
+        exclude: ^python/packages/opencloning/tests/
+      # deptry runs from python/ (uv --directory), so its paths are relative to python/
+      - id: deptry
+        name: deptry
+        entry: uv run --directory python deptry --config packages/opencloning/pyproject.toml packages/opencloning/src
+        language: system
+        pass_filenames: false
+        files: ^python/(packages/opencloning/(src/.*|pyproject\.toml)|pyproject\.toml)$
+      - id: deptry-opencloning-db
+        name: deptry (opencloning-db)
+        entry: uv run --directory python deptry --config packages/opencloning-db/pyproject.toml packages/opencloning-db/src
+        language: system
+        pass_filenames: false
+        files: ^python/(packages/opencloning-db/(src/.*|pyproject\.toml)|pyproject\.toml)$
+      - id: deptry-opencloning-mcp
+        name: deptry (opencloning-mcp)
+        entry: uv run --directory python deptry --config packages/opencloning-mcp/pyproject.toml packages/opencloning-mcp/src
+        language: system
+        pass_filenames: false
+        files: ^python/(packages/opencloning-mcp/(src/.*|pyproject\.toml)|pyproject\.toml)$
+
+  # --- js/ (pygrep: fails if the regex matches a line in a staged file) -------
+  - repo: local
+    hooks:
+      - id: no-it-only
+        name: no it.only() in tests
+        language: pygrep
+        entry: 'it\.only\('
+        files: ^js/.*\.(cy\.jsx?|test\.js)$
+      - id: no-it-skip
+        name: 'no it.skip() in tests (unless the line has an "allow-skip: <reason>" comment)'
+        language: pygrep
+        entry: 'it\.skip\((?!.*allow-skip)'
+        files: ^js/.*\.(cy\.jsx?|test\.js)$
+      - id: no-axios-outside-clients
+        name: axios only imported in client files
+        language: pygrep
+        entry: 'import.*axios|axios.*import'
+        files: ^js/(apps|packages)/.*\.jsx?$
+        exclude: |
+          (?x)^js/(
+            .*test\.jsx?|
+            apps/syntax-builder/.*|
+            apps/opencloning/build/.*|
+            .*/(node_modules|dist|build)/.*|
+            packages/utils/src/utils/httpClients\.js|
+            packages/opencloning-elabftw/src/common\.js|
+            packages/opencloningdb/src/common\.js
+          )$
+      - id: no-mui-subpath-imports
+        name: "MUI imported from the main package, not subpaths (e.g. import { Button } from '@mui/material')"
+        language: pygrep
+        entry: "from '@mui/(material/[A-Z]|icons-material/)"
+        files: ^js/(apps|packages)/.*/src/.*\.jsx?$

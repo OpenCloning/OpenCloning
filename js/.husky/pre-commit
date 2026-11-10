@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-bash .husky/intro.sh
-
-bash .husky/no_test_skipping.sh
-
-bash .husky/no_axios_outside_clients.sh
-
-bash .husky/no_mui_subpath_imports.sh

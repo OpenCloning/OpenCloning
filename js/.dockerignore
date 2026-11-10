@@ -10,7 +10,6 @@ node_modules/
 !.yarn/versions
 
 .nyc_output/
-.husky/
 coverage/
 cypress/
 .changeset/
