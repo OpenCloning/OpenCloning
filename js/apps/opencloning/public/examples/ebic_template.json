@@ -1,0 +1,165 @@
+{
+  "sequences": [
+    {
+      "id": 1,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": null
+    },
+    {
+      "id": 2,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": "ebic"
+    },
+    {
+      "id": 3,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": "ebic"
+    },
+    {
+      "id": 4,
+      "type": "TemplateSequence",
+      "circular": true,
+      "primer_design": null
+    },
+    {
+      "id": 5,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       common_plasmid          5747 bp    DNA     circular SYN 08-AUG-2024\nDEFINITION  synthetic circular DNA.\nACCESSION   .\nVERSION     .\nKEYWORDS    .\nSOURCE      synthetic DNA construct\n  ORGANISM  recombinant plasmid\n            .\nREFERENCE   1  (bases 1 to 5747)\n  AUTHORS   SnapGene License\n  TITLE     Direct Submission\n  JOURNAL   Exported Dec 20, 2024 from SnapGene 7.2.1 https://www.snapgene.com\nFEATURES             Location/Qualifiers\n     source          1..5747\n                     /mol_type=\"other DNA\"\n                     /organism=\"recombinant plasmid\"\n     misc_feature    1..4\n                     /label=\"AATG\"\n                     /note=\"/color=#f7e8f7\"\n     misc_feature    5..2586\n                     /label=\"From pC0.026\"\n                     /note=\"/color=white\"\n                     /note=\"/indicates_part=True\"\n                     /note=\"/source=pC0.026\"\n     promoter        5..450\n                     /gene=\"sacR\"\n                     /label=\"sacB promoter\"\n                     /note=\"sacB promoter and control region\"\n     CDS             451..1872\n                     /codon_start=1\n                     /gene=\"Bacillus subtilis sacB\"\n                     /product=\"secreted levansucrase that renders\n                     bacterialgrowth sensitive to sucrose\"\n                     /label=\"SacB\"\n                     /note=\"negative selection marker\"\n                     /translation=\"MNIKKFAKQATVLTFTTALLAGGATQAFAKETNQKPYKETYGISH\n                     ITRHDMLQIPEQQKNEKYQVPEFDSSTIKNISSAKGLDVWDSWPLQNADGTVANYHGYH\n                     IVFALAGDPKNADDTSIYMFYQKVGETSIDSWKNAGRVFKDSDKFDANDSILKDQTQEW\n                     SGSATFTSDGKIRLFYTDFSGKHYGKQTLTTAQVNVSASDSSLNINGVEDYKSIFDGDG\n                     KTYQNVQQFIDEGNYSSGDNHTLRDPHYVEDKGHKYLVFEANTGTEDGYQGEESLFNKA\n                     YYGKSTSFFRQESQKLLQSDKKRTAELANGALGMIELNDDYTLKKVMKPLIASNTVTDE\n                     IERANVFKMNGKWYLFTDSRGSKMTIDGITSNDIYMLGYVSNSLTGPYKPLNKTGLVLK\n                     MDLDPNDVTFTYSHFAVPQAKGNNVVITSYMTNRGFYADKQSTFAPSFLLNIKGKKTSV\n                     VKDSILEQGQLTVNK\"\n     misc_feature    2587..2590\n                     /label=\"AGGT\"\n                     /note=\"/color=#f7e8f7\"\n     misc_feature    2591..3800\n                     /label=\"From pC0.027\"\n                     /note=\"/color=white\"\n                     /note=\"/indicates_part=True\"\n                     /note=\"/source=pC0.027\"\n     CDS             complement(2875..3690)\n                     /codon_start=1\n                     /gene=\"aph(3')-Ia\"\n                     /product=\"aminoglycoside phosphotransferase\"\n                     /label=\"KanR\"\n                     /note=\"confers resistance to kanamycin in bacteria or\n                     G418(Geneticin(R)) in eukaryotes\"\n                     /translation=\"MSHIQRETSCSRPRLNSNMDADLYGYKWARDNVGQSGATIYRLYG\n                     KPDAPELFLKHGKGSVANDVTDEMVRLNWLTEFMPLPTIKHFIRTPDDAWLLTTAIPGK\n                     TAFQVLEEYPDSGENIVDALAVFLRRLHSIPVCNCPFNSDRVFRLAQAQSRMNNGLVDA\n                     SDFDDERNGWPVEQVWKEMHKLLPFSPDSVVTHGDFSLDNLIFDEGKLIGCIDVGRVGI\n                     ADRYQDLAILWNCLGEFSPSLQKRLFQKYGIDNPDMNKLQFHLMLDEFF\"\n     misc_feature    3691..3800\n                     /label=\"promoter\"\n     misc_feature    3801..3804\n                     /label=\"GCTT\"\n                     /note=\"/color=#f7e8f7\"\n     misc_feature    3805..4682\n                     /label=\"From gblock_OriTOriR\"\n                     /note=\"/color=white\"\n                     /note=\"/indicates_part=True\"\n                     /note=\"/source=gblock_OriTOriR\"\n     misc_feature    4675..4681\n                     /label=\"SapI site\"\n     promoter        4713..4842\n                     /label=\"BBa_J72163 GlpT Promoter\"\n                     /note=\"label: BBa_J72163 GlpT Promoter\"\n     primer_bind     4713..4732\n                     /label=\"CG17\"\n     RBS             4843..4878\n                     /label=\"RBS\"\n                     /note=\"label: RBS\"\n     RBS             4861..4872\n                     /label=\"RBS\"\n                     /note=\"note: strong bacterial ribosome binding site\n                     (Elowitz and Leibler, 2000)\"\n     CDS             4879..5577\n                     /label=\"mScarlet\"\n                     /note=\"codon_start: 1 label: mScarlet transl_table: 1\n                     translation:\n                     MVSKGEAVIKEFMRFKVHMEGSMNGHEFEIEGEGEGRPYEGTQTAKLKVTKGGPLPFSW\n                     DILSPQFMYGSRAFTKHPADIPDYYKQSFPEGFKWERVMNFEDGGAVTVTQDTSLEDGT\n                     LIYKVKLRGTNFPPDGPVMQKKTMGWEASTERLYPEDGVLKGDIKMALRLKDGGRYLAD\n                     FKTTYKAKKPVQMPGAYNVDRKLDITSHNEDYTVVEQYERSEGRHSTGGMDELYK*\"\n     terminator      5578..5706\n                     /label=\"BBa_B0015 Terminator\"\n                     /note=\"label: BBa_B0015 Terminator\"\n     terminator      5586..5657\n                     /label=\"rrnB T1 terminator\"\n                     /note=\"label: rrnB T1 terminator note: pLannotate note:\n                     /database=snapgene note: /fragment=False note:\n                     /identity=100.0 note: /match_length=100.0 note:\n                     /other=terminator\"\n     terminator      5673..5700\n                     /label=\"T7Te terminator\"\n                     /note=\"label: T7Te terminator note: pLannotate note:\n                     /database=snapgene note: /fragment=False note:\n                     /identity=100.0 note: /match_length=100.0 note:\n                     /other=terminator\"\n     primer_bind     complement(5685..5706)\n                     /label=\"CG18\"\n     misc_feature    5734..5747\n                     /label=\"From gblock_OriTOriR\"\n                     /note=\"/color=white\"\n                     /note=\"/indicates_part=True\"\n                     /note=\"/source=gblock_OriTOriR\"\n     misc_feature    5738..5744\n                     /label=\"SapI site\"\nORIGIN\n        1 aatgcacata tacctgccgt tcactattat ttagtgaaat gagatattat gatattttct\n       61 gaattgtgat taaaaaggca actttatgcc catgcaacag aaactataaa aaatacagag\n      121 aatgaaaaga aacagataga ttttttagtt ctttaggccc gtagtctgca aatcctttta\n      181 tgattttcta tcaaacaaaa gaggaaaata gaccagttgc aatccaaacg agagtctaat\n      241 agaatgaggt cgaaaagtaa atcgcgcggg tttgttactg ataaagcagg caagacctaa\n      301 aatgtgtaaa gggcaaagtg tatactttgg cgtcacccct tacatatttt aggtcttttt\n      361 ttattgtgcg taactaactt gccatcttca aacaggaggg ctggaagaag cagaccgcta\n      421 acacagtaca taaaaaagga gacatgaacg atgaacatca aaaagtttgc aaaacaagca\n      481 acagtattaa cctttactac cgcactgctg gcaggaggcg caactcaagc gtttgcgaaa\n      541 gaaacgaacc aaaagccata taaggaaaca tacggcattt cccatattac acgccatgat\n      601 atgctgcaaa tccctgaaca gcaaaaaaat gaaaaatatc aagttcctga attcgattcg\n      661 tccacaatta aaaatatctc ttctgcaaaa ggcctggacg tttgggacag ctggccatta\n      721 caaaacgctg acggcactgt cgcaaactat cacggctacc acatcgtctt tgcattagcc\n      781 ggagatccta aaaatgcgga tgacacatcg atttacatgt tctatcaaaa agtcggcgaa\n      841 acttctattg acagctggaa aaacgctggc cgcgtcttta aagacagcga caaattcgat\n      901 gcaaatgatt ctatcctaaa agaccaaaca caagaatggt caggttcagc cacatttaca\n      961 tctgacggaa aaatccgttt attctacact gatttctccg gtaaacatta cggcaaacaa\n     1021 acactgacaa ctgcacaagt taacgtatca gcatcagaca gctctttgaa catcaacggt\n     1081 gtagaggatt ataaatcaat ctttgacggt gacggaaaaa cgtatcaaaa tgtacagcag\n     1141 ttcatcgatg aaggcaacta cagctcaggc gacaaccata cgctgagaga tcctcactac\n     1201 gtagaagata aaggccacaa atacttagta tttgaagcaa acactggaac tgaagatggc\n     1261 taccaaggcg aagaatcttt atttaacaaa gcatactatg gcaaaagcac atcattcttc\n     1321 cgtcaagaaa gtcaaaaact tctgcaaagc gataaaaaac gcacggctga gttagcaaac\n     1381 ggcgctctcg gtatgattga gctaaacgat gattacacac tgaaaaaagt gatgaaaccg\n     1441 ctgattgcat ctaacacagt aacagatgaa attgaacgcg cgaacgtctt taaaatgaac\n     1501 ggcaaatggt acctgttcac tgactcccgc ggatcaaaaa tgacgattga cggcattacg\n     1561 tctaacgata tttacatgct tggttatgtt tctaattctt taactggccc atacaagccg\n     1621 ctgaacaaaa ctggccttgt gttaaaaatg gatcttgatc ctaacgatgt aacctttact\n     1681 tactcacact tcgctgtacc tcaagcgaaa ggaaacaatg tcgtgattac aagctatatg\n     1741 acaaacagag gattctacgc agacaaacaa tcaacgtttg cgccaagctt cctgctgaac\n     1801 atcaaaggca agaaaacatc tgttgtcaaa gacagcatcc ttgaacaagg acaattaaca\n     1861 gttaacaaat aaaaacgcaa aagaaaatgc cgatatccta ttggcatttt cttttatttc\n     1921 ttatcaacat aaaggtgaat cccatatgaa ctatataaaa gcaggcaaat ggctaaccgt\n     1981 attcctaacc ttttggtaat gactccaact tattgatagt gttttatgtt cagataatgc\n     2041 ccgatgactt tgtcatgcag ctccaccgat tttgagaacg acagcgactt ccgtcccagc\n     2101 cgtgccaggt gctgcctcag attcaggtta tgccgctcaa ttcgctgcgt atatcgcttg\n     2161 ctgattacgt gcagctttcc cttcaggcgg gattcataca gcggccagcc atccgtcatc\n     2221 catatcacca cgtcaaaggg tgacagcagg ctcataagac gccccagcgt cgccatagtg\n     2281 cgttcaccga atacgtgcgc aacaaccgtc taccggagac tgtcatacgc gtaaaacagc\n     2341 cagcgctggc gcgatttagc cccgacatag ccccactgtt cgtccatttc cgcgcagacg\n     2401 atgacgtcac tgcccggctg tatgcgcgag gttaccgact gcggcctgag ttttttaagt\n     2461 gacgtaaaat cgtgttgagg ccaacgccca taatgcgggc tgttgcccgg catccaacgc\n     2521 cattcatggc catatcaatg attttctggt gcgtaccggg ttgagaagcg gtgtaagtga\n     2581 actgcaaggt ctgaggtctg cctcgtgaag aaggtgttgc tgactcatac caggcctgaa\n     2641 tcgccccatc atccagccag aaagtgaggg agccacggtt gatgagagct ttgttgtagg\n     2701 tggaccagtt ggtgattttg aacttttgct ttgccacgga acggtctgcg ttgtcgggaa\n     2761 gatgcgtgat ctgatccttc aactcagcaa aagttcgatt tattcaacaa agccgccgtc\n     2821 ccgtcaagtc agcgtaatgc tctgccagtg ttacaaccaa ttaaccaatt ctgattagaa\n     2881 aaactcatcg agcatcaaat gaaactgcaa tttattcata tcaggattat caataccata\n     2941 tttttgaaaa agccgtttct gtaatgaagg agaaaactca ccgaggcagt tccataggat\n     3001 ggcaagatcc tggtatcggt ctgcgattcc gactcgtcca acatcaatac aacctattaa\n     3061 tttcccctcg tcaaaaataa ggttatcaag tgagaaatca ccatgagtga cgactgaatc\n     3121 cggtgagaat ggcaaaagct tatgcatttc tttccagact tgttcaacag gccagccatt\n     3181 acgctcgtca tcaaaatcac tcgcatcaac caaaccgtta ttcattcgtg attgcgcctg\n     3241 agcgagacga aatacgcgat cgctgttaaa aggacaatta caaacaggaa tcgaatgcaa\n     3301 ccggcgcagg aacactgcca gcgcatcaac aatattttca cctgaatcag gatattcttc\n     3361 taatacctgg aatgctgttt tcccggggat cgcagtggtg agtaaccatg catcatcagg\n     3421 agtacggata aaatgcttga tggtcggaag aggcataaat tccgtcagcc agtttagtct\n     3481 gaccatctca tctgtaacat cattggcaac gctacctttg ccatgtttca gaaacaactc\n     3541 tggcgcatcg ggcttcccat acaatcgata gattgtcgca cctgattgcc cgacattatc\n     3601 gcgagcccat ttatacccat ataaatcagc atccatgttg gaatttaatc gcggcctcga\n     3661 gcaagacgtt tcccgttgaa tatggctcat aacacccctt gtattactgt ttatgtaagc\n     3721 agacagtttt attgttcatg atgatatatt tttatcttgt gcaatgtaac atcagagatt\n     3781 ttgagacaca acgtggcttt gcttgtacac cttgataggt gggctgccct tcctggttgg\n     3841 cttggtttca tcagccatcc gcttgccctc atctgttacg ccggcggtag ccggccagcc\n     3901 tcgcagagca ggattcccgt tgagcaccgc caggtgcgaa taagggacag tgaagaagga\n     3961 acacccgctc gcgggtgggc ctacttcacc tatcctgccc ggctgacgcc gttggataca\n     4021 ccaaggaaag tctacacgaa ccctttggca aaatatcaaa ggatcttctt gagatccttt\n     4081 ttttctgcgc gtaatctgct gcttgcaaac aaaaaaacca ccgctaccag cggtggtttg\n     4141 tttgccggat caagagctac caactctttt tccgaaggta actggcttca gcagagcgca\n     4201 gataccaaat actgttcttc tagtgtagcc gtagttaggc caccacttca agaactctgt\n     4261 agcaccgcct acatacctcg ctctgctaat cctgttacca gtggctgctg ccagtggcga\n     4321 taagtcgtgt cttaccgggt tggactcaag acgatagtta ccggataagg cgcagcggtc\n     4381 gggctgaacg gggggttcgt gcacacagcc cagcttggag cgaacgacct acaccgaact\n     4441 gagataccta cagcgtgagc tatgagaaag cgccacgctt cccgaaggga gaaaggcgga\n     4501 caggtatccg gtaagcggca gggtcggaac aggagagcgc acgagggagc ttccaggggg\n     4561 aaacgcctgg tatctttata gtcctgtcgg gtttcgccac ctctgacttg agcgtcgatt\n     4621 tttgtgatgc tcgtcagggg ggcggagcct atggaaaaac gccagcaacg cggcgctctt\n     4681 catgctcgga gagagacctt tgccttgtct tcgaaagtga aacgtgattt catgcgtcat\n     4741 tttgaacatt ttgtaaatct tatttaataa tgtgtgcggc aattcacatt taatttatga\n     4801 atgttttctt aacatcgcgg caactcaaga aacggcaggt tcggatctta gctactagag\n     4861 aaagaggaga aatactagat ggttagcaaa ggcgaggcgg ttatcaagga gtttatgcgt\n     4921 tttaaggttc acatggaggg tagcatgaac ggtcacgagt tcgagatcga gggtgaaggc\n     4981 gagggtcgtc cgtacgaagg cacccagacc gcgaagctga aagtgaccaa gggtggcccg\n     5041 ctgccgttca gctgggacat cctgagcccg cagttcatgt atggcagccg tgcgtttacc\n     5101 aaacacccgg cggacattcc ggattactat aagcaaagct tcccggaagg ttttaaatgg\n     5161 gagcgtgtta tgaacttcga agatggtggc gcggtgaccg ttacccagga caccagcctg\n     5221 gaggatggca ccctgattta caaggtgaaa ctgcgtggca ccaactttcc gccggatggt\n     5281 ccggttatgc agaagaaaac gatgggttgg gaagcgagca ccgagcgtct gtatccggaa\n     5341 gatggcgtgc tgaagggtga tatcaaaatg gcgctgcgtc tgaaggacgg tggccgttac\n     5401 ctggcggatt ttaagaccac ctataaagcg aagaaaccgg tgcaaatgcc gggtgcgtac\n     5461 aacgttgacc gtaaactgga tattaccagc cacaacgagg attataccgt ggttgagcaa\n     5521 tatgagcgta gcgagggtcg ccacagcacc ggcggcatgg acgaactgta taagtgacca\n     5581 ggcatcaaat aaaacgaaag gctcagtcga aagactgggc ctttcgtttt atctgttgtt\n     5641 tgtcggtgaa cgctctctac tagagtcaca ctggctcacc ttcgggtggg cctttctgcg\n     5701 tttatagaag acaagggaaa ggtctctcgc tgagatagaa gagcacg\n//"
+    },
+    {
+      "id": 6,
+      "type": "TemplateSequence",
+      "circular": true,
+      "primer_design": null
+    },
+    {
+      "id": 7,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": null
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "type": "GenomeCoordinatesSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "repository_id": "CU329670.1",
+      "coordinates": "1877189..1881726",
+      "assembly_accession": "GCA_000002945.3",
+      "locus_tag": "SPOM_SPAPB1A10.09",
+      "gene_id": null
+    },
+    {
+      "id": 2,
+      "type": "PCRSource",
+      "output_name": "left_homology_arm",
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 1
+        }
+      ],
+      "circular": null,
+      "add_primer_features": false
+    },
+    {
+      "id": 3,
+      "type": "PCRSource",
+      "output_name": "right_homology_arm",
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 1
+        }
+      ],
+      "circular": null,
+      "add_primer_features": false
+    },
+    {
+      "id": 4,
+      "type": "UploadedFileSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "sequence_file_format": "genbank",
+      "file_name": null,
+      "index_in_file": null,
+      "circularize": null,
+      "coordinates": null
+    },
+    {
+      "id": 5,
+      "type": "UploadedFileSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "sequence_file_format": "genbank",
+      "file_name": "common_plasmid.gb",
+      "index_in_file": 0,
+      "circularize": true,
+      "coordinates": null
+    },
+    {
+      "id": 6,
+      "type": "RestrictionAndLigationSource",
+      "output_name": "golgen_gate",
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 2
+        },
+        {
+          "type": "SourceInput",
+          "sequence": 3
+        },
+        {
+          "type": "SourceInput",
+          "sequence": 4
+        },
+        {
+          "type": "SourceInput",
+          "sequence": 5
+        }
+      ],
+      "circular": null,
+      "restriction_enzymes": [
+        "BsaI"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "HomologousRecombinationSource",
+      "output_name": "engineered_allele",
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 1
+        },
+        {
+          "type": "SourceInput",
+          "sequence": 6
+        }
+      ],
+      "circular": null
+    }
+  ],
+  "primers": [],
+  "description": "EBIC cloning strategy",
+  "files": null,
+  "schema_version": "1.0.0",
+  "backend_version": null,
+  "frontend_version": null
+}

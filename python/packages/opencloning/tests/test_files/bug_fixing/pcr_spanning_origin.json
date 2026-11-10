@@ -1,0 +1,81 @@
+{
+  "sequences": [
+    {
+      "id": 1,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      89 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 atgcaaacag taatgatgga tgacattcaa agcactgatt ctattgctga aaaagataat\n       61 cactctaata atgaatctaa ctttacttg\n//"
+    },
+    {
+      "id": 2,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      45 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 tttacttgat gcaaacagta atgatggatg acattcaaag cactg\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    },
+    {
+      "id": 2,
+      "type": "PCRSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [
+        {
+          "type": "AssemblyFragment",
+          "sequence": 3,
+          "left_location": null,
+          "right_location": "1..17",
+          "reverse_complemented": false
+        },
+        {
+          "type": "AssemblyFragment",
+          "sequence": 1,
+          "left_location": "1..89",
+          "right_location": "20..37",
+          "reverse_complemented": false
+        },
+        {
+          "type": "AssemblyFragment",
+          "sequence": 4,
+          "left_location": "1..18",
+          "right_location": null,
+          "reverse_complemented": true
+        }
+      ],
+      "circular": false,
+      "add_primer_features": false
+    }
+  ],
+  "primers": [
+    {
+      "id": 3,
+      "type": "Primer",
+      "name": "fwd",
+      "database_id": null,
+      "sequence": "tttacttgatgcaaaca"
+    },
+    {
+      "id": 4,
+      "type": "Primer",
+      "name": "rvs",
+      "database_id": null,
+      "sequence": "cagtgctttgaatgtcat"
+    }
+  ],
+  "description": "",
+  "files": null,
+  "schema_version": "0.4.9",
+  "backend_version": null,
+  "frontend_version": null
+}

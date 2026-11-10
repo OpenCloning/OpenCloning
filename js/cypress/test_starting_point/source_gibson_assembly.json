@@ -1,0 +1,108 @@
+{
+  "sequences": [
+    {
+      "id": 1,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       pj5_00001                 48 bp    DNA     linear   SYN 29-APR-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    1..20\n                     /label=\"Homology A in 1\"\n     misc_feature    21..28\n                     /label=\"Payload 1\"\n     misc_feature    29..48\n                     /label=\"Homology B in 1\"\nORIGIN\n        1 acttgacggc tacatcattc acacacactc gctcgggctg gccccggt\n//"
+    },
+    {
+      "id": 2,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       pj5_00001                 48 bp    DNA     linear   SYN 29-APR-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    1..20\n                     /label=\"Homology B in 1\"\n     misc_feature    21..28\n                     /label=\"Payload 2\"\n     misc_feature    29..48\n                     /label=\"Homology C in 2\"\nORIGIN\n        1 tcgctcgggc tggccccggt acacacactc aaaaccaaca ttgcgacc\n//"
+    },
+    {
+      "id": 3,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       pj5_00001                 46 bp    DNA     linear   SYN 29-APR-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    1..20\n                     /label=\"Homology C in 3\"\n     misc_feature    21..26\n                     /label=\"Payload 3\"\n     misc_feature    27..46\n                     /label=\"Homology A in 3\"\nORIGIN\n        1 tcaaaaccaa cattgcgacc acacacactt gacggctaca tcattc\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "type": "UploadedFileSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "sequence_file_format": "genbank",
+      "file_name": "part1.gb",
+      "index_in_file": 0,
+      "circularize": null,
+      "coordinates": null
+    },
+    {
+      "id": 2,
+      "type": "UploadedFileSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "sequence_file_format": "genbank",
+      "file_name": "part2.gb",
+      "index_in_file": 0,
+      "circularize": null,
+      "coordinates": null
+    },
+    {
+      "id": 3,
+      "type": "UploadedFileSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "sequence_file_format": "genbank",
+      "file_name": "part3.gb",
+      "index_in_file": 0,
+      "circularize": null,
+      "coordinates": null
+    }
+  ],
+  "primers": [
+    {
+      "id": 4,
+      "type": "Primer",
+      "name": "fwd",
+      "database_id": null,
+      "sequence": "gatctcgccataaaagacag"
+    },
+    {
+      "id": 5,
+      "type": "Primer",
+      "name": "rvs",
+      "database_id": null,
+      "sequence": "ttaacaaagcgactataagt"
+    },
+    {
+      "id": 6,
+      "type": "Primer",
+      "name": "ase1_sgRNA",
+      "database_id": null,
+      "sequence": "CATTACTGTTTGCATTGAAC"
+    },
+    {
+      "id": 7,
+      "type": "Primer",
+      "name": "ase1_fwd",
+      "database_id": null,
+      "sequence": "TTTCATATCTTCCTTTATATTCTATTAATTGAATTTCAAACATCGTTTTATTGAGCTCATTTACATCAACCGGTTCAATGtacccatacgatgttcctga"
+    },
+    {
+      "id": 8,
+      "type": "Primer",
+      "name": "ase1_rvs",
+      "database_id": null,
+      "sequence": "AAGTTAGATTCATTATTAGAGTGATTATCTTTTTCAGCAATAGAATCAGTGCTTTGAATGTCATCCATCATTACTGTTTGagcgtaatctggaacgtcat"
+    }
+  ],
+  "description": "",
+  "files": null,
+  "schema_version": "1.0.0",
+  "backend_version": null,
+  "frontend_version": null
+}

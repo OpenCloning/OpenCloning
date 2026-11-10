@@ -1,0 +1,981 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_sequences",
+  "params": null,
+  "response": {
+    "body": {
+      "items": [
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 80,
+          "name": "template_sequence_plasmid",
+          "sample_uids": [],
+          "seguid": null,
+          "sequence_type": "plasmid",
+          "tags": [],
+          "type": "template_sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 79,
+          "name": "template_sequence_allele",
+          "sample_uids": [],
+          "seguid": null,
+          "sequence_type": "allele",
+          "tags": [],
+          "type": "template_sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 77,
+          "name": "pDGB3_omega2R",
+          "sample_uids": [],
+          "seguid": "cdseguid=GHXuFOjSxAth7YmWjbVpLOPNGqY",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 76,
+          "name": "pDGB3_alpha2",
+          "sample_uids": [],
+          "seguid": "cdseguid=o9i0KgJxZW6X78ubLg2oUeN0GRY",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 75,
+          "name": "pJOG587",
+          "sample_uids": [],
+          "seguid": "cdseguid=yTEDgvR4afgcVxOcYkMrDVGom6c",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 74,
+          "name": "pJOG351",
+          "sample_uids": [],
+          "seguid": "cdseguid=ljMbhA5V1un_kFepel_oN_1gaZA",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 73,
+          "name": "pJOG171",
+          "sample_uids": [],
+          "seguid": "cdseguid=3xtFY6XTYQMoyPjkisAJ6oKxeO0",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 72,
+          "name": "pJOG173",
+          "sample_uids": [],
+          "seguid": "cdseguid=-Yallf7ldmUi3NJGpPYJc_GfHjs",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 71,
+          "name": "pJOG684",
+          "sample_uids": [],
+          "seguid": "cdseguid=HYx14nyqju5yskhq2L4Tri27Oe0",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 70,
+          "name": "pUPD-ADH2t_(17-21)",
+          "sample_uids": [],
+          "seguid": "cdseguid=elPtSwjgKAQJsuX2r89VxYCvJks",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 11,
+              "name": "golden-braid"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 69,
+          "name": "polymerase_extended",
+          "sample_uids": [
+            "templateless_PCR-sample"
+          ],
+          "seguid": "ldseguid=QI3G6XbkYI_wSr6SJ9CNZfafrz0",
+          "sequence_type": "linear_dna",
+          "tags": [
+            {
+              "id": 10,
+              "name": "templateless_PCR"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 68,
+          "name": "templateless_PCR",
+          "sample_uids": [],
+          "seguid": "ldseguid=viDBlEx8gZUC8hlic_0dQ7Dxeew",
+          "sequence_type": "linear_dna",
+          "tags": [
+            {
+              "id": 10,
+              "name": "templateless_PCR"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 65,
+          "name": "name",
+          "sample_uids": [
+            "restriction_ligation_assembly-sample"
+          ],
+          "seguid": "cdseguid=p6ZFRTcOFOKjiC74CdhQRUMPb_w",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_ligation_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 64,
+          "name": "pFA6a-kanMX6",
+          "sample_uids": [],
+          "seguid": "cdseguid=zLgYTVEhETF5TIn6fKnWn37OTL4",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_ligation_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 63,
+          "name": "name",
+          "sample_uids": [],
+          "seguid": "ldseguid=oMGruVpBiElY0ffP28XC_BlHXv8",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_ligation_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 62,
+          "name": "CU329670",
+          "sample_uids": [],
+          "seguid": "ldseguid=aOmJm_g8bM_td-kzUAZlVUGzhWM",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_ligation_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 59,
+          "name": "ase1delta::hphMX6",
+          "sample_uids": [
+            "homologous_recombination-sample"
+          ],
+          "seguid": "ldseguid=5icvyD5nmkpy5aN_zpBx_rmmkNw",
+          "sequence_type": "allele",
+          "tags": [
+            {
+              "id": 8,
+              "name": "homologous_recombination"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 58,
+          "name": "CU329670",
+          "sample_uids": [],
+          "seguid": "ldseguid=aOmJm_g8bM_td-kzUAZlVUGzhWM",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 8,
+              "name": "homologous_recombination"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 57,
+          "name": "pcr_product",
+          "sample_uids": [],
+          "seguid": "ldseguid=PVxj8O0Ul_FzG7qr4qxqFfZ8EU0",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 8,
+              "name": "homologous_recombination"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 56,
+          "name": "pFA6a-5FLAG-hphMX6",
+          "sample_uids": [],
+          "seguid": "cdseguid=cifdJJ4UGw2hS6jied0pGte8nf4",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 8,
+              "name": "homologous_recombination"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 53,
+          "name": "pREP42-ase1",
+          "sample_uids": [
+            "gibson_assembly-sample"
+          ],
+          "seguid": "cdseguid=qdd6VBGDxAo1WzsHKf_FT_hMpnU",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 7,
+              "name": "gibson_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 52,
+          "name": "digested_vector",
+          "sample_uids": [],
+          "seguid": "ldseguid=Ptf72Sz4aZAE7j49KlqEJetuGeU",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 7,
+              "name": "gibson_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 51,
+          "name": "ase1_CDS",
+          "sample_uids": [],
+          "seguid": "ldseguid=YBDwZj0rcRWUMsmehQzAUyOayCM",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 7,
+              "name": "gibson_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 50,
+          "name": "NC_003424",
+          "sample_uids": [],
+          "seguid": "ldseguid=aOmJm_g8bM_td-kzUAZlVUGzhWM",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 7,
+              "name": "gibson_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 49,
+          "name": "pREP42-MCS+",
+          "sample_uids": [],
+          "seguid": "cdseguid=3LQ-tKp2yAkKPXAjSWM8FiD_9YQ",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 7,
+              "name": "gibson_assembly"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 44,
+          "name": "expression_clone_lacZ",
+          "sample_uids": [
+            "gateway-sample"
+          ],
+          "seguid": "cdseguid=iO38f2YivBO-6TqDiVoC4UF0bnU",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 43,
+          "name": "entry_clone_lacZ",
+          "sample_uids": [],
+          "seguid": "cdseguid=MqPXLeF7MXM63b4EsQU3vI3DBXI",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 42,
+          "name": "lacZ_PCR_product",
+          "sample_uids": [],
+          "seguid": "ldseguid=xnlrvJOWvC1omQRF7QUknDGGgIs",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 41,
+          "name": "pcDNA6.2_C-YFP-DEST",
+          "sample_uids": [],
+          "seguid": "cdseguid=deBUtglinRcbMhjD7EvBjXUKhGg",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 40,
+          "name": "pDONR221",
+          "sample_uids": [],
+          "seguid": "cdseguid=NHJEzJ3E7cnPasODRhCfZ_3OlGU",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 39,
+          "name": "NC_000913",
+          "sample_uids": [],
+          "seguid": "ldseguid=dZybNlCfzY6Eg0hg0Ymc5Y6aoTI",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 6,
+              "name": "gateway"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 34,
+          "name": "final_product",
+          "sample_uids": [
+            "golden_gate-sample"
+          ],
+          "seguid": "cdseguid=nXIrIUkUJNMDuQNMX9urTILmyuY",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 33,
+          "name": "pcr_product",
+          "sample_uids": [],
+          "seguid": "ldseguid=tcRysmQaGdgJv2AWiIaxS2xLAng",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 32,
+          "name": "CU329670",
+          "sample_uids": [],
+          "seguid": "ldseguid=Ggf4izi9PrVjm0oR6TUmpOLxMeY",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 31,
+          "name": "pYTK083",
+          "sample_uids": [],
+          "seguid": "cdseguid=1dqDOlLuTA7HbO0D2dXpE7vArgI",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 30,
+          "name": "pYTK081",
+          "sample_uids": [],
+          "seguid": "cdseguid=XpVM0LTs1wWdbbXPy9JKu43-c3w",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 29,
+          "name": "pYTK074",
+          "sample_uids": [],
+          "seguid": "cdseguid=u1zemqASRpHJQhRrGnUc1OmAL3E",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 28,
+          "name": "pYTK067",
+          "sample_uids": [],
+          "seguid": "cdseguid=GZ7s0rc1XAM_Kywxl_wmPCVMbXk",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 27,
+          "name": "pYTK051",
+          "sample_uids": [],
+          "seguid": "cdseguid=wYgwnXvFBuBSnPgZPiR7gLXLGcA",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 26,
+          "name": "pYTK038",
+          "sample_uids": [],
+          "seguid": "cdseguid=3CkY8DNdxuEtVJ-MZdiKqfFrFug",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 25,
+          "name": "pYTK009",
+          "sample_uids": [],
+          "seguid": "cdseguid=R-VWJHr0xmv_2qJFj9u2BbKDpzY",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 24,
+          "name": "pYTK002",
+          "sample_uids": [],
+          "seguid": "cdseguid=qtB5HWzsbXGBt7PXkom6SY49NSM",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 5,
+              "name": "golden_gate"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 21,
+          "name": "3xHA-ase1",
+          "sample_uids": [
+            "crispr_hdr-sample"
+          ],
+          "seguid": "ldseguid=3LN-NLtnubkWGEtAvOqu_pdcebQ",
+          "sequence_type": "allele",
+          "tags": [
+            {
+              "id": 4,
+              "name": "crispr_hdr"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 20,
+          "name": "pcr_product",
+          "sample_uids": [],
+          "seguid": "ldseguid=h10T-QsjHos0J7faWsTXHZU614k",
+          "sequence_type": "pcr_product",
+          "tags": [
+            {
+              "id": 4,
+              "name": "crispr_hdr"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 19,
+          "name": "pFA6a-3HA-kanMX6",
+          "sample_uids": [],
+          "seguid": "cdseguid=7cLjtkbXOkZH5FSmMANj2PZl6QE",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 4,
+              "name": "crispr_hdr"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 18,
+          "name": "NC_003424",
+          "sample_uids": [],
+          "seguid": "ldseguid=yGDpNcn1WIHwPiaCDFN3LbOaUcQ",
+          "sequence_type": "locus",
+          "tags": [
+            {
+              "id": 4,
+              "name": "crispr_hdr"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 14,
+          "name": "final_product",
+          "sample_uids": [
+            "restriction_then_ligation-sample"
+          ],
+          "seguid": "cdseguid=p6ZFRTcOFOKjiC74CdhQRUMPb_w",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 3,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 13,
+          "name": "pFA6a-kanMX6_SalI_AscI",
+          "sample_uids": [],
+          "seguid": "ldseguid=Z89cNYWGZkfjFaGa9aBPBYrpsCE",
+          "sequence_type": "restriction_fragment",
+          "tags": [
+            {
+              "id": 3,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 12,
+          "name": "ase1_CDS_PCR_SalI_AscI",
+          "sample_uids": [],
+          "seguid": "ldseguid=84qdfT36jnkUuRt0NlRI9y0Wp2k",
+          "sequence_type": "restriction_fragment",
+          "tags": [
+            {
+              "id": 3,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 11,
+          "name": "pFA6a-kanMX6",
+          "sample_uids": [],
+          "seguid": "cdseguid=zLgYTVEhETF5TIn6fKnWn37OTL4",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 3,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "type": "sequence"
+        }
+      ],
+      "page": 1,
+      "pages": 2,
+      "size": 50,
+      "total": 58
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

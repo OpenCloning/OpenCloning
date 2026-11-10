@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Enter DNA Sequences</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        textarea {
+            width: 400px;
+            height: 300px;
+            margin: 20px auto;
+            display: block;
+            font-family: monospace;
+        }
+
+        .error {
+            color: red;
+            margin: 10px auto;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.4em;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Versatile Cloning Strategy for Efficient Multigene Editing in Arabidopsis</h1>
+    <p>Ziqiang P. Li, Jennifer Huard, Emmanuelle M. Bayer and Valérie Wattelet-Boyer</p>
+    <p><a href="https://doi.org/10.21769/BioProtoc.5029">doi:10.21769/BioProtoc.5029</a></p>
+    <p>Enter protospacer sequences (20 bases each) separated by line breaks.</p>
+    <p>Below is the example protospacer sequences from the paper.</p>
+
+    <form id="sequenceForm">
+        <textarea id="sequences" name="sequences">
+GCTGGCTAACCGTGAGGGGA
+CCGTGTACTGTAGTTACAGT
+TGTGGTTCCCCGGCCGTCTT
+ATACTCTAGTCCTCAACGCC</textarea>
+        <div style="margin: 10px auto; text-align: center;">
+            <input type="checkbox" id="bpOnly" name="bpOnly">
+            <label for="bpOnly">Generate only entry clone (stop after BP)</label>
+        </div>
+        <br>
+        <div id="error" class="error">
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        document.getElementById('sequenceForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const sequences = document.getElementById('sequences').value;
+            const lines = sequences.split('\n').filter(line => line.trim().length > 0);
+            const dnaRegex = /^[ACGTacgt]{20}$/;
+
+            const valid = lines.every(line => dnaRegex.test(line.trim()));
+
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = valid ? '' : 'Each sequence must be exactly 20 bases long and contain only A, C, G, or T';
+
+            if (valid) {
+                // Submit the form data via fetch
+                try {
+                    const bpOnly = document.getElementById('bpOnly').checked;
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('until_bp', bpOnly);
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(lines)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 400) {
+                            const error = await response.json();
+                            errorDiv.textContent = error.detail;
+                        } else {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    }
+
+                    const data = await response.json();
+
+                    // Create a blob with the JSON data
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+                    // Create a temporary link element
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = 'cloning_strategy.json';
+
+                    // Trigger the download
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+
+                    // Clean up
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(downloadLink.href);
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

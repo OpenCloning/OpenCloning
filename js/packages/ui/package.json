@@ -1,0 +1,62 @@
+{
+    "license": "MIT",
+    "name": "@opencloning/ui",
+    "version": "2.1.1",
+    "type": "module",
+    "main": "./src/index.js",
+    "scripts": {
+        "prepack": "node scripts/inject-version.js",
+        "postpack": "node scripts/reset-version.js"
+    },
+    "exports": {
+        ".": "./src/index.js",
+        "./components": "./src/components/index.js",
+        "./components/assembler": "./src/components/assembler/index.js",
+        "./components/dummy": "./src/components/dummy/index.js",
+        "./components/form/GetRequestMultiSelect": "./src/components/form/GetRequestMultiSelect.jsx",
+        "./components/form/RetryAlert": "./src/components/form/RetryAlert.jsx",
+        "./components/form/RequestStatusWrapper": "./src/components/form/RequestStatusWrapper.jsx",
+        "./components/form/PostRequestSelect": "./src/components/form/PostRequestSelect.jsx",
+        "./components/verification": "./src/components/verification/index.js",
+        "./providers/ConfigProvider": "./src/providers/index.js",
+        "./providers/DatabaseContext": "./src/providers/DatabaseContext.jsx",
+        "./hooks": "./src/hooks/index.js",
+        "./hooks/useLoadDatabaseFile": "./src/hooks/useLoadDatabaseFile.js",
+        "./hooks/useAlerts": "./src/hooks/useAlerts.js",
+        "./hooks/useCloningAlerts": "./src/hooks/useCloningAlerts.js",
+        "./hooks/useSequencingAlignment": "./src/hooks/useSequencingAlignment.js",
+        "./hooks/useBackendHttpClient": "./src/hooks/useBackendHttpClient.js",
+        "./components/SequenceViewer": "./src/components/SequenceViewer.jsx",
+        "./standalone": "./src/StandAloneOpenCloning.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OpenCloning/OpenCloning_frontend.git",
+        "directory": "packages/ui"
+    },
+    "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@mui/icons-material": "^5.18.0",
+        "@mui/material": "^5.18.0",
+        "@mui/x-data-grid": "^8.28.5",
+        "@opencloning/store": "workspace:*",
+        "@opencloning/utils": "workspace:*",
+        "@teselagen/bio-parsers": "^0.4.38",
+        "@teselagen/ove": "^0.8.42",
+        "@teselagen/range-utils": "^0.3.20",
+        "@teselagen/sequence-utils": "^0.3.42",
+        "@zip.js/zip.js": "^2.8.26",
+        "axios": "^1.20.0",
+        "lodash-es": "^4.18.1",
+        "react-draggable": "^4.5.0"
+    },
+    "peerDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-redux": "^8.1.3"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

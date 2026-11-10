@@ -1,0 +1,93 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: double-quote-string-fixer
+  - repo: https://github.com/psf/black
+    rev: 24.4.0
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+  # Hook to remove metadata changes from notebooks to avoid diff contamination
+  - repo: local
+    hooks:
+      - id: nbstripout
+        name: nbstripout with keep-output
+        entry: |
+          python -m nbstripout --keep-output $@
+        language: system
+        files: \.ipynb$
+        exclude: packages/opencloning/tests/
+  # Hook to ensure that httpx2 is only imported in the http_client.py file
+  - repo: local
+    hooks:
+      - id: httpx-import-check
+        name: httpx-import-check
+        entry: python scripts/check_httpx_imports.py
+        language: system
+        files: \.py$
+        exclude: |
+            (?x)^(
+                packages/opencloning/tests/.*|
+                scripts/.*|
+            )$
+  # Hook to ensure that primer3 is only imported in the primer3_functions.py file
+  # This is to centralize how the settings etc. are handled.
+  - repo: local
+    hooks:
+      - id: primer3-import-check
+        name: primer3-import-check
+        entry: python scripts/check_primer3_imports.py
+        language: system
+        files: \.py$
+        exclude: packages/opencloning/tests/
+  - repo: local
+    hooks:
+      - id: deptry
+        name: deptry
+        entry: uv run deptry --config packages/opencloning/pyproject.toml packages/opencloning/src
+        language: system
+        pass_filenames: false
+        files: |
+            (?x)^(
+                packages/opencloning/src/.*|
+                packages/opencloning/pyproject.toml|
+                pyproject.toml
+            )$
+        exclude: |
+            (?x)^(
+                packages/opencloning/tests/.*|
+                packages/opencloning-db/tests/.*|
+            )$
+  - repo: local
+    hooks:
+      - id: deptry-opencloning-db
+        name: deptry (opencloning-db)
+        entry: uv run deptry --config packages/opencloning-db/pyproject.toml packages/opencloning-db/src
+        language: system
+        pass_filenames: false
+        files: |
+            (?x)^(
+                packages/opencloning-db/src/.*|
+                packages/opencloning-db/pyproject.toml|
+                pyproject.toml
+            )$
+  - repo: local
+    hooks:
+      - id: deptry-opencloning-mcp
+        name: deptry (opencloning-mcp)
+        entry: uv run deptry --config packages/opencloning-mcp/pyproject.toml packages/opencloning-mcp/src
+        language: system
+        pass_filenames: false
+        files: |
+            (?x)^(
+                packages/opencloning-mcp/src/.*|
+                packages/opencloning-mcp/pyproject.toml|
+                pyproject.toml
+            )$

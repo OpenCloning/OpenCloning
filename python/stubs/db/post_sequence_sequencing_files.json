@@ -1,0 +1,31 @@
+{
+  "body": {
+    "multipart_files": [
+      {
+        "content": "SEQUENCING-RUN-1",
+        "content_type": "application/octet-stream",
+        "filename": "run.ab1"
+      }
+    ]
+  },
+  "endpoint": "/db/sequences/10/sequencing_files",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "POST",
+  "name": "post_sequence_sequencing_files",
+  "params": null,
+  "response": {
+    "body": [
+      {
+        "id": 4,
+        "original_name": "run.ab1"
+      }
+    ],
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

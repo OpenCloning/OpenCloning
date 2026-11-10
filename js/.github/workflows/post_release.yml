@@ -1,0 +1,118 @@
+name: App Post Release - Opencloning (Docker and Netlify)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build_and_push_docker_image:
+    if: startsWith(github.event.release.tag_name, 'opencloning-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract app name and version from tag
+        id: tag_info
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          # Extract app name (everything before -v)
+          APP_NAME="${TAG%-v*}"
+          # Extract version (everything after -v)
+          VERSION="v${TAG#*-v}"
+          echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "App: $APP_NAME, Version: $VERSION, Tag: $TAG"
+
+      - name: echo values
+        run: |
+          echo "App: ${{ steps.tag_info.outputs.app_name }}, Version: ${{ steps.tag_info.outputs.version }}, Tag: ${{ steps.tag_info.outputs.tag }}"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: manulera/opencloningfrontend
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6.9.0
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: .
+          push: true
+          tags: |
+            manulera/opencloningfrontend:latest
+            manulera/opencloningfrontend:prod
+            manulera/opencloningfrontend:${{ steps.tag_info.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push Docker image (with baseurl)
+        uses: docker/build-push-action@v6.9.0
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: .
+          push: true
+          tags: |
+            manulera/opencloningfrontend:latest-baseurl-opencloning
+            manulera/opencloningfrontend:prod-baseurl-opencloning
+            manulera/opencloningfrontend:${{ steps.tag_info.outputs.version }}-baseurl-opencloning
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BASE_URL=/opencloning/
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: manulera/opencloningfrontend:prod
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  deploy_to_netlify:
+    if: startsWith(github.event.release.tag_name, 'opencloning-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install dependencies
+        run: |
+          corepack enable
+          yarn install
+
+      - name: build
+        run: yarn build
+        env:
+          VITE_UMAMI_WEBSITE_ID: ${{ secrets.VITE_UMAMI_WEBSITE_ID }}
+          VITE_MCP_SERVER_URL: https://mcp.opencloning.org
+
+      - name: Publish to Netlify
+        run: |
+          npx netlify-cli deploy --no-build --json --filter opencloning --prod --dir ./apps/opencloning/build --message "production [${{ github.event.release.tag_name }}]"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          VITE_UMAMI_WEBSITE_ID: ${{ secrets.VITE_UMAMI_WEBSITE_ID }}
+

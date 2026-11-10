@@ -1,0 +1,23 @@
+{
+  "body": {
+    "name": "new",
+    "sequence": "GGCC"
+  },
+  "endpoint": "/db/primers",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "POST",
+  "name": "post_primer",
+  "params": null,
+  "response": {
+    "body": {
+      "id": 81
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

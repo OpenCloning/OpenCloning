@@ -1,0 +1,14 @@
+.primer-row {
+    display: flex;
+    align-items: center;
+}
+
+.primer-result-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.primer-row svg[data-testid] {
+    font-size: 1.2em;
+}

@@ -1,0 +1,95 @@
+{
+  "sequences": [
+    {
+      "id": 205,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       product                   18 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   205\nVERSION     205\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 aagaattccc gtcgacaa\n//"
+    },
+    {
+      "id": 202,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": -4,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       c_rc                       7 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description_rc.\nACCESSION   202\nVERSION     202\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 aattctt\n//"
+    },
+    {
+      "id": 203,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": -4,
+      "overhang_watson_3prime": -4,
+      "file_content": "LOCUS       d_rc                      12 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description_rc.\nACCESSION   203\nVERSION     203\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 tcgacgggaa tt\n//"
+    },
+    {
+      "id": 204,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": -4,
+      "file_content": "LOCUS       e_rc                       7 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description_rc.\nACCESSION   204\nVERSION     204\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ttgtcga\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 205,
+      "type": "LigationSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [
+        {
+          "type": "AssemblyFragment",
+          "sequence": 202,
+          "left_location": null,
+          "right_location": "4..7",
+          "reverse_complemented": false
+        },
+        {
+          "type": "AssemblyFragment",
+          "sequence": 203,
+          "left_location": "1..4",
+          "right_location": "9..12",
+          "reverse_complemented": false
+        },
+        {
+          "type": "AssemblyFragment",
+          "sequence": 204,
+          "left_location": "1..4",
+          "right_location": null,
+          "reverse_complemented": false
+        }
+      ],
+      "circular": false
+    },
+    {
+      "id": 202,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    },
+    {
+      "id": 203,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    },
+    {
+      "id": 204,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    }
+  ],
+  "primers": [],
+  "description": "",
+  "files": null,
+  "schema_version": "1.0.0",
+  "backend_version": null,
+  "frontend_version": null
+}

@@ -1,0 +1,118 @@
+{
+  "body": {
+    "backend_version": null,
+    "description": "",
+    "files": null,
+    "frontend_version": null,
+    "primers": [
+      {
+        "database_id": null,
+        "id": 4,
+        "name": "name",
+        "sequence": "ACGTACGT",
+        "type": "Primer"
+      },
+      {
+        "database_id": null,
+        "id": 3,
+        "name": "name",
+        "sequence": "GCGCGCGC",
+        "type": "Primer"
+      }
+    ],
+    "schema_version": "1.0.0",
+    "sequences": [
+      {
+        "file_content": "LOCUS       name                      22 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 acgtacgtaa aaaagcgcgc gc\n//",
+        "id": 2,
+        "overhang_crick_3prime": 0,
+        "overhang_watson_3prime": 0,
+        "sequence_file_format": "genbank",
+        "type": "TextFileSequence"
+      },
+      {
+        "file_content": "LOCUS       name                      30 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ccccacgtac gtaaaaaagc gcgcgccccc\n//",
+        "id": 1,
+        "overhang_crick_3prime": 0,
+        "overhang_watson_3prime": 0,
+        "sequence_file_format": "genbank",
+        "type": "TextFileSequence"
+      }
+    ],
+    "sources": [
+      {
+        "add_primer_features": false,
+        "circular": false,
+        "database_id": null,
+        "id": 2,
+        "input": [
+          {
+            "left_location": null,
+            "reverse_complemented": false,
+            "right_location": "1..8",
+            "sequence": 4,
+            "type": "AssemblyFragment"
+          },
+          {
+            "left_location": "5..12",
+            "reverse_complemented": false,
+            "right_location": "19..26",
+            "sequence": 1,
+            "type": "AssemblyFragment"
+          },
+          {
+            "left_location": "1..8",
+            "reverse_complemented": true,
+            "right_location": null,
+            "sequence": 3,
+            "type": "AssemblyFragment"
+          }
+        ],
+        "output_name": null,
+        "type": "PCRSource"
+      },
+      {
+        "database_id": null,
+        "id": 1,
+        "input": [],
+        "output_name": null,
+        "type": "ManuallyTypedSource"
+      }
+    ]
+  },
+  "endpoint": "/db/sequences",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "POST",
+  "name": "post_sequence",
+  "params": null,
+  "response": {
+    "body": {
+      "id": 84,
+      "mappings": [
+        {
+          "databaseId": 84,
+          "localId": 2
+        },
+        {
+          "databaseId": 83,
+          "localId": 1
+        },
+        {
+          "databaseId": 81,
+          "localId": 4
+        },
+        {
+          "databaseId": 82,
+          "localId": 3
+        }
+      ]
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

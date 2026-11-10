@@ -1,0 +1,135 @@
+name: CI / CD Pipeline
+on: [push, pull_request]
+
+# Avoid running multiple jobs for the same branch
+# in case of updates.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run tests with locked resolution and with a freshly resolved lockfile
+        mode: [lock, fresh]
+    env:
+      COMPOSE_PROJECT_NAME: opencloning-ci-${{ github.run_id }}-${{ matrix.mode }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: install mafft
+        run: |
+          sudo apt-get install -y mafft
+      - name: Download MARS executable
+        run: |
+          wget https://github.com/manulera/MARS/releases/download/v0.2/mars-Linux
+          chmod +x mars-Linux
+          sudo mv mars-Linux /usr/local/bin/mars
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 0.11.5
+          enable-cache: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Remove uv.lock (fresh resolution)
+        if: ${{ matrix.mode == 'fresh' }}
+        run: rm -f uv.lock
+      - name: Lock dependencies
+        if: ${{ matrix.mode == 'fresh' }}
+        run: uv lock
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Start Postgres (Compose)
+        run: docker compose -f docker/docker-compose.postgres.yml up -d --wait postgres
+      - name: Apply database migrations
+        env:
+          OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_test
+        run: uv run alembic -c packages/opencloning-db/alembic.ini upgrade head
+      - name: Run tests
+        env:
+          PYTHONUNBUFFERED: "1"
+          OPENCLONING_TEST_DATABASE_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_test
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+        run: |
+          uv run pytest --tb=short -v --capture=no --cov=packages/opencloning/src --cov=packages/opencloning-db/src --cov=packages/opencloning-mcp/src --cov-report term --cov-report xml:coverage.xml
+
+      - name: Stop Postgres (Compose)
+        if: always()
+        run: docker compose -f docker/docker-compose.postgres.yml down -v
+
+      - name: Stop workflow if mode is fresh
+        if: ${{ matrix.mode == 'fresh' }}
+        run: exit 0
+
+      - uses: actions/cache@v4
+        if: ${{ matrix.mode == 'lock' }}
+        id: cache-precommit
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-precommit-hooks-v2-${{ hashFiles('**/.pre-commit-config.yaml') }}
+
+      - name: Installing pre-commit hooks (cached)
+        if: ${{ matrix.mode == 'lock' && steps.cache-precommit.outputs.cache-hit != 'true' }}
+        run: uv run pre-commit install --install-hooks
+
+      - name: Run style checking via pre-commit
+        if: ${{ matrix.mode == 'lock' }}
+        run: uv run pre-commit run --all-files
+
+      - name: 🔼 Upload coverage to Codecov
+        if: ${{ matrix.mode == 'lock' }}
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
+
+  test_in_docker:
+    name: Test in Docker
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_PROJECT_NAME: opencloning-dockerci-${{ github.run_id }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/opencloning.Dockerfile
+          target: builder-test
+          tags: manulera/opencloningbackend-test
+
+      - name: Run tests in container (Compose)
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+        run: |
+          docker compose \
+            -f docker/docker-compose.postgres.yml \
+            -f docker/docker-compose.ci-tests.yml \
+            run --rm tests \
+            sh -c 'alembic -c packages/opencloning-db/alembic.ini upgrade head && python -m pytest -vs -o cache_dir=/tmp/pytest-cache'
+
+      - name: Tear down Compose (Docker tests)
+        if: always()
+        run: |
+          docker compose \
+            -f docker/docker-compose.postgres.yml \
+            -f docker/docker-compose.ci-tests.yml \
+            down -v

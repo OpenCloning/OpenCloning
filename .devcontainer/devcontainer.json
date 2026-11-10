@@ -1,0 +1,52 @@
+{
+  "name": "OpenCloning dev container",
+  // Mounts, capabilities and the Postgres sidecar are defined in docker-compose.yml
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "runServices": [
+    "db",
+    "app"
+  ],
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [
+    8000,
+    8001,
+    3000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "cloning API"
+    },
+    "8001": {
+      "label": "db API"
+    },
+    "3000": {
+      "label": "frontend API"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "ms-python.python",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck",
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteUser": "dev",
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": ""
+  },
+  "workspaceFolder": "/workspace",
+  "initializeCommand": "git submodule update --init --remote || echo 'Reference repos not updated; using current versions'",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/check-isolation.sh",
+  "postAttachCommand": "/usr/local/bin/check-isolation.sh",
+  // Runs before the firewall exists; seeding is destructive, so it stays manual
+  // "postCreateCommand": "uv sync --frozen && uv run opencloning-cli db migrate",
+  "waitFor": "postStartCommand"
+}

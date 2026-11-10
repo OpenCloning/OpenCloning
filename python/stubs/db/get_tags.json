@@ -1,0 +1,63 @@
+{
+  "body": null,
+  "endpoint": "/db/tags",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_tags",
+  "params": null,
+  "response": {
+    "body": [
+      {
+        "id": 1,
+        "name": "example_sequencing"
+      },
+      {
+        "id": 2,
+        "name": "cre_lox_recombination"
+      },
+      {
+        "id": 3,
+        "name": "restriction_then_ligation"
+      },
+      {
+        "id": 4,
+        "name": "crispr_hdr"
+      },
+      {
+        "id": 5,
+        "name": "golden_gate"
+      },
+      {
+        "id": 6,
+        "name": "gateway"
+      },
+      {
+        "id": 7,
+        "name": "gibson_assembly"
+      },
+      {
+        "id": 8,
+        "name": "homologous_recombination"
+      },
+      {
+        "id": 9,
+        "name": "restriction_ligation_assembly"
+      },
+      {
+        "id": 10,
+        "name": "templateless_PCR"
+      },
+      {
+        "id": 11,
+        "name": "golden-braid"
+      }
+    ],
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

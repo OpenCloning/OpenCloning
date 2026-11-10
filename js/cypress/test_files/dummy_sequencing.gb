@@ -1,0 +1,11 @@
+LOCUS       pj5_00001                226 bp    DNA     linear SYN 18-FEB-2025
+COMMENT             teselagen_unique_id: 5adf735aa1811801e17d8aac
+FEATURES             Location/Qualifiers
+     misc_feature    115..137
+                     /label="dummy_Feature"
+ORIGIN      
+        1 aacgtagttc taagcactgt aatgccatac tgttttagag ggtgatgctt cctaaaatct
+       61 ccttacataa agtaatacat ggattttact gccctgattc tatcgaaata tgctgttttt
+      121 tttattcgtt tttatttatt ttcaataatt tttttgtaat ataaatgtat agccatacat
+      181 cttgaactcc ttacaccaat acttcatatc cattagccat tttcct 
+//

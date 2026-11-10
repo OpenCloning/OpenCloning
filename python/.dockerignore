@@ -1,0 +1,11 @@
+.vscode/
+examples/
+.github/
+.venv/
+.git/
+.pytest_cache/
+.DS_Store
+.flake8
+__pycache__/
+frontend/
+dist/

@@ -1,0 +1,74 @@
+{
+    "sequences": [
+        {
+            "id": 2,
+            "type": "TextFileSequence",
+            "sequence_file_format": "genbank",
+            "sequence": {
+                "type": "file",
+                "file_extension": "gb",
+                "file_content": "LOCUS       pj5_00001                 27 bp    DNA     linear   SYN 15-JAN-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    10..17\n                     /label=\"A\"\nORIGIN\n        1 ggtctcaatt aaaaaattaa agagacc\n//",
+                "overhang_crick_3prime": 0,
+                "overhang_watson_3prime": 0
+            }
+        },
+        {
+            "id": 5,
+            "type": "TextFileSequence",
+            "sequence_file_format": "genbank",
+            "sequence": {
+                "type": "file",
+                "file_extension": "gb",
+                "file_content": "LOCUS       pj5_00001                 27 bp    DNA     linear   SYN 15-JAN-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    complement(10..17)\n                     /label=\"B\"\nORIGIN\n        1 ggtctcatta acccccatat agagacc\n//",
+                "overhang_crick_3prime": 0,
+                "overhang_watson_3prime": 0
+            }
+        },
+        {
+            "id": 7,
+            "type": "TextFileSequence",
+            "sequence_file_format": "genbank",
+            "sequence": {
+                "type": "file",
+                "file_extension": "gb",
+                "file_content": "LOCUS       pj5_00001                 27 bp    DNA     linear   SYN 15-JAN-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    10..17\n                     /label=\"C\"\nORIGIN\n        1 ggtctcaata tgggggccgg agagacc\n//",
+                "overhang_crick_3prime": 0,
+                "overhang_watson_3prime": 0
+            }
+        },
+        {
+            "id": 15,
+            "type": "TextFileSequence",
+            "sequence_file_format": "genbank",
+            "sequence": {
+                "type": "file",
+                "file_extension": "gb",
+                "file_content": "LOCUS       pj5_00001                 35 bp    DNA     circular SYN 15-JAN-2024\nDEFINITION  .\nACCESSION   pj5_00001\nVERSION     pj5_00001\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     teselagen_unique_id: 5adf735aa1811801e17d8aac\nFEATURES             Location/Qualifiers\n     misc_feature    11..25\n                     /label=\"VectorOUT\"\n     misc_feature    32..36\n                     /label=\"VectorIN\"\nORIGIN\n        1 ttttattaag agaccttttt ggtctcaccg gtttt\n//",
+                "overhang_crick_3prime": 0,
+                "overhang_watson_3prime": 0
+            }
+        },
+        {
+            "id": 19,
+            "type": "TextFileSequence",
+            "sequence_file_format": "genbank",
+            "sequence": {
+                "type": "file",
+                "file_extension": "gb",
+                "file_content": "LOCUS       name                      39 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\n     misc_feature    3..10\n                     /label=\"A\"\n     misc_feature    complement(12..19)\n                     /label=\"B\"\n     misc_feature    21..28\n                     /label=\"C\"\n     misc_feature    32..36\n                     /label=\"VectorIN\"\nORIGIN\n        1 attaaaaaat taacccccat atgggggccg gtttttttt\n//",
+                "overhang_crick_3prime": 0,
+                "overhang_watson_3prime": 0
+            }
+        }
+    ],
+    "files": [
+        {
+            "sequence_id": 2,
+            "file_name": "BZO903_13409037_13409037.ab1"
+        },
+        {
+            "sequence_id": 2,
+            "file_name": "BZO902_13409020_13409020.ab1"
+        }
+    ]
+}

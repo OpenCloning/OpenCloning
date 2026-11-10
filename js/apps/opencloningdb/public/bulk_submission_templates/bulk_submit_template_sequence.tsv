@@ -1,0 +1,5 @@
+name	sequence_type
+new_template_sequence_name	allele
+other_template_sequence_name	plasmid
+another_template_sequence_name	linear_dna
+

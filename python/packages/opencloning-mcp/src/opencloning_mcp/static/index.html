@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCloning MCP server</title>
+<meta name="description" content="Use OpenCloning from your AI assistant">
+<style>
+  :root { --primary: #1976d2; --light: #e8f1fb; --text: #444; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; color: var(--text); line-height: 1.55; background: #fff; font-size: 15px; }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3 { line-height: 1.2; font-weight: 700; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+  .banner { background: var(--primary); color: #fff; text-align: center; padding: 16px 0 16px; }
+  .banner h1 { font-size: 2em; margin: 0 0 2px; }
+  .banner p { color: #fff; font-size: 1.05em; margin: 0; }
+
+  section { padding: 18px 0; }
+  section.alt { background: var(--light); }
+  h2 { font-size: 1.4em; margin: 0 0 8px; }
+  p { margin: 0 0 8px; }
+
+  .tabs input { display: none; }
+  .tab-labels { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+  .tab-labels label { padding: 4px 16px; border-radius: 30px; border: 1px solid var(--primary); color: var(--primary); font-weight: 600; cursor: pointer; transition: .2s ease; }
+  .tab-labels label:hover { background: #fff; }
+  .panel { display: none; background: #fff; border: 1px solid #ececec; border-radius: 10px; padding: 6px 18px 8px; margin-top: 10px; }
+  #t1:checked ~ .tab-labels label[for=t1], #t2:checked ~ .tab-labels label[for=t2],
+  #t3:checked ~ .tab-labels label[for=t3], #t4:checked ~ .tab-labels label[for=t4],
+  #t5:checked ~ .tab-labels label[for=t5] { background: var(--primary); color: #fff; }
+  #t1:checked ~ #p1, #t2:checked ~ #p2, #t3:checked ~ #p3, #t4:checked ~ #p4, #t5:checked ~ #p5 { display: block; }
+
+  code { font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: 88%; background: var(--light); padding: 1px 6px; border-radius: 4px; color: #0d47a1; }
+  pre { background: #f6f8fa; border: 1px solid #ececec; border-radius: 10px; padding: 8px 12px; overflow-x: auto; margin: 8px 0; }
+  pre code { background: none; padding: 0; color: #212529; font-size: 90%; }
+
+  .prompts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0; }
+  .prompt { background: #fff; border-radius: 10px; padding: 8px 14px; font-size: .88em; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); }
+  .prompt p { margin: 0; line-height: 1.45; }
+  .prompt small { color: #6c757d; display: block; }
+  button.copy { font: inherit; font-weight: 600; background: var(--primary); color: #fff; border: 0; border-radius: 30px; padding: 2px 14px; cursor: pointer; font-size: .85em; width: 100%; }
+  button.copy:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); }
+
+  ol { margin: 6px 0; padding-left: 22px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  .card { background: #fff; border-radius: 10px; padding: 10px 16px; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); border-top: 4px solid var(--primary); }
+  .card.warn { border-top-color: #e65100; }
+  .card h3 { font-size: 1.05em; margin: 0 0 4px; }
+  .card p { margin: 0; }
+  @media (max-width: 640px) { .cards, .prompts { grid-template-columns: 1fr; } }
+
+  footer { text-align: center; padding: 12px; color: #6c757d; font-size: .9em; }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="container">
+    <h1>OpenCloning MCP server</h1>
+    <p>Plan cloning from your AI assistant, and open the result in OpenCloning</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <p>
+      This server lets an AI assistant build <a href="{{FRONTEND_URL}}">OpenCloning</a> cloning strategies step by step:
+      import sequences from files, NCBI or Addgene, design primers, and run PCR, restriction, ligation, Gibson,
+      Gateway and other assemblies. Server URL: <code>{{BASE_URL}}/mcp</code>
+    </p>
+    <div class="cards">
+      <div class="card">
+        <h3>Your result opens in OpenCloning</h3>
+        <p>When the design is ready, the assistant gives you a <b>link</b>. Click it to open the whole strategy in
+        <a href="{{FRONTEND_URL}}">OpenCloning</a>, where you can inspect and edit every step. If you don't get one, ask:
+        <i>"give me the link to open the strategy in OpenCloning"</i>.</p>
+      </div>
+      <div class="card warn">
+        <h3>Uploading files? Don't paste them in the chat</h3>
+        <p>Pasting a sequence file wastes your tokens and fails for binary files (SnapGene <code>.dna</code>).
+        Instead, <b>ask the assistant for an upload link</b>, upload the files there, and tell it when you're done.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Connect your assistant</h2>
+    <div class="tabs">
+      <input type="radio" name="tab" id="t1" checked>
+      <input type="radio" name="tab" id="t2">
+      <input type="radio" name="tab" id="t3">
+      <input type="radio" name="tab" id="t4">
+      <input type="radio" name="tab" id="t5">
+      <div class="tab-labels">
+        <label for="t1">Claude Code</label>
+        <label for="t2">Claude app</label>
+        <label for="t3">ChatGPT</label>
+        <label for="t4">Goose</label>
+        <label for="t5">Other clients</label>
+      </div>
+
+      <div class="panel" id="p1">
+        <p>Run this once in your terminal:</p>
+        <pre><code>claude mcp add --transport http opencloning {{BASE_URL}}/mcp</code></pre>
+        <p>Then start <code>claude</code> and check that it is connected with <code>/mcp</code>.</p>
+      </div>
+
+      <div class="panel" id="p2">
+        <ol>
+          <li>Open <b>Settings → Connectors</b> (in claude.ai or the desktop app).</li>
+          <li>Click <b>Add custom connector</b>.</li>
+          <li>Name it <code>OpenCloning</code> and paste the server URL: <code>{{BASE_URL}}/mcp</code></li>
+          <li>Save, and enable the connector in the chat where you want to use it.</li>
+        </ol>
+        <p><small>Custom connectors are not available on every plan.</small></p>
+      </div>
+
+      <div class="panel" id="p3">
+        <ol>
+          <li>Open <b>Settings → Connectors → Advanced</b> and turn on <b>Developer mode</b>.</li>
+          <li>Create a new connector, paste the server URL <code>{{BASE_URL}}/mcp</code>, and choose no authentication.</li>
+          <li>In a new chat, enable the connector from the tools menu.</li>
+        </ol>
+        <p><small>Custom connectors depend on your ChatGPT plan and workspace settings.</small></p>
+      </div>
+
+      <div class="panel" id="p4">
+        <p>In the terminal, start a session with the server as a remote extension:</p>
+        <pre><code>goose session --with-streamable-http-extension "{{BASE_URL}}/mcp"</code></pre>
+        <p>To keep it, run <code>goose configure</code> → <b>Add Extension</b> → <b>Remote Extension (Streaming HTTP)</b>, name it
+        <code>opencloning</code> and paste the URL. In Goose Desktop: <b>Extensions → Add custom extension</b>, type
+        <b>Streamable HTTP</b>, endpoint <code>{{BASE_URL}}/mcp</code>.</p>
+      </div>
+
+      <div class="panel" id="p5">
+        <p>Any client that supports remote MCP servers over HTTP (Cursor, VS Code, Gemini CLI...) works. Add this to its MCP configuration:</p>
+<pre><code>{
+  "mcpServers": {
+    "opencloning": {
+      "url": "{{BASE_URL}}/mcp"
+    }
+  }
+}</code></pre>
+        <p><small>The file and the name of the <code>url</code> key differ between clients (some use <code>httpUrl</code> or <code>serverUrl</code>, and VS Code uses <code>servers</code> with <code>"type": "http"</code>).</small></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Prompts to try</h2>
+    <p>Once connected, try one of these.</p>
+
+    <div class="prompts">
+    <div class="prompt">
+      <p id="prompt1">Using opencloning mcp, Let's get a pfa6a plasmid with kanamycin and a GFP, and design the primers to tag the klp2 gene with GFP in it's c-term. If the annotation of the klp2 cds is lost due to cutting, re-add it in the product. Then give me a link to open the strategy in opencloning.</p>
+      <button class="copy" data-target="prompt1">Copy</button>
+    </div>
+
+    <div class="prompt">
+      <p id="prompt2">Get the vectors pAG416GPD-EGFP-ccdB and pAG416GPD-ccdB-EGFP from addgene and clone the aldolase gene from E. coli reference strain in each of them using Gibson Assembly.</p>
+      <button class="copy" data-target="prompt2">Copy</button>
+    </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2>Where do my sequences live?</h2>
+    <p>
+      <b>When you use OpenCloning on its own, without MCP, your sequences are not stored anywhere.</b>
+      The MCP server is the exception: the assistant needs somewhere to keep your strategy between steps, so it is stored here.
+    </p>
+    <p>
+      There are no accounts. When you start working, the server creates a <b>long random token</b> for your strategy
+      and stores the sequences and primers on the server, under that token.
+      <b>Anyone who has the token can read and edit that strategy</b>, but it is 43 characters long and impossible
+      to guess. The token appears in the links the assistant gives you, so don't share those links publicly.
+      Everything is <b>deleted after 30 minutes without use</b>, so open or download your strategy before you leave.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <a href="https://opencloning.org">opencloning.org</a> ·
+  <a href="https://github.com/manulera/OpenCloning">GitHub</a>
+</footer>
+
+<script>
+  document.querySelectorAll('button.copy').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var text = document.getElementById(button.dataset.target).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        button.textContent = 'Copied!';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1500);
+      });
+    });
+  });
+</script>
+</body>
+</html>

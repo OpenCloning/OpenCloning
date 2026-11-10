@@ -1,0 +1,12 @@
+# Reverse proxy: http://localhost:3000/cloning/... → http://localhost:8000/cloning/...
+# Run your app on the host at :8000 first, then:
+#   docker compose -f docker/docker-compose.local-cloning-proxy.yml up
+services:
+  proxy:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.local-cloning-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,38 @@
+{
+    "version": "1.2.2",
+    "gb_file": "LOCUS       plasmid                  597 bp    DNA     linear   SYN 26-NOV-2024\nDEFINITION  .\nACCESSION   .\nVERSION     .\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nCOMMENT     Annotated with pLannotate v1.2.2\nFEATURES             Location/Qualifiers\n     rep_origin      5..593\n                     /note=\"pLannotate\"\n                     /label=\"ori\"\n                     /database=\"snapgene\"\n                     /identity=\"99.8\"\n                     /match_length=\"100.0\"\n                     /fragment=\"False\"\n                     /other=\"rep_origin\"\n     ncRNA           complement(44..148)\n                     /note=\"pLannotate\"\n                     /label=\"RNAI\"\n                     /database=\"Rfam\"\n                     /identity=\"100.0\"\n                     /match_length=\"102.9\"\n                     /fragment=\"False\"\n                     /other=\"ncRNA\"\nORIGIN\n        1 aaaattgaga tccttttttt ctgcgcgtaa tctgctgctt gcaaacaaaa aaaccaccgc\n       61 taccagcggt ggtttgtttg ccggatcaag agctaccaac tctttttccg aaggtaactg\n      121 gcttcagcag agcgcagata ccaaatactg ttcttctagt gtagccgtag ttaggccacc\n      181 acttcaagaa ctctgtagca ccgcctacat acctcgctct gctaatcctg ttaccagtgg\n      241 ctgctgccag tggcgataag tcgtgtctta ccgggttgga ctcaagacga tagttaccgg\n      301 ataaggcgca gcggtcgggc tgaacggggg gttcgtgcac acagcccagc ttggagcgaa\n      361 cgacctacac cgaactgaga tacctacagc gtgagctatg agaaagcgcc acgcttcccg\n      421 aagggagaaa ggcggacagg tatccggtaa gcggcagggt cggaacagga gagcgcacga\n      481 gggagcttcc agggggaaac gcctggtatc tttatagtcc tgtcgggttt cgccacctct\n      541 gacttgagcg tcgatttttg tgatgctcgt caggggggcg gagcctatgg aaaaaaa\n//\n",
+    "report": [
+        {
+            "sseqid": "ori",
+            "start_location": 4,
+            "end_location": 593,
+            "strand": 1,
+            "percent_identity": 99.83,
+            "full_length_of_feature_in_db": 589,
+            "length_of_found_feature": 589,
+            "percent_match_length": 100,
+            "fragment": false,
+            "database": "snapgene",
+            "Feature": "ori",
+            "Type": "rep_origin",
+            "Description": "high-copy-number ColE1/pMB1/pBR322/pUC origin of replication ",
+            "sequence": "TTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAA"
+        },
+        {
+            "sseqid": "1",
+            "start_location": 43,
+            "end_location": 148,
+            "strand": -1,
+            "percent_identity": 100,
+            "full_length_of_feature_in_db": 102,
+            "length_of_found_feature": 105,
+            "percent_match_length": 97.05882352941177,
+            "fragment": false,
+            "database": "Rfam",
+            "Feature": "RNAI",
+            "Type": "ncRNA",
+            "Description": "Accession: RF00106 - RNAI",
+            "sequence": "AGTATTTGGTATCTGCGCTCTGCTGAAGCCAGTTACCTTCGGAAAAAGAGTTGGTAGCTCTTGATCCGGCAAACAAACCACCGCTGGTAGCGGTGGTTTTTTTGT"
+        }
+    ]
+}

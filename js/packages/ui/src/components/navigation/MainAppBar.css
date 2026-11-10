@@ -1,0 +1,26 @@
+.app-bar {
+    position: relative;
+}
+
+.github-corner {
+    position: fixed !important;
+    top: 0px !important;
+    right: 0px !important;
+    padding: 0px !important;
+}
+
+
+.app-bar-container button[type="button"] {
+    font-size: large;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: white;
+}
+
+.app-name {
+    font-size: 4em;
+    font-weight: 200;
+    text-align: center;
+}
+
+

@@ -1,0 +1,31 @@
+{
+  "body": {
+    "name": "lacZ_renamed"
+  },
+  "endpoint": "/db/primers/37",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "PATCH",
+  "name": "patch_primer",
+  "params": null,
+  "response": {
+    "body": {
+      "created_at": "2000-01-01T00:00:00Z",
+      "created_by": {
+        "display_name": "Bootstrap User",
+        "id": 1
+      },
+      "id": 37,
+      "name": "lacZ_renamed",
+      "sequence": "GGGGACAAGTTTGTACAAAAAAGCAGGCTTAATGACCATGATTACGGATTC",
+      "tags": [],
+      "uid": null
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

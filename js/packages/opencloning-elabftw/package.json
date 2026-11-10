@@ -1,0 +1,30 @@
+{
+    "license": "MIT",
+    "name": "@opencloning/opencloning-elabftw",
+    "version": "2.1.1",
+    "type": "module",
+    "main": "./src/index.js",
+    "exports": {
+        ".": "./src/index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OpenCloning/OpenCloning_frontend.git",
+        "directory": "packages/opencloning-elabftw"
+    },
+    "dependencies": {
+        "@mui/icons-material": "^5.18.0",
+        "@mui/material": "^5.18.0",
+        "@opencloning/ui": "workspace:*",
+        "@opencloning/utils": "workspace:*",
+        "axios": "^1.20.0"
+    },
+    "peerDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-redux": "^8.1.3"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

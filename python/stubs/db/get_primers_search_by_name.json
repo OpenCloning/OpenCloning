@@ -1,0 +1,39 @@
+{
+  "body": null,
+  "endpoint": "/db/primers",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_primers_search_by_name",
+  "params": {
+    "name": "lacZ_attB1_fwd"
+  },
+  "response": {
+    "body": {
+      "items": [
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 37,
+          "name": "lacZ_attB1_fwd",
+          "sequence": "GGGGACAAGTTTGTACAAAAAAGCAGGCTTAATGACCATGATTACGGATTC",
+          "tags": [],
+          "uid": null
+        }
+      ],
+      "page": 1,
+      "pages": 1,
+      "size": 50,
+      "total": 1
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

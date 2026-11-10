@@ -1,0 +1,86 @@
+/* CSS variables - can be defined at the module level or use :root */
+:root {
+    --border-color: #EE220C;
+    --border-width: 2.5px;
+    --border-style: dashed;
+}
+
+.dna {
+    font-family: monospace;
+}
+
+.dna div {
+    white-space: pre;
+    min-height: 1em;
+}
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    height: auto;
+    text-align: left;
+}
+
+.boxContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.box {
+    align-self: stretch;
+    border: 3px solid black;
+    width: 5em;
+    margin-left: .2em;
+    margin-right: .2em;
+    overflow: hidden;
+    border-radius: 6px;
+    margin-bottom: var(--border-width);
+}
+
+.box .imageContainer {
+    text-align: center;
+}
+
+.imageContainer img {
+    height: 2.2em;
+}
+
+.overhang .watson {
+    border-left: var(--border-width) var(--border-style) var(--border-color);
+    border-bottom: var(--border-width) var(--border-style) var(--border-color);
+}
+
+.overhang .crick {
+    border-right: var(--border-width) var(--border-style) var(--border-color);
+}
+
+.inside .watson {
+    padding-bottom: var(--border-width);
+}
+
+.overhang {
+    padding-left: var(--border-width);
+    padding-right: var(--border-width);
+}
+
+.overhang.left .watson {
+    font-weight: bold;
+}
+
+.overhang.right .crick {
+    font-weight: bold;
+}
+
+.overhang .top {
+    padding-left: var(--border-width);
+    padding-right: var(--border-width);
+}
+
+.overhang .crick {
+    padding-left: var(--border-width);
+}

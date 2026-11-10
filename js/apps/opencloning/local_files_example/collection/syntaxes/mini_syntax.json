@@ -1,0 +1,44 @@
+{
+    "syntaxName": "MoClo YSD",
+    "assemblyEnzymes": ["BsaI"],
+    "domesticationEnzyme": "BsmBI",
+    "relatedDois": [
+      "10.1021/acssynbio.3c00743"
+    ],
+    "submitters": [
+      "0000-0002-8666-9746"
+    ],
+    "overhangNames": {
+      "TATG": "",
+      "ATCC": "",
+      "TGCT": ""
+    },
+    "parts": [
+      {
+        "id": 9,
+        "name": "3a'",
+        "info": "Non-standard N-term part",
+        "glyph": "cds",
+        "left_overhang": "TATG",
+        "right_overhang": "TGCT",
+        "left_inside": "",
+        "right_inside": "",
+        "left_codon_start": 2,
+        "right_codon_start": 2,
+        "color": "#f3eb91"
+      },
+      {
+        "id": 10,
+        "name": "3b'",
+        "info": "Non-standard C-term part",
+        "glyph": "cds",
+        "left_overhang": "TGCT",
+        "right_overhang": "ATCC",
+        "left_inside": "",
+        "right_inside": "",
+        "left_codon_start": 2,
+        "right_codon_start": 2,
+        "color": "#f3eb91"
+      }
+    ]
+  }

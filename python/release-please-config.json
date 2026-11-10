@@ -1,0 +1,47 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "release-type": "python",
+    "include-component-in-tag": true,
+    "include-v-in-tag": true,
+    "separate-pull-requests": false,
+    "packages": {
+        "packages/opencloning": {
+            "component": "opencloning",
+            "package-name": "opencloning",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": [
+                {
+                    "type": "generic",
+                    "path": "/packages/opencloning-db/pyproject.toml"
+                }
+            ]
+        },
+        "packages/opencloning-db": {
+            "component": "opencloning-db",
+            "package-name": "opencloning-db",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": [
+                {
+                    "type": "generic",
+                    "path": "/packages/opencloning-cli/pyproject.toml"
+                }
+            ]
+        },
+        "packages/opencloning-cli": {
+            "component": "opencloning-cli",
+            "package-name": "opencloning-cli",
+            "changelog-path": "CHANGELOG.md"
+        }
+    },
+    "plugins": [
+        {
+            "type": "linked-versions",
+            "groupName": "backend-packages",
+            "components": [
+                "opencloning",
+                "opencloning-db",
+                "opencloning-cli"
+            ]
+        }
+    ]
+}

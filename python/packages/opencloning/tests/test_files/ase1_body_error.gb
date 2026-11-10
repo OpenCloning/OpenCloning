@@ -1,0 +1,55 @@
+LOCUS       CU329670                4538 bp    DNA              UNK 01-JAN-1980
+DEFINITION  .
+ACCESSION   SPAPB1A10.09
+VERSION     SPAPB1A10.09
+KEYWORDS    .
+SOURCE      .
+  ORGANISM  .
+            .
+FEATURES             Location/Qualifiers
+     3'UTR           394..676
+                     /systematic_id="SPAPB1A10.08"
+                     /db_xref="PMID:21511999"
+     5'UTR           1001..1173
+                     /systematic_id="SPAPB1A10.09"
+                     /db_xref="PMID:30566651"
+                     /feature_source="evidence=ECO:0000309; source=SO:0001238;
+                     condition=FYECO:0000126; during=GO:0072690; score=146.757;
+                     db_xref=PMID:30566651"
+     CDS             join(1174..1597,1645..3416)
+                     /colour="2"
+                     /primary_name="ase1"
+                     /product="antiparallel microtubule cross-linking factor
+                     Ase1"
+                     /systematic_id="SPAPB1A10.09"
+                     /controlled_curation="term=modification, phosphorylated;
+                     db_xref=PMID:19547744; evidence=IDA; cv=pt_mod;
+                     date=20100606"
+                     /controlled_curation="term=orthologous to S. cerevisiae
+                     YOR058C; date=19700101"
+                     /controlled_curation="term=species distribution, conserved
+                     in eukaryotes; date=20081110"
+                     /controlled_curation="term=species distribution, conserved
+                     in metazoa; date=20081110"
+                     /controlled_curation="term=species distribution, conserved
+                     in vertebrates; date=20081110"
+                     /controlled_curation="term=species distribution,
+                     predominantly single copy (one to one); date=20081110"
+                     /controlled_curation="term=species distribution, conserved
+                     in fungi; date=20081110"
+                     /controlled_curation="term=species distribution, conserved
+                     in eukaryotes only; date=20081110"
+                     /translation="MQTVMMDDIQSTDSIAEKDNHSNNESNFTWKAFREQVEKHFSKIE
+                     RLHQVLGTDGDNSSLFELFTTAMNAQLHEMEQCQKKLEDDCQQRIDSIRFLVSSLKLTD
+                     DTSSLKIESPLIQCLNRLSMVEGQYMAQYDQKLSTIKEMYHKLESYCNRLGSPFVLPDF
+                     ENSFLSDVSDAFTESLRGRINEAEKEIDARLEVINSFEEEILGLWSELGVEPADVPQYE
+                     QLLESHTNRPNDVYVTQELIDQLCKQKEVFSAEKEKRSDHLKSIQSEVSNLWNKLQVSP
+                     NEQSQFGDSSNINQENISLWETELEKLHQLKKEHLPIFLEDCRQQILQLWDSLFYSEEQ
+                     RKSFTPMYEDIITEQVLTAHENYIKQLEAEVSANKSFLSLINRYASLIEGKKELEASSN
+                     DASRLTQRGRRDPGLLLREEKIRKRLSRELPKVQSLLIPEITAWEERNGRTFLFYDEPL
+                     LKICQEATQPKSLYRSASAAANRPKTATTTDSVNRTPSQRGRVAVPSTPSVRSASRAMT
+                     SPRTPLPRVKNTQNPSRSISAEPPSATSTANRRHPTANRIDINARLNSASRSRSANMIR
+                     QGANGSDSNMSSSPVSGNSNTPFNKFPNSVSRNTHFESKSPHPNYSRTPHETYSKASSK
+                     NVPLSPPKQRVVNEHALNIMSEKLQRTNLKEQTPEMDIENSSQNLPFSPMKISPIRASP
+                     VKTIPSSPSPTTNIFSAPLNNITNCTPMEDEWGEEGF*"
+     3'UTR           3417..

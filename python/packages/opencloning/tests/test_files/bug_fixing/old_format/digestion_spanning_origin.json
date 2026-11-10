@@ -1,0 +1,89 @@
+{
+  "sequences": [
+    {
+      "id": 2,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      10 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ttcaaaagaa\n//"
+    },
+    {
+      "id": 4,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      12 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ttcccccccg aa\n//"
+    },
+    {
+      "id": 6,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                       0 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "input": [],
+      "output": 2,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "user_input": "TTCaaaaGAA",
+      "circular": true
+    },
+    {
+      "id": 3,
+      "input": [],
+      "output": 4,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "user_input": "ttcccccccgaa",
+      "circular": true
+    },
+    {
+      "id": 5,
+      "input": [
+        2,
+        4
+      ],
+      "output": 6,
+      "type": "RestrictionAndLigationSource",
+      "output_name": null,
+      "database_id": null,
+      "circular": true,
+      "assembly": [
+        {
+          "sequence": 2,
+          "left_location": "1..10",
+          "right_location": "1..10",
+          "reverse_complemented": false
+        },
+        {
+          "sequence": 4,
+          "left_location": "1..12",
+          "right_location": "1..12",
+          "reverse_complemented": false
+        }
+      ],
+      "restriction_enzymes": [
+        "EcoRI"
+      ]
+    }
+  ],
+  "primers": [],
+  "description": "",
+  "files": null,
+  "schema_version": "0.2.9",
+  "backend_version": null,
+  "frontend_version": null
+}

@@ -1,0 +1,60 @@
+.import-primers-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.import-primers-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 800px;
+  background-color: #fff;
+  box-shadow: 24;
+  padding: 32px;
+  border-radius: 16px;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.import-primers-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+}
+
+.primers-table {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.primers-table th {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* This makes the two first columns narrow and the sequence column wider */
+.primers-table td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.primers-table td:nth-child(2) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.sequence-cell {
+  font-family: monospace;
+}
+
+.primer-add-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+}
+

@@ -1,0 +1,127 @@
+/* Adapted from https://github.com/dumptyd/treeflex */
+
+.tf-ancestor-tree {
+    position: relative;
+}
+
+.tf-ancestor-tree>div {
+    transform-origin: top left;
+    /* This is how you could potentially scale for screenshots */
+    /* transform: scale(0.5); */
+}
+
+.tf-ancestor-tree>div>ul {
+    transform: rotateX(180deg);
+}
+
+.node-text {
+    display: inline-block;
+    transform: rotateX(180deg);
+}
+
+.tf-tree {
+    font-size: 16px;
+}
+
+.tf-tree * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0
+}
+
+.tf-tree ul {
+    display: inline-flex;
+}
+
+.tf-tree li {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 0 1em;
+    position: relative
+}
+
+.tf-tree li ul {
+    margin-top: 2em
+}
+
+.tf-tree li li:before {
+    border-top: 2px solid #000;
+    content: "";
+    display: block;
+    height: .0625em;
+    left: -.03125em;
+    position: absolute;
+    top: -1.00em;
+    width: 100%;
+    z-index: -1;
+}
+
+.tf-tree li li:first-child:before {
+    left: calc(50% - .03125em);
+    max-width: calc(50% + .0625em)
+}
+
+.tf-tree li li:last-child:before {
+    left: auto;
+    max-width: calc(50% + .0625em);
+    right: calc(50% - .03125em)
+}
+
+.tf-tree li li:only-child:before {
+    display: none
+}
+
+.tf-tree li li:only-child>.tf-nc:before, .tf-tree li li:only-child>.tf-node-content:before {
+    height: 1.0625em;
+    top: -1.0625em
+}
+
+.tf-tree .tf-nc, .tf-tree .tf-node-content {
+    padding: .5em 1em;
+    position: relative
+}
+
+/* Sticking down */
+.tf-tree .tf-nc:before, .tf-tree .tf-node-content:before {
+    top: -1.2em
+}
+
+.tf-tree .tf-nc:after, .tf-tree .tf-nc:before, .tf-tree .tf-node-content:after, .tf-tree .tf-node-content:before {
+    border-left: 2px solid #000;
+    content: "";
+    display: block;
+    height: 1.2em;
+    left: calc(50% - .03125em);
+    position: absolute;
+    width: 2px;
+    z-index: -1;
+}
+
+.tf-tree .tf-nc:after, .tf-tree .tf-node-content:after {
+    top: calc(100% + .12em)
+}
+
+/* .tf-tree>div>ul>li>.tf-nc:before removes the things sticking to the bottom */
+.tf-tree .tf-nc:only-child:after, .tf-tree .tf-node-content:only-child:after, .tf-tree>div>ul>li>.tf-nc:before, .tf-tree>div>ul>li>.tf-node-content:before {
+    display: none
+}
+
+.tf-tree.tf-gap-sm li {
+    padding: 0 .6em
+}
+
+.tf-tree.tf-gap-sm li>.tf-nc:before, .tf-tree.tf-gap-sm li>.tf-node-content:before {
+    height: .6em;
+    top: -.6em
+}
+
+.tf-tree.tf-gap-sm li>.tf-nc:after, .tf-tree.tf-gap-sm li>.tf-node-content:after {
+    height: .6em
+}
+
+.tf-nc {
+    border-radius: 15px;
+    text-align: center;
+}

@@ -1,0 +1,2172 @@
+2018 InterLab Devices:
+- backbone: pSB1C3
+  description: Interlab 2018 Positive Control
+  id: 42
+  part: BBa_I20270
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 1
+  id: 43
+  part: BBa_J364000
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 2
+  id: 44
+  part: BBa_J364001
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 3
+  id: 45
+  part: BBa_J364002
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 4
+  id: 46
+  part: BBa_J364007
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 5
+  id: 47
+  part: BBa_J364008
+- backbone: pSB1C3
+  description: Interlab 2018 Test Device 6
+  id: 48
+  part: BBa_J364009
+2022 InterLab Devices:
+- backbone: pSB1C3
+  description: Interlab_NegC
+  id: 56
+  part: BBa_J428100
+- backbone: pSB1C3
+  description: DC_PC_ins_BBa_J06504
+  id: 54
+  part: BBa_J428101
+- backbone: pSB1C3
+  description: DC_PC_ins_K2656022
+  id: 482
+  part: BBa_J428102
+- backbone: pSB1C3
+  description: DC_R_ins_K2656022
+  id: 55
+  part: BBa_J428104
+- backbone: pSB1C3
+  description: DC_G_ins_BBa_K592100
+  id: 53
+  part: BBa_J428106
+- backbone: pSB1C3
+  description: DC_G_ins_BBa_J06504
+  id: 52
+  part: BBa_J428107
+- backbone: pSB1C3
+  description: DC_B_ins_BBa_J06504
+  id: 50
+  part: BBa_J428108
+- backbone: pSB1C3
+  description: DC_B_ins_K2656022
+  id: 51
+  part: BBa_J428109
+- backbone: pSB1C3
+  description: 3_Colors_ins_BBa_E1010
+  id: 57
+  part: BBa_J428110
+- backbone: pSB1C3
+  description: 3_Colors_ins_BBa_J06504
+  id: 58
+  part: BBa_J428111
+- backbone: pSB1C3
+  description: 3_Colors_ins_K2656022
+  id: 59
+  part: BBa_J428112
+Anderson Promoters:
+- backbone: pSB1C5SA
+  description: BBa_J23100
+  id: 17
+  part: BBa_J23100
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23101
+  id: 485
+  part: BBa_J23101
+- backbone: pSB1C5SA
+  description: BBa_J23102
+  id: 73
+  part: BBa_J23102
+- backbone: pSB1C5SA
+  description: Promoters_in_vector_BBa_J23103
+  id: 600
+  part: BBa_J23103
+- backbone: pSB1C5SA
+  description: BBa_J23105
+  id: 18
+  part: BBa_J23105
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23106
+  id: 486
+  part: BBa_J23106
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23107
+  id: 483
+  part: BBa_J23107
+- backbone: pSB1C5SA
+  description: Promoters_in_vector_BBa_J23108
+  id: 597
+  part: BBa_J23108
+- backbone: pSB1C5SA
+  description: BBa_J23109
+  id: 19
+  part: BBa_J23109
+- backbone: pSB1C5SA
+  description: BBa_J23110
+  id: 20
+  part: BBa_J23110
+- backbone: pSB1C5SA
+  description: Promoters_in_vector_BBa_J23111
+  id: 594
+  part: BBa_J23111
+- backbone: pSB1C5SA
+  description: Promoters_in_vector_BBa_J23113
+  id: 590
+  part: BBa_J23113
+- backbone: pSB1C5SA
+  description: BBa_J23114
+  id: 21
+  part: BBa_J23114
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23115
+  id: 490
+  part: BBa_J23115
+- backbone: pSB1C5SA
+  description: BBa_J23116
+  id: 22
+  part: BBa_J23116
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23117
+  id: 487
+  part: BBa_J23117
+- backbone: pSB1C3SA
+  description: Promoters_in_vector_BBa_J23118
+  id: 488
+  part: BBa_J23118
+- backbone: pSB1C5SA
+  description: BBa_J23119
+  id: 23
+  part: BBa_J23119
+Asimov:
+- backbone: BBa_J433100
+  description: P1 reference plasmid (hEF1a)
+  id: 571
+  part: BBa_J433048
+- backbone: BBa_J433100
+  description: P1 process control plasmid (EFS)
+  id: 572
+  part: BBa_J433049
+- backbone: BBa_J433100
+  description: P1 process control plasmid (chEF1a)
+  id: 573
+  part: BBa_J433050
+- backbone: BBa_J433100
+  description: P1 process control plasmid (hCMV)
+  id: 574
+  part: BBa_J433051
+- backbone: BBa_J433100
+  description: P1.2 3'UTR-polyA scaffold
+  id: 568
+  part: BBa_J433053
+- backbone: BBa_J433100
+  description: P2.1 transcription factor (hEF1a) scaffold
+  id: 569
+  part: BBa_J433054
+- backbone: BBa_J433100
+  description: P2.2 transcription factor (EFS) scaffold
+  id: 570
+  part: BBa_J433055
+- backbone: BBa_J433207
+  description: P1.1 promoter-5'UTR scaffold
+  id: 567
+  part: BBa_J433209
+Asimov Mammalian Parts:
+- backbone: BBa_J433103
+  description: CMV_v1
+  id: 540
+  part: BBa_J433000
+- backbone: BBa_J433103
+  description: hEF1a_v3
+  id: 542
+  part: BBa_J433001
+- backbone: BBa_J433103
+  description: EFS
+  id: 543
+  part: BBa_J433002
+- backbone: BBa_J433104
+  description: 5UTR13
+  id: 551
+  part: BBa_J433003
+- backbone: BBa_J433104
+  description: uORFs (1x weak)
+  id: 552
+  part: BBa_J433004
+- backbone: BBa_J433104
+  description: uORFs (1x)
+  id: 553
+  part: BBa_J433005
+- backbone: BBa_J433104
+  description: uORFs (4x)
+  id: 554
+  part: BBa_J433006
+- backbone: BBa_J433135
+  description: TagBFP v2
+  id: 548
+  part: BBa_J433011
+- backbone: BBa_J433135
+  description: YFP v2
+  id: 549
+  part: BBa_J433012
+- backbone: BBa_J433125
+  description: iRFP720
+  id: 550
+  part: BBa_J433013
+- backbone: BBa_J433145
+  description: Gaussia Luciferase
+  id: 533
+  part: BBa_J433016
+- backbone: BBa_J433106
+  description: Inert/synthetic1 3UTR
+  id: 555
+  part: BBa_J433018
+- backbone: BBa_J433106
+  description: inert/synthetic2 3UTR
+  id: 556
+  part: BBa_J433019
+- backbone: BBa_J433107
+  description: bGH
+  id: 558
+  part: BBa_J433021
+- backbone: BBa_J433107
+  description: rb glob
+  id: 557
+  part: BBa_J433023
+- backbone: BBa_J433133
+  description: UAS-Gal4-minCMV
+  id: 532
+  part: BBa_J433026
+- backbone: BBa_J433125
+  description: Gal4-VP16
+  id: 544
+  part: BBa_J433029
+- backbone: BBa_J433100
+  description: L1 hEF1a-YFP positive control
+  id: 521
+  part: BBa_J433040
+- backbone: BBa_J433100
+  description: L1 PGK-BFP positive control
+  id: 522
+  part: BBa_J433041
+- backbone: BBa_J433100
+  description: L1 hEF1a-RFP positive control
+  id: 523
+  part: BBa_J433042
+- backbone: BBa_J433100
+  description: L1 hEF1a-YFP-IRES-RFP positive control
+  id: 524
+  part: BBa_J433043
+- backbone: BBa_J433103
+  description: L0 promoter
+  id: 535
+  part: BBa_J433045
+- backbone: BBa_J433105
+  description: L0 Kozak-CDS
+  id: 537
+  part: BBa_J433045
+- backbone: BBa_J433106
+  description: L0 3'UTR
+  id: 538
+  part: BBa_J433045
+- backbone: BBa_J433107
+  description: L0 polyA
+  id: 539
+  part: BBa_J433045
+- backbone: BBa_J433104
+  description: L0 5'UTR
+  id: 536
+  part: BBa_J433066
+CRISPR-Cas:
+- backbone: pSB1C5C
+  description: Anti_CRISPR_AcrIIA2_mammalian
+  id: 32
+  part: BBa_J428055
+- backbone: pSB1C5C
+  description: Cas_variants_ABE8e_TadA_8e_V106W
+  id: 33
+  part: BBa_J428056
+- backbone: pSB1C5C
+  description: Cas_variants_CP1028_ABE8e
+  id: 34
+  part: BBa_J428057
+- backbone: pSB1C5C
+  description: His_TwinStrep_SUMO_LwCas13a
+  id: 35
+  part: BBa_J428058
+- backbone: pSB1C5C
+  description: Cas_variants_dhLwCas13a
+  id: 36
+  part: BBa_J428059
+- backbone: pSB1C5C
+  description: Cas_variants_dhSpCas9
+  id: 37
+  part: BBa_J428060
+- backbone: pSB1C5C
+  description: Cas_variants_hLwCas13a
+  id: 38
+  part: BBa_J428061
+- backbone: pSB1C5C
+  description: Cas_variants_hSpCas9
+  id: 39
+  part: BBa_J428062
+- backbone: pSB1C5C
+  description: Nickases_Cas9n_D10A
+  id: 40
+  part: BBa_J428063
+- backbone: pSB1C5C
+  description: Nickases_Cas9n_H840A
+  id: 41
+  part: BBa_J428064
+- backbone: pSB1C5C
+  description: Anti_CRISPR_AcrIIA2_bacterial
+  id: 60
+  part: BBa_J428066
+Cell-Cell Communication:
+- backbone: pSB1C5C
+  description: BBa_C0062
+  id: 115
+  part: BBa_C0062
+- backbone: pSB1C5C
+  description: BBa_C0070
+  id: 116
+  part: BBa_C0070
+- backbone: pSB1C5C
+  description: BBa_C0179
+  id: 117
+  part: BBa_C0179
+- backbone: pSB1C5SA
+  description: Prhl_NM
+  id: 119
+  part: BBa_J428031
+- backbone: pSB1C5SA
+  description: BBa_K1529300
+  id: 84
+  part: BBa_K1529300
+- backbone: pSB1C5SA
+  description: BBa_K649000
+  id: 118
+  part: BBa_K649000
+- backbone: pSB1C3SA
+  description: Cell_Comm_Promoters_BBa_R0051
+  id: 498
+  part: BBa_R0051
+Chromoproteins:
+- backbone: pSB1C5C
+  description: tsPurple
+  id: 4
+  part: BBa_K1033906
+- backbone: pSB1C5C
+  description: amajLime
+  id: 5
+  part: BBa_K1033916
+- backbone: pSB1C5C
+  description: gfasPurple
+  id: 6
+  part: BBa_K1033919
+- backbone: pSB1C5C
+  description: asPink
+  id: 7
+  part: BBa_K1033933
+- backbone: pSB1C5C
+  description: cjBlue
+  id: 78
+  part: BBa_K592011
+- backbone: pSB1C5C
+  description: aeBlue
+  id: 8
+  part: BBa_K864401
+E. coli Protein Expression Tookit:
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_Riboj54_F1
+  id: 154
+  part: BBa_J435302
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD2_pelB
+  id: 155
+  part: BBa_J435303
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_BCD12
+  id: 157
+  part: BBa_J435305
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2N3_fuGFP
+  id: 158
+  part: BBa_J435306
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_OMMLV
+  id: 159
+  part: BBa_J435307
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_SUMO_protease
+  id: 160
+  part: BBa_J435308
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_MBP
+  id: 163
+  part: BBa_J435311
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_Riboj_B34
+  id: 164
+  part: BBa_J435312
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_CBD
+  id: 165
+  part: BBa_J435313
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2N3_AmilCP
+  id: 168
+  part: BBa_J435316
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_Bst-LF
+  id: 169
+  part: BBa_J435317
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_Calmodulin
+  id: 170
+  part: BBa_J435318
+- backbone: '[+] BBa_J435500 [+]'
+  description: DN5_TEVcut
+  id: 171
+  part: BBa_J435319
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_R5
+  id: 173
+  part: BBa_J435321
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD12
+  id: 174
+  part: BBa_J435322
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_Cex
+  id: 175
+  part: BBa_J435323
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2C_GS flexible
+  id: 177
+  part: BBa_J435325
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2N3_GS flexible
+  id: 178
+  part: BBa_J435326
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_OpenVent
+  id: 179
+  part: BBa_J435327
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_fuGFP
+  id: 180
+  part: BBa_J435328
+- backbone: '[+] BBa_J435500 [+]'
+  description: DF_TEVcut_fuGFP_His_Stop_TZ
+  id: 181
+  part: BBa_J435329
+- backbone: '[+] BBa_J435500 [+]'
+  description: high copy (pUC) ori/KanR
+  id: 182
+  part: BBa_J435330
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_CipA
+  id: 183
+  part: BBa_J435331
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD23
+  id: 184
+  part: BBa_J435332
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_MBP
+  id: 185
+  part: BBa_J435333
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1C_His_TEVcut
+  id: 186
+  part: BBa_J435334
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2C_TEVcut
+  id: 187
+  part: BBa_J435335
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_RNAseInhibitor
+  id: 189
+  part: BBa_J435337
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_AmilCP
+  id: 190
+  part: BBa_J435338
+- backbone: '[+] BBa_J435500 [+]'
+  description: N4N5_Int_SaltS
+  id: 191
+  part: BBa_J435339
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_3xStop
+  id: 193
+  part: BBa_J435341
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD2_His
+  id: 194
+  part: BBa_J435342
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_R5
+  id: 195
+  part: BBa_J435343
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN2_BCD2_His
+  id: 196
+  part: BBa_J435344
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_BCD2_His_TEVcut
+  id: 197
+  part: BBa_J435345
+- backbone: '[+] BBa_J435500 [+]'
+  description: N3C_TEV
+  id: 198
+  part: BBa_J435346
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_BsuLF
+  id: 199
+  part: BBa_J435347
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_TthRNAseH
+  id: 200
+  part: BBa_J435348
+- backbone: '[+] BBa_J435500 [+]'
+  description: N4N5_GS flexible
+  id: 201
+  part: BBa_J435349
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_T7_lacO
+  id: 202
+  part: BBa_J435350
+- backbone: '[+] BBa_J435500 [+]'
+  description: EF_ECK9600
+  id: 203
+  part: BBa_J435351
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_RiboJ_B34_His
+  id: 204
+  part: BBa_J435352
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_GST
+  id: 205
+  part: BBa_J435353
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN2_RiboJ_B34
+  id: 206
+  part: BBa_J435354
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_BCD2_His_fuGFP_TEVcut
+  id: 207
+  part: BBa_J435355
+- backbone: '[+] BBa_J435500 [+]'
+  description: "N3C_int_\u201A\xC4\xF6\u221A\u2020\u221A\xFAI"
+  id: 208
+  part: BBa_J435356
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_UvsY
+  id: 209
+  part: BBa_J435357
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_EcRNAseH
+  id: 210
+  part: BBa_J435358
+- backbone: '[+] BBa_J435500 [+]'
+  description: N4E_3xStop
+  id: 211
+  part: BBa_J435359
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_pTac
+  id: 212
+  part: BBa_J435360
+- backbone: '[+] BBa_J435500 [+]'
+  description: EF_T7term
+  id: 213
+  part: BBa_J435361
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD2_DsbA
+  id: 214
+  part: BBa_J435362
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_CipA
+  id: 215
+  part: BBa_J435363
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_B0034
+  id: 216
+  part: BBa_J435364
+- backbone: '[+] BBa_J435500 [+]'
+  description: "N2N3_int_\u201A\xC4\xF6\u221A\u2020\u221A\xFAI"
+  id: 217
+  part: BBa_J435365
+- backbone: '[+] BBa_J435500 [+]'
+  description: N3C_fuGFP
+  id: 218
+  part: BBa_J435366
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_UvsX
+  id: 219
+  part: BBa_J435367
+- backbone: '[+] BBa_J435500 [+]'
+  description: DN4_Int_SaltS
+  id: 220
+  part: BBa_J435368
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_6H
+  id: 221
+  part: BBa_J435369
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD2
+  id: 222
+  part: BBa_J435370
+- backbone: '[+] BBa_J435500 [+]'
+  description: EF_TZ
+  id: 223
+  part: BBa_J435371
+- backbone: '[+] BBa_J435500 [+]'
+  description: BN1_BCD2_OmpT
+  id: 224
+  part: BBa_J435372
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_S-Tag
+  id: 225
+  part: BBa_J435373
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_B0032
+  id: 226
+  part: BBa_J435374
+- backbone: '[+] BBa_J435500 [+]'
+  description: N2N3_SUMO
+  id: 227
+  part: BBa_J435375
+- backbone: '[+] BBa_J435500 [+]'
+  description: N3C_GS flexible linker
+  id: 228
+  part: BBa_J435376
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_PBCV-1_ligase
+  id: 229
+  part: BBa_J435377
+- backbone: '[+] BBa_J435500 [+]'
+  description: DN4_Int_ThiolS
+  id: 230
+  part: BBa_J435378
+- backbone: '[+] BBa_J435500 [+]'
+  description: N5E_CBD
+  id: 231
+  part: BBa_J435379
+- backbone: '[+] BBa_J435500 [+]'
+  description: beta-galactosidase
+  id: 232
+  part: BBa_J435380
+- backbone: '[+] BBa_J435500 [+]'
+  description: fuGFP
+  id: 233
+  part: BBa_J435381
+- backbone: '[+] BBa_J435500 [+]'
+  description: sarcGFP
+  id: 235
+  part: BBa_J435383
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_BCD23
+  id: 237
+  part: BBa_J435385
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_RiboJ_RBS64
+  id: 239
+  part: BBa_J435387
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_gp32
+  id: 240
+  part: BBa_J435388
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_HIVRT
+  id: 241
+  part: BBa_J435389
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_HRP
+  id: 242
+  part: BBa_J435390
+- backbone: '[+] BBa_J435500 [+]'
+  description: CD_TEV_protease
+  id: 243
+  part: BBa_J435391
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_T7RNApol_Stop
+  id: 244
+  part: BBa_J435392
+- backbone: '[+] BBa_J435500 [+]'
+  description: DF_TEVcut_His_Stop_TZ
+  id: 245
+  part: BBa_J435393
+- backbone: '[+] BBa_J435500 [+]'
+  description: DT4_fuGFP
+  id: 246
+  part: BBa_J435394
+- backbone: '[+] BBa_J435500 [+]'
+  description: DT4_TEV
+  id: 247
+  part: BBa_J435395
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_Calm
+  id: 248
+  part: BBa_J435396
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_GB1
+  id: 249
+  part: BBa_J435397
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4T5_AmilCP
+  id: 250
+  part: BBa_J435398
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4T5_fuGFP
+  id: 251
+  part: BBa_J435399
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4T5_Int_ThiolS
+  id: 252
+  part: BBa_J435400
+- backbone: '[+] BBa_J435500 [+]'
+  description: T5E_Calm
+  id: 253
+  part: BBa_J435401
+Fluorescent Reporter Proteins:
+- backbone: pSB1C5C
+  description: eCFP
+  id: 9
+  part: BBa_E0020
+- backbone: pSB1C5C
+  description: eYFP
+  id: 10
+  part: BBa_E0030
+- backbone: pSB1C5C
+  description: BBa_E0040_TypeIIS_variant
+  id: 604
+  part: BBa_J119040
+- backbone: pSB1C5C
+  description: mCerulean3
+  id: 15
+  part: BBa_J428035
+- backbone: pSB1C5C
+  description: mRFP1
+  id: 16
+  part: BBa_J428036
+- backbone: pSB1C5C
+  description: EiraCFP
+  id: 11
+  part: BBa_J97000
+- backbone: pSB1C5C
+  description: TannenRFP
+  id: 12
+  part: BBa_J97003
+- backbone: pSB1C5C
+  description: mTagBFP
+  id: 13
+  part: BBa_K592100
+- backbone: pSB1C5C
+  description: SYFP2
+  id: 14
+  part: BBa_K864100
+InterLab Devices in pOpen_v4:
+- backbone: BBa_J435502
+  description: 2018_Interlab_I20270
+  id: 605
+  part: BBa_I20270
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364000
+  id: 602
+  part: BBa_J364000
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364001
+  id: 599
+  part: BBa_J364001
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364002
+  id: 596
+  part: BBa_J364002
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364007
+  id: 581
+  part: BBa_J364007
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364008
+  id: 593
+  part: BBa_J364008
+- backbone: BBa_J435502
+  description: 2018_Interlab_J364009
+  id: 589
+  part: BBa_J364009
+- backbone: BBa_J435502
+  description: Interlab_NegC
+  id: 582
+  part: BBa_J428100
+One-Step Integration:
+- backbone: null
+  description: pE-FLP
+  id: 437
+  part: BBa_J435114
+- backbone: null
+  description: pOSIP-CH (with CCDB)
+  id: 438
+  part: BBa_J435115
+Open Enzymes:
+- backbone: '[+] BBa_J435500 [+]'
+  description: "9\xB0N-7 DNA polymerase"
+  id: 350
+  part: BBa_J435000
+- backbone: '[+] BBa_J435500 [+]'
+  description: TEV protease
+  id: 351
+  part: BBa_J435001
+- backbone: '[+] BBa_J435500 [+]'
+  description: DNA Topoisomerase 1B Vaccinia Virus
+  id: 352
+  part: BBa_J435002
+- backbone: '[+] BBa_J435500 [+]'
+  description: "Pyrococcus Sp. Heat-Stable DNA Polymerase (Deep Vent\u2122 (exo\u2013\
+    ) at NEB)"
+  id: 353
+  part: BBa_J435003
+- backbone: '[+] BBa_J435500 [+]'
+  description: "9\xB0N-7 DNA Polymerase chain terminating (NEB > Therminator DNA Pol)"
+  id: 354
+  part: BBa_J435004
+- backbone: '[+] BBa_J435500 [+]'
+  description: DNA Ligase IV
+  id: 355
+  part: BBa_J435005
+- backbone: '[+] BBa_J435500 [+]'
+  description: EcoRI restriction enzyme
+  id: 356
+  part: BBa_J435006
+- backbone: '[+] BBa_J435500 [+]'
+  description: T7 RNA Polymerase
+  id: 357
+  part: BBa_J435007
+- backbone: '[+] BBa_J435500 [+]'
+  description: Eco31I restriction enzyme
+  id: 358
+  part: BBa_J435008
+- backbone: '[+] BBa_J435500 [+]'
+  description: NotI restriction enzyme
+  id: 359
+  part: BBa_J435009
+- backbone: '[+] BBa_J435500 [+]'
+  description: HindIII restriction enzyme
+  id: 360
+  part: BBa_J435010
+- backbone: '[+] BBa_J435500 [+]'
+  description: DNA Polymerase I, Large (Klenow) Fragment
+  id: 361
+  part: BBa_J435011
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 Polynucleotide Kinase
+  id: 362
+  part: BBa_J435012
+- backbone: '[+] BBa_J435500 [+]'
+  description: lambda red operon (exo, bet, gam)
+  id: 363
+  part: BBa_J435013
+- backbone: '[+] BBa_J435500 [+]'
+  description: Taq DNA Polymerase
+  id: 364
+  part: BBa_J435014
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sulfolobus DNA Polymerase IV
+  id: 365
+  part: BBa_J435015
+- backbone: '[+] BBa_J435500 [+]'
+  description: 9 Degrees North DNA Ligase
+  id: 366
+  part: BBa_J435016
+- backbone: '[+] BBa_J435500 [+]'
+  description: EcoRI methyltransferase
+  id: 367
+  part: BBa_J435017
+- backbone: '[+] BBa_J435500 [+]'
+  description: SP6 RNA Polymerase
+  id: 368
+  part: BBa_J435018
+- backbone: '[+] BBa_J435500 [+]'
+  description: Eco31IA methyltransferase
+  id: 369
+  part: BBa_J435019
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.NotI methyltransferase
+  id: 370
+  part: BBa_J435020
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.HindIII methyltransferase
+  id: 371
+  part: BBa_J435021
+- backbone: '[+] BBa_J435500 [+]'
+  description: DNA Polymerase I, Large (Klenow) Fragment (3__5_ exo-)
+  id: 372
+  part: BBa_J435022
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 Phage _-glucosyltransferase
+  id: 373
+  part: BBa_J435023
+- backbone: '[+] BBa_J435500 [+]'
+  description: Uracil DNA glycosylase
+  id: 374
+  part: BBa_J435024
+- backbone: '[+] BBa_J435500 [+]'
+  description: "Tli DNA polymerase (exo-) (available from NEB as VentR\xAE (exo-)\
+    \ DNA Polymerase)"
+  id: 375
+  part: BBa_J435025
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 DNA Polymerase
+  id: 376
+  part: BBa_J435026
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pfu DNA Ligase
+  id: 377
+  part: BBa_J435027
+- backbone: '[+] BBa_J435500 [+]'
+  description: PstI restriction enzyme
+  id: 378
+  part: BBa_J435028
+- backbone: '[+] BBa_J435500 [+]'
+  description: Eco31IB methyltransferase
+  id: 380
+  part: BBa_J435029
+- backbone: '[+] BBa_J435500 [+]'
+  description: SfiI (used to create cDNA libraries)
+  id: 381
+  part: BBa_J435030
+- backbone: '[+] BBa_J435500 [+]'
+  description: DpnI restriction enzyme
+  id: 382
+  part: BBa_J435031
+- backbone: '[+] BBa_J435500 [+]'
+  description: E. coli DNA Polymerase I
+  id: 383
+  part: BBa_J435032
+- backbone: '[+] BBa_J435500 [+]'
+  description: T7EI (T7 Endonuclease I)
+  id: 384
+  part: BBa_J435033
+- backbone: '[+] BBa_J435500 [+]'
+  description: Formamidopyrimidine DNA Glycosylase
+  id: 385
+  part: BBa_J435034
+- backbone: '[+] BBa_J435500 [+]'
+  description: Tth DNA polymerase
+  id: 386
+  part: BBa_J435035
+- backbone: '[+] BBa_J435500 [+]'
+  description: T7 DNA Polymerase (unmodified)
+  id: 387
+  part: BBa_J435036
+- backbone: '[+] BBa_J435500 [+]'
+  description: Taq DNA Ligase
+  id: 388
+  part: BBa_J435037
+- backbone: '[+] BBa_J435500 [+]'
+  description: PstI methyltransferase
+  id: 389
+  part: BBa_J435038
+- backbone: '[+] BBa_J435500 [+]'
+  description: SapI restriction enzyme
+  id: 391
+  part: BBa_J435039
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.SfiI methyltransferase
+  id: 392
+  part: BBa_J435040
+- backbone: '[+] BBa_J435500 [+]'
+  description: Bst polymerase, High fidelity
+  id: 393
+  part: BBa_J435041
+- backbone: '[+] BBa_J435500 [+]'
+  description: KlenTaq1 polymerase
+  id: 394
+  part: BBa_J435042
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 PGD (T4 Endonuclease V)
+  id: 395
+  part: BBa_J435043
+- backbone: '[+] BBa_J435500 [+]'
+  description: Endonuclease IV E. coli
+  id: 396
+  part: BBa_J435044
+- backbone: '[+] BBa_J435500 [+]'
+  description: Bst DNA Polymerase, Full Length
+  id: 397
+  part: BBa_J435045
+- backbone: '[+] BBa_J435500 [+]'
+  description: T5 DNA Polymerase
+  id: 398
+  part: BBa_J435046
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 RNA Ligase 1
+  id: 399
+  part: BBa_J435047
+- backbone: '[+] BBa_J435500 [+]'
+  description: Moloney Murine Leukemia Virus (MMLV) Reverse Transcriptase (RNAse H
+    deactivated by 3 mutations)
+  id: 400
+  part: BBa_J435048
+- backbone: '[+] BBa_J435500 [+]'
+  description: M1.SapI methyltransferase
+  id: 402
+  part: BBa_J435049
+- backbone: '[+] BBa_J435500 [+]'
+  description: EcoRV restriction enzyme
+  id: 403
+  part: BBa_J435050
+- backbone: '[+] BBa_J435500 [+]'
+  description: Extreme Thermostable Single-Stranded DNA Binding Protein
+  id: 404
+  part: BBa_J435051
+- backbone: '[+] BBa_J435500 [+]'
+  description: KOD DNA polymerase
+  id: 405
+  part: BBa_J435052
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4 gene 32
+  id: 406
+  part: BBa_J435053
+- backbone: '[+] BBa_J435500 [+]'
+  description: Endonuclease VIII E. coli
+  id: 407
+  part: BBa_J435054
+- backbone: '[+] BBa_J435500 [+]'
+  description: Bst DNA Polymerase, Large Fragment
+  id: 408
+  part: BBa_J435055
+- backbone: '[+] BBa_J435500 [+]'
+  description: T4-DNA Ligase
+  id: 409
+  part: BBa_J435056
+- backbone: '[+] BBa_J435500 [+]'
+  description: CIP (calf intestinal phosphatase)
+  id: 410
+  part: BBa_J435057
+- backbone: '[+] BBa_J435500 [+]'
+  description: Moloney Murine Leukemia Virus (MMLV) Reverse Transcriptase RNaseH -
+    (lacking RNaseH domain) (SuperScriptII)
+  id: 411
+  part: BBa_J435058
+- backbone: '[+] BBa_J435500 [+]'
+  description: M2.SapI methyltransferase
+  id: 413
+  part: BBa_J435059
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.EcoRV methyltransferase
+  id: 414
+  part: BBa_J435060
+- backbone: '[+] BBa_J435500 [+]'
+  description: T5 Exonuclease
+  id: 415
+  part: BBa_J435061
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pwo DNA Polymerase
+  id: 416
+  part: BBa_J435062
+- backbone: '[+] BBa_J435500 [+]'
+  description: P45 (ArchaeMaxx/PfuTurbo)
+  id: 417
+  part: BBa_J435063
+- backbone: '[+] BBa_J435500 [+]'
+  description: Exonuclease III E. coli
+  id: 418
+  part: BBa_J435064
+- backbone: '[+] BBa_J435500 [+]'
+  description: Bsu DNA Polymerase I, Large Fragment
+  id: 419
+  part: BBa_J435065
+- backbone: '[+] BBa_J435500 [+]'
+  description: E. coli DNA Ligase
+  id: 420
+  part: BBa_J435066
+- backbone: '[+] BBa_J435500 [+]'
+  description: RNAse A
+  id: 421
+  part: BBa_J435067
+- backbone: '[+] BBa_J435500 [+]'
+  description: Thermus thermophilus (Tth) RT
+  id: 422
+  part: BBa_J435068
+- backbone: '[+] BBa_J435500 [+]'
+  description: XbaI restriction enzyme
+  id: 424
+  part: BBa_J435069
+- backbone: '[+] BBa_J435500 [+]'
+  description: NcoI restriction enzyme
+  id: 425
+  part: BBa_J435070
+- backbone: '[+] BBa_J435500 [+]'
+  description: Tth DNA Ligase K294R
+  id: 426
+  part: BBa_J435071
+- backbone: '[+] BBa_J435500 [+]'
+  description: "Pyrococcus Sp. Heat-Stable (exo\u2013) DNA Polymerase (Deep Vent\u2122\
+    \ (exo\u2013) DNA Polymerase at NEB)"
+  id: 427
+  part: BBa_J435072
+- backbone: '[+] BBa_J435500 [+]'
+  description: Bovine DNTT
+  id: 428
+  part: BBa_J435073
+- backbone: '[+] BBa_J435500 [+]'
+  description: phi29 DNA Polymerase
+  id: 429
+  part: BBa_J435074
+- backbone: '[+] BBa_J435500 [+]'
+  description: DNA Lligase III
+  id: 430
+  part: BBa_J435075
+- backbone: '[+] BBa_J435500 [+]'
+  description: RNAse H
+  id: 431
+  part: BBa_J435076
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3 RNA Polymerase
+  id: 432
+  part: BBa_J435077
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.XbaI methyltransferase
+  id: 434
+  part: BBa_J435078
+- backbone: '[+] BBa_J435500 [+]'
+  description: M.NcoI methyltransferase
+  id: 435
+  part: BBa_J435079
+- backbone: '[+] BBa_J435500 [+]'
+  description: dNK from drosophila
+  id: 436
+  part: BBa_J435080
+Open Reporters:
+- backbone: '[+] BBa_J435500 [+]'
+  description: gfasPurple/gfasCP Biobrick K1033918
+  id: 120
+  part: BBa_J435081
+- backbone: '[+] BBa_J435500 [+]'
+  description: amilGFP Biobrick K592010
+  id: 121
+  part: BBa_J435082
+- backbone: '[+] BBa_J435500 [+]'
+  description: meffRed/meffRFP Biobricks K592012
+  id: 122
+  part: BBa_J435083
+- backbone: '[+] BBa_J435500 [+]'
+  description: Firefly Luciferase [Photinus pyralis] (Fluc)
+  id: 123
+  part: BBa_J435084
+- backbone: '[+] BBa_J435500 [+]'
+  description: meffCFP
+  id: 124
+  part: BBa_J435085
+- backbone: '[+] BBa_J435500 [+]'
+  description: eechGFP1
+  id: 125
+  part: BBa_J435086
+- backbone: '[+] BBa_J435500 [+]'
+  description: pporRFP
+  id: 126
+  part: BBa_J435087
+- backbone: '[+] BBa_J435500 [+]'
+  description: Luciferase [Luciola cruciata] (Japanese firefly)
+  id: 127
+  part: BBa_J435088
+- backbone: '[+] BBa_J435500 [+]'
+  description: mmilCFP
+  id: 128
+  part: BBa_J435089
+- backbone: '[+] BBa_J435500 [+]'
+  description: eechGFP2
+  id: 129
+  part: BBa_J435090
+- backbone: '[+] BBa_J435500 [+]'
+  description: meleRFP
+  id: 130
+  part: BBa_J435091
+- backbone: '[+] BBa_J435500 [+]'
+  description: Renilla luciferase
+  id: 131
+  part: BBa_J435092
+- backbone: '[+] BBa_J435500 [+]'
+  description: meleCFP
+  id: 132
+  part: BBa_J435093
+- backbone: '[+] BBa_J435500 [+]'
+  description: eechGFP3
+  id: 133
+  part: BBa_J435094
+- backbone: '[+] BBa_J435500 [+]'
+  description: scubRFP
+  id: 134
+  part: BBa_J435095
+- backbone: '[+] BBa_J435500 [+]'
+  description: beta-lactamase
+  id: 135
+  part: BBa_J435096
+- backbone: '[+] BBa_J435500 [+]'
+  description: efasGFP
+  id: 137
+  part: BBa_J435098
+- backbone: '[+] BBa_J435500 [+]'
+  description: eforRed/eforCP Biobrick K592012
+  id: 138
+  part: BBa_J435099
+- backbone: '[+] BBa_J435500 [+]'
+  description: Calf Intestine Alkaline phosphatase (CIAP)
+  id: 139
+  part: BBa_J435100
+- backbone: '[+] BBa_J435500 [+]'
+  description: gfasGFP
+  id: 141
+  part: BBa_J435102
+- backbone: '[+] BBa_J435500 [+]'
+  description: amajLime/amajCFP/amFP486 BioBrick K1033916
+  id: 142
+  part: BBa_J435103
+- backbone: '[+] BBa_J435500 [+]'
+  description: cjBlue/ BioBrick K592011
+  id: 143
+  part: BBa_J435104
+- backbone: '[+] BBa_J435500 [+]'
+  description: palmGFP
+  id: 145
+  part: BBa_J435106
+- backbone: '[+] BBa_J435500 [+]'
+  description: EiraCFP Biobrick J97000
+  id: 146
+  part: BBa_J435107
+- backbone: '[+] BBa_J435500 [+]'
+  description: beta-galactosidasealphadomain
+  id: 147
+  part: BBa_J435108
+- backbone: '[+] BBa_J435500 [+]'
+  description: afraGFP
+  id: 148
+  part: BBa_J435109
+- backbone: '[+] BBa_J435500 [+]'
+  description: amilRFP
+  id: 149
+  part: BBa_J435110
+- backbone: '[+] BBa_J435500 [+]'
+  description: horseradish peroxidase (HRP)
+  id: 150
+  part: BBa_J435111
+- backbone: '[+] BBa_J435500 [+]'
+  description: spisPink/spisCPBiobrickK1033925
+  id: 236
+  part: BBa_J435384
+Open Yeast:
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pAdh1
+  id: 254
+  part: BBa_J435200
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pCUP1
+  id: 255
+  part: BBa_J435201
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pCYC1
+  id: 256
+  part: BBa_J435202
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pLeu2
+  id: 257
+  part: BBa_J435203
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pMF2
+  id: 258
+  part: BBa_J435204
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pMFA1
+  id: 259
+  part: BBa_J435205
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pMFalpha2
+  id: 260
+  part: BBa_J435206
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pRPL18B
+  id: 261
+  part: BBa_J435207
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pSAC6
+  id: 262
+  part: BBa_J435208
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pTDH3
+  id: 263
+  part: BBa_J435209
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pTrp1
+  id: 264
+  part: BBa_J435210
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_Sc-pCYC1
+  id: 265
+  part: BBa_J435211
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_Pp-pGAP
+  id: 266
+  part: BBa_J435212
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_Pp-pAOX1
+  id: 267
+  part: BBa_J435213
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScMET17
+  id: 269
+  part: BBa_J435215
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScAUR1
+  id: 270
+  part: BBa_J435216
+- backbone: '[+] BBa_J435500 [+]'
+  description: Cre
+  id: 271
+  part: BBa_J435217
+- backbone: '[+] BBa_J435500 [+]'
+  description: FLP
+  id: 272
+  part: BBa_J435218
+- backbone: '[+] BBa_J435500 [+]'
+  description: GPP synthase
+  id: 273
+  part: BBa_J435219
+- backbone: '[+] BBa_J435500 [+]'
+  description: GGPP synthase
+  id: 274
+  part: BBa_J435220
+- backbone: '[+] BBa_J435500 [+]'
+  description: FPP synthase
+  id: 275
+  part: BBa_J435221
+- backbone: '[+] BBa_J435500 [+]'
+  description: carveol dehydrogenase
+  id: 276
+  part: BBa_J435222
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScGal4-DNA-AD
+  id: 277
+  part: BBa_J435223
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScGal4-DNA-BD
+  id: 278
+  part: BBa_J435224
+- backbone: '[+] BBa_J435500 [+]'
+  description: N1N2_SV40_NLS
+  id: 279
+  part: BBa_J435225
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pp_aMF_sec_tag
+  id: 280
+  part: BBa_J435226
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pp_aMF_noEAEA_sec_tag
+  id: 281
+  part: BBa_J435227
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tENO1
+  id: 282
+  part: BBa_J435228
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tENO2
+  id: 283
+  part: BBa_J435229
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tTDH1
+  id: 284
+  part: BBa_J435230
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pp-tAOX1
+  id: 285
+  part: BBa_J435231
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL-start
+  id: 286
+  part: BBa_J435232
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL1
+  id: 287
+  part: BBa_J435233
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL2
+  id: 288
+  part: BBa_J435234
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL3
+  id: 289
+  part: BBa_J435235
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL4
+  id: 290
+  part: BBa_J435236
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL5
+  id: 291
+  part: BBa_J435237
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR-end-rev
+  id: 292
+  part: BBa_J435238
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR5'-LEU2
+  id: 293
+  part: BBa_J435239
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR5'-URA3
+  id: 294
+  part: BBa_J435240
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR5'-HO
+  id: 295
+  part: BBa_J435241
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR3'-HO
+  id: 296
+  part: BBa_J435242
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR5'-NTS
+  id: 297
+  part: BBa_J435243
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR3'-NTS
+  id: 298
+  part: BBa_J435244
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR5'-RGI2
+  id: 299
+  part: BBa_J435245
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR3'-RGI2
+  id: 300
+  part: BBa_J435246
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR5'-ENO
+  id: 301
+  part: BBa_J435247
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR3'-ENO
+  id: 302
+  part: BBa_J435248
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR5'-AOXTT
+  id: 303
+  part: BBa_J435249
+- backbone: '[+] BBa_J435500 [+]'
+  description: PpHR3'-AOXTT
+  id: 304
+  part: BBa_J435250
+- backbone: '[+] BBa_J435500 [+]'
+  description: Pichia PARS
+  id: 305
+  part: BBa_J435251
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScADE2-marker
+  id: 306
+  part: BBa_J435252
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScURA3-marker
+  id: 307
+  part: BBa_J435253
+- backbone: '[+] BBa_J435500 [+]'
+  description: OYC-bridge-AGAC-CGAA
+  id: 308
+  part: BBa_J435254
+- backbone: '[+] BBa_J435500 [+]'
+  description: OYC-bridge-AGAC-GCAA
+  id: 309
+  part: BBa_J435255
+- backbone: '[+] BBa_J435500 [+]'
+  description: OYC-CamR
+  id: 310
+  part: BBa_J435256
+- backbone: '[+] BBa_J435500 [+]'
+  description: OYC-SpecR
+  id: 311
+  part: BBa_J435257
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pCCW12
+  id: 312
+  part: BBa_J435258
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pHis3
+  id: 313
+  part: BBa_J435259
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pSte5
+  id: 314
+  part: BBa_J435260
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-pUra3
+  id: 315
+  part: BBa_J435261
+- backbone: '[+] BBa_J435500 [+]'
+  description: AB_Sc-pCCW12
+  id: 316
+  part: BBa_J435262
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tSSA1
+  id: 317
+  part: BBa_J435263
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConL-start-rev
+  id: 318
+  part: BBa_J435264
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR1
+  id: 319
+  part: BBa_J435265
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR2
+  id: 320
+  part: BBa_J435266
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR3
+  id: 321
+  part: BBa_J435267
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR4
+  id: 322
+  part: BBa_J435268
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR5
+  id: 323
+  part: BBa_J435269
+- backbone: '[+] BBa_J435500 [+]'
+  description: AConR-end
+  id: 324
+  part: BBa_J435270
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR3'-LEU2
+  id: 325
+  part: BBa_J435271
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHR3'-URA3
+  id: 326
+  part: BBa_J435272
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHIS3-marker
+  id: 327
+  part: BBa_J435273
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tUBX6
+  id: 329
+  part: BBa_J435274
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc-tPRM9
+  id: 330
+  part: BBa_J435275
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScHygro-marker
+  id: 332
+  part: BBa_J435277
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScNAT-marker
+  id: 333
+  part: BBa_J435278
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScTRP1-marker
+  id: 334
+  part: BBa_J435279
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScZeo-marker
+  id: 335
+  part: BBa_J435280
+- backbone: '[+] BBa_J435500 [+]'
+  description: pWV01-ori
+  id: 337
+  part: BBa_J435282
+- backbone: '[+] BBa_J435500 [+]'
+  description: 4S-limonene-synthase
+  id: 338
+  part: BBa_J435283
+- backbone: '[+] BBa_J435500 [+]'
+  description: limonene-3-hydroxylase
+  id: 339
+  part: BBa_J435284
+- backbone: '[+] BBa_J435500 [+]'
+  description: S-linalool synthase
+  id: 340
+  part: BBa_J435285
+- backbone: '[+] BBa_J435500 [+]'
+  description: oriT
+  id: 342
+  part: BBa_J435286
+- backbone: '[+] BBa_J435500 [+]'
+  description: ScKanR-marker
+  id: 343
+  part: BBa_J435287
+- backbone: '[+] BBa_J435500 [+]'
+  description: Sc2micron
+  id: 348
+  part: BBa_J435290
+Plants:
+- backbone: pSB1C5C
+  description: Bar
+  id: 61
+  part: BBa_J428072
+- backbone: pSB1C5A
+  description: CaMV35S
+  id: 68
+  part: BBa_J428074
+- backbone: pSB1C5A
+  description: MAS_pro
+  id: 70
+  part: BBa_J428075
+- backbone: see notes
+  description: GFP
+  id: 62
+  part: BBa_J428076
+- backbone: pSB1C5C
+  description: NPTII
+  id: 63
+  part: BBa_J428077
+- backbone: pSB1C5C
+  description: hph
+  id: 65
+  part: BBa_J428078
+- backbone: pSB1C5C
+  description: mCherry
+  id: 66
+  part: BBa_J428079
+- backbone: pSB1C5A
+  description: LHB1B2
+  id: 69
+  part: BBa_J428080
+- backbone: pSB1C5D
+  description: OCS
+  id: 72
+  part: BBa_J428081
+- backbone: pSB1C3SB
+  description: Plant_fiveUTRs_CMV1_UTR
+  id: 511
+  part: BBa_J428084
+- backbone: pSB1C3SA
+  description: Plant_promoters_short_AtU6
+  id: 512
+  part: BBa_J428085
+- backbone: pSB1C3SB
+  description: Plant_fiveUTRs_TMV_SV40
+  id: 513
+  part: BBa_J428086
+- backbone: pSB1C3SB
+  description: Plant_fiveUTRs_TMV
+  id: 514
+  part: BBa_J428087
+- backbone: pSB1C3SB
+  description: Plant_fiveUTRs_AtRbcS2B_5UTR
+  id: 515
+  part: BBa_J428088
+- backbone: pSB1C3SD
+  description: threeUTRs_short_CaMV35S_3UTR
+  id: 516
+  part: BBa_J428089
+- backbone: pSB1C5SB
+  description: TMV_chloroplast_transit
+  id: 67
+  part: BBa_J428090
+- backbone: pSB1C3SB
+  description: fiveUTRs_TMV_chloroplast_transit
+  id: 517
+  part: BBa_J428090
+- backbone: pSB1C5A
+  description: PDF1_2
+  id: 71
+  part: BBa_K1467103
+- backbone: pSB1C5C
+  description: RUBY
+  id: 64
+  part: BBa_K3900028
+Plastic Degradation:
+- backbone: pSB1C5C
+  description: PETase_EcCO_WT
+  id: 31
+  part: BBa_J428065
+- backbone: pSB1C3C
+  description: library_PETase_W159H_S238F
+  id: 518
+  part: BBa_J428067
+- backbone: pSB1C5C
+  description: IsPETase-W159H-S238F with C-terminal Hexahistidine Tag
+  id: 29
+  part: BBa_K2910000
+- backbone: pSB1C5C
+  description: IsPETase-T88F-I208Y-S238F-S245Y-R280A with C-terminal Hexahistidine
+    Tag
+  id: 30
+  part: BBa_K2910003
+- backbone: pSB1C3C
+  description: PETase_library_K3039002
+  id: 519
+  part: BBa_K3039002
+- backbone: pSB1C5C
+  description: BHETase 1
+  id: 28
+  part: BBa_K3039005
+RBSs:
+- backbone: pSB1C5SB
+  description: BBa_B0030_m0
+  id: 24
+  part: BBa_J428032
+- backbone: pSB1C5SB
+  description: BCD1
+  id: 26
+  part: BBa_J428034
+- backbone: pSB1C5SB
+  description: BBa_B0031_m0
+  id: 74
+  part: BBa_J428037
+- backbone: pSB1C5SB
+  description: BBa_B0034_m1
+  id: 76
+  part: BBa_J428038
+- backbone: pSB1C3SB
+  description: RBSs_in_vector_SpoVG
+  id: 484
+  part: BBa_J428039
+- backbone: pSB1C5SB
+  description: RBSs_in_vector_BCD13
+  id: 586
+  part: BBa_J434008
+- backbone: pSB1C5SB
+  description: BCD12
+  id: 27
+  part: BBa_K2680529
+- backbone: pSB1C5SB
+  description: BBa_B0033_m0
+  id: 75
+  part: BBa_K2680530
+- backbone: pSB1C3SB
+  description: RBSs_in_vector_BBa_B0032_m0
+  id: 520
+  part: BBa_K2680531
+- backbone: pSB1C5SB
+  description: BCD8
+  id: 77
+  part: BBa_K2680561
+- backbone: pSB1C3SB
+  description: RBSs_in_vector_BBa_Z0262
+  id: 489
+  part: BBa_Z0262
+Small Molecule Inducers:
+- backbone: pSB1C5C
+  description: AraC
+  id: 106
+  part: BBa_J428022
+- backbone: pSB1C5C
+  description: BetI_AM
+  id: 81
+  part: BBa_J428023
+- backbone: pSB1C5C
+  description: CinR_AM
+  id: 108
+  part: BBa_J428024
+- backbone: pSB1C5C
+  description: CymR_AM
+  id: 109
+  part: BBa_J428025
+- backbone: pSB1C5C
+  description: EryR
+  id: 82
+  part: BBa_J428026
+- backbone: pSB1C5C
+  description: MphR_AM
+  id: 83
+  part: BBa_J428027
+- backbone: pSB1C5C
+  description: TetR
+  id: 110
+  part: BBa_J428028
+- backbone: pSB1C5C
+  description: TtgR_AM
+  id: 111
+  part: BBa_J428029
+- backbone: pSB1C5SA
+  description: pAcu
+  id: 114
+  part: BBa_J428030
+- backbone: pSB1C3SA
+  description: Promoters_pTtg
+  id: 492
+  part: BBa_J428040
+- backbone: pSB1C3SA
+  description: Promoters_pL_lac0_1
+  id: 493
+  part: BBa_J428041
+- backbone: pSB1C3SA
+  description: Promoters_pBetI
+  id: 500
+  part: BBa_J428047
+- backbone: pSB1C5C
+  description: AraC_AM_AraE
+  id: 107
+  part: BBa_J428093
+- backbone: pSB1C5C
+  description: Coding_sequences_AraE
+  id: 598
+  part: BBa_J434001
+- backbone: pSB1C5C
+  description: Coding_sequences_LuxR
+  id: 591
+  part: BBa_J434002
+- backbone: pSB1C5C
+  description: Coding_sequences_PcaU_AM
+  id: 587
+  part: BBa_J434003
+- backbone: pSB1C3SA
+  description: Promoters_pTac
+  id: 499
+  part: BBa_K2572025
+- backbone: pSB1C3SA
+  description: Promoters_BBa_K2680520
+  id: 509
+  part: BBa_K2680520
+- backbone: pSB1C5C
+  description: LacI-AM
+  id: 80
+  part: BBa_K2680537
+- backbone: pSB1C5C
+  description: Coding_sequences_BBa_K3317004
+  id: 601
+  part: BBa_K3317004
+- backbone: pSB1C5SA
+  description: pVanCC
+  id: 112
+  part: BBa_K3317006
+- backbone: pSB1C3SA
+  description: Promoters_BBa_K3317007
+  id: 501
+  part: BBa_K3317007
+- backbone: pSB1C5SA
+  description: Promoters_pMph
+  id: 606
+  part: BBa_K3386002
+- backbone: pSB1C5SA
+  description: BBa_R0010
+  id: 113
+  part: BBa_R0010
+Terminators:
+- backbone: pSB1C3SD
+  description: Terminators_in_vector_rpoC_T
+  id: 491
+  part: BBa_J428069
+- backbone: pSB1C5SD
+  description: BBa_B0012
+  id: 1
+  part: BBa_J428091
+- backbone: pSB1C5SD
+  description: BBa_B0015
+  id: 2
+  part: BBa_J428092
+- backbone: pSB1C5SD
+  description: Terminators_in_vector_BBa_B0010
+  id: 603
+  part: BBa_J434007
+TetR Orthologs:
+- backbone: pSB1C5SA
+  description: pAmeR
+  id: 85
+  part: BBa_J428000
+- backbone: pSB1C5SA
+  description: pAmtR
+  id: 86
+  part: BBa_J428001
+- backbone: pSB1C5SA
+  description: pButR
+  id: 87
+  part: BBa_J428002
+- backbone: pSB1C5SA
+  description: pHapR
+  id: 88
+  part: BBa_J428003
+- backbone: pSB1C5SA
+  description: pHlyllR
+  id: 89
+  part: BBa_J428004
+- backbone: pSB1C5SA
+  description: pPsrA
+  id: 90
+  part: BBa_J428005
+- backbone: pSB1C5SA
+  description: pScbR
+  id: 91
+  part: BBa_J428006
+- backbone: pSB1C5SA
+  description: pSmcR
+  id: 92
+  part: BBa_J428007
+- backbone: pSB1C5C
+  description: AmeR
+  id: 93
+  part: BBa_J428008
+- backbone: pSB1C5C
+  description: AmtR
+  id: 94
+  part: BBa_J428009
+- backbone: pSB1C5C
+  description: BetI
+  id: 95
+  part: BBa_J428010
+- backbone: pSB1C5C
+  description: ButR
+  id: 79
+  part: BBa_J428011
+- backbone: pSB1C5C
+  description: HapR
+  id: 96
+  part: BBa_J428012
+- backbone: pSB1C5C
+  description: LmrA
+  id: 97
+  part: BBa_J428013
+- backbone: pSB1C5C
+  description: McbR
+  id: 98
+  part: BBa_J428014
+- backbone: pSB1C5C
+  description: Orf2
+  id: 99
+  part: BBa_J428015
+- backbone: pSB1C5C
+  description: PhlF
+  id: 100
+  part: BBa_J428016
+- backbone: pSB1C5C
+  description: PsrA
+  id: 101
+  part: BBa_J428017
+- backbone: pSB1C5C
+  description: QacR
+  id: 102
+  part: BBa_J428018
+- backbone: pSB1C5C
+  description: ScbR
+  id: 103
+  part: BBa_J428019
+- backbone: pSB1C5C
+  description: SrpR
+  id: 104
+  part: BBa_J428020
+- backbone: pSB1C5C
+  description: TarA
+  id: 105
+  part: BBa_J428021
+- backbone: pSB1C3SA
+  description: Promoters_pIcaRA
+  id: 494
+  part: BBa_J428042
+- backbone: pSB1C3C
+  description: TetR_Orthologs_LitR
+  id: 495
+  part: BBa_J428043
+- backbone: pSB1C3C
+  description: TetR_Orthologs_IcaRA
+  id: 496
+  part: BBa_J428044
+- backbone: pSB1C3C
+  description: TetR_Orthologs_BM3R1
+  id: 497
+  part: BBa_J428045
+- backbone: pSB1C3SA
+  description: Promoters_pTarA
+  id: 502
+  part: BBa_J428048
+- backbone: pSB1C3SA
+  description: Promoters_pSrpR
+  id: 503
+  part: BBa_J428049
+- backbone: pSB1C3SA
+  description: Promoters_pQacR
+  id: 504
+  part: BBa_J428050
+- backbone: pSB1C3SA
+  description: Promoters_pMcbR
+  id: 506
+  part: BBa_J428052
+- backbone: pSB1C3SA
+  description: Promoters_pBetI_2
+  id: 507
+  part: BBa_J428053
+- backbone: pSB1C3SA
+  description: Promoters_pBM3R1
+  id: 508
+  part: BBa_J428054
+- backbone: pSB1C5C
+  description: TetR_Orthologs_SmcR
+  id: 595
+  part: BBa_J434004
+- backbone: pSB1C5SA
+  description: Promoters_pLitR
+  id: 583
+  part: BBa_J434005
+- backbone: pSB1C3SA
+  description: Promoters_pPhlF
+  id: 505
+  part: BBa_K1899004
+Yeast Protein Expression Toolkit:
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_His_TEVcut
+  id: 614
+  part: BBa_J434100
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_pre_Ost1_pro_MF_I_His_TEVcut
+  id: 619
+  part: BBa_J434101
+- backbone: '[+] BBa_J435500 [+]'
+  description: BC_Wci_MF_signal_His_tag_TEVcut
+  id: 624
+  part: BBa_J434102
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_alpha_amylase_signal
+  id: 629
+  part: BBa_J434103
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_glucoamylase_signal
+  id: 634
+  part: BBa_J434104
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_inulinase_signal
+  id: 639
+  part: BBa_J434105
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_invertase_signal
+  id: 644
+  part: BBa_J434106
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_killer_protein_signal
+  id: 649
+  part: BBa_J434107
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_Kna_MF_signal
+  id: 615
+  part: BBa_J434108
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_Lfe_MF_signal
+  id: 620
+  part: BBa_J434109
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_preOst1_proMF_signal
+  id: 625
+  part: BBa_J434110
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_Sce_MF_signal
+  id: 630
+  part: BBa_J434111
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_serum_albumin_signal
+  id: 635
+  part: BBa_J434112
+- backbone: '[+] BBa_J435500 [+]'
+  description: BT1_Wci_MF_signal
+  id: 640
+  part: BBa_J434113
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_kp_ERO1
+  id: 645
+  part: BBa_J434114
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_kp_hac1p
+  id: 650
+  part: BBa_J434115
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_kp_kar2p
+  id: 616
+  part: BBa_J434116
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_kp_PDI1
+  id: 621
+  part: BBa_J434117
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_kp_RPP0
+  id: 626
+  part: BBa_J434118
+- backbone: '[+] BBa_J435500 [+]'
+  description: CE_ymScarlet3
+  id: 631
+  part: BBa_J434119
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yCBD
+  id: 636
+  part: BBa_J434120
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_y_xynC
+  id: 641
+  part: BBa_J434121
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yCalm
+  id: 646
+  part: BBa_J434122
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yCex
+  id: 651
+  part: BBa_J434123
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yCipA
+  id: 617
+  part: BBa_J434124
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yGB1
+  id: 622
+  part: BBa_J434125
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yGS_flex
+  id: 627
+  part: BBa_J434126
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yGST
+  id: 632
+  part: BBa_J434127
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yMBP
+  id: 637
+  part: BBa_J434128
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yR5
+  id: 642
+  part: BBa_J434129
+- backbone: '[+] BBa_J435500 [+]'
+  description: T1T2_yS_Tag
+  id: 647
+  part: BBa_J434130
+- backbone: '[+] BBa_J435500 [+]'
+  description: T2C_flex_Kex2_Ste13cut
+  id: 652
+  part: BBa_J434131
+- backbone: '[+] BBa_J435500 [+]'
+  description: T2T3_yfuGFP
+  id: 618
+  part: BBa_J434132
+- backbone: '[+] BBa_J435500 [+]'
+  description: T2T3_yint_I
+  id: 623
+  part: BBa_J434133
+- backbone: '[+] BBa_J435500 [+]'
+  description: T2T3_ymCherryM10L
+  id: 628
+  part: BBa_J434134
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3C_yEnterokinase_cut
+  id: 633
+  part: BBa_J434135
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3C_yGS_flex
+  id: 638
+  part: BBa_J434136
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3C_ySUMOcut
+  id: 643
+  part: BBa_J434137
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3C_yTEVcut
+  id: 648
+  part: BBa_J434138
+- backbone: '[+] BBa_J435500 [+]'
+  description: T3C_yThrombin_cut
+  id: 653
+  part: BBa_J434139

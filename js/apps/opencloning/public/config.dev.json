@@ -1,0 +1,8 @@
+{
+    "backendUrl": "http://127.0.0.1:8000",
+    "showAppBar": true,
+    "noExternalRequests": false,
+    "enableAssembler": true,
+    "enablePlannotate": true,
+    "staticContentPath": "collection"
+}

@@ -1,0 +1,48 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_sequences_search_by_uid",
+  "params": {
+    "uid": "example_sequencing-sample"
+  },
+  "response": {
+    "body": {
+      "items": [
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 1,
+          "name": "pREX0008",
+          "sample_uids": [
+            "example_sequencing-sample"
+          ],
+          "seguid": "cdseguid=B1Hf10-i7VRt7sgFiDRwUj6K8xQ",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 1,
+              "name": "example_sequencing"
+            }
+          ],
+          "type": "sequence"
+        }
+      ],
+      "page": 1,
+      "pages": 1,
+      "size": 50,
+      "total": 1
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

@@ -1,0 +1,58 @@
+diff --git a/dist/changesets-cli.cjs.js b/dist/changesets-cli.cjs.js
+index 0f03e31068a5a7f77ef03ee97684d7f4d5136367..f5f74fa6b689fb67fa1e6341a2ec017e1f6b0da1 100644
+--- a/dist/changesets-cli.cjs.js
++++ b/dist/changesets-cli.cjs.js
+@@ -634,7 +634,13 @@ async function getPublishTool(cwd) {
+   const pm = await packageManagerDetector.detect({
+     cwd
+   });
+-  if (!pm || pm.name !== "pnpm") return {
++  if (!pm) return {
++    name: "npm"
++  };
++  if (pm.name === "yarn") return {
++    name: "yarn"
++  };
++  if (pm.name !== "pnpm") return {
+     name: "npm"
+   };
+   try {
+@@ -771,6 +777,9 @@ async function internalPublish(packageJson, opts, twoFactorState) {
+   } = publishTool.name === "pnpm" ? await spawn__default["default"]("pnpm", ["publish", "--json", ...publishFlags], {
+     env: Object.assign({}, process.env, envOverride),
+     cwd: opts.cwd
++  }) : publishTool.name === "yarn" ? await spawn__default["default"]("yarn", ["npm", "publish", ...publishFlags], {
++    env: Object.assign({}, process.env, envOverride),
++    cwd: opts.cwd
+   }) : await spawn__default["default"](publishTool.name, ["publish", opts.publishDir, "--json", ...publishFlags], {
+     env: Object.assign({}, process.env, envOverride)
+   });
+diff --git a/dist/changesets-cli.esm.js b/dist/changesets-cli.esm.js
+index 1946941b0b876b6f90d25c613696a8e151b726c4..08dbba5128df00abf392a9a31db824d340444105 100644
+--- a/dist/changesets-cli.esm.js
++++ b/dist/changesets-cli.esm.js
+@@ -596,7 +596,13 @@ async function getPublishTool(cwd) {
+   const pm = await detect({
+     cwd
+   });
+-  if (!pm || pm.name !== "pnpm") return {
++  if (!pm) return {
++    name: "npm"
++  };
++  if (pm.name === "yarn") return {
++    name: "yarn"
++  };
++  if (pm.name !== "pnpm") return {
+     name: "npm"
+   };
+   try {
+@@ -733,6 +739,9 @@ async function internalPublish(packageJson, opts, twoFactorState) {
+   } = publishTool.name === "pnpm" ? await spawn$1("pnpm", ["publish", "--json", ...publishFlags], {
+     env: Object.assign({}, process.env, envOverride),
+     cwd: opts.cwd
++  }) : publishTool.name === "yarn" ? await spawn__default["default"]("yarn", ["npm", "publish", ...publishFlags], {
++    env: Object.assign({}, process.env, envOverride),
++    cwd: opts.cwd
+   }) : await spawn$1(publishTool.name, ["publish", opts.publishDir, "--json", ...publishFlags], {
+     env: Object.assign({}, process.env, envOverride)
+   });

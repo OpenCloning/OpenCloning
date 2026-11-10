@@ -1,0 +1,1 @@
+echo -e "\033[1;33m>\033[0m \033[1;33mRunning pre-commit checks...\033[0m"

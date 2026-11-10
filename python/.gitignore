@@ -1,0 +1,36 @@
+*.pyc
+/__pycache__
+.DS_Store
+.ipynb_checkpoints
+/.venv
+
+# Test coverage
+.coverage
+coverage.xml
+
+
+# Frontend build
+frontend/
+
+# Env secrets
+/secrets
+.env.secret
+.env.clerk
+
+batch_cloning_output/
+.pytest_cache/
+
+# build artifacts
+dist/
+
+bin/
+
+# dummy certs for testing
+certs/
+
+# development database
+dev_database/
+
+# MCP server strategy store (opencloning-mcp)
+opencloning_mcp.sqlite
+packages/opencloning-mcp/scripts/smoke_strategy.json

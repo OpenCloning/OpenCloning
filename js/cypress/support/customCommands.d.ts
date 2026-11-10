@@ -1,0 +1,53 @@
+declare namespace Cypress {
+    interface Chainable<Subject> {
+        readFileAsText(file: any): Chainable<any>;
+        addSource(sourceType: any, isFirst?: boolean, index?: number): Chainable<any>;
+        addLane(): Chainable<any>;
+        clearPrimers(): Chainable<any>;
+        addPrimer(name: any, seq: any): Chainable<any>;
+        clickMultiSelectOption(label: any, option: any, parentSelector?: string, containsSettings?: object): Chainable<any>;
+        selectOptionShould(label: any, option: any, shouldWhat?: string, parentSelector?: string): Chainable<any>;
+        setInputValue(label: any, value: any, parentSelector?: string): Chainable<any>;
+        setAutocompleteValue(label: any, value: any, parentSelector?: string, exactMatch?: boolean): Chainable<any>;
+        clearAutocompleteValue(label: any, parentSelector?: string): Chainable<any>;
+        clearInputValue(label: any, parentSelector?: string): Chainable<any>;
+        checkInputValue(label: any, value: any, parentSelector?: string): Chainable<any>;
+        clickSequenceOutputArrow(parentSelector: any, isRight?: boolean): Chainable<any>;
+        loadHistory(filePath: any): Chainable<any>;
+        deleteSourceById(id: any): Chainable<any>;
+        deleteSourceByContent(content: any): Chainable<any>;
+        manuallyTypeSequence(seq: any, circular?: boolean, overhangs?: any[]): Chainable<any>;
+        waitForEnzymes(parentSelector?: string): Chainable<any>;
+        loadExample(name: any): Chainable<any>;
+        changeTab(tabName: any, extraSelector?: string): Chainable<any>;
+        closeAlerts(): Chainable<any>;
+        openCloningAlertsAreEmpty(): Chainable<any>;
+        openCloningAlertExists(message: any): Chainable<any>;
+        dbAlertExists(message: any): Chainable<any>;
+        closeDbAlerts(): Chainable<any>;
+        disableCache(): Chainable<any>;
+        clearChip(text: any, parentSelector?: string): Chainable<any>;
+        dragAndDropFile(filePath: any): Chainable<any>;
+        checkSequenceInDatabase(sequenceId: any): Chainable<any>;
+        checkSequenceNotInDatabase(sequenceId: any): Chainable<any>;
+        sequenceEditorCreateFeature(name: any, start: any, end: any, isPrimer?: boolean): Chainable<any>;
+        sequenceEditorDeleteFeature(name: any): Chainable<any>;
+        sequenceEditorChangeTab(tabName: any): Chainable<any>;
+        sequenceEditorClickUndoTool(): Chainable<any>;
+        sequenceEditorClickRedoTool(): Chainable<any>;
+        resolveTestUserByEmail(email: any): Chainable<any>;
+        addTagInTableTest(resourcePlural: any, tagEndpointName: any): Chainable<any>;
+        addTagInDetailPageTest(resourcePlural: any, resourceName: any, expectedTagName: any): Chainable<any>;
+        openCloningDbTablePaginationTest(resourcePlural: any, pageTestId: any): Chainable<any>;
+        openCloningDbTableSelectAllTest(resourcePlural: any, pageTestId: any, selectAllAriaLabel: any, bulkButtonLabel: any): Chainable<any>;
+        goBackToMainPageFromDetailPage(resourcePlural: any, resourceName: any): Chainable<any>;
+        mount(component: any, options?: object): Chainable<any>;
+        loginToOpenCloningDB(email: any, password: any, workspaceId: any): Chainable<any>;
+        mockLogin(): Chainable<any>;
+        setupOpenCloningDBTestAuth(workspaceId?: number, token?: string): Chainable<any>;
+        getStub(name: any): Chainable<any>;
+        interceptOpenCloningDBStub(stubOrName: any, options?: object): Chainable<any>;
+        e2eLogin(page: any, email: any): Chainable<any>;
+        resetDB(): Chainable<any>;
+    }
+}
