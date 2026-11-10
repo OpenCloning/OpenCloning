@@ -2,8 +2,8 @@
 # which GitHub never runs (it only reads workflows from the root .github/).
 #
 # Jobs only run for the side of the repo that changed (see `changes`): python/ changes run the
-# Python jobs, js/ changes run the JS jobs, and either one runs the e2e tests, since those need
-# both the frontend and the backend. python/stubs/ also counts as a JS change, since the JS
+# Python jobs, js/ changes run the JS jobs, and either one runs the Cypress component and e2e
+# tests, since those use the backend. python/stubs/ also counts as a JS change, since the JS
 # tests read those stubs. Changes to .github/ run everything.
 name: CI
 
@@ -161,15 +161,33 @@ jobs:
           name: coverage-js-vitest
           path: js/coverage/coverage-final.json
 
+  # Some component tests (e.g. enzymes) call the cloning API, so this needs the backend and runs on
+  # python/ changes too
   cypress-component:
     needs: changes
-    if: needs.changes.outputs.js == 'true'
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.js == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+        with:
+          alignment-tools: 'true'
+      - name: Install Python dependencies
+        working-directory: python
+        run: uv sync --frozen
       - uses: ./.github/actions/setup-js
         with:
           cypress: 'true'
+
+      - name: Start backend (cloning API)
+        working-directory: python
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+        run: uv run uvicorn opencloning.main:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+      - name: Wait for backend
+        run: curl -sf --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:8000 > /dev/null
+
       - uses: cypress-io/github-action@v6
         env:
           VITE_COVERAGE: 'true'
@@ -187,6 +205,12 @@ jobs:
         with:
           name: cypress-screenshots-component
           path: js/cypress/screenshots
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: backend-log-component
+          path: backend.log
           if-no-files-found: ignore
 
   # ---------------------------------------------------------------------------
