@@ -22,11 +22,6 @@
         "start": "yarn workspace opencloning start",
         "build": "./scripts/build_opencloning_app.sh",
         "test": "vitest run",
-        "changeset": "changeset",
-        "version": "changeset version",
-        "release": "changeset publish",
-        "pre:enter": "changeset pre enter",
-        "pre:exit": "changeset pre exit",
         "pack:all": "yarn workspace @opencloning/store pack --filename /tmp/@opencloning-store.tgz && yarn workspace @opencloning/utils pack --filename /tmp/@opencloning-utils.tgz && yarn workspace @opencloning/ui pack --filename /tmp/@opencloning-ui.tgz"
     },
     "browserslist": {
@@ -42,8 +37,6 @@
         ]
     },
     "devDependencies": {
-        "@changesets/changelog-github": "^0.5.2",
-        "@changesets/cli": "patch:@changesets/cli@npm%3A2.29.8#~/.yarn/patches/@changesets-cli-npm-2.29.8-52df46efd2.patch",
         "@clerk/testing": "patch:@clerk/testing@npm%3A2.2.37#~/.yarn/patches/@clerk-testing-npm-2.2.37-69582bb577.patch",
         "@cypress/code-coverage": "^4.0.3",
         "@cypress/react": "^9.0.2",

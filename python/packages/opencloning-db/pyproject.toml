@@ -1,6 +1,6 @@
 [project]
 name = "opencloning-db"
-version = "2.1.0"
+version = "2.1.0"  # x-release-please-version
 description = "Database for OpenCloning, a web application to generate molecular cloning strategies in json format, and share them with others."
 readme = "README.md"
 license = "MIT"
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/OpenCloning/OpenCloning_backend"
+Repository = "https://github.com/OpenCloning/OpenCloning"
 
 [build-system]
 requires = ["hatchling"]

@@ -211,55 +211,16 @@ describe("ab1ToJson", () => {
 npx -y yarn-update-indirect form-data
 ```
 
-## Versioning and publishing to npm
+## Versioning and releases
 
-### Creating changesets
+The whole monorepo is released together, with a single version, by [release-please](https://github.com/googleapis/release-please). See the [release workflow](../.github/workflows/release.yml).
 
-When making changes that affect packages or apps, you need to create a changeset. This documents what changed and helps determine version bumps.
+* PR titles must follow [conventional commits](https://www.conventionalcommits.org/) (`feat: ...`, `fix: ...`); this is checked on every PR. PRs are squash-merged, so the title becomes the commit message, which determines the version bump and the changelog entry.
+* Every push to `master` updates a release PR with the version bumps and `CHANGELOG.md`.
+* Merging that PR publishes the `@opencloning/*` npm packages, the Python packages, the Docker images and the Netlify site.
 
-To create a changeset:
-
-```bash
-yarn changeset
-```
-
-This will prompt you to:
-
-1. Select which packages are affected (`@opencloning/store`, `@opencloning/ui`, `@opencloning/utils`, or apps)
-2. Choose the type of change (patch, minor, or major)
-3. Write a description of the changes
-
-The changeset file will be created in `.changeset/` directory. Commit this file along with your changes.
-
-**Note:** When creating a PR, you will be warned if no changeset is included for changes that affect packages or apps. This helps ensure all changes are properly documented and versioned.
-
-### Package releases
-
-Packages (`@opencloning/store`, `@opencloning/ui`, `@opencloning/utils`) are automatically released to npm on every commit to master. The release workflow creates a PR with version bumps and changelog updates, and once merged, publishes the packages to npm.
-
-Currently relies on the patch in `.yarn/patches/@changesets-cli-npm-2.29.8-52df46efd2.patch` to publish to npm, coming from this [PR](https://github.com/adobe/spectrum-web-components/pull/5821/files). It's pending on the resolution of this [other PR](https://github.com/changesets/changesets/pull/674).
-
-For manual publishing:
+To publish the npm packages manually:
 
 ```
-YARN_NPM_AUTH_TOKEN=<> yarn changeset publish
-```
-
-### App releases
-
-Apps (like `opencloning`) are not automatically deployed. They need to be manually released by calling the [App Release workflow](https://github.com/OpenCloning/OpenCloning_frontend/actions/workflows/app_release.yml) with the app name (e.g., `opencloning`). This creates a GitHub release and tag for the app. When you publish the release, the action [App Post Release](https://github.com/OpenCloning/OpenCloning_frontend/actions/workflows/post_release.yml) is triggered to build the Docker image and deploy the app to Netlify.
-
-Note that app version numbers will automatically increase when their dependencies (packages) are updated, even if the app itself is not deployed. This ensures version consistency across the monorepo.
-
-### Releasing a pre-release
-
-For manual releases or when not using the automated workflow:
-
-```
-yarn pre:enter
-# make changes
-# Create changeset
-
-yarn changeset version
-yarn release
+YARN_NPM_AUTH_TOKEN=<> yarn workspaces foreach --all --no-private --topological npm publish --access public --tolerate-republish
 ```

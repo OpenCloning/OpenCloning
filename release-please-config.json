@@ -1,0 +1,62 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "release-type": "simple",
+    "include-component-in-tag": false,
+    "include-v-in-tag": true,
+    "bootstrap-sha": "1957c97c4eeaa31dc530e2eb5e1195791948e8ed",
+    "packages": {
+        ".": {
+            "package-name": "opencloning",
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": [
+                {
+                    "type": "generic",
+                    "path": "python/packages/opencloning/pyproject.toml"
+                },
+                {
+                    "type": "generic",
+                    "path": "python/packages/opencloning-db/pyproject.toml"
+                },
+                {
+                    "type": "generic",
+                    "path": "python/packages/opencloning-cli/pyproject.toml"
+                },
+                {
+                    "type": "json",
+                    "path": "js/packages/store/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/packages/utils/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/packages/ui/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/packages/opencloning-elabftw/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/packages/opencloningdb/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/apps/opencloning/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "js/apps/opencloningdb/package.json",
+                    "jsonpath": "$.version"
+                }
+            ]
+        }
+    }
+}

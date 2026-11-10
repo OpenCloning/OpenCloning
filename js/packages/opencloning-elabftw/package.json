@@ -9,8 +9,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/OpenCloning/OpenCloning_frontend.git",
-        "directory": "packages/opencloning-elabftw"
+        "url": "https://github.com/OpenCloning/OpenCloning.git",
+        "directory": "js/packages/opencloning-elabftw"
     },
     "dependencies": {
         "@mui/icons-material": "^5.18.0",

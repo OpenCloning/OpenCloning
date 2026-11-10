@@ -1,6 +1,6 @@
 [project]
 name = "opencloning-cli"
-version = "2.1.0"
+version = "2.1.0"  # x-release-please-version
 description = "Command-line tools for OpenCloning."
 readme = "README.md"
 license = "MIT"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/OpenCloning/OpenCloning_backend"
+Repository = "https://github.com/OpenCloning/OpenCloning"
 
 [project.scripts]
 opencloning-cli = "opencloning_cli.main:app"

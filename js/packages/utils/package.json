@@ -29,8 +29,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/OpenCloning/OpenCloning_frontend.git",
-        "directory": "packages/utils"
+        "url": "https://github.com/OpenCloning/OpenCloning.git",
+        "directory": "js/packages/utils"
     },
     "dependencies": {
         "@opencloning/store": "workspace:*",

@@ -31,8 +31,8 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/OpenCloning/OpenCloning_frontend.git",
-        "directory": "packages/ui"
+        "url": "https://github.com/OpenCloning/OpenCloning.git",
+        "directory": "js/packages/ui"
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",

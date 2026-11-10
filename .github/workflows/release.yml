@@ -1,0 +1,253 @@
+# Release process for the whole monorepo: one version for everything (see release-please-config.json).
+#
+# 1. Every push to master updates the release PR (version bumps + CHANGELOG.md, from the
+#    conventional-commit PR titles, see semantic-pr-title.yml).
+# 2. Merging the release PR tags vX.Y.Z, creates the GitHub release and publishes everything:
+#    PyPI and npm packages, Docker images (backend, frontend, then the combined app built from those
+#    exact images), and the Netlify site.
+name: Release
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          # A PAT / app token, so that CI runs on the release PR (pushes made with GITHUB_TOKEN trigger no workflows)
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      # release-please bumps the versions in the pyproject.toml files, which uv.lock also records
+      - name: Check out the release PR
+        if: steps.release.outputs.prs_created == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+      - uses: ./.github/actions/setup-python
+        if: steps.release.outputs.prs_created == 'true'
+      - name: Sync uv.lock on the release PR
+        if: steps.release.outputs.prs_created == 'true'
+        run: |
+          uv lock --directory python
+          if git diff --quiet -- python/uv.lock; then
+            echo "uv.lock already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: sync uv.lock for release" -- python/uv.lock
+          git push
+
+  # ---------------------------------------------------------------------------
+  # Packages
+  # ---------------------------------------------------------------------------
+  publish-pypi:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: publish
+      url: https://pypi.org/p/opencloning
+    permissions:
+      contents: read
+      id-token: write # PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+      - name: Build
+        working-directory: python
+        run: |
+          uv build --package opencloning --out-dir dist/opencloning
+          uv build --package opencloning-db --out-dir dist/opencloning-db
+      - name: Publish opencloning
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist/opencloning/
+      - name: Publish opencloning-db
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist/opencloning-db/
+
+  publish-npm:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-js
+      # Topological, so dependencies are published before their dependents.
+      # workspace:* ranges are replaced by the released version at publish time.
+      - name: Publish @opencloning/* packages
+        working-directory: js
+        env:
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn workspaces foreach --all --no-private --topological npm publish --access public --tolerate-republish
+
+  # ---------------------------------------------------------------------------
+  # Docker images
+  # ---------------------------------------------------------------------------
+  docker-backend:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { target: cloning, image: manulera/opencloningbackend }
+          - { target: db, image: manulera/opencloning-db-backend }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: python
+          file: python/docker/opencloning.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: APP_TARGET=${{ matrix.target }}
+          tags: |
+            ${{ matrix.image }}:prod
+            ${{ matrix.image }}:${{ needs.release-please.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Trivy vulnerability scan (report only)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ matrix.image }}:${{ needs.release-please.outputs.version }}
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+  docker-frontend:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # suffix: tag suffix; base_url: path the app is served under
+        include:
+          - { suffix: '', base_url: / }
+          - { suffix: -baseurl-opencloning, base_url: /opencloning/ }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: manulera/opencloningfrontend
+      - uses: docker/build-push-action@v6
+        with:
+          context: js
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: BASE_URL=${{ matrix.base_url }}
+          tags: |
+            manulera/opencloningfrontend:latest${{ matrix.suffix }}
+            manulera/opencloningfrontend:prod${{ matrix.suffix }}
+            manulera/opencloningfrontend:${{ needs.release-please.outputs.tag_name }}${{ matrix.suffix }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Trivy vulnerability scan (report only)
+        if: matrix.suffix == ''
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: manulera/opencloningfrontend:${{ needs.release-please.outputs.tag_name }}
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+  # The full app (Dockerfile at the root): backend serving the frontend build.
+  # Built from the images of this exact release, not from whatever :prod points to.
+  docker-combined:
+    needs: [release-please, docker-backend, docker-frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        suffix: ['', -baseurl-opencloning]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: manulera/opencloning
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            FRONTEND_TAG=${{ needs.release-please.outputs.tag_name }}${{ matrix.suffix }}
+            BACKEND_TAG=${{ needs.release-please.outputs.version }}
+            OPENCLONING_VERSION=${{ needs.release-please.outputs.tag_name }}
+          tags: |
+            manulera/opencloning:latest${{ matrix.suffix }}
+            manulera/opencloning:prod${{ matrix.suffix }}
+            manulera/opencloning:${{ needs.release-please.outputs.tag_name }}${{ matrix.suffix }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # ---------------------------------------------------------------------------
+  # Website
+  # ---------------------------------------------------------------------------
+  deploy-netlify:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-js
+      - name: Build
+        working-directory: js
+        env:
+          VITE_UMAMI_WEBSITE_ID: ${{ secrets.VITE_UMAMI_WEBSITE_ID }}
+          VITE_MCP_SERVER_URL: https://mcp.opencloning.org
+        run: yarn build
+      - name: Publish to Netlify
+        working-directory: js
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: >-
+          npx --yes netlify-cli deploy --no-build --json --filter opencloning --prod
+          --dir ./apps/opencloning/build
+          --message "production [${{ needs.release-please.outputs.tag_name }}]"

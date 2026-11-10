@@ -12,7 +12,6 @@ node_modules/
 .nyc_output/
 coverage/
 cypress/
-.changeset/
 build/
 Dockerfile
 .git
