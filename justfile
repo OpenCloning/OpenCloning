@@ -88,6 +88,17 @@ cypress-component *args:
 cypress-e2e *args:
     env -u ELECTRON_RUN_AS_NODE xvfb-run -a yarn cypress run --e2e {{args}}
 
+# Cypress UI, LOCAL MACHINE ONLY (needs a display + local yarn install), e.g. just cypress-open --e2e --browser chrome
+[working-directory: 'js']
+[group('frontend')]
+cypress-open *args:
+    #!/usr/bin/env bash
+    if [ "${DEVCONTAINER:-}" = true ]; then
+        echo "cypress open needs a display: run it from the local machine, not the dev container." >&2
+        exit 1
+    fi
+    yarn cypress open {{args}}
+
 # All pre-commit checks on all files
 lint:
     pre-commit run --all-files
