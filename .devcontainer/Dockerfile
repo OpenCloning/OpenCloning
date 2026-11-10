@@ -12,10 +12,10 @@ ARG CLAUDE_CODE_VERSION=stable
 ARG YARN_VERSION=4.9.1
 ARG PYTHON_VERSION=3.12
 
-# Basic tools, firewall tools (used by init-firewall.sh), shellcheck for the tests,
-# build tools + postgres client for python/, and Cypress system dependencies for js/
+# Basic tools, just (task runner for the root justfile), firewall tools (used by init-firewall.sh),
+# shellcheck for the tests, build tools + postgres client for python/, and Cypress system dependencies for js/
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates curl git less procps sudo nano \
+  ca-certificates curl git less procps sudo nano just \
   iptables ipset iproute2 dnsutils aggregate jq \
   shellcheck build-essential postgresql-client \
   xvfb libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 \
