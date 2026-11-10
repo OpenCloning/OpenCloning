@@ -58,6 +58,9 @@ export default defineConfig({
         const istanbul = (await import('vite-plugin-istanbul')).default;
         return {
           mode: 'test',
+          // Fixed port, so the backend can allow it as a CORS origin (ALLOWED_ORIGINS in .env.dev and CI).
+          // strictPort: fail if it is taken, rather than silently moving to a port the backend rejects.
+          server: { port: 5173, strictPort: true },
           resolve: {
             alias: {
               '@opencloning/ui': resolve(import.meta.dirname, 'packages/ui/src'),

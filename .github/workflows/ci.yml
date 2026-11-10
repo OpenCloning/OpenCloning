@@ -184,6 +184,8 @@ jobs:
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+          # Cypress serves component tests from Vite's default port (5173), not 3000
+          ALLOWED_ORIGINS: http://localhost:5173
         run: uv run uvicorn opencloning.main:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
       - name: Wait for backend
         run: curl -sf --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:8000 > /dev/null
