@@ -1,9 +1,9 @@
-[![Python tests](https://github.com/OpenCloning/OpenCloning_frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCloning/OpenCloning_frontend/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/OpenCloning/OpenCloning_frontend/graph/badge.svg?token=CFIB2H6WMO)](https://codecov.io/gh/OpenCloning/OpenCloning_frontend)
+[![CI](https://github.com/OpenCloning/OpenCloning/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCloning/OpenCloning/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/OpenCloning/OpenCloning/graph/badge.svg?flag=js)](https://codecov.io/gh/OpenCloning/OpenCloning)
 
 # OpenCloning frontend
 
-This repository contains the OpenCloning frontend monorepo, which includes the main React application and shared packages. Before going further, please go to the [main project README](https://github.com/OpenCloning/OpenCloning?tab=readme-ov-file#readme), where you can find an introduction.
+This directory of the OpenCloning repository contains the frontend: the main React application and shared packages. Before going further, please go to the [main project README](../README.md), where you can find an introduction.
 
 A hosted version of this application can be found at [https://opencloning.org/](https://opencloning.org/).
 
@@ -19,7 +19,7 @@ This is a monorepo managed with Yarn workspaces:
 
 ## Getting started
 
-If you want to quickly set up a local instance of the frontend and backend of the application using Docker, check [getting started in 5 minutes](https://github.com/OpenCloning/OpenCloning#timer_clock-getting-started-in-5-minutes) in the main repository.
+If you want to quickly set up a local instance of the frontend and backend of the application using Docker, check "Getting started in 5 minutes" in the [main README](../README.md).
 
 ## Running the site locally
 
@@ -49,13 +49,13 @@ yarn build
 
 ## Connecting to the backend
 
-For the application to work, you must have a running backend. For that, see the [backend installation instructions](https://github.com/OpenCloning/OpenCloning_backend#local-installation).
+For the application to work, you must have a running backend, which is in [`python/`](../python/README.md). From the repository root, `just dev-api-cloning` runs it, or `just dev-cloning` runs the backend and this frontend together.
 
 By default, if you run the dev server with `uvicorn opencloning.main:app`, the backend will be running at `http://localhost:8000/`. That's where the dev server of the frontend (ran with `yarn start`) will send the requests to by default.
 
 The backend URL can be changed by setting a different value in the `config.json` (see next section).
 
-See also [connecting to the frontend section](https://github.com/OpenCloning/OpenCloning_backend?tab=readme-ov-file#connecting-to-the-frontend) in the backend repo.
+See also the [connecting to the frontend section](../python/packages/opencloning/README.md#connecting-to-the-frontend) of the backend README.
 
 ## Configuration
 
@@ -66,13 +66,13 @@ The configuration of the frontend is done in the file that will be served from `
 - `noExternalRequests`: Whether to block requests to external services. By default, it is `false`.
 - `database`: For integrations, provide the database name. This is not documented, but for an example see `packages/ui/src/components/eLabFTW`.
 
-For production: when building the site with `yarn build`, simply replace `apps/opencloning/build/config.json` with your settings. This is what is done in [this docker-compose file](https://github.com/OpenCloning/OpenCloning).
+For production: when building the site with `yarn build`, simply replace `apps/opencloning/build/config.json` with your settings. This is what is done in [this docker-compose file](../docker-compose.yml).
 
 ## Running with docker 🐳
 
-If you want to serve the full site (backend and frontend) with docker, check [getting started in 5 minutes](https://github.com/OpenCloning/OpenCloning#timer_clock-getting-started-in-5-minutes) in the main repository.
+If you want to serve the full site (backend and frontend) with docker, check "Getting started in 5 minutes" in the [main README](../README.md).
 
-If you want to serve only the frontend from a docker container, an image is available at [manulera/opencloningfrontend](https://hub.docker.com/r/manulera/opencloningfrontend). The image is built from the Dockerfile in the root of this repository and exposes the port 3000. To run it:
+If you want to serve only the frontend from a docker container, an image is available at [manulera/opencloningfrontend](https://hub.docker.com/r/manulera/opencloningfrontend). The image is built from the [Dockerfile](Dockerfile) in this directory and exposes the port 3000. To run it:
 
 ```bash
 docker pull manulera/opencloningfrontend
@@ -81,7 +81,7 @@ docker run -p 3000:3000 manulera/opencloningfrontend
 
 ## Contributing :hammer_and_wrench:
 
-Check [contribution guidelines in the main repository](https://github.com/OpenCloning/OpenCloning/blob/master/CONTRIBUTING.md).
+Check the [contribution guidelines](../CONTRIBUTING.md).
 
 ## Settings for vscode :desktop_computer:
 
@@ -93,7 +93,7 @@ For the `eslint` to work, you will need the [eslint module](https://marketplace.
 
 To run the tests, first run the dev server with `yarn start`.
 
-To run most tests, you will need the backend to be running at http://localhost:8000/. You can see how to do run it in the [backend repo](https://github.com/OpenCloning/OpenCloning_backend). For the github actions tests, a submodule is used (see below).
+To run most tests, you will need the backend to be running at http://localhost:8000/ (`just dev-api-cloning` from the repository root).
 
 To run the tests:
 
@@ -124,24 +124,6 @@ These are run with `vitest`. To run them:
 
 ```bash
 yarn vitest
-```
-
-### Actions and submodule
-
-The tests run with cypress in github actions require the submodule OpenCloning_backend to be included. If you want to include it locally:
-
-```bash
-git submodule update --init
-```
-
-If you want to change the commit of the submodule:
-
-```bash
-cd OpenCloning_backend
-git checkout -b the-branch
-git pull origin the-branch
-cd ..
-# commit the frontend repo normally
 ```
 
 ### Coverage

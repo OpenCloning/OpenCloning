@@ -64,7 +64,7 @@ docker run -p 8000:8000 manulera/opencloning
 
 * Click the menu at the top left of the github website, then click codespaces
 * On the top-right click on `New codespace`
-* On `Repository` select `manulera/OpenCloning`
+* On `Repository` select `OpenCloning/OpenCloning`
 * Click on `Create codespace`
 * In the terminal enter `docker-compose up`
 * Once complete a popup will appear saying port 8000 is now available, click `Open in Browser` to navigate to your own version of the OpenCloning app
@@ -73,22 +73,21 @@ docker run -p 8000:8000 manulera/opencloning
 
 ## Running it yourself and configuration
 
-If you want to run a dev server locally, or run the site without using docker, you can see how to set up the backend and frontend in their respective repositories:
+This repository contains the whole application:
 
-* [Frontend](https://github.com/manulera/OpenCloning_frontend)
-* [Backend](https://github.com/manulera/OpenCloning_backend)
+* [`python/`](python/): the backend, a web API built with FastAPI, and the Python packages (`opencloning`, `opencloning-db`, `opencloning-cli`, `opencloning-mcp`). See its [README](python/README.md).
+* [`js/`](js/): the frontend, a React application (the "family tree builder" that you see in your browser), and the `@opencloning/*` npm packages. See its [README](js/README.md).
 
-### Backend
+### Development
 
-The code of the backend is here: [https://github.com/manulera/OpenCloning_backend](https://github.com/manulera/OpenCloning_backend)
+The easiest way to work on the code is the dev container in [`.devcontainer/`](.devcontainer/) (see its [README](.devcontainer/README.md)), which has everything installed. Common tasks are recipes in the [`justfile`](justfile); run `just` to list them, for example:
 
-The backend is a web API built with FastAPI. For information on what it does, and how to install it and what it does see [this](https://github.com/manulera/OpenCloning_backend).
-
-### Frontend
-
-The code of the frontend is here: [https://github.com/manulera/OpenCloning_frontend](https://github.com/manulera/OpenCloning_frontend)
-
-The frontend application is built with react, and it is the "family tree builder" that you will see in your browser. For more info on what it does and how to install it see [this](https://github.com/manulera/OpenCloning_frontend)
+```bash
+just install        # install Python and JS dependencies
+just dev-cloning    # cloning API + frontend in one terminal (Ctrl+C stops both)
+just pytest         # Python tests
+just vitest         # JS unit tests
+```
 
 <!--running-locally-end-->
 
@@ -115,13 +114,13 @@ You can see how the workflow of cloning happens in the app in [this video](https
 
 The data model is built using the [LinkML](https://linkml.io/) framework, and can be accessed in [this repository](https://github.com/OpenCloning/OpenCloning_LinkML).
 
-For an example of the data model to represent an homologous recombination, you can see [this json file](https://github.com/manulera/OpenCloning_frontend/blob/master/public/examples/homologous_recombination.json).
+For an example of the data model to represent an homologous recombination, you can see [this json file](js/apps/opencloning/public/examples/homologous_recombination.json).
 
 From the json, you can see how every `sequence` comes from a `source`, and every `sequence` can be the input of another `source`. The application frontend provides an interface where the user can specify a `source` (with or without inputs). This `source` is sent to the backend in a `POST` request, where the step encoded in the `source` is executed, and the output `sequence` is returned and displayed in the frontend. When multiple outputs could come out of a `source` (for example, a restriction enzyme digestion), the user can select which one of them is the desired output. Then the user can use the output `sequence` as an input for a new `source`, and so on.
 
 ## Dependencies
 
-You can find the full dependency list in the code repositories for the frontend and backend, but it's worth mentioning two key ones:
+You can find the full dependency list in [`python/`](python/pyproject.toml) and [`js/`](js/package.json), but it's worth mentioning two key ones:
 
 * [pydna](https://github.com/pydna-group/pydna), a python library that extends [BioPython](https://biopython.org/) `Seq` and `SeqRecord` classes to represent overhangs and circularity. And implements functions to simulate DNA sequence operations (golden gate, gibson, etc.).
 * [LinkML](https://linkml.io/) a framework for developing data models, which allows users to define their data model as a yaml file, and generate code in different programming languages to work with it.

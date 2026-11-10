@@ -1,5 +1,5 @@
 # Backend for OpenCloning
-# https://github.com/OpenCloning/OpenCloning_backend
+# https://github.com/OpenCloning/OpenCloning (python/)
 #
 # Production (cloning app): docker build -f docker/opencloning.Dockerfile .
 # Production (db combined): docker build -f docker/opencloning.Dockerfile --build-arg APP_TARGET=db .

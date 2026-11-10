@@ -33,20 +33,20 @@ uvicorn opencloning.main:app
 
 ### Installing from GitHub (monorepo)
 
-This repository is a uv workspace; the installable package lives in `packages/opencloning/`.
+The package lives in `python/packages/opencloning/` of the [OpenCloning repository](https://github.com/OpenCloning/OpenCloning).
 When installing directly from GitHub, include the `subdirectory` fragment:
 
 ```bash
 # uv
-uv add "opencloning @ git+https://github.com/OpenCloning/OpenCloning_backend.git@master#subdirectory=packages/opencloning"
+uv add "opencloning @ git+https://github.com/OpenCloning/OpenCloning.git@master#subdirectory=python/packages/opencloning"
 
 # pip
-pip install "git+https://github.com/OpenCloning/OpenCloning_backend.git@master#subdirectory=packages/opencloning"
+pip install "git+https://github.com/OpenCloning/OpenCloning.git@master#subdirectory=python/packages/opencloning"
 ```
 
 ### Running locally if you want to contribute
 
-This repository is a [uv](https://docs.astral.sh/uv/) workspace: the installable package lives under `packages/opencloning/`, and the repo root holds workspace metadata and shared dev dependencies. Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then from the repository root:
+The `python/` directory of the [OpenCloning repository](https://github.com/OpenCloning/OpenCloning) is a [uv](https://docs.astral.sh/uv/) workspace: the installable package lives under `packages/opencloning/`, and `python/` holds workspace metadata and shared dev dependencies. The easiest setup is the repository's dev container. Otherwise, install [uv](https://docs.astral.sh/uv/getting-started/installation/), then from `python/`:
 
 ```bash
 # Install the workspace (editable opencloning + dev/test dependency groups) into .venv
@@ -59,7 +59,7 @@ uv run pre-commit install
 source .venv/bin/activate   # optional
 ```
 
-The virtual environment is created at the repository root (`.venv`). For VS Code settings see the folder `.vscode`.
+The virtual environment is created in `python/.venv`. For VS Code settings see the folder `.vscode` at the repository root.
 
 Now you should be able to run the api by running:
 
@@ -107,7 +107,7 @@ The api will be running at `http://localhost:8000`, so you should be able to acc
 
 ### Connecting to the frontend
 
-If you want to receive requests from the [frontend](https://github.com/OpenCloning/OpenCloning_frontend), or from another web application you may have to include the url of the frontend application in the CORS exceptions. By default, if you run the dev server with `uvicorn opencloning.main:app --reload --reload-exclude='.venv'`, the backend will accept requests coming from `http://localhost:3000`, which is the default address of the frontend dev server (ran with `yarn start`).
+If you want to receive requests from the [frontend](https://github.com/OpenCloning/OpenCloning/tree/master/js), or from another web application you may have to include the url of the frontend application in the CORS exceptions. By default, if you run the dev server with `uvicorn opencloning.main:app --reload --reload-exclude='.venv'`, the backend will accept requests coming from `http://localhost:3000`, which is the default address of the frontend dev server (ran with `yarn start`).
 
 If you want to change the allowed origins, you can do so via env variables (comma-separated). e.g.:
 
@@ -115,12 +115,12 @@ If you want to change the allowed origins, you can do so via env variables (comm
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001 uvicorn opencloning.main:app --reload --reload-exclude='.venv'
 ```
 
-Similarly, the frontend should be configured to send requests to the backend address, [see here](https://github.com/OpenCloning/OpenCloning_frontend#connecting-to-the-backend).
+Similarly, the frontend should be configured to send requests to the backend address, [see here](https://github.com/OpenCloning/OpenCloning/tree/master/js#connecting-to-the-backend).
 
 #### Serving the frontend from the backend
 
 You may prefer to handle everything from a single server. You can do so by:
-* Build the [frontend](https://github.com/OpenCloning/OpenCloning_frontend) with `yarn build`.
+* Build the [frontend](https://github.com/OpenCloning/OpenCloning/tree/master/js) with `yarn build`.
 * Copy the folder `build` from the frontend to the root directory of the backend, and rename it to `frontend`.
 * Set the environment variable `SERVE_FRONTEND=1` when running the backend. By default this will remove all allowed origins, but you can still set them with `ALLOWED_ORIGINS`.
 * Set the value of `backendUrl` in `frontend/config.js` to `/`.

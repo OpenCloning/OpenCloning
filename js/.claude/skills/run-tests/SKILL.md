@@ -5,47 +5,62 @@ description: How to run the unit (vitest), component and e2e (Cypress) tests ins
 
 # Running tests in the dev container
 
+Use the `just` recipes from the repository root (`/workspace`); they run inside `js/`, so `--spec`
+paths are relative to `js/`. Run `just` to list all recipes.
+
 ## Vitest (unit tests)
 
 ```bash
-yarn test                                   # all
-yarn vitest run packages/ui/src/components/assembler/assembler_utils.test.js   # one file
+just vitest                                                          # all
+just vitest packages/ui/src/components/assembler/assembler_utils.test.js   # one file
 ```
+
+No backend needed.
 
 ## Cypress component tests
 
+Some component tests call the cloning API, so start it first, in the background:
+
 ```bash
-env -u ELECTRON_RUN_AS_NODE xvfb-run -a yarn cypress run --component --spec <path/to/File.cy.jsx>
+just dev-api-cloning
+just cypress-component --spec packages/ui/src/components/assembler/UploadPlasmidsButton.cy.jsx
 ```
 
-Run from the repo root (`/workspace`); `--spec` paths are relative to it, e.g.
-`packages/ui/src/components/assembler/UploadPlasmidsButton.cy.jsx`.
-
-### Why the extra bits
-
-- `env -u ELECTRON_RUN_AS_NODE`: the shell may have `ELECTRON_RUN_AS_NODE=1` set (e.g. by the VS Code extension). This makes Cypress's Electron run as plain Node and fail with `Cannot find module 'electron'`. Unset it for the command.
-- `xvfb-run -a`: the container has no display; Xvfb provides a virtual one.
+- The backend must be the **cloning API** (`dev-api-cloning`), not the combined one (`dev-api-combined`
+  serves the cloning API under `/cloning`, so the tests get 404s).
+- Component tests are served from `localhost:5173` (pinned in `cypress.config.js`), which must be in the
+  backend's `ALLOWED_ORIGINS` (it is in `.env.dev`). CORS failures show up in the backend log as
+  `OPTIONS ... 400 Bad Request`.
+- OpenCloningDB requests must be stubbed (`cy.interceptOpenCloningDBStub` / `cy.intercept`): an unstubbed
+  one fails the test with "Unstubbed OpenCloningDB request in a component test" (see `cypress/support/component.js`).
 
 ## Cypress e2e tests
 
-Specs live in `cypress/e2e/group-*/`. They need two things reachable from inside the container:
-
-1. **Frontend at `localhost:3000`**: start it in the background and wait for it:
-   ```bash
-   (yarn start > /tmp/vite.log 2>&1 &); sleep 12; curl -s -o /dev/null -w "%{http_code}\n" localhost:3000
-   ```
-2. **Backend at `localhost:8000`**: it runs on the *host* (see the OpenCloning_backend README: `uv run uvicorn opencloning.main:app`). The `backend-forward` socat sidecar in `.devcontainer/docker-compose.yml` relays the container's `localhost:8000` to `host.docker.internal:8000`. Check with `curl localhost:8000/openapi.json`. If it fails, make sure the backend is running on the host and the dev container was rebuilt after the compose change.
-
-Then run a spec (no `--component`):
+Specs live in `cypress/e2e/group-*/`. They need the backend at `localhost:8000` and the frontend at
+`localhost:3000`, both started from the dev container:
 
 ```bash
-env -u ELECTRON_RUN_AS_NODE xvfb-run -a yarn cypress run --spec cypress/e2e/group-3/source_empty.cy.js
+just dev-cloning      # cloning API + OpenCloning frontend (Ctrl+C stops both)
+just dev-db           # or: combined API + OpenCloningDB frontend, for the opencloningdb groups
+                      #     (needs Postgres seeded: just db-seed)
+just cypress-e2e --spec cypress/e2e/group-3/source_empty.cy.js
 ```
 
-Verified working with `source_empty.cy.js`. Stop the dev server afterwards by killing the process listening on port 3000 (do not use `pkill -f`: it matches and kills your own shell). Failed runs leave screenshots in `cypress/screenshots/`; delete them. Specs that call external services (e.g. NCBI genome lookups) can fail because the container firewall only allows a fixed set of domains.
+Check the servers with `curl localhost:8000` and `curl localhost:3000`. Failed runs leave screenshots in
+`js/cypress/screenshots/`; delete them. Specs that call external services (e.g. NCBI genome lookups) can
+fail because the container firewall only allows a fixed set of domains.
 
-### Tips
+## Why the recipes wrap Cypress
 
-- Output is noisy with vite "externalized for browser compatibility" warnings; pipe through `tail -50` to see the test results.
+- `env -u ELECTRON_RUN_AS_NODE`: the shell may have `ELECTRON_RUN_AS_NODE=1` set (e.g. by the VS Code
+  extension). This makes Cypress's Electron run as plain Node and fail with `Cannot find module 'electron'`.
+- `xvfb-run -a`: the container has no display; Xvfb provides a virtual one. For the same reason
+  `just cypress-open` (interactive UI) only works on the local machine, not in the container.
+
+## Tips
+
+- Output is noisy with vite "externalized for browser compatibility" warnings; pipe through `tail -50` to
+  see the test results.
 - Use a timeout (Cypress startup can take a while); the first run compiles with vite.
-- Run the full suite in parallel with `./run_tests_in_parallel.sh` (see the script for options such as `--filter-out`).
+- Run the full e2e suite in parallel with `js/run_tests_in_parallel.sh` (see the script for options such as
+  `--filter-out`).

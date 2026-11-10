@@ -1,5 +1,5 @@
 # Frontend for OpenCloning
-# https://github.com/OpenCloning/OpenCloning_frontend
+# https://github.com/OpenCloning/OpenCloning (js/)
 
 # Stage 1: Build the application
 FROM node:22.22.2-alpine3.22 AS builder

@@ -1,11 +1,11 @@
 ---
 description: "Use when writing, planning, or debugging Cypress e2e tests. Covers test patterns, common functions, iteration workflow, and file conventions for OpenCloning frontend."
-applyTo: "cypress/**"
+applyTo: "js/cypress/**"
 ---
 # E2E Testing Guidelines (Cypress)
 
 ## Project structure
-- Tests are in `cypress/e2e/group-*/` folders
+- Paths below are relative to `js/`. Tests are in `cypress/e2e/group-*/` folders
 - Test data files go in `cypress/test_files/`
 - Shared helpers are in `cypress/e2e/common_functions.js`
 

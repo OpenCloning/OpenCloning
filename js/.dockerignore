@@ -15,7 +15,6 @@ cypress/
 build/
 Dockerfile
 .git
-OpenCloning_backend
 tests/
 
 .env.local

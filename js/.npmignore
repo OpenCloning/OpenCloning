@@ -32,5 +32,3 @@ dist/
 .gitignore
 .yarn/
 .yarnrc.yml
-
-OpenCloning_backend/

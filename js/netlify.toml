@@ -1,5 +1,0 @@
-# [[redirects]]
-# from = "https://app.opencloning.org/*"
-# to = "https://opencloning.org/:splat"
-# status = 301
-# force = true

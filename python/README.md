@@ -1,11 +1,11 @@
-[![Python tests](https://github.com/OpenCloning/OpenCloning_backend/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCloning/OpenCloning_backend/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/OpenCloning/OpenCloning_backend/graph/badge.svg?token=CFIB2H6WMO)](https://codecov.io/gh/OpenCloning/OpenCloning_backend)
+[![CI](https://github.com/OpenCloning/OpenCloning/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCloning/OpenCloning/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/OpenCloning/OpenCloning/graph/badge.svg?flag=python)](https://codecov.io/gh/OpenCloning/OpenCloning)
 
 # OpenCloning Backend monorepo
 
-This monorepo contains the backend API and the database API. Before going further, please check out the [project website](https://opencloning.org) and read the [main project readme](https://github.com/OpenCloning/OpenCloning).
+This directory of the OpenCloning repository contains the backend API and the database API. Before going further, please check out the [project website](https://opencloning.org) and read the [main project readme](../README.md).
 
-This repository contains two main packages, a CLI and an experimental MCP server that are part of the OpenCloning project. Check out their respective readmes for more information on how to run them locally or using Docker:
+This directory contains two main packages, a CLI and an experimental MCP server that are part of the OpenCloning project. Check out their respective readmes for more information on how to run them locally or using Docker:
 - [opencloning](./packages/opencloning/README.md): the backend API for *in silico* cloning
 - [opencloning-db](./packages/opencloning-db/README.md): the database API to store a collection of plasmids, primers, and lines.
 - [opencloning-cli](./packages/opencloning-cli/README.md): useful CLI for development and testing.
@@ -90,10 +90,10 @@ You can write python scripts to automate cloning using the python library [pydna
 
 ## Contributing :hammer_and_wrench:
 
-Check [contribution guidelines in the main repository](https://github.com/OpenCloning/OpenCloning/blob/master/CONTRIBUTING.md) for general guidelines.
+Check the [contribution guidelines](../CONTRIBUTING.md) for general guidelines.
 
 For more specific tasks:
-* Creating a new type of source: follow the [new source issue template](.github/ISSUE_TEMPLATE/new-source.md). You can create an issue like that [here](https://github.com/OpenCloning/OpenCloning_backend/issues/new?assignees=&labels=new-source&projects=&template=new-source.md&title=New+source%3A+%3Cname-of-source%3E).
+* Creating a new type of source: follow the [new source issue template](../.github/ISSUE_TEMPLATE/new-source.md). You can create an issue like that [here](https://github.com/OpenCloning/OpenCloning/issues/new?template=new-source.md).
 
 ## Notes
 

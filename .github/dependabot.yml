@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Python dependencies (uv workspace in python/)
+  - package-ecosystem: "uv"
+    directory: "/python"
+    schedule:
+      interval: "daily"
+
+  # Base images of the backend Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/python/docker"
+    schedule:
+      interval: "weekly"
