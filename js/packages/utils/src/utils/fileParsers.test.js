@@ -13,7 +13,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -24,7 +24,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name;sequence\nprimer1;ATGC\nprimer2;CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -35,7 +35,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name\tsequence\nprimer1\tATGC\nprimer2\tCGTG', 'test.tsv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -70,7 +70,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\n\nprimer1,ATGC\n  \nprimer2,CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -107,7 +107,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\r\nprimer1,ATGC\r\nprimer2,CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -118,7 +118,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\rprimer1,ATGC\rprimer2,CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -129,7 +129,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,CGTG', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' },
       { name: 'primer2', sequence: 'CGTG' }
@@ -140,7 +140,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\nprimer1,ATGC', 'test.csv');
 
     const result = await delimitedFileToJson(file, []);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' }
     ]);
@@ -150,7 +150,7 @@ describe('delimitedFileToJson', () => {
     const file = createFile('name,sequence\nprimer1,ATGC', 'test.csv');
 
     const result = await delimitedFileToJson(file);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC' }
     ]);
@@ -172,7 +172,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,CGTG', 'test.csv');
 
     const result = await primersFromTextFile(file, []);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: '' },
       { name: 'primer2', sequence: 'CGTG', error: '' }
@@ -183,7 +183,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,CGTG', 'test.csv');
 
     const result = await primersFromTextFile(file, ['primer1']);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: 'existing' },
       { name: 'primer2', sequence: 'CGTG', error: '' }
@@ -194,7 +194,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,XYZ', 'test.csv');
 
     const result = await primersFromTextFile(file, []);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: '' },
       { name: 'primer2', sequence: 'XYZ', error: 'invalid' }
@@ -205,7 +205,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,XYZ', 'test.csv');
 
     const result = await primersFromTextFile(file, ['primer1']);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'XYZ', error: 'existing' }
     ]);
@@ -215,7 +215,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,ATGC\nprimer2,XYZ\nprimer3,CGTG', 'test.csv');
 
     const result = await primersFromTextFile(file, ['primer1']);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: 'existing' },
       { name: 'primer2', sequence: 'XYZ', error: 'invalid' },
@@ -233,7 +233,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name,sequence\nprimer1,ATGC', 'test.csv');
 
     const result = await primersFromTextFile(file, []);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: '' }
     ]);
@@ -243,7 +243,7 @@ describe('primersFromTextFile', () => {
     const file = createFile('name\tsequence\nprimer1\tATGC', 'test.tsv');
 
     const result = await primersFromTextFile(file, []);
-    
+
     expect(result).toEqual([
       { name: 'primer1', sequence: 'ATGC', error: '' }
     ]);

@@ -169,7 +169,7 @@ function MainSequenceEditor() {
       <AnnotationChangedAlert onSave={updateAnnotationInMainSequence} onCancel={onAnnotationCancel} />
       }
       <Editor {...{ editorName, ...defaultMainEditorProps, ...extraProp, height: '800' }} />
-      {domesticateDialogOpen && 
+      {domesticateDialogOpen &&
         <DomesticateDialog
           open={domesticateDialogOpen}
           onClose={() => {

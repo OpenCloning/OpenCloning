@@ -112,7 +112,7 @@ describe('openCycleAtNode', () => {
     graph.addEdge('A', 'B');
     graph.addEdge('B', 'C');
     graph.addEdge('C', 'B'); // Creates cycle
-    
+
     expect(graph.inDegree('B')).toBe(2);
     const newGraph = openCycleAtNode(graph, 'B');
     expect(newGraph.inDegree('B')).toBe(0);
@@ -126,7 +126,7 @@ describe('openCycleAtNode', () => {
     graph.addNode('B');
     graph.addEdge('A', 'B');
     graph.addEdge('B', 'A'); // Cycle
-    
+
     const newGraph = openCycleAtNode(graph, 'A');
     expect(newGraph.outDegree('A')).toBe(1);
     expect(newGraph.hasEdge('A', 'B')).toBe(true);
@@ -137,7 +137,7 @@ describe('openCycleAtNode', () => {
     graph.addNode('A');
     graph.addNode('B');
     graph.addEdge('A', 'B');
-    
+
     const newGraph = openCycleAtNode(graph, 'A');
     expect(newGraph.inDegree('A')).toBe(0);
     expect(newGraph.hasEdge('A', 'B')).toBe(true);
@@ -203,7 +203,7 @@ describe('graphHasCycle', () => {
     graph.addNode('C');
     graph.addEdge('A', 'B');
     graph.addEdge('B', 'C');
-    
+
     expect(graphHasCycle(graph)).toBe(false);
   });
 
@@ -213,7 +213,7 @@ describe('graphHasCycle', () => {
     graph.addNode('B');
     graph.addEdge('A', 'B');
     graph.addEdge('B', 'A');
-    
+
     expect(graphHasCycle(graph)).toBe(true);
   });
 
@@ -221,7 +221,7 @@ describe('graphHasCycle', () => {
     const graph = new DirectedGraph();
     graph.addNode('A');
     graph.addEdge('A', 'A');
-    
+
     expect(graphHasCycle(graph)).toBe(true);
   });
 
@@ -233,7 +233,7 @@ describe('graphHasCycle', () => {
   it('handles single node with no edges', () => {
     const graph = new DirectedGraph();
     graph.addNode('A');
-    
+
     expect(graphHasCycle(graph)).toBe(false);
   });
 });

@@ -10,13 +10,13 @@ import React, { useRef, useState } from 'react'
  * @param {Function} onChange - Callback when validation succeeds, receives validation data
  * @param {number} debounceDelay - Delay in milliseconds before validation (default: 500)
  */
-function TextFieldApiValidated({ 
-  label, 
-  placeholder, 
-  validateFunction, 
+function TextFieldApiValidated({
+  label,
+  placeholder,
+  validateFunction,
   onChange,
   value = '',
-  debounceDelay = 500, 
+  debounceDelay = 500,
   ...rest
 }) {
   const [localValue, setLocalValue] = useState(value);
@@ -55,8 +55,8 @@ function TextFieldApiValidated({
     } else {
       onChange('');
     }
-  } 
-  
+  }
+
   return (
     <TextField
       label={label}

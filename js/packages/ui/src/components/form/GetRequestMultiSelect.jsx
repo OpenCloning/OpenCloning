@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Autocomplete, TextField, Alert, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material';
 
-export default function GetRequestMultiSelect({ 
+export default function GetRequestMultiSelect({
   getOptionsFromResponse,
   url,
   label,

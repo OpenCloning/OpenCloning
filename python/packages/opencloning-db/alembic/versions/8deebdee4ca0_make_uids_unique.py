@@ -28,30 +28,24 @@ def _rename_case_insensitive_uid_duplicates(
     uid_col: str = 'uid',
 ) -> None:
     """Rename case-insensitive UID collisions, keeping the lowest-id row unchanged."""
-    duplicate_groups = conn.execute(
-        text(
-            f"""
+    duplicate_groups = conn.execute(text(f"""
             SELECT {workspace_col}, lower({uid_col}) AS uid_lower
             FROM {table}
             WHERE {uid_col} IS NOT NULL
             GROUP BY {workspace_col}, lower({uid_col})
             HAVING COUNT(*) > 1
-            """
-        )
-    ).fetchall()
+            """)).fetchall()
 
     for workspace_id, uid_lower in duplicate_groups:
         # Get all UIDs in the workspace, lowercased
         used = {
             row[0]
             for row in conn.execute(
-                text(
-                    f"""
+                text(f"""
                     SELECT lower({uid_col})
                     FROM {table}
                     WHERE {workspace_col} = :workspace_id AND {uid_col} IS NOT NULL
-                    """
-                ),
+                    """),
                 {'workspace_id': workspace_id},
             ).fetchall()
         }
@@ -59,14 +53,12 @@ def _rename_case_insensitive_uid_duplicates(
         # Gets all rows in this collision group, oldest first
         # For instance, [(1, 'strain-a'), (2, 'STRAIN-A')]
         rows = conn.execute(
-            text(
-                f"""
+            text(f"""
                 SELECT {id_col}, {uid_col}
                 FROM {table}
                 WHERE {workspace_col} = :workspace_id AND lower({uid_col}) = :uid_lower
                 ORDER BY {id_col} ASC
-                """
-            ),
+                """),
             {'workspace_id': workspace_id, 'uid_lower': uid_lower},
         ).fetchall()
 

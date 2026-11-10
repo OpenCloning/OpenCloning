@@ -194,7 +194,7 @@ describe('<ExistingSyntaxDialog />', () => {
     );
 
     cy.wait('@getSyntaxes');
-    
+
     // Click first syntax (fails)
     cy.contains('Test Syntax 1').click();
     cy.wait('@getSyntaxDataError');

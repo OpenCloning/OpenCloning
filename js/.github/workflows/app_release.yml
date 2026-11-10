@@ -40,13 +40,13 @@ jobs:
         run: |
           CHANGELOG_FILE="apps/${{ inputs.app_name }}/CHANGELOG.md"
           VERSION="${{ steps.app_version.outputs.version }}"
-          
+
           if [ ! -f "$CHANGELOG_FILE" ]; then
             echo "Warning: Changelog file not found at $CHANGELOG_FILE"
             echo "body=" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Extract the changelog section for this version
           # Match the version header (## VERSION) and capture until next version header
           awk -v version="$VERSION" '
@@ -63,14 +63,14 @@ jobs:
               print
             }
           ' "$CHANGELOG_FILE" > /tmp/changelog_section.txt
-          
+
           # Use multiline output delimiter for GitHub Actions
           {
             echo "body<<CHANGELOG_EOF"
             cat /tmp/changelog_section.txt
             echo "CHANGELOG_EOF"
           } >> $GITHUB_OUTPUT
-          
+
           echo "Extracted changelog for version $VERSION"
 
       - name: Create tag

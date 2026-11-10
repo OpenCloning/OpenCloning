@@ -319,4 +319,3 @@ export function getPrimerBindingInfoFromSource(primers, source, sequenceLength) 
 export function doesSourceHaveOutput(cloningState, sourceId) {
   return Boolean(cloningState.sequences.find((s) => s.id === sourceId));
 }
-

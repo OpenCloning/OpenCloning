@@ -1,9 +1,9 @@
 /**
  * Standalone OpenCloning Example
- * 
+ *
  * This demonstrates how to use OpenCloning without manually setting up
  * React Provider, Redux Provider, or ConfigProvider.
- * 
+ *
  * Compare this to test-app/src/main.jsx which requires manual setup of all providers.
  */
 

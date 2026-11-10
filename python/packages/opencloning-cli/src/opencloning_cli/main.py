@@ -11,7 +11,6 @@ import typer
 from .commands.admin import admin_app
 from .commands.db import db_app
 
-
 app = typer.Typer(
     no_args_is_help=True,
     help='Command-line tools for OpenCloning.',

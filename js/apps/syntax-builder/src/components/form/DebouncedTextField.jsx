@@ -37,10 +37,10 @@ function DebouncedTextField({ value, setValue, debounceDelay = 500, ...props }) 
   }, [localValue, value, debounceDelay, setValue]);
 
   return (
-    <TextField 
-      value={localValue} 
-      onChange={(e) => setLocalValue(e.target.value)} 
-      {...props} 
+    <TextField
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      {...props}
     />
   );
 }

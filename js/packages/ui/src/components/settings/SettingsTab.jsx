@@ -165,5 +165,3 @@ function SettingsTab() {
 }
 
 export default SettingsTab;
-
-

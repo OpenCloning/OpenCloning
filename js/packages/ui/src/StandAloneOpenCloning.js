@@ -9,24 +9,24 @@ import './index.css';
 
 /**
  * StandAloneOpenCloning - Mounts the OpenCloning component into a DOM element
- * 
+ *
  * This function handles all the setup required for OpenCloning:
  * - Redux Provider with store
  * - ConfigProvider with config
  * - React rendering
- * 
+ *
  * @param {Object} options - Configuration options
  * @param {Object} options.config - Configuration object for OpenCloning
  * @param {HTMLElement} options.element - DOM element where to mount the component
  * @returns {Function} Cleanup function that unmounts the component
- * 
+ *
  * @example
  * const container = document.getElementById('opencloning-container');
  * const cleanup = StandAloneOpenCloning({
  *   config: { /* config object *\/ },
  *   element: container
  * });
- * 
+ *
  * // Later, to unmount:
  * cleanup();
  */

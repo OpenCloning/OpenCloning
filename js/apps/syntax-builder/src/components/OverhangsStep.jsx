@@ -31,13 +31,13 @@ export function validateOverhangPaths(paths) {
   // Validate subsequent paths respect ordering
   for (let pathIndex = 1; pathIndex < paths.length; pathIndex++) {
     const path = paths[pathIndex]
-    
+
     // First node must exist in previous paths
     const firstNode = path[0]
     if (!nodePositions.has(firstNode)) {
-      return { 
-        isValid: false, 
-        error: `Path ${pathIndex + 1} starts with "${firstNode}" which doesn't exist in previous paths` 
+      return {
+        isValid: false,
+        error: `Path ${pathIndex + 1} starts with "${firstNode}" which doesn't exist in previous paths`
       }
     }
 
@@ -46,14 +46,14 @@ export function validateOverhangPaths(paths) {
     // Process remaining nodes in path
     for (let i = 1; i < path.length; i++) {
       const node = path[i]
-      
+
       if (nodePositions.has(node)) {
         // Node exists - check ordering
         const nodePosition = nodePositions.get(node)
         if (nodePosition < lastPosition) {
-          return { 
-            isValid: false, 
-            error: `Path ${pathIndex + 1} violates ordering: "${node}" appears before "${path[i - 1]}"` 
+          return {
+            isValid: false,
+            error: `Path ${pathIndex + 1} violates ordering: "${node}" appears before "${path[i - 1]}"`
           }
         }
         lastPosition = nodePosition
@@ -107,7 +107,7 @@ function OverhangsField() {
     const lines = processedLines;
     const paths = [];
     let currentPath = [];
-    
+
     for (const line of lines) {
       if (line.length === 0) {
         // Empty line - end current path if it has content
@@ -167,7 +167,7 @@ function OverhangsField() {
     handleChange({ target: { value: exampleText } });
   }, []);
 
-  
+
   return (
 
     <Paper data-testid="overhangs-step" sx={{ p: 1.5 }}>
@@ -192,7 +192,7 @@ function OverhangsField() {
         onChange={handleChange}
         placeholder="ACGT&#10;TATG&#10;CATG&#10;&#10;TATG&#10;TTCT&#10;ATCC"
         inputProps={{
-          style: { 
+          style: {
             fontFamily: 'monospace',
             fontSize: '0.875rem',
             textTransform: 'uppercase'

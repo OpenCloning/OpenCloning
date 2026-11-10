@@ -195,10 +195,10 @@ describe('tripletsToTranslation', () => {
   it('translates valid triplets to amino acid codes', () => {
     // ATG = Methionine (Met)
     expect(tripletsToTranslation(['ATG'])).toBe('Met');
-    
+
     // TTT = Phenylalanine (Phe)
     expect(tripletsToTranslation(['TTT'])).toBe('Phe');
-    
+
     // Multiple triplets
     expect(tripletsToTranslation(['ATG', 'TTT', 'GCA'])).toBe('MetPheAla');
   });
@@ -230,9 +230,9 @@ describe('partDataToDisplayData', () => {
       left_inside: 'TTAA',
       right_inside: 'AATT'
     };
-    
+
     const result = partDataToDisplayData(data);
-    
+
     expect(result.leftOverhangRc).toBe(getComplementSequenceString('ATGC'));
     expect(result.rightOverhangRc).toBe(getComplementSequenceString('CGTA'));
     expect(result.leftInsideRc).toBe(getComplementSequenceString('TTAA'));
@@ -252,9 +252,9 @@ describe('partDataToDisplayData', () => {
       right_overhang: '',
       right_inside: ''
     };
-    
+
     const result = partDataToDisplayData(data);
-    
+
     // ATG CGC A... should translate to Met Arg...
     expect(result.leftTranslationOverhang).toBe('Me');
     expect(result.leftTranslationInside).toBe('tArg');

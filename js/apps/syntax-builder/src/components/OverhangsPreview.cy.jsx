@@ -61,7 +61,7 @@ const twoParts = [
     left_codon_start: 0,
     right_codon_start: 0,
     color: '#00FF00',
-  },  
+  },
   {
     id: 4,
     name: 'Part 4',

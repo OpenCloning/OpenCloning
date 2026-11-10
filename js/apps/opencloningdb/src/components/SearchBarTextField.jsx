@@ -16,4 +16,3 @@ function SearchBarTextField({ label, placeholder, value, onChange, sx }) {
 }
 
 export default SearchBarTextField;
-

@@ -197,7 +197,7 @@ describe('SequencesPage', () => {
             });
             cy.get('[data-testid="change-sequence-circularity-button"]').should('not.exist');
             // Lines
-            cy.get('[data-testid="sequence-lines"]').should('not.exist'); 
+            cy.get('[data-testid="sequence-lines"]').should('not.exist');
           }
         });
         cy.get('.veEditor').contains(name).should('exist');

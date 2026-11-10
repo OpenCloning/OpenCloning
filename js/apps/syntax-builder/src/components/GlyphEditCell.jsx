@@ -18,15 +18,15 @@ const glyphOptions = [
   'terminator',
   'three-prime-sticky-restriction-site',
 ]
-  
+
 // Custom edit component for glyph field
 function GlyphEditCell({ id, value, field }) {
   const apiRef = useGridApiContext()
-  
+
   const handleChange = (event) => {
     apiRef.current.setEditCellValue({ id, field, value: event.target.value })
   }
-  
+
   return (
     <Select
       value={value || 'engineered-region'}
@@ -40,7 +40,7 @@ function GlyphEditCell({ id, value, field }) {
         <MenuItem key={option} value={option}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <img
-              src={getSvgByGlyph(option)} 
+              src={getSvgByGlyph(option)}
               alt={option}
               style={{ width: '24px', height: '24px', objectFit: 'contain' }}
             />

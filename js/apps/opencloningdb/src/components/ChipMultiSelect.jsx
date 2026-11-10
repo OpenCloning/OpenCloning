@@ -48,4 +48,3 @@ function ChipMultiSelect({ label, options, value, onChange, loading, disabled, s
 }
 
 export default ChipMultiSelect;
-

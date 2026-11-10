@@ -62,5 +62,3 @@ export function CommaSeparatorWrapper({ children }) {
     </React.Fragment>
   );
 }
-
-

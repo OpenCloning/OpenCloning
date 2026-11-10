@@ -101,4 +101,3 @@ describe('<GetSequenceFileAndDatabaseIdComponent />', () => {
 
   });
 });
-

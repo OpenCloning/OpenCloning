@@ -134,4 +134,3 @@ describe('Actions that can be perfomed by an edit user on the Primers page', () 
     cy.closeDbAlerts();
   });
 });
-

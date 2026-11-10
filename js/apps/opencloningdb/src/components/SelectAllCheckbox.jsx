@@ -34,4 +34,3 @@ function SelectAllCheckbox({ ids, selectedIds, toggleRow, ariaLabel = 'select al
 }
 
 export default SelectAllCheckbox;
-

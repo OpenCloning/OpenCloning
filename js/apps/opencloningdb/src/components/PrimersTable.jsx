@@ -64,4 +64,3 @@ function PrimersTable({ primers, showCreatedBy = false, showCreatedAt = false, w
 }
 
 export default PrimersTable;
-

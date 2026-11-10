@@ -9,12 +9,12 @@ import useUploadData from './useUploadData'
 export default function HeaderActions() {
   const { downloadData } = useDownloadData()
   const { uploadData } = useUploadData()
-  
+
   return (
     <Box className="header-actions">
-      <Button 
-        variant="contained" 
-        startIcon={<DownloadIcon />} 
+      <Button
+        variant="contained"
+        startIcon={<DownloadIcon />}
         onClick={downloadData}
         size="large"
       >
@@ -23,6 +23,6 @@ export default function HeaderActions() {
       <UploadDataButton onFileChange={uploadData} />
       <ResetButton />
     </Box>
-    
+
   )
 }

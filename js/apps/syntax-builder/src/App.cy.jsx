@@ -8,17 +8,17 @@ import { setInputValue } from '../../../cypress/e2e/common_functions';
 function FormDataProviderWithSpy({ children }) {
   const ContextExposer = ({ children: innerChildren }) => {
     const context = useFormData();
-    
+
     React.useEffect(() => {
       // Store context on window so Cypress can access it
       if (typeof window !== 'undefined') {
         window.cyFormDataContext = context;
       }
     }, [context]);
-    
+
     return <>{innerChildren}</>;
   };
-  
+
   return (
     <FormDataProvider>
       <ContextExposer>
@@ -63,7 +63,7 @@ describe('App', () => {
     cy.get('[data-testid="overhangs-step-container"] button').contains('Next').click();
 
     cy.get('[data-testid="design-form"]').should('be.visible');
-    
+
     // Example: Access FormDataProvider context values
     cy.window().its('cyFormDataContext').then(context => {
       expect(context.parts).to.have.length.greaterThan(0);

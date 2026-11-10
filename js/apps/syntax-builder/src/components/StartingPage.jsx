@@ -189,4 +189,3 @@ function StartingPage({ setOverhangsStep }) {
 }
 
 export default StartingPage;
-

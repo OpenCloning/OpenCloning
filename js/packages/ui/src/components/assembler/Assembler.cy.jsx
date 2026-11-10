@@ -144,7 +144,7 @@ describe('<AssemblerComponent />', () => {
       cy.get('input').click();
     });
     cy.get('li').contains('Test Plasmid 1').click();
-  
+
     // Select second plasmid
     cy.get('[data-testid="plasmid-select"]').eq(1).within(() => {
       cy.get('input').click();
@@ -284,13 +284,13 @@ describe('<AssemblerComponent />', () => {
     cy.get('[data-testid="assembler-download-assemblies-button"]').click();
 
     // Check that the download was triggered (createObjectURL receives the zip Blob)
-    
+
     cy.get('@createObjectURL').should((stub) => {
       expect(stub).to.have.been.calledOnce;
       expect(stub.firstCall.args[0]).to.be.instanceOf(Blob);
       expect(stub.firstCall.args[0].type).to.equal('application/zip');
     });
-    
+
     cy.get('@addAlert').should('have.not.been.called');
 
   });

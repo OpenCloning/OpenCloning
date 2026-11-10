@@ -16,7 +16,6 @@ from opencloning_linkml.datamodel import (
 )
 from ...endpoints.assembly import pcr, restriction_and_ligation, gateway
 
-
 router = get_router()
 
 

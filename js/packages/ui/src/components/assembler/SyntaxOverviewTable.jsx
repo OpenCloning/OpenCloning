@@ -9,7 +9,7 @@ function OverhangRow({ row, parts, mode = 'detailed' }) {
 
   const rows2iterate = [...row];
   const actualRows =[];
-    
+
   let currentCell = [rows2iterate.shift(), 1];
   while (currentCell[0] !== undefined) {
     if (rows2iterate[0] === GRAPH_SPACER) {
@@ -40,7 +40,7 @@ function OverhangRow({ row, parts, mode = 'detailed' }) {
       {actualRows.flatMap(
         (cell, index) => {
           const showRight = index === actualRows.length - 1;
-    
+
           const colSpan = (cell[1]-1)*2 + 1;
           const { left_overhang, right_overhang, left_inside, color, glyph } = cell[2];
           const { leftTranslationOverhang, leftTranslationInside, leftOverhangRc, rightOverhangRc, leftInsideRc } = partDataToDisplayData(cell[2]);
@@ -58,7 +58,7 @@ function OverhangRow({ row, parts, mode = 'detailed' }) {
                 </AssemblerPartContainer>
               </TableCell>
               {showRight && (
-                <TableCell 
+                <TableCell
                   key={index}
                   sx={{ padding: 0, borderRight: 'solid 1px gray' }}
                 >

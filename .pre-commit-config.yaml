@@ -1,8 +1,21 @@
 # Git hooks for the whole monorepo. Hooks run from the repo root, so paths are relative to it.
 # Install once (from anywhere in the repo): cd python && uv run pre-commit install
 
-# Yarn-managed files: whitespace in .patch files is significant, so no hook may touch them
-exclude: ^js/\.yarn/|\.patch$
+# Files no hook may touch:
+# - Yarn-managed files, and .patch files (whitespace is significant)
+# - Data: sequence/table files, test fixtures, examples and generated stubs. Tests compare against
+#   them byte for byte, so whitespace "fixes" can break them.
+exclude: |
+  (?x)^(
+    js/\.yarn/.*|
+    .*\.patch|
+    .*\.(gb|gbk|dna|ape|fasta|ab1|embl|tsv|csv|svg)|
+    js/apps/opencloning/public/examples/.*|
+    js/cypress/(test_files|test_starting_point)/.*|
+    python/packages/[^/]+/tests/test_files/.*|
+    python/stubs/.*|
+    static_content/.*
+  )$
 
 repos:
   # --- General ---------------------------------------------------------------

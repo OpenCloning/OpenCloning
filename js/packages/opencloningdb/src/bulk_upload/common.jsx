@@ -104,7 +104,7 @@ export function BulkUploadPreviewTableWrapper({
     </>
   );
 }
-  
+
 export function StatusIcon({ status }) {
   const isClear = status === 'clear';
   const isError = status === 'error';

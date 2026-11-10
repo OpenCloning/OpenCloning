@@ -11,4 +11,3 @@ const repositoryMetadata = {
 };
 
 export default repositoryMetadata;
-

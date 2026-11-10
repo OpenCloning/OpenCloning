@@ -39,10 +39,10 @@ export default function PartsForm() {
   }, [problematicNodes])
 
   const handleInfoSave = useCallback((newValue) => {
-    setParts(prevParts => 
-      prevParts.map(part => 
-        part.id === infoDialog.rowId 
-          ? { ...part, info: newValue } 
+    setParts(prevParts =>
+      prevParts.map(part =>
+        part.id === infoDialog.rowId
+          ? { ...part, info: newValue }
           : part
       )
     )
@@ -50,8 +50,8 @@ export default function PartsForm() {
   }, [infoDialog.rowId, setParts])
 
   const processRowUpdate = useCallback((newRow) => {
-    setParts(prevParts => 
-      prevParts.map(part => 
+    setParts(prevParts =>
+      prevParts.map(part =>
         part.id === newRow.id ? newRow : part
       )
     )
@@ -64,7 +64,7 @@ export default function PartsForm() {
     const errorMessage = validateField(field, params.value, params.row)
     return (
       <Tooltip title={errorMessage || ''} placement="top" arrow>
-        <Box className={field} sx={{ 
+        <Box className={field} sx={{
           color: errorMessage ? 'error.main' : 'inherit',
           fontWeight: errorMessage ? 'bold' : 'normal',
           width: '100%'
@@ -92,15 +92,15 @@ export default function PartsForm() {
         />
       ]
     },
-    { 
-      field: 'name', 
-      headerName: 'Name', 
+    {
+      field: 'name',
+      headerName: 'Name',
       flex: 1,
-      editable: true 
+      editable: true
     },
-    { 
-      field: 'info', 
-      headerName: 'Info', 
+    {
+      field: 'info',
+      headerName: 'Info',
       flex: 1,
       editable: false,
       renderCell: (params) => (
@@ -109,9 +109,9 @@ export default function PartsForm() {
         </Box>
       )
     },
-    { 
-      field: 'glyph', 
-      headerName: 'Glyph', 
+    {
+      field: 'glyph',
+      headerName: 'Glyph',
       flex: 1,
       editable: true,
       renderCell: (params) => (
@@ -122,57 +122,57 @@ export default function PartsForm() {
       ),
       renderEditCell: (params) => <GlyphEditCell {...params} />
     },
-    { 
-      field: 'left_overhang', 
-      headerName: 'Left Overhang', 
+    {
+      field: 'left_overhang',
+      headerName: 'Left Overhang',
       flex: 1,
       editable: true,
       renderCell: (params) => renderValidatedCell('left_overhang', params),
       valueParser: (value) => (value || '').toUpperCase().replace(/[^ACGT]/g, '')
     },
-    { 
-      field: 'right_overhang', 
-      headerName: 'Right Overhang', 
+    {
+      field: 'right_overhang',
+      headerName: 'Right Overhang',
       flex: 1,
       editable: true,
       renderCell: (params) => renderValidatedCell('right_overhang', params),
       valueParser: (value) => (value || '').toUpperCase().replace(/[^ACGT]/g, '')
     },
-    { 
-      field: 'left_inside', 
-      headerName: 'Left Inside', 
+    {
+      field: 'left_inside',
+      headerName: 'Left Inside',
       flex: 1,
       editable: true,
       renderCell: (params) => renderValidatedCell('left_inside', params),
       valueParser: (value) => (value || '').toUpperCase().replace(/[^ACGTN]/g, '')
     },
-    { 
-      field: 'right_inside', 
-      headerName: 'Right Inside', 
+    {
+      field: 'right_inside',
+      headerName: 'Right Inside',
       flex: 1,
       editable: true,
       renderCell: (params) => renderValidatedCell('right_inside', params),
       valueParser: (value) => (value || '').toUpperCase().replace(/[^ACGTN]/g, '')
     },
-    { 
-      field: 'left_codon_start', 
-      headerName: 'Left Codon Start', 
+    {
+      field: 'left_codon_start',
+      headerName: 'Left Codon Start',
       flex: 1,
       type: 'number',
       editable: true,
       valueParser: (value) => Math.max(0, parseInt(value, 10) || 0)
     },
-    { 
-      field: 'right_codon_start', 
-      headerName: 'Right Codon Start', 
+    {
+      field: 'right_codon_start',
+      headerName: 'Right Codon Start',
       flex: 1,
       type: 'number',
       editable: true,
       valueParser: (value) => Math.max(0, parseInt(value, 10) || 0)
     },
-    { 
-      field: 'color', 
-      headerName: 'Color', 
+    {
+      field: 'color',
+      headerName: 'Color',
       flex: 1,
       editable: true,
       renderCell: (params) => {
@@ -180,8 +180,8 @@ export default function PartsForm() {
         return (
           <Tooltip title={errorMessage || ''} placement="top" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ 
-                width: 20, height: 20, 
+              <Box sx={{
+                width: 20, height: 20,
                 backgroundColor: errorMessage ? 'transparent' : (params.value || 'transparent'),
                 border: errorMessage ? '2px solid red' : '1px solid #ccc',
                 borderRadius: '4px'
@@ -206,7 +206,7 @@ export default function PartsForm() {
         <Button size="small" variant="contained" startIcon={<CopyIcon />} onClick={() => navigator.clipboard.writeText(mermaidString)}>
             Copy Mermaid String
         </Button>
-        
+
       </>
     }>
       {graphErrorMessage && graphErrorMessage.length > 0 && (
@@ -231,7 +231,7 @@ export default function PartsForm() {
         sx={{
           '& .MuiDataGrid-cell': { fontSize: '0.875rem' },
           '& .MuiDataGrid-columnHeader': { fontWeight: 'bold' },
-          '& .problematic-row': { 
+          '& .problematic-row': {
             backgroundColor: 'rgba(255, 152, 0, 0.15)',
             '&:hover': { backgroundColor: 'rgba(255, 152, 0, 0.25)' }
           },
@@ -241,7 +241,7 @@ export default function PartsForm() {
           }
         }}
       />
-      
+
       <EditTextDialog
         open={infoDialog.open}
         value={infoDialog.value}

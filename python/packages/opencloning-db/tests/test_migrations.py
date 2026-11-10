@@ -62,26 +62,22 @@ class TestMigration_8deebdee4ca0:
         id_base = workspace_id * 100
 
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO line (workspace_id, uid, created_by_id)
                 VALUES (:workspace_id, 'strain-a', :user_id),
                     (:workspace_id, 'STRAIN-A', :user_id),
                     (:workspace_id, 'unique-line', :user_id)
-                """
-            ),
+                """),
             {'workspace_id': workspace_id, 'user_id': user_id},
         )
 
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO input_entity (id, workspace_id, type, name, created_by_id)
                 VALUES (:id1, :workspace_id, 'primer', 'primer-1', :user_id),
                     (:id2, :workspace_id, 'primer', 'primer-2', :user_id),
                     (:id3, :workspace_id, 'primer', 'primer-unique', :user_id)
-                """
-            ),
+                """),
             {
                 'id1': id_base + 1,
                 'id2': id_base + 2,
@@ -91,25 +87,21 @@ class TestMigration_8deebdee4ca0:
             },
         )
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO primer (id, workspace_id, uid, sequence)
                 VALUES (:id1, :workspace_id, 'ml7', 'ACGT'),
                     (:id2, :workspace_id, 'ML7', 'ACGT'),
                     (:id3, :workspace_id, 'unique-primer', 'ACGT')
-                """
-            ),
+                """),
             {'id1': id_base + 1, 'id2': id_base + 2, 'id3': id_base + 3, 'workspace_id': workspace_id},
         )
 
         seq_id = id_base + 10
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO input_entity (id, workspace_id, type, name, created_by_id)
                 VALUES (:seq_id, :workspace_id, 'sequence', 'plasmid-seq', :user_id)
-                """
-            ),
+                """),
             {'seq_id': seq_id, 'workspace_id': workspace_id, 'user_id': user_id},
         )
         conn.execute(
@@ -117,36 +109,30 @@ class TestMigration_8deebdee4ca0:
             {'seq_id': seq_id},
         )
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO sequence (id, overhang_crick_3prime, overhang_watson_3prime, seguid, file_content)
                 VALUES (:seq_id, 0, 0, :seguid, '')
-                """
-            ),
+                """),
             {'seq_id': seq_id, 'seguid': f'MIGTESTSEG{workspace_id}'},
         )
         instance_ids = [
             conn.execute(
-                text(
-                    """
+                text("""
                     INSERT INTO sequence_instance (sequence_id, type)
                     VALUES (:seq_id, 'sequence_sample')
                     RETURNING id
-                    """
-                ),
+                    """),
                 {'seq_id': seq_id},
             ).scalar_one()
             for _ in range(3)
         ]
         conn.execute(
-            text(
-                """
+            text("""
                 INSERT INTO sequence_sample (id, workspace_id, uid)
                 VALUES (:id1, :workspace_id, 'sample-1'),
                     (:id2, :workspace_id, 'SAMPLE-1'),
                     (:id3, :workspace_id, 'unique-sample')
-                """
-            ),
+                """),
             {
                 'id1': instance_ids[0],
                 'id2': instance_ids[1],
@@ -157,15 +143,11 @@ class TestMigration_8deebdee4ca0:
 
     def _seed_case_insensitive_uid_collisions(self, conn) -> None:
         """Insert minimal rows with case-only UID duplicates in workspaces 1 and 2."""
-        user_id = conn.execute(
-            text(
-                """
+        user_id = conn.execute(text("""
                 INSERT INTO "user" (email, display_name, password_hash, is_instance_admin)
                 VALUES ('migration@test.com', 'Migr', NULL, false)
                 RETURNING id
-                """
-            )
-        ).scalar_one()
+                """)).scalar_one()
         for workspace_id in (1, 2):
             conn.execute(
                 text('INSERT INTO workspace (id, name) VALUES (:workspace_id, :name)'),
@@ -210,21 +192,14 @@ class TestMigration_8deebdee4ca0:
                 assert primer_uids == self._EXPECTED_UIDS_AFTER_MIGRATION['primer']
                 assert sample_uids == self._EXPECTED_UIDS_AFTER_MIGRATION['sequence_sample']
 
-            indexes = {
-                row[0]
-                for row in conn.execute(
-                    text(
-                        """
+            indexes = {row[0] for row in conn.execute(text("""
                         SELECT indexname FROM pg_indexes
                         WHERE indexname IN (
                             'uq_line_workspace_uid_ci',
                             'uq_primer_workspace_uid_ci',
                             'uq_sequence_sample_workspace_uid_ci'
                         )
-                        """
-                    )
-                ).fetchall()
-            }
+                        """)).fetchall()}
 
         assert indexes == {
             'uq_line_workspace_uid_ci',
@@ -234,11 +209,7 @@ class TestMigration_8deebdee4ca0:
 
         with engine.begin() as conn:
             with pytest.raises(IntegrityError):
-                conn.execute(
-                    text(
-                        """
+                conn.execute(text("""
                         INSERT INTO line (workspace_id, uid, created_by_id)
                         VALUES (1, 'Strain-A', 1)
-                        """
-                    )
-                )
+                        """))

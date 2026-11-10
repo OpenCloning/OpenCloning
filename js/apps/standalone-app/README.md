@@ -31,7 +31,7 @@ const cleanup = StandAloneOpenCloning({
 
 That's it! No need to:
 - Set up Redux Provider
-- Set up ConfigProvider  
+- Set up ConfigProvider
 - Import and configure the store
 - Wrap components in providers
 

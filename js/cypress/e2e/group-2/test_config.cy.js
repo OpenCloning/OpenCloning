@@ -24,7 +24,7 @@ describe('test that configuration works', () => {
     cy.intercept('GET', '**/config.json', (req) => {
       req.reply({ statusCode: 200, body: {...defaultConfig, enablePlannotate: true}});
     }).as('configRequest');
-  
+
     cy.visit('/');
     cy.wait('@configRequest');
 
@@ -93,4 +93,3 @@ describe('test that configuration works', () => {
     cy.get('[data-testid="load-plasmids-from-local-server"]').should('not.exist');
   });
 });
-

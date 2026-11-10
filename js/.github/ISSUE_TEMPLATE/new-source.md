@@ -22,4 +22,3 @@ assignees: ''
   * [ ] Prevent primers used in the source from being deleted in `PrimerList.jsx` > `getUsedPrimerIds`.
   * [ ] Implement the `shiftSource` and `mergePrimersInSource` functionality in `cloning_utils.js`.
 * [ ] Make a test
-

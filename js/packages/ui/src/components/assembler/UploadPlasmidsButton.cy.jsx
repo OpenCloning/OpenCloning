@@ -172,14 +172,14 @@ describe('<UploadPlasmidsButton />', () => {
         <UploadPlasmidsButton addPlasmids={addPlasmidsSpy} syntax={mocloSyntax} />
       </ConfigProvider>,
     );
-    
+
     cy.get('[data-testid="load-plasmids-file-input"]').selectFile([
       'cypress/test_files/syntax/pYTK002.gb',
       'cypress/test_files/syntax/moclo_ytk_multi_part.gb',
       'cypress/test_files/syntax/pYTK095.gb',
       'cypress/test_files/sequencing/locus.gb'],
     { force: true });
-    
+
     cy.get('.MuiDialog-root', { timeout: 10000 }).should('be.visible');
 
     cy.get('button').contains('Cancel').click();
@@ -240,7 +240,7 @@ describe('<UploadPlasmidsButton />', () => {
         return Promise.resolve({
           data: dummyIndex,
         });
-      } 
+      }
       if (url.endsWith('/example2.gb')) {
         return Promise.resolve({ data: 'wrong_format' });
       }

@@ -67,7 +67,7 @@ function SyntaxListItem({ syntax, onSyntaxClick }) {
         </AccordionDetails>
       </Accordion>
     </ListItem>
-    
+
   )
 }
 

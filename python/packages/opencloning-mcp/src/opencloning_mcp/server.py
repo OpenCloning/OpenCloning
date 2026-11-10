@@ -26,7 +26,6 @@ from . import (  # noqa: F401
     tools_strategy,
 )
 
-
 # The page is a template: the placeholders are replaced with the public URLs of this deployment
 LANDING_PAGE = (Path(__file__).parent / 'static' / 'index.html').read_text()
 

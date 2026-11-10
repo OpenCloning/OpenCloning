@@ -108,7 +108,7 @@ describe('Actions that can be perfomed by an edit user on the Lines page', () =>
         cy.intercept('POST', Cypress.getDbURL(endpoints.postLine)).as('postLine');
         cy.get('button').contains('Submit').click();
         cy.wait('@postLine').then(({ response }) => {
-          cy.url().should('match', new RegExp(`/lines/${response.body.id}$`));  
+          cy.url().should('match', new RegExp(`/lines/${response.body.id}$`));
         });
       });
 

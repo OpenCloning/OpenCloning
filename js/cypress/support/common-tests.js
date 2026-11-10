@@ -30,7 +30,7 @@ Cypress.Commands.add('addTagInTableTest', (resourcePlural, tagEndpointName) => {
   cy.get('tbody tr').eq(2).contains('test-tag').should('not.exist');
 
   // No errors if adding the same tag again (just skipped)
-  
+
   cy.get('tbody tr input').eq(0).click();
   cy.get('tbody tr input').eq(1).click();
   cy.get('button').contains(`Tag ${resourcePlural}`, { matchCase: false }).click();

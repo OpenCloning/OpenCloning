@@ -7,4 +7,3 @@ export * from './components/index.js';
 export { StandAloneOpenCloning } from './StandAloneOpenCloning.js';
 // Export version - replaced at publish time via prepack script
 export { version } from './version.js';
-

@@ -9,7 +9,7 @@ function TagEntitiesDialog({ selectedEntities, entityType, label, open, onClose,
   const { addErrorAlert } = useAppAlerts();
   const [tags, setTags] = React.useState([]);
   const queryClient = useQueryClient();
-  
+
   const attachTagsMutation = useMutation({
     mutationFn: async ({ entities, tagIds }) => {
       const attachTagRequests = [];
@@ -62,7 +62,7 @@ function TagEntitiesDialog({ selectedEntities, entityType, label, open, onClose,
       }
     },
   });
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!tags.length || !selectedEntities.length || attachTagsMutation.isPending) return;
@@ -71,7 +71,7 @@ function TagEntitiesDialog({ selectedEntities, entityType, label, open, onClose,
       tagIds: tags,
     });
   };
-  
+
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} data-testid="tag-entities-dialog">
       <DialogTitle>Tag {label}</DialogTitle>
@@ -107,5 +107,5 @@ function TagEntitiesDialog({ selectedEntities, entityType, label, open, onClose,
     </Dialog>
   );
 }
-  
+
 export default TagEntitiesDialog;

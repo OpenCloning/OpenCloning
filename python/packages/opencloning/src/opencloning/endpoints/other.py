@@ -19,7 +19,6 @@ from .._version import __version__ as backend_version
 from ..syntax import Syntax
 from pydna.opencloning_models import CloningStrategy as PydnaCloningStrategy
 
-
 router = get_router()
 
 

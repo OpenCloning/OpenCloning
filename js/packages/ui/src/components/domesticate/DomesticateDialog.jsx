@@ -197,7 +197,7 @@ export default function DomesticateDialog({ open, onClose, initialContext, mainS
               ))}
             </Select>
           </FormControl>
-          {location.includes('join') && cloningType === 'synthesis' && 
+          {location.includes('join') && cloningType === 'synthesis' &&
           <Alert severity="info" sx={{ mb: 2 }}>Synthesis will remove introns in this feature</Alert>
           }
           <FormControl fullWidth margin="dense">

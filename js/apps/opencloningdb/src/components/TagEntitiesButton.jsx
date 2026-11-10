@@ -29,4 +29,3 @@ export default function TagEntitiesButton({ selectedEntities, entityType, label,
     </>
   );
 }
-

@@ -6,9 +6,9 @@ import { DataGrid, useGridApiRef } from '@mui/x-data-grid';
 function OverhangNamesForm() {
   const { overhangNames, updateOverhangName } = useFormData();
   const apiRef = useGridApiRef();
-  
+
   // Transform overhangNames object into rows format for DataGrid
-  const rows = React.useMemo(() => 
+  const rows = React.useMemo(() =>
     Object.keys(overhangNames).map((overhang) => ({
       id: overhang,
       overhang,

@@ -33,4 +33,3 @@ export const sbolVisualGlyphs = {
 export const getSvgByGlyph = (glyphName) => {
   return sbolVisualGlyphs[glyphName] || sbolVisualGlyphs['engineered-region'] // fallback to engineered-region if not found
 }
-

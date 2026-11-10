@@ -31,7 +31,7 @@ describe('<AssemblyIdSelector />', () => {
     }).as('getAssemblyInfo');
 
     cy.intercept('GET', 'https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_000002945.3/dataset_report*', {
-      statusCode: 200, 
+      statusCode: 200,
       body: {
         reports: [{
           accession: 'GCF_000002945.3',
@@ -49,7 +49,7 @@ describe('<AssemblyIdSelector />', () => {
 
     cy.mount(
       <ConfigProvider config={config}>
-        <AssemblyIdSelector 
+        <AssemblyIdSelector
           setAssemblyId={setAssemblyId}
           setHasAnnotation={setHasAnnotation}
           onAssemblyIdChange={onAssemblyIdChange}
@@ -188,5 +188,3 @@ describe('<SequenceAccessionPicker />', () => {
 
   });
 });
-
-
