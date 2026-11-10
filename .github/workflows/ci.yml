@@ -304,9 +304,10 @@ jobs:
         with:
           working-directory: js
           install: false
+          # No wait-on: Vite listens on localhost, which can resolve to IPv6 (::1) only on the runner,
+          # and the action's wait-on ping then fails with "Socket closed before the connection was
+          # established". Cypress itself waits for baseUrl (localhost:3000) and handles both.
           start: ${{ matrix.start }}
-          wait-on: http://localhost:3000
-          wait-on-timeout: 180
 
       - uses: actions/upload-artifact@v4
         with:
