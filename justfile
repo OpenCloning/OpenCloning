@@ -28,7 +28,7 @@ dev-api-combined:
 dev-frontend-cloning:
     yarn start
 
-# OpenCloningDB frontend (5173), test OIDC provider
+# OpenCloningDB frontend (3000), test OIDC provider
 [working-directory: 'js']
 [group('frontend')]
 dev-frontend-db:

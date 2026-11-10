@@ -23,7 +23,7 @@ class TestAppSettings(unittest.TestCase):
         # self.assertEqual(app_settings.settings.NCBI_API_KEY, None) > This is different in the CI
         self.assertEqual(
             app_settings.settings.ALLOWED_ORIGINS,
-            ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:3002'],
+            ['http://localhost:3000'],
         )
         self.assertEqual(app_settings.settings.MAX_SEQUENCE_FILE_SIZE_MB, 10)
         self.assertEqual(app_settings.settings.MAX_REQUEST_BODY_SIZE_MB, 100)

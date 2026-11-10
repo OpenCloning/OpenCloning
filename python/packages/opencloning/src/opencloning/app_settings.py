@@ -13,7 +13,7 @@ def parse_bool(value: str | bool) -> bool:
 # API settings ===============================================
 SERVE_FRONTEND = parse_bool(os.environ['SERVE_FRONTEND']) if 'SERVE_FRONTEND' in os.environ else False
 BATCH_CLONING = parse_bool(os.environ['BATCH_CLONING']) if 'BATCH_CLONING' in os.environ else True
-ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:3002']
+ALLOWED_ORIGINS = ['http://localhost:3000']
 if os.environ.get('ALLOWED_ORIGINS') is not None:
     # Remove trailing slash from each origin if ends with one
     ALLOWED_ORIGINS = [

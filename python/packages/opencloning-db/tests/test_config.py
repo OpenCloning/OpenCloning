@@ -12,8 +12,6 @@ common_args = Config(
         issuer_url='https://test.example',
         authorized_parties=[
             'http://localhost:3000',
-            'http://localhost:5173',
-            'http://localhost:3002',
         ],
         test_mode=False,
     ),

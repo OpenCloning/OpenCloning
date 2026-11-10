@@ -23,7 +23,7 @@ services:
     #   If you want to allow other origins via CORS (comma separated)
     #   IMPORTANT: Do not add a trailing slash to the URLs:
     #     > Do not use http://localhost:3000/, but http://localhost:3000
-    #   default value: unset (http://localhost:3000 and http://localhost:5173 allowed)
+    #   default value: unset (http://localhost:3000 allowed)
       # - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
     #
     #   Set this if you want to use plannotate

@@ -67,8 +67,6 @@ def _apply_testing_oidc_config(config: Config) -> Config:
                 issuer_url='https://seed.example',
                 authorized_parties=[
                     'http://localhost:3000',
-                    'http://localhost:5173',
-                    'http://localhost:3002',
                 ],
                 test_mode=True,
             ),

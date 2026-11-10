@@ -28,7 +28,7 @@ readonly_db = pytest.mark.readonly_db
 MOCK_ISSUER = 'https://oidc-mock.example'
 MOCK_JWKS_URI = f'{MOCK_ISSUER}/jwks'
 MOCK_KID = 'test-rsa-key'
-MOCK_AZP = 'http://localhost:3002'
+MOCK_AZP = 'http://localhost:3000'
 MOCK_AUTH_PROVIDER = 'oidc:oidc-mock.example'
 
 
@@ -110,7 +110,7 @@ def allow_mock_issuer(monkeypatch):
 def oidc_config() -> OidcConfig:
     return OidcConfig(
         issuer_url='https://test.example',
-        authorized_parties=['http://localhost:3002'],
+        authorized_parties=['http://localhost:3000'],
         test_mode=True,
     )
 

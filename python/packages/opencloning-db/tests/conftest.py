@@ -31,8 +31,6 @@ def _build_postgres_test_config(default_config: Config | None, database_url: str
             issuer_url='https://test.example',
             authorized_parties=[
                 'http://localhost:3000',
-                'http://localhost:5173',
-                'http://localhost:3002',
             ],
             test_mode=True,
         ),

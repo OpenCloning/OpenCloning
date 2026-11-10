@@ -27,7 +27,7 @@ def temp_workspace() -> Generator[tuple[Path, Config], None, None]:
         database_url=_TEST_DATABASE_URL,
         oidc_config=OidcConfig(
             issuer_url='https://test.example',
-            authorized_parties=['http://localhost:3002'],
+            authorized_parties=['http://localhost:3000'],
             test_mode=True,
         ),
     )
