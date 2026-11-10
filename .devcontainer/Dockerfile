@@ -49,7 +49,8 @@ RUN corepack enable
 RUN mkdir -p /workspace/js/node_modules /commandhistory "/home/$USERNAME/.claude" \
   && touch /commandhistory/.bash_history \
   && chown -R "$USERNAME:$USERNAME" /workspace /commandhistory "/home/$USERNAME/.claude" \
-  && echo "export PROMPT_COMMAND='history -a' HISTFILE=/commandhistory/.bash_history" >> "/home/$USERNAME/.bashrc"
+  && echo "export PROMPT_COMMAND='history -a' HISTFILE=/commandhistory/.bash_history" >> "/home/$USERNAME/.bashrc" \
+  && echo 'source <(just --completions bash)' >> "/home/$USERNAME/.bashrc"
 
 # Firewall script: the user may run this one script as root, nothing else
 COPY .devcontainer/init-firewall.sh .devcontainer/check-isolation.sh /usr/local/bin/

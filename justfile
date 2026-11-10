@@ -34,11 +34,35 @@ dev-frontend-cloning:
 dev-frontend-db:
     yarn workspace opencloningdb dev:test
 
+# Cloning API + OpenCloning frontend in one terminal (Ctrl+C stops both)
+[group('dev')]
+dev-cloning:
+    #!/usr/bin/env bash
+    trap 'trap - INT TERM EXIT; kill 0' INT TERM EXIT
+    just dev-api-cloning &
+    just dev-frontend-cloning &
+    wait -n
+
+# Combined API + OpenCloningDB frontend in one terminal (Ctrl+C stops both)
+[group('dev')]
+dev-db:
+    #!/usr/bin/env bash
+    trap 'trap - INT TERM EXIT; kill 0' INT TERM EXIT
+    just dev-api-combined &
+    just dev-frontend-db &
+    wait -n
+
 # Apply database migrations
 [working-directory: 'python']
 [group('backend')]
 db-migrate:
     uv run opencloning-cli db migrate
+
+# Reset the local DB to the test baseline, e.g. just db-seed --recreate-schema (destructive)
+[group('backend')]
+[working-directory: 'python']
+db-seed *args:
+    OPENCLONING_TESTING=1 uv run opencloning-cli db seed {{args}}
 
 # Python tests, e.g. just pytest -k assembly
 [working-directory: 'python']
