@@ -1,0 +1,332 @@
+# CI for the monorepo. Replaces python/.github/workflows/ci.yml and js/.github/workflows/ci.yml,
+# which GitHub never runs (it only reads workflows from the root .github/).
+#
+# Jobs only run for the side of the repo that changed (see `changes`): python/ changes run the
+# Python jobs, js/ changes run the JS jobs, and either one runs the e2e tests, since those need
+# both the frontend and the backend. python/stubs/ also counts as a JS change, since the JS
+# tests read those stubs. Changes to .github/ run everything.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded PR runs, but let every master run finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      python: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.python == 'true' }}
+      js: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.js == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            python:
+              - 'python/**'
+              - '.github/**'
+            js:
+              - 'js/**'
+              # Backend-generated stubs that the opencloningdb vitest and component tests read
+              - 'python/stubs/**'
+              - '.github/**'
+
+  lint:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Run pre-commit on all files
+        run: uv run --project python pre-commit run --all-files --show-diff-on-failure
+
+  # ---------------------------------------------------------------------------
+  # python/
+  # ---------------------------------------------------------------------------
+  pytest:
+    name: pytest (${{ matrix.mode }})
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # lock: the committed uv.lock. fresh: a newly resolved lockfile, to catch breakage from new releases.
+        mode: [lock, fresh]
+    defaults:
+      run:
+        working-directory: python
+    env:
+      OPENCLONING_TEST_DATABASE_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+        with:
+          alignment-tools: 'true'
+
+      - name: Re-resolve dependencies
+        if: matrix.mode == 'fresh'
+        run: rm uv.lock && uv lock
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Start Postgres
+        run: docker compose -f docker/docker-compose.postgres.yml up -d --wait postgres
+      - name: Apply database migrations
+        env:
+          OPENCLONING_DB_URL: ${{ env.OPENCLONING_TEST_DATABASE_URL }}
+        run: uv run alembic -c packages/opencloning-db/alembic.ini upgrade head
+
+      - name: Run tests
+        env:
+          PYTHONUNBUFFERED: '1'
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+        run: >-
+          uv run pytest --tb=short -v
+          --cov=packages/opencloning/src
+          --cov=packages/opencloning-db/src
+          --cov=packages/opencloning-mcp/src
+          --cov-report term
+          --cov-report xml:coverage.xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.mode == 'lock'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: python/coverage.xml
+          flags: python
+          fail_ci_if_error: true
+
+  pytest-docker:
+    name: pytest (Docker image)
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: python
+          file: python/docker/opencloning.Dockerfile
+          target: builder-test
+          tags: manulera/opencloningbackend-test
+          load: true
+      - name: Run tests in the container
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+        run: >-
+          docker compose
+          -f python/docker/docker-compose.postgres.yml
+          -f python/docker/docker-compose.ci-tests.yml
+          run --rm tests
+          sh -c 'alembic -c packages/opencloning-db/alembic.ini upgrade head && python -m pytest -vs -o cache_dir=/tmp/pytest-cache'
+
+  # ---------------------------------------------------------------------------
+  # js/
+  # ---------------------------------------------------------------------------
+  vitest:
+    needs: changes
+    if: needs.changes.outputs.js == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-js
+      - name: Run vitest
+        working-directory: js
+        run: yarn vitest run --coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-js-vitest
+          path: js/coverage/coverage-final.json
+
+  cypress-component:
+    needs: changes
+    if: needs.changes.outputs.js == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-js
+        with:
+          cypress: 'true'
+      - uses: cypress-io/github-action@v6
+        env:
+          VITE_COVERAGE: 'true'
+          VITE_LOG_LEVEL: warn
+        with:
+          working-directory: js
+          install: false
+          component: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-js-component
+          path: js/coverage/coverage-final.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-component
+          path: js/cypress/screenshots
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # e2e: frontend + backend
+  # ---------------------------------------------------------------------------
+  cypress-e2e:
+    name: cypress-e2e (${{ matrix.group }})
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.js == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # app: cloning = cloning API + OpenCloning frontend
+        #      db      = combined API + OpenCloningDB frontend, test OIDC provider
+        #      clerk   = combined API + OpenCloningDB frontend, real Clerk login
+        include:
+          - { group: '1', app: cloning, start: yarn start }
+          - { group: '2', app: cloning, start: yarn start }
+          - { group: '3', app: cloning, start: yarn start }
+          - { group: '4', app: cloning, start: yarn start }
+          - { group: opencloningdb1, app: db, start: 'yarn workspace opencloningdb dev:test --port 3000' }
+          - { group: opencloningdb2, app: db, start: 'yarn workspace opencloningdb dev:test --port 3000' }
+          - { group: opencloningdb-clerk, app: clerk, start: 'yarn workspace opencloningdb dev --port 3000' }
+    env:
+      NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+      ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
+      # Used by the db/clerk backends and by `db seed`
+      OPENCLONING_TESTING: '1'
+      OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+        with:
+          alignment-tools: 'true'
+      - name: Install Python dependencies
+        working-directory: python
+        run: uv sync --frozen
+      - uses: ./.github/actions/setup-js
+        with:
+          cypress: 'true'
+
+      - name: Start Postgres
+        if: matrix.app != 'cloning'
+        run: docker compose -f python/docker/docker-compose.postgres.yml up -d --wait postgres
+
+      - name: Start backend (cloning API)
+        if: matrix.app == 'cloning'
+        working-directory: python
+        run: |
+          uv run uvicorn opencloning.main:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          echo "HEALTH_URL=http://127.0.0.1:8000" >> "$GITHUB_ENV"
+
+      - name: Start backend (combined API, test OIDC)
+        if: matrix.app == 'db'
+        working-directory: python
+        env:
+          OIDC_TEST_MODE: '1'
+          OIDC_ISSUER_URL: http://dummy.value.test
+        run: |
+          uv run opencloning-cli db seed
+          uv run uvicorn opencloning_db.combined:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
+
+      - name: Start backend (combined API, Clerk)
+        if: matrix.app == 'clerk'
+        working-directory: python
+        env:
+          OIDC_TEST_MODE: '0'
+          OIDC_ISSUER_URL: ${{ secrets.OIDC_ISSUER_URL }}
+          OIDC_AUTHORIZED_PARTIES: http://localhost:3000
+          OIDC_SUBJECT_CLAIM: sub
+          OIDC_EMAIL_CLAIM: email_address
+          OIDC_NAME_CLAIM: display_name
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+        run: |
+          uv run opencloning-cli db seed
+          uv run uvicorn opencloning_db.combined:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
+
+      - name: Wait for backend
+        run: curl -sf --retry 30 --retry-delay 1 --retry-all-errors "$HEALTH_URL" > /dev/null
+
+      - uses: cypress-io/github-action@v6
+        env:
+          VITE_COVERAGE: 'true'
+          VITE_LOG_LEVEL: warn
+          CYPRESS_TEST_GROUP: ${{ matrix.group }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ matrix.app == 'clerk' && secrets.VITE_CLERK_PUBLISHABLE_KEY || '' }}
+          CLERK_SECRET_KEY: ${{ matrix.app == 'clerk' && secrets.CLERK_SECRET_KEY || '' }}
+        with:
+          working-directory: js
+          install: false
+          start: ${{ matrix.start }}
+          wait-on: http://localhost:3000
+          wait-on-timeout: 180
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-js-e2e-${{ matrix.group }}
+          path: js/coverage/coverage-final.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.group }}
+          path: js/cypress/screenshots
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: backend-log-${{ matrix.group }}
+          path: backend.log
+          if-no-files-found: ignore
+
+  js-coverage:
+    name: Upload JS coverage
+    needs: [vitest, cypress-component, cypress-e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-js-*
+          path: .nyc_output
+          merge-multiple: false
+      - name: Merge coverage reports
+        run: |
+          # One coverage-final.json per artifact directory -> flat .nyc_output/<artifact>.json
+          for dir in .nyc_output/coverage-js-*/; do
+            mv "$dir/coverage-final.json" "${dir%/}.json"
+            rmdir "$dir"
+          done
+          npx --yes nyc report --reporter json --report-dir coverage
+          # Make paths relative to the repo root (js/packages/...)
+          sed -i "s|\"$GITHUB_WORKSPACE/|\"|g" coverage/coverage-final.json
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/coverage-final.json
+          flags: js

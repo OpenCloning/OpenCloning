@@ -1,0 +1,29 @@
+name: Set up Python (uv)
+description: Installs uv and Python, and optionally the mafft and MARS binaries the cloning API shells out to.
+
+inputs:
+  alignment-tools:
+    description: Install mafft and MARS
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv and Python
+      uses: astral-sh/setup-uv@v6
+      with:
+        # Keep in sync with UV_VERSION / PYTHON_VERSION in .devcontainer/Dockerfile
+        version: 0.13.7
+        python-version: '3.12'
+        enable-cache: true
+        cache-dependency-glob: python/uv.lock
+
+    - name: Install mafft and MARS
+      if: inputs.alignment-tools == 'true'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mafft
+        wget -q https://github.com/manulera/MARS/releases/download/v0.2/mars-Linux
+        chmod +x mars-Linux
+        sudo mv mars-Linux /usr/local/bin/mars

@@ -1,0 +1,26 @@
+# Codecov only reads this file from the repo root (python/codecov.yml and js/codecov.yml are not used).
+# Each side uploads with its own flag (see .github/workflows/ci.yml). With carryforward, a run that
+# only tests one side keeps the last coverage of the other.
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: python
+      paths:
+        - python/
+    - name: js
+      paths:
+        - js/
+
+ignore:
+  # python/
+  - "python/packages/opencloning/tests/**"
+  - "python/packages/opencloning/src/opencloning/batch_cloning/pombe"
+  - "python/packages/opencloning/src/opencloning/batch_cloning/domesticate/__init__.py"
+  - "python/packages/opencloning-mcp/**"
+  # js/
+  - "js/apps/test-app/**"
+  - "js/apps/standalone-app/**"
+  - "js/packages/*/src/**/index.js"
+  - "js/packages/*/src/index.js"
+  - "js/packages/ui/scripts/**"
