@@ -45,3 +45,12 @@ Cypress.Commands.add('mount', (component, options = {}) => {
 
 // Example use:
 // cy.mount(<MyComponent />)
+
+// Component tests run against the cloning API only (no database), so every OpenCloningDB request
+// must be stubbed (cy.interceptOpenCloningDBStub / cy.intercept). This catch-all is registered
+// first, so any intercept a spec adds takes precedence; whatever reaches it was not stubbed.
+beforeEach(() => {
+  cy.intercept(Cypress.getDbURL('/**'), (req) => {
+    throw new Error(`Unstubbed OpenCloningDB request in a component test: ${req.method} ${req.url}`);
+  });
+});

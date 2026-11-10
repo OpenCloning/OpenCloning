@@ -34,6 +34,8 @@ function mountComponent() {
 describe('<SubmitCloningStrategiesInBulkComponent />', () => {
   beforeEach(() => {
     cy.setupOpenCloningDBTestAuth();
+    // TagMultiSelect fetches the tags on mount, in every test
+    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
   });
 
   it('validates the files as multipart and shows the status of each one', () => {
@@ -62,7 +64,6 @@ describe('<SubmitCloningStrategiesInBulkComponent />', () => {
 
   it('submits the importable rows with the selected tags', () => {
     cy.intercept(validateUrl, { statusCode: 200, body: validationRows }).as('validate');
-    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
     cy.intercept(submitUrl, (req) => {
       req.reply({ statusCode: 200, body: createdSequences });
     }).as('submit');

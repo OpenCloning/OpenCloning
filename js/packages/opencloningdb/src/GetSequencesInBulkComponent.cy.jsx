@@ -20,11 +20,12 @@ function expectLoadedSequences(spy, stubBody) {
 describe('<GetSequencesInBulkComponent />', () => {
   beforeEach(() => {
     cy.setupOpenCloningDBTestAuth();
+    // TagMultiSelect fetches the tags on mount, in every test
+    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
   });
 
   it('loads all sequences with a tag', () => {
     const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
-    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
     cy.interceptOpenCloningDBStub('get_text_file_sequences_by_tag', { alias: 'getSequences' });
 
     cy.mount(<GetSequencesInBulkComponent onSequencesLoaded={onSequencesLoadedSpy} />);
@@ -64,7 +65,6 @@ describe('<GetSequencesInBulkComponent />', () => {
 
   it('shows the error returned by the server', () => {
     const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
-    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
     cy.intercept('GET', `**${endpoints.sequenceTextFiles}*`, {
       statusCode: 400,
       body: { detail: 'Too many sequences (300), the maximum is 200.' },
@@ -82,7 +82,6 @@ describe('<GetSequencesInBulkComponent />', () => {
 
   it('shows a message when no sequences have the tag', () => {
     const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
-    cy.interceptOpenCloningDBStub('get_tags', { alias: 'getTags' });
     cy.intercept('GET', `**${endpoints.sequenceTextFiles}*`, { statusCode: 200, body: [] }).as('getSequences');
 
     cy.mount(<GetSequencesInBulkComponent onSequencesLoaded={onSequencesLoadedSpy} />);
