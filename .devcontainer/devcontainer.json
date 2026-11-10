@@ -36,6 +36,8 @@
         "timonwong.shellcheck",
         // python/
         "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
         "samuelcolvin.jinjahtml",
         // js/
         "dbaeumer.vscode-eslint",

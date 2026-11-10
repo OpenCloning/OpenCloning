@@ -1,0 +1,37 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/*.pyc": true,
+        "**/__pycache__": true
+    },
+    "files.insertFinalNewline": true,
+
+    // js/
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    },
+    // Run ESLint from js/ so it finds js/eslint.config.js and js/node_modules
+    "eslint.workingDirectories": [
+        { "directory": "js", "changeProcessCWD": true }
+    ],
+    "eslint.format.enable": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "cypressHelper.typeDefinitionOnSave": true,
+
+    // python/
+    // flake8 and black come from the selected interpreter (python/.venv locally, /opt/venv in the dev container)
+    "flake8.importStrategy": "fromEnvironment",
+    "black-formatter.importStrategy": "fromEnvironment",
+    // flake8 only reads .flake8 from its working directory
+    "flake8.cwd": "${workspaceFolder}/python",
+    "cursorpyright.analysis.typeCheckingMode": "basic"
+}
