@@ -294,7 +294,10 @@ describe('<UploadPlasmidsButton />', () => {
         ];
         const mockDatabase = {
           name: 'MockDB',
-          GetSequencesInBulkComponent: ({ onSequencesLoaded }) => <button type="button" onClick={() => onSequencesLoaded(entries)}>Mock load</button>,
+          // Shows the default sequence types it receives, to check that plasmids are selected by default
+          GetSequencesInBulkComponent: ({ onSequencesLoaded, defaultSequenceTypes }) => (
+            <button type="button" data-default-types={JSON.stringify(defaultSequenceTypes)} onClick={() => onSequencesLoaded(entries)}>Mock load</button>
+          ),
         };
         const addPlasmidsSpy = cy.spy().as('addPlasmidsSpy');
         cy.mount(
@@ -306,7 +309,7 @@ describe('<UploadPlasmidsButton />', () => {
         );
         cy.get('[data-testid="load-plasmids-button"]').click();
         cy.get('[data-testid="load-plasmids-from-database"]').contains('From MockDB').click();
-        cy.contains('button', 'Mock load').click();
+        cy.contains('button', 'Mock load').should('have.attr', 'data-default-types', '["plasmid"]').click();
         // The bulk dialog closes and the valid / invalid dialog is shown
         cy.contains('button', 'Mock load').should('not.exist');
         cy.get('[data-testid="invalid-plasmids-box"]').contains('multi_part_db');

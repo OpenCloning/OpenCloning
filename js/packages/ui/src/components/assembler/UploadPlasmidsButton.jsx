@@ -172,7 +172,7 @@ function UploadPlasmidsButton({ addPlasmids, syntax }) {
     )}
     {openDialog === 'database' && (
       <LoadPlasmidsDialog title={`Load Plasmids from ${database.name}`} onLoad={loadPlasmidsFromDatabase} onClose={closeDialog}>
-        {(onLoad) => <database.GetSequencesInBulkComponent onSequencesLoaded={onLoad} />}
+        {(onLoad) => <database.GetSequencesInBulkComponent onSequencesLoaded={onLoad} defaultSequenceTypes={['plasmid']} />}
       </LoadPlasmidsDialog>
     )}
     <ImportPlasmidsDialog

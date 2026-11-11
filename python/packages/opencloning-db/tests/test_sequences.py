@@ -1354,6 +1354,47 @@ def test_get_text_file_sequences_by_several_tags(sequences_client):
 
 
 @readonly_db
+@pytest.mark.parametrize(
+    'sequence_types, expected_keys',
+    [
+        (['plasmid'], ['seq_circ_id']),
+        (['pcr_product'], ['pcr_product_id']),
+        (['plasmid', 'pcr_product'], ['seq_circ_id', 'pcr_product_id']),
+        (['locus'], []),
+    ],
+)
+def test_get_text_file_sequences_by_tag_and_sequence_type(sequences_client, sequence_types, expected_keys):
+    r = sequences_client['client'].get(
+        '/sequences/text_file_sequences',
+        headers=workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1']),
+        params=[('tags', str(sequences_client['filter_tag_id'])), ('tags', str(sequences_client['bulk_tag_id']))]
+        + [('sequence_types', t) for t in sequence_types],
+    )
+    assert r.status_code == 200, r.text
+    assert [item['sequence_ref']['id'] for item in r.json()] == sorted(sequences_client[k] for k in expected_keys)
+
+
+@readonly_db
+def test_get_text_file_sequences_sequence_types_requires_tags(sequences_client):
+    r = sequences_client['client'].get(
+        '/sequences/text_file_sequences',
+        headers=workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1']),
+        params=[('ids', str(sequences_client['seq_circ_id'])), ('sequence_types', 'plasmid')],
+    )
+    assert r.status_code == 422, r.text
+
+
+@readonly_db
+def test_get_text_file_sequences_invalid_sequence_type_422(sequences_client):
+    r = sequences_client['client'].get(
+        '/sequences/text_file_sequences',
+        headers=workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1']),
+        params=[('tags', str(sequences_client['bulk_tag_id'])), ('sequence_types', 'not_a_type')],
+    )
+    assert r.status_code == 422, r.text
+
+
+@readonly_db
 def test_get_text_file_sequences_duplicate_ids(sequences_client):
     sid = sequences_client['seq_circ_id']
     r = sequences_client['client'].get(

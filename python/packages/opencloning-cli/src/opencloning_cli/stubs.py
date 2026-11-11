@@ -189,6 +189,12 @@ def stubs(dirname: str) -> Generator[StubRequest, None, None]:
         params={'tags': str(get_selected_tag_id(dirname, 'get_tags'))},
     )
     yield StubRequest(
+        name='get_text_file_sequences_by_tag_plasmids',
+        endpoint='/db/sequences/text_file_sequences',
+        method='GET',
+        params={'tags': str(get_selected_tag_id(dirname, 'get_tags')), 'sequence_types': 'plasmid'},
+    )
+    yield StubRequest(
         name='get_cloning_strategy',
         endpoint=f'/db/sequences/{selected_sequence_id}/cloning_strategy',
         method='GET',

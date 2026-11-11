@@ -42,6 +42,56 @@ describe('<GetSequencesInBulkComponent />', () => {
     });
   });
 
+  it('loads only the sequences of the selected types', () => {
+    const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
+    cy.interceptOpenCloningDBStub('get_text_file_sequences_by_tag_plasmids', { alias: 'getSequences' });
+
+    cy.mount(<GetSequencesInBulkComponent onSequencesLoaded={onSequencesLoadedSpy} />);
+
+    cy.wait('@getTags');
+    clickMultiSelectOption('Tags', TAG_NAME, 'div');
+    cy.get('input[placeholder="All types"]').should('exist');
+    clickMultiSelectOption('Sequence types', 'Plasmid', 'div');
+    cy.contains('.MuiChip-root', 'Plasmid').should('exist');
+    cy.contains('button', 'Load sequences').click();
+    cy.wait('@getSequences');
+
+    cy.getStub('get_text_file_sequences_by_tag_plasmids').then((stub) => {
+      expect(stub.response.body).to.have.length.greaterThan(0);
+      stub.response.body.forEach(({ sequence_ref }) => expect(sequence_ref.sequence_type).to.equal('plasmid'));
+      cy.get('@onSequencesLoadedSpy').should((spy) => expectLoadedSequences(spy, stub.response.body));
+    });
+  });
+
+  it('uses defaultSequenceTypes as the initial type filter, which can be cleared', () => {
+    const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
+    cy.interceptOpenCloningDBStub('get_text_file_sequences_by_tag_plasmids', { alias: 'getPlasmids' });
+
+    cy.mount(<GetSequencesInBulkComponent onSequencesLoaded={onSequencesLoadedSpy} defaultSequenceTypes={['plasmid']} />);
+
+    cy.wait('@getTags');
+    clickMultiSelectOption('Tags', TAG_NAME, 'div');
+    cy.contains('button', 'Load sequences').click();
+    cy.wait('@getPlasmids');
+    cy.getStub('get_text_file_sequences_by_tag_plasmids').then((stub) => {
+      cy.get('@onSequencesLoadedSpy').should((spy) => expectLoadedSequences(spy, stub.response.body));
+    });
+
+    // Unselecting the default type loads sequences of all types
+    cy.interceptOpenCloningDBStub('get_text_file_sequences_by_tag', { alias: 'getAll' });
+    cy.contains('.MuiChip-root', 'Plasmid').find('.MuiChip-deleteIcon').click();
+    cy.get('input[placeholder="All types"]').should('exist');
+    cy.contains('button', 'Load sequences').click();
+    cy.wait('@getAll');
+  });
+
+  it('does not show the type filter when picking sequences', () => {
+    cy.mount(<GetSequencesInBulkComponent onSequencesLoaded={cy.spy()} defaultSequenceTypes={['plasmid']} />);
+    cy.contains('label', 'Sequence types').should('exist');
+    cy.contains('button', 'Pick sequences').click();
+    cy.contains('label', 'Sequence types').should('not.exist');
+  });
+
   it('loads the picked sequences', () => {
     const onSequencesLoadedSpy = cy.spy().as('onSequencesLoadedSpy');
     cy.interceptOpenCloningDBStub('get_sequences_search_by_name', { alias: 'searchByName' });
@@ -90,7 +140,7 @@ describe('<GetSequencesInBulkComponent />', () => {
     clickMultiSelectOption('Tags', TAG_NAME, 'div');
     cy.contains('button', 'Load sequences').click();
     cy.wait('@getSequences');
-    cy.contains('No sequences found with the selected tags.').should('exist');
+    cy.contains('No sequences found with the selected tags and types.').should('exist');
     cy.get('@onSequencesLoadedSpy').should('not.have.been.called');
   });
 
@@ -109,7 +159,7 @@ describe('<GetSequencesInBulkComponent />', () => {
     cy.contains('button', 'Load sequences').click();
     cy.wait('@getSequences');
     cy.contains('The selected sequences have no content (template sequences cannot be loaded).').should('exist');
-    cy.contains('No sequences found with the selected tags.').should('not.exist');
+    cy.contains('No sequences found with the selected tags and types.').should('not.exist');
     cy.get('@onSequencesLoadedSpy').should('not.have.been.called');
   });
 });
