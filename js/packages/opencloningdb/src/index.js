@@ -9,3 +9,4 @@ export { default as SubmitCloningStrategiesInBulkComponent } from './SubmitCloni
 export { default as BulkUploadPreview } from './bulk_upload/BulkUploadPreview.jsx';
 export { default as BulkUploadModal } from './bulk_upload/BulkUploadModal.jsx';
 export { CommonTableRow } from './bulk_upload/common.jsx';
+export { default as SequencingCheckModal } from './sequencing_check/SequencingCheckModal.jsx';

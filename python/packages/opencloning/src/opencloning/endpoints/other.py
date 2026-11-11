@@ -1,4 +1,5 @@
-from fastapi import Query, HTTPException, Response
+from fastapi import Body, Query, HTTPException, Response
+from pydna.dseq import Dseq
 from Bio.Restriction.Restriction_Dictionary import rest_dict
 from opencloning.utils import validate_cloning_strategy_format_and_migrate
 from opencloning_linkml._version import __version__ as schema_version
@@ -115,3 +116,16 @@ def align_sanger(
         return align_sanger_traces(dseqr, traces)
     except RuntimeError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post('/seguid', response_model=str)
+def seguid(
+    sequence: str = Body(..., description='The DNA sequence (single strand, the complementary strand is inferred).'),
+    circular: bool = Body(False, description='Whether the sequence is circular (cdseguid) or linear (ldseguid).'),
+):
+    """Return the SEGUID checksum of a blunt double-stranded DNA sequence, computed like the seguid of sequences
+    stored in OpenCloningDB (cdseguid if circular, ldseguid if linear)."""
+    try:
+        return Dseq(sequence, circular=circular).seguid()
+    except (AssertionError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f'Invalid sequence: {e}' if str(e) else 'Invalid sequence')

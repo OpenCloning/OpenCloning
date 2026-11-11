@@ -279,6 +279,16 @@ export async function getTeselaJsonFromBase64(ab1Base64, fileName = null) {
   }
 }
 
+/**
+ * Read a sequencing file (ab1, fasta, genbank, fastq...) and parse it.
+ * Returns the base64 content (to store it) and the parsed teselaJson (e.g. teselaJson.sequence is the trace).
+ */
+export async function readSequencingFile(file) {
+  const base64str = await file2base64(file);
+  const teselaJson = await getTeselaJsonFromBase64(base64str, file.name);
+  return { base64str, teselaJson };
+}
+
 export function formatTemplate(data, url) {
   const newData = { ...data };
   const segments = url.split('/');
