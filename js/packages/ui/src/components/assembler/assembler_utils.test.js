@@ -190,6 +190,14 @@ describe('assignSequenceToSyntaxPart', () => {
     // A single cut only gives fragments with a sequence end
     expect(assignSequenceToSyntaxPart({ sequence: 'tgggtctcaTACTagagtc', circular: false }, enzymes, graph)).toEqual([]);
   })
+
+  it('does not assign a sequence that the enzyme does not cut', () => {
+    const parts = [{left_overhang: 'TACT', right_overhang: 'AATG'}, {left_overhang: 'AATG', right_overhang: 'AGGT'}];
+    const graph = partsToEdgesGraph(parts);
+    const enzymes = [aliasedEnzymesByName["bsai"]];
+    expect(assignSequenceToSyntaxPart({ sequence: 'AAAAAAA', circular: true }, enzymes, graph)).toEqual([]);
+    expect(assignSequenceToSyntaxPart({ sequence: 'AAAAAAA', circular: false }, enzymes, graph)).toEqual([]);
+  })
 });
 
 describe('tripletsToTranslation', () => {
