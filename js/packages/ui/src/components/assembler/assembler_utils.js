@@ -92,11 +92,13 @@ export function longestFeatureInDigestFragment(digestFragment, sequenceData) {
 export function getSimplifiedDigestFragments(sequenceData, enzymes) {
   const { sequence, circular } = sequenceData;
 
+  // In linear sequences, the fragments at the ends have a "cut" at the start / end of the sequence,
+  // which has no overhang, so they cannot be parts.
   const digestFragments = getDigestFragmentsForRestrictionEnzymes(
     sequence,
     circular,
     enzymes,
-  );
+  ).filter(({ cut1, cut2 }) => cut1.type !== 'START_OR_END_OF_SEQ' && cut2.type !== 'START_OR_END_OF_SEQ');
 
   const longestFeatures = digestFragments.map(fragment => longestFeatureInDigestFragment(fragment, sequenceData));
   const simplifiedDigestFragments = digestFragments.map(simplifyDigestFragment);
