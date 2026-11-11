@@ -19,14 +19,14 @@
             "display_name": "Bootstrap User",
             "id": 1
           },
-          "id": 12,
+          "id": 63,
           "name": "ase1_CDS_PCR_SalI_AscI",
           "sample_uids": [],
           "seguid": "ldseguid=84qdfT36jnkUuRt0NlRI9y0Wp2k",
           "sequence_type": "restriction_fragment",
           "tags": [
             {
-              "id": 3,
+              "id": 9,
               "name": "restriction_then_ligation"
             }
           ],
@@ -38,14 +38,14 @@
             "display_name": "Bootstrap User",
             "id": 1
           },
-          "id": 10,
+          "id": 61,
           "name": "ase1_CDS_PCR",
           "sample_uids": [],
           "seguid": "ldseguid=oMGruVpBiElY0ffP28XC_BlHXv8",
           "sequence_type": "pcr_product",
           "tags": [
             {
-              "id": 3,
+              "id": 9,
               "name": "restriction_then_ligation"
             }
           ],

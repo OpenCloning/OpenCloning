@@ -16,15 +16,15 @@
           "display_name": "Bootstrap User",
           "id": 1
         },
-        "id": 10,
-        "name": "ase1_CDS_PCR",
+        "id": 55,
+        "name": "name",
         "sample_uids": [],
         "seguid": "ldseguid=oMGruVpBiElY0ffP28XC_BlHXv8",
         "sequence_type": "pcr_product",
         "tags": [
           {
-            "id": 3,
-            "name": "restriction_then_ligation"
+            "id": 8,
+            "name": "restriction_ligation_assembly"
           }
         ],
         "type": "sequence"
@@ -35,15 +35,15 @@
           "display_name": "Bootstrap User",
           "id": 1
         },
-        "id": 63,
-        "name": "name",
+        "id": 61,
+        "name": "ase1_CDS_PCR",
         "sample_uids": [],
         "seguid": "ldseguid=oMGruVpBiElY0ffP28XC_BlHXv8",
         "sequence_type": "pcr_product",
         "tags": [
           {
             "id": 9,
-            "name": "restriction_ligation_assembly"
+            "name": "restriction_then_ligation"
           }
         ],
         "type": "sequence"

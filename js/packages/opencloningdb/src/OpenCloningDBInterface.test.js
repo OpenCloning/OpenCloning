@@ -108,7 +108,9 @@ describe('getSequencingFiles', () => {
     addStubToServer(server, listStub);
     addStubToServer(server, downloadStub);
 
-    const files = await OpenCloningDBInterface.getSequencingFiles(10);
+    // The sequence id comes from the stub (/db/sequences/<id>/sequencing_files), so it follows the seed data
+    const sequenceId = Number(listStub.endpoint.match(/\/db\/sequences\/(\d+)\//)[1]);
+    const files = await OpenCloningDBInterface.getSequencingFiles(sequenceId);
 
     expect(files).toHaveLength(1);
     expect(files[0].id).toBe(listStub.response.body[0].id);

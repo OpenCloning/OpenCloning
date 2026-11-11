@@ -1,6 +1,6 @@
 {
   "body": null,
-  "endpoint": "/db/sequences/10",
+  "endpoint": "/db/sequences/61",
   "headers": {
     "authorization": "Bearer __TEST_TOKEN__",
     "x-workspace-id": "1"
@@ -15,14 +15,14 @@
         "display_name": "Bootstrap User",
         "id": 1
       },
-      "id": 10,
+      "id": 61,
       "name": "ase1_CDS_PCR",
       "sample_uids": [],
       "seguid": "ldseguid=oMGruVpBiElY0ffP28XC_BlHXv8",
       "sequence_type": "pcr_product",
       "tags": [
         {
-          "id": 3,
+          "id": 9,
           "name": "restriction_then_ligation"
         }
       ],

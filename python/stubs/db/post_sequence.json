@@ -7,14 +7,14 @@
     "primers": [
       {
         "database_id": null,
-        "id": 4,
+        "id": 3,
         "name": "name",
         "sequence": "ACGTACGT",
         "type": "Primer"
       },
       {
         "database_id": null,
-        "id": 3,
+        "id": 4,
         "name": "name",
         "sequence": "GCGCGCGC",
         "type": "Primer"
@@ -24,7 +24,7 @@
     "sequences": [
       {
         "file_content": "LOCUS       name                      22 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 acgtacgtaa aaaagcgcgc gc\n//",
-        "id": 2,
+        "id": 1,
         "overhang_crick_3prime": 0,
         "overhang_watson_3prime": 0,
         "sequence_file_format": "genbank",
@@ -32,7 +32,7 @@
       },
       {
         "file_content": "LOCUS       name                      30 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ccccacgtac gtaaaaaagc gcgcgccccc\n//",
-        "id": 1,
+        "id": 2,
         "overhang_crick_3prime": 0,
         "overhang_watson_3prime": 0,
         "sequence_file_format": "genbank",
@@ -44,27 +44,27 @@
         "add_primer_features": false,
         "circular": false,
         "database_id": null,
-        "id": 2,
+        "id": 1,
         "input": [
           {
             "left_location": null,
             "reverse_complemented": false,
             "right_location": "1..8",
-            "sequence": 4,
+            "sequence": 3,
             "type": "AssemblyFragment"
           },
           {
             "left_location": "5..12",
             "reverse_complemented": false,
             "right_location": "19..26",
-            "sequence": 1,
+            "sequence": 2,
             "type": "AssemblyFragment"
           },
           {
             "left_location": "1..8",
             "reverse_complemented": true,
             "right_location": null,
-            "sequence": 3,
+            "sequence": 4,
             "type": "AssemblyFragment"
           }
         ],
@@ -73,7 +73,7 @@
       },
       {
         "database_id": null,
-        "id": 1,
+        "id": 2,
         "input": [],
         "output_name": null,
         "type": "ManuallyTypedSource"
@@ -94,19 +94,19 @@
       "mappings": [
         {
           "databaseId": 84,
-          "localId": 2
-        },
-        {
-          "databaseId": 83,
           "localId": 1
         },
         {
+          "databaseId": 83,
+          "localId": 2
+        },
+        {
           "databaseId": 81,
-          "localId": 4
+          "localId": 3
         },
         {
           "databaseId": 82,
-          "localId": 3
+          "localId": 4
         }
       ]
     },

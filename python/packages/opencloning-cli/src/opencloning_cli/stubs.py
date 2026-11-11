@@ -6,11 +6,31 @@ from pydna.assembly2 import pcr_assembly
 from pydna.dseqrecord import Dseqrecord
 from pydna.primer import Primer
 
+
+def _renumber_ids_by_appearance(cloning_strategy: dict) -> dict:
+    """Renumber the local ids of a dumped cloning strategy in order of appearance.
+
+    pydna assigns ids with Python's id() (memory addresses) and renumbers them sorted by address,
+    which depends on the platform and allocation order, so the same strategy gets different ids on
+    different machines. Numbering by position (sequences, then primers, then sources) is stable.
+    A source and the sequence it produces share an id, so they keep sharing the new one.
+    """
+    mapping: dict[int, int] = {}
+    for item in [*cloning_strategy['sequences'], *cloning_strategy['primers'], *cloning_strategy['sources']]:
+        mapping.setdefault(item['id'], len(mapping) + 1)
+    for item in [*cloning_strategy['sequences'], *cloning_strategy['primers'], *cloning_strategy['sources']]:
+        item['id'] = mapping[item['id']]
+    for source in cloning_strategy['sources']:
+        for source_input in source['input']:
+            source_input['sequence'] = mapping[source_input['sequence']]
+    return cloning_strategy
+
+
 primer1 = Primer('ACGTACGT')
 primer2 = Primer(reverse_complement('GCGCGCGC'))
 pcr_template = Dseqrecord('ccccACGTACGTAAAAAAGCGCGCGCcccc', circular=True)
 pcr_product, *_ = pcr_assembly(pcr_template, primer1, primer2, limit=8)
-cs_pcr = opencloning_models.CloningStrategy.from_dseqrecords([pcr_product]).model_dump()
+cs_pcr = _renumber_ids_by_appearance(opencloning_models.CloningStrategy.from_dseqrecords([pcr_product]).model_dump())
 
 
 class StubRequest(BaseModel):

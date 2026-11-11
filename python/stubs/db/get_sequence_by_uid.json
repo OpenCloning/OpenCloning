@@ -15,7 +15,7 @@
         "display_name": "Bootstrap User",
         "id": 1
       },
-      "id": 1,
+      "id": 13,
       "name": "pREX0008",
       "sample_uids": [
         "example_sequencing-sample"
@@ -24,7 +24,7 @@
       "sequence_type": "plasmid",
       "tags": [
         {
-          "id": 1,
+          "id": 3,
           "name": "example_sequencing"
         }
       ],

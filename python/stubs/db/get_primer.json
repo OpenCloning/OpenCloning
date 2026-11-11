@@ -1,6 +1,6 @@
 {
   "body": null,
-  "endpoint": "/db/primers/37",
+  "endpoint": "/db/primers/16",
   "headers": {
     "authorization": "Bearer __TEST_TOKEN__",
     "x-workspace-id": "1"
@@ -15,7 +15,7 @@
         "display_name": "Bootstrap User",
         "id": 1
       },
-      "id": 37,
+      "id": 16,
       "name": "lacZ_attB1_fwd",
       "sequence": "GGGGACAAGTTTGTACAAAAAAGCAGGCTTAATGACCATGATTACGGATTC",
       "tags": [],

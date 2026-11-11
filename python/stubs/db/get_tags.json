@@ -12,39 +12,39 @@
     "body": [
       {
         "id": 1,
-        "name": "example_sequencing"
-      },
-      {
-        "id": 2,
         "name": "cre_lox_recombination"
       },
       {
-        "id": 3,
-        "name": "restriction_then_ligation"
-      },
-      {
-        "id": 4,
+        "id": 2,
         "name": "crispr_hdr"
       },
       {
-        "id": 5,
-        "name": "golden_gate"
+        "id": 3,
+        "name": "example_sequencing"
       },
       {
-        "id": 6,
+        "id": 4,
         "name": "gateway"
       },
       {
-        "id": 7,
+        "id": 5,
         "name": "gibson_assembly"
       },
       {
-        "id": 8,
+        "id": 6,
+        "name": "golden_gate"
+      },
+      {
+        "id": 7,
         "name": "homologous_recombination"
       },
       {
-        "id": 9,
+        "id": 8,
         "name": "restriction_ligation_assembly"
+      },
+      {
+        "id": 9,
+        "name": "restriction_then_ligation"
       },
       {
         "id": 10,

@@ -40,7 +40,8 @@ def load_seed_data(engine: Engine) -> None:
     cloning_strategies = []
     file_names = []
     data_dir = Path(__file__).resolve().parent / 'init_db'
-    for file in glob.glob(str(data_dir / '*.json')):
+    # sorted: glob order depends on the filesystem, and it decides the database ids of the seed data
+    for file in sorted(glob.glob(str(data_dir / '*.json'))):
         with open(file) as f:
             cloning_strategies.append(opencloning_models.CloningStrategy.model_validate(json.load(f)))
             file_names.append(os.path.basename(file))
@@ -141,7 +142,7 @@ def load_seed_data(engine: Engine) -> None:
         test_primer.tags.append(tag)
         session.add(test_primer)
 
-        for file in glob.glob(str(data_dir / 'sequencing_data' / '*')):
+        for file in sorted(glob.glob(str(data_dir / 'sequencing_data' / '*'))):
             with open(file, 'rb') as f:
                 content = f.read()
             file_name = os.path.basename(file)
