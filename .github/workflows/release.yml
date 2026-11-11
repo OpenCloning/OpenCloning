@@ -11,6 +11,12 @@ on:
   push:
     branches: [master]
 
+# One release run at a time, queued in push order: overlapping runs could update the release PR
+# concurrently or publish twice. Never cancel: a cancelled run could stop a release halfway.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -156,7 +162,7 @@ jobs:
             ${{ matrix.image }}:${{ needs.release-please.outputs.version }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Trivy vulnerability scan (report only)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ matrix.image }}:${{ needs.release-please.outputs.version }}
           format: table
@@ -200,7 +206,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
       - name: Trivy vulnerability scan (report only)
         if: matrix.suffix == ''
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: manulera/opencloningfrontend:${{ needs.release-please.outputs.tag_name }}
           format: table
