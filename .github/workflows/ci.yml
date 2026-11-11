@@ -125,6 +125,7 @@ jobs:
         env:
           OPENCLONING_TESTING: '1'
           OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_e2e
+          OIDC_ISSUER_URL: http://dummy.value.test
         run: |
           uv run opencloning-cli db stubs > /dev/null
           if [ -n "$(git status --porcelain -- stubs)" ]; then
