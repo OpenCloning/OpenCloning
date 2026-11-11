@@ -7,7 +7,7 @@ license = "MIT"
 authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
 requires-python = ">=3.11,<4"
 dependencies = [
-    "beautifulsoup4>=4.11.1,<5",
+    "beautifulsoup4>=4.15.0,<5",
     "biopython>=1.87",
     "certifi>=2026.10.18",
     "fastapi>=0.135.3",

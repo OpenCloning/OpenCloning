@@ -9,7 +9,7 @@ requires-python = ">=3.11,<4"
 dependencies = [
     "opencloning",
     "opencloning-linkml>=1.0.0",
-    "biopython>=1.87",
+    "biopython>=1.88",
     "fastapi>=0.135.3",
     "mcp>=2.3,<3",
     "pydantic>=2.7.1",
