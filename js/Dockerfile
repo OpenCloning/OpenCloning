@@ -2,7 +2,7 @@
 # https://github.com/OpenCloning/OpenCloning (js/)
 
 # Stage 1: Build the application
-FROM node:22.22.2-alpine3.22 AS builder
+FROM node:26.3.0-alpine3.22 AS builder
 WORKDIR /app
 
 # Copy everything (Yarn workspaces need the full structure)
@@ -22,7 +22,7 @@ ENV VITE_MCP_SERVER_URL=$VITE_MCP_SERVER_URL
 RUN yarn build --base "$BASE_URL"
 
 # Stage 2: Create a lightweight production image
-FROM node:22.22.2-alpine3.22
+FROM node:26.3.0-alpine3.22
 WORKDIR /build
 COPY --from=builder /app/apps/opencloning/build .
 
