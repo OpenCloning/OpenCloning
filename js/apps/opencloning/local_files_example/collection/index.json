@@ -1,0 +1,29 @@
+{
+    "sequences": [
+        {
+            "name": "seq1",
+            "path": "sequences/seq1.gb",
+            "categories": ["category1", "category2"]
+        },
+        {
+            "name": "seq2",
+            "path": "sequences/seq2.fasta",
+            "categories": ["category2"]
+        },
+        {
+            "name": "seq3",
+            "path": "sequences/seq3.gb",
+            "categories": ["category3"]
+        },
+        {
+            "name": "seq4",
+            "path": "sequences/seq3.gb"
+        }
+    ],
+    "syntaxes": [
+        {
+            "name": "syntax1",
+            "path": "syntaxes/mini_syntax.json"
+        }
+    ]
+}

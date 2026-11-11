@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+cypress/
+cypress.config.js
+vitest.config.js
+*.test.js
+*.test.jsx
+*.cy.js
+*.cy.jsx
+
+# Build outputs
+build/
+dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+.DS_Store
+.env*
+.git/
+.gitignore
+.yarn/
+.yarnrc.yml

@@ -1,0 +1,59 @@
+[project]
+name = "opencloning-workspace"
+version = "0.0.0"
+requires-python = ">=3.11,<4"
+dependencies = [
+    "opencloning",
+    "opencloning-db",
+    "opencloning-cli",
+    "opencloning-mcp",
+]
+
+[tool.uv]
+package = false
+default-groups = ["dev", "test", "ipython"]
+
+[tool.uv.sources]
+opencloning = { workspace = true }
+opencloning-cli = { workspace = true }
+opencloning-db = { workspace = true }
+opencloning-mcp = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "packages/opencloning",
+    "packages/opencloning-db",
+    "packages/opencloning-cli",
+    "packages/opencloning-mcp",
+]
+
+[dependency-groups]
+dev = [
+    "autopep8>=2.0.4",
+    "flake8-bugbear>=24.2.6",
+    "black>=26.10.1",
+    "pre-commit>=3.6.2",
+    "watchfiles>=0.21.0",
+    "nbstripout>=0.8.1",
+    "flake8>=7.0.0",
+    "deptry>=0.25.1",
+]
+test = [
+    "pytest>=9.0.3",
+    "pytest-cov>=4.1.0",
+    "pytest-httpx2>=1.0.0",
+    "pytest-rerunfailures>=14.0",
+]
+
+# This is needed for the notebooks in the docs
+ipython = ["ipython>=8.20.0", "ipykernel>=6.28.0"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+markers = [
+    "readonly_db: use module-scoped readonly test database for sequence tests",
+]
+
+[tool.black]
+skip-string-normalization = true
+line-length = 119

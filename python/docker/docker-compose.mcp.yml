@@ -1,0 +1,33 @@
+# Run the MCP server with Postgres, as it will run on App Platform (2 gunicorn workers).
+# To run: docker compose -f docker/docker-compose.mcp.yml up --build
+# The server is then at http://localhost:8002/mcp
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: mcp
+      POSTGRES_PASSWORD: mcp
+      POSTGRES_DB: opencloning_mcp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mcp:
+    build:
+      context: ..
+      dockerfile: docker/opencloning.Dockerfile
+      args:
+        APP_TARGET: mcp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8002:8000"
+    environment:
+      GUNICORN_WORKERS: 2
+      OPENCLONING_MCP_DB_URL: postgresql+psycopg://mcp:mcp@postgres:5432/opencloning_mcp
+      OPENCLONING_MCP_BASE_URL: http://localhost:8002
+      OPENCLONING_MCP_FRONTEND_URL: http://localhost:3000
+    command: gunicorn -c python:opencloning.observability.gunicorn_conf "opencloning_mcp.server:app()"

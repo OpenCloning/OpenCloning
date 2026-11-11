@@ -1,0 +1,51 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences/61/primers",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_sequence_primers",
+  "params": null,
+  "response": {
+    "body": {
+      "products": [
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 58,
+          "name": "fwd_restriction_then_ligation",
+          "sequence": "TAAGCAGTCGACatgcaaacagtaatgatggatg",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "uid": "ML7"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 59,
+          "name": "rvs_restriction_then_ligation",
+          "sequence": "TAAGCAGGCGCGCCttaaaagccttcttctccccatt",
+          "tags": [],
+          "uid": null
+        }
+      ],
+      "templates": []
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

@@ -1,0 +1,14 @@
+services:
+  opencloning-db:
+    image: manulera/opencloning-db-backend:local
+    container_name: opencloning-db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      USE_HTTPS: "false"
+      OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@postgres:5432/opencloning_dev
+      OIDC_ISSUER_URL: https://example.idp.accounts.dev
+      OIDC_TEST_MODE: "1"

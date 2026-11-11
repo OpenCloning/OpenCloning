@@ -1,0 +1,50 @@
+{
+    "license": "MIT",
+    "name": "@opencloning/utils",
+    "version": "2.1.1",
+    "type": "module",
+    "main": "./src/utils/index.js",
+    "exports": {
+        ".": "./src/utils/index.js",
+        "./readNwrite": "./src/utils/readNwrite.js",
+        "./verificationFileStore": "./src/utils/verificationFileStore.js",
+        "./network": "./src/utils/network.js",
+        "./httpClients": "./src/utils/httpClients.js",
+        "./httpClientAuth": "./src/utils/httpClientAuth.js",
+        "./urlUtils": "./src/utils/urlUtils.js",
+        "./sourceFunctions": "./src/utils/sourceFunctions.js",
+        "./error2String": "./src/utils/error2String.js",
+        "./enzyme_utils": "./src/utils/enzyme_utils.js",
+        "./sequenceManipulation": "./src/utils/sequenceManipulation.js",
+        "./sequenceDisplay": "./src/utils/sequenceDisplay.js",
+        "./sequencingFileExtensions": "./src/utils/sequencingFileExtensions.js",
+        "./fileParsers": "./src/utils/fileParsers.js",
+        "./thunks": "./src/utils/thunks.js",
+        "./ncbiRequests": "./src/utils/ncbiRequests.js",
+        "./other": "./src/utils/other.js",
+        "./transformCoords": "./src/utils/transformCoords.js",
+        "./selectedRegionUtils": "./src/utils/selectedRegionUtils.js",
+        "./normalizeSyntax": "./src/utils/normalizeSyntax.js",
+        "./alignmentUtils": "./src/utils/alignmentUtils.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OpenCloning/OpenCloning.git",
+        "directory": "js/packages/utils"
+    },
+    "dependencies": {
+        "@opencloning/store": "workspace:*",
+        "@teselagen/bio-parsers": "^0.4.38",
+        "@teselagen/sequence-utils": "^0.3.42",
+        "@zip.js/zip.js": "^2.8.26",
+        "dom-to-svg": "^0.12.2",
+        "lodash-es": "^4.18.1"
+    },
+    "peerDependencies": {
+        "react": "^18.3.1",
+        "react-redux": "^8.1.3"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

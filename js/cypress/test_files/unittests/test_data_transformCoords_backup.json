@@ -1,0 +1,100 @@
+{
+  "sequences": [
+    {
+      "id": 2,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      23 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 attcaaaaat atgcaaaaaa cag\n//"
+    },
+    {
+      "id": 4,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name_rc                   23 bp    DNA     circular UNK 01-JAN-1980\nDEFINITION  description_rc.\nACCESSION   2_rc\nVERSION     2_rc\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 ctgttttttg catatttttg aat\n//"
+    },
+    {
+      "id": 6,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                      18 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 cagattcaaa aatatgca\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "input": [],
+      "output": 2,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "user_input": "attcaaaaatatgcaaaaaacag",
+      "circular": true
+    },
+    {
+      "id": 3,
+      "input": [
+        2
+      ],
+      "output": 4,
+      "type": "ReverseComplementSource",
+      "output_name": null,
+      "database_id": null
+    },
+    {
+      "id": 5,
+      "input": [
+        4
+      ],
+      "output": 6,
+      "type": "PCRSource",
+      "output_name": null,
+      "database_id": null,
+      "circular": false,
+      "assembly": [
+        {
+          "sequence": 1,
+          "left_location": null,
+          "right_location": "1..7",
+          "reverse_complemented": false
+        },
+        {
+          "sequence": 4,
+          "left_location": "join(21..23,1..4)",
+          "right_location": "10..15",
+          "reverse_complemented": true
+        },
+        {
+          "sequence": 2,
+          "left_location": "1..6",
+          "right_location": null,
+          "reverse_complemented": true
+        }
+      ],
+      "add_primer_features": false
+    }
+  ],
+  "description": "",
+  "primers": [
+    {
+      "id": 1,
+      "name": "fwd",
+      "sequence": "cagattc"
+    },
+    {
+      "id": 2,
+      "name": "rvs",
+      "sequence": "tgcata"
+    }
+  ],
+  "backend_version": "0.2.8.3.post5.dev0+f5942fe",
+  "schema_version": "0.3.0a0",
+  "frontend_version": "v0.2.12.8-7-g9cec8e2"
+}

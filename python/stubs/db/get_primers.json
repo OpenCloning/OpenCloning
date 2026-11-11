@@ -1,0 +1,294 @@
+{
+  "body": null,
+  "endpoint": "/db/primers",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_primers",
+  "params": null,
+  "response": {
+    "body": {
+      "items": [
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 78,
+          "name": "no_source_primer",
+          "sequence": "GGTTaaCCaaa",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 67,
+          "name": "rvs_hyb",
+          "sequence": "ttacgagatatttgagttaaacttcatgcataccctccaaaaactcaatcatttcaccaagcccatcatcttggtaatcc",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 66,
+          "name": "fwd_hyb",
+          "sequence": "agaactcaaccattacgggtttgacgaatatagacgagattcgcaattacttgtctgatggattaccaagatgatgggct",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 59,
+          "name": "rvs_restriction_then_ligation",
+          "sequence": "TAAGCAGGCGCGCCttaaaagccttcttctccccatt",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 58,
+          "name": "fwd_restriction_then_ligation",
+          "sequence": "TAAGCAGTCGACatgcaaacagtaatgatggatg",
+          "tags": [
+            {
+              "id": 9,
+              "name": "restriction_then_ligation"
+            }
+          ],
+          "uid": "ML7"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 53,
+          "name": "rvs_restriction_ligation_assembly",
+          "sequence": "TAAGCAGGCGCGCCttaaaagccttcttctccccatt",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 52,
+          "name": "fwd_restriction_ligation_assembly",
+          "sequence": "TAAGCAGTCGACatgcaaacagtaatgatggatg",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 47,
+          "name": "rvs_homologous_recombination",
+          "sequence": "CTTTTATGAATTATCTATATGCTGTATTCATATGCAAAAATATGTATATTTAAATTTGATCGATTAGGTAAATAAGAAGCGAATTCGAGCTCGTTTAAAC",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 46,
+          "name": "fwd_homologous_recombination",
+          "sequence": "AGTTTTCATATCTTCCTTTATATTCTATTAATTGAATTTCAAACATCGTTTTATTGAGCTCATTTACATCAACCGGTTCACGGATCCCCGGGTTAATTAA",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 34,
+          "name": "rvs_golden_gate",
+          "sequence": "aaGGTCTCAGGATttaacgtttataatgtttaata",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 33,
+          "name": "fwd_golden_gate",
+          "sequence": "aaGGTCTCATTCTatggtaattgaggtaagaggt",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 27,
+          "name": "ase1_rvs_gibson_assembly",
+          "sequence": "ACAGATCTCTCGAGCATATTAAAAGCCTTCTTCTCCC",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 26,
+          "name": "ase1_fwd_gibson_assembly",
+          "sequence": "AGTCGCTTTGTTAAATCAATGCAAACAGTAATGATGGA",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 25,
+          "name": "vector_rvs",
+          "sequence": "CATCATTACTGTTTGCATTGATTTAACAAAGCGACTATAAG",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 24,
+          "name": "vector_fwd",
+          "sequence": "GGAGAAGAAGGCTTTTAATATGCTCGAGAGATCTGT",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 17,
+          "name": "lacZ_attB2_rvs",
+          "sequence": "GGGGACCACTTTGTACAAGAAAGCTGGGTTTTTTTGACACCAGACCAACT",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 16,
+          "name": "lacZ_attB1_fwd",
+          "sequence": "GGGGACAAGTTTGTACAAAAAAGCAGGCTTAATGACCATGATTACGGATTC",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 15,
+          "name": "rvs_gateway",
+          "sequence": "ttaacaaagcgactataagt",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 14,
+          "name": "fwd_gateway",
+          "sequence": "gatctcgccataaaagacag",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 8,
+          "name": "ase1_rvs_crispr_hdr",
+          "sequence": "AAGTTAGATTCATTATTAGAGTGATTATCTTTTTCAGCAATAGAATCAGTGCTTTGAATGTCATCCATCATTACTGTTTGagcgtaatctggaacgtcat",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 7,
+          "name": "ase1_fwd_crispr_hdr",
+          "sequence": "TTTCATATCTTCCTTTATATTCTATTAATTGAATTTCAAACATCGTTTTATTGAGCTCATTTACATCAACCGGTTCAATGtacccatacgatgttcctga",
+          "tags": [],
+          "uid": null
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 6,
+          "name": "ase1_sgRNA",
+          "sequence": "CATTACTGTTTGCATTGAAC",
+          "tags": [],
+          "uid": null
+        }
+      ],
+      "page": 1,
+      "pages": 1,
+      "size": 50,
+      "total": 22
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

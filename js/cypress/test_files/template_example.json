@@ -1,0 +1,115 @@
+{
+  "sequences": [
+    {
+      "id": 1,
+      "type": "TemplateSequence",
+      "circular": true,
+      "primer_design": null
+    },
+    {
+      "id": 2,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": null
+    },
+    {
+      "id": 3,
+      "type": "TemplateSequence",
+      "circular": false,
+      "primer_design": "homologous_recombination"
+    },
+    {
+      "id": 5,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 3,
+      "overhang_watson_3prime": -3,
+      "file_content": "LOCUS       name                       7 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 aaaaaaa\n//"
+    },
+    {
+      "id": 6,
+      "type": "TextFileSequence",
+      "sequence_file_format": "genbank",
+      "overhang_crick_3prime": 3,
+      "overhang_watson_3prime": 0,
+      "file_content": "LOCUS       name                       7 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   id\nVERSION     id\nKEYWORDS    .\nSOURCE      .\n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\nORIGIN\n        1 aaaaaaa\n//"
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "type": "Source",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    },
+    {
+      "id": 2,
+      "type": "GenomeCoordinatesSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [],
+      "repository_id": "dummy",
+      "coordinates": "1..2",
+      "assembly_accession": null,
+      "locus_tag": null,
+      "gene_id": null
+    },
+    {
+      "id": 3,
+      "type": "PCRSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 1
+        }
+      ],
+      "circular": null,
+      "add_primer_features": false
+    },
+    {
+      "id": 4,
+      "type": "HomologousRecombinationSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 2
+        },
+        {
+          "type": "SourceInput",
+          "sequence": 3
+        }
+      ],
+      "circular": null
+    },
+    {
+      "id": 5,
+      "type": "ManuallyTypedSource",
+      "output_name": null,
+      "database_id": null,
+      "input": []
+    },
+    {
+      "id": 6,
+      "type": "PolymeraseExtensionSource",
+      "output_name": null,
+      "database_id": null,
+      "input": [
+        {
+          "type": "SourceInput",
+          "sequence": 5
+        }
+      ]
+    }
+  ],
+  "primers": [],
+  "description": "",
+  "files": null,
+  "schema_version": "1.0.0",
+  "backend_version": null,
+  "frontend_version": null
+}

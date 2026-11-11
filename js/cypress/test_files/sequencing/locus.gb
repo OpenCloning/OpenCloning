@@ -1,0 +1,102 @@
+LOCUS       name                    2026 bp    DNA     linear   SYN 21-JAN-2025
+DEFINITION  description.
+ACCESSION  id
+VERSION  id
+KEYWORDS    .
+SOURCE      .
+  ORGANISM  .
+            .
+FEATURES             Location/Qualifiers
+     gene            1..338
+                     /label="prl103"
+                     /locus_tag="SPOM_SPNCRNA.1708"
+                     /gene_synonym="prl3; SPNCRNA.5498"
+                     /db_xref="GeneID:90818481"
+                     /db_xref="PomBase:SPNCRNA.1708"
+     ncRNA           1..338
+                     /label="prl103"
+                     /ncRNA_class="lncRNA"
+                     /locus_tag="SPOM_SPNCRNA.1708"
+                     /gene_synonym="prl3; SPNCRNA.5498"
+                     /product="Pdc2-Repressed lncRNA, antisense to Mat1-Mi"
+                     /transcript_id="NR_191361.1"
+                     /db_xref="GeneID:90818481"
+                     /db_xref="PomBase:SPNCRNA.1708"
+     gene            complement(210..338)
+                     /label="mat1-Mi"
+                     /locus_tag="SPOM_SPBC23G7.17C"
+                     /gene_synonym="mat1-Mm; matMi; matMm"
+                     /db_xref="GeneID:3361261"
+                     /db_xref="PomBase:SPBC23G7.17c"
+     mRNA            complement(210..338)
+                     /label="mat1-Mi"
+                     /locus_tag="SPOM_SPBC23G7.17C"
+                     /gene_synonym="mat1-Mm; matMi; matMm"
+                     /product="M-specific transcription factor Mi"
+                     /transcript_id="NM_001021772.1"
+                     /db_xref="GeneID:3361261"
+                     /db_xref="PomBase:SPBC23G7.17c"
+     CDS             complement(210..338)
+                     /label="mat1-Mi"
+                     /locus_tag="SPOM_SPBC23G7.17C"
+                     /gene_synonym="mat1-Mm; matMi; matMm"
+     gene            473..1018
+                     /label="mat1-Mc"
+                     /locus_tag="SPOM_SPBC23G7.09"
+                     /gene_synonym="mat1Mc; matMc"
+                     /db_xref="GeneID:2539619"
+                     /db_xref="PomBase:SPBC23G7.09"
+     mRNA            473..1018
+                     /label="mat1-Mc"
+                     /locus_tag="SPOM_SPBC23G7.09"
+                     /gene_synonym="mat1Mc; matMc"
+                     /product="M-specific transcription factor Mc"
+                     /transcript_id="NM_001021773.3"
+                     /db_xref="GeneID:2539619"
+                     /db_xref="PomBase:SPBC23G7.09"
+     CDS             473..1018
+                     /label="mat1-Mc"
+                     /locus_tag="SPOM_SPBC23G7.09"
+                     /gene_synonym="mat1Mc; matMc"
+     primer_bind     1279..1298
+                     /label="Msmt0-RF-Fw"
+                     /note="sequence: ATACATGGATTTTACTGCCC"
+     primer_bind     complement(1510..1529)
+                     /label="smt0-RF-Rv"
+                     /note="sequence: ATGGTTGAGGAAGTGGAACG"
+ORIGIN      
+        1 tagtgggtta gccgtgaaag gaaaagagag tgagaagaag ggtaggaaaa gaagagagag
+       61 tagttgaagg aaaaatattg gaagaggtag tatttttctg tatgcatatg catatgcatt
+      121 tgtatagcat acaaccttta atttaatagc catacaacct aatagccaga aacgccttcc
+      181 caatttactg aaccctgctt atatgtagtt tataattgtt gtgtcttttt tttacgttta
+      241 agttgtaatt tgatgttaga atttattaca atggatgcaa gttttaactc aatttgatca
+      301 cataggattt gaattgtaaa aaggtcttct gctgacatta ttagtatgta ttgtgcttta
+      361 gattaaatta ttgtgtttta gtgtattttg ttcctttgtt tttgggtttc tttgttctgt
+      421 aagtagttaa ataccctcca cactctacac ctaccttgca ctcacaacta caatggactc
+      481 acaccaagaa ttatcagcgg gttcccctat ttcctacgac tttttagatc cagactggtg
+      541 ttttaaaaga taccttacaa aggatgctct tcattcaatt gaaactggca aaggtgctgc
+      601 ttactttgtt cctgatggct ttactcctat actcattcct aactcacaaa gctacctgtt
+      661 ggatgggaat tctgcacaac tgccaagacc tcaaccaata tccttcacat tggatcaatg
+      721 taaagttccc ggctatattt tgaagagttt acggaaagac actacgtcta ctgaacgtac
+      781 tccgagaccc cctaatgctt ttatattata caggaaggaa aaacatgcta cattattaaa
+      841 gtctaaccct tccatcaata attcacaagt ttccaagctg gttggagaga tgtggagaaa
+      901 cgaatcaaag gaagtacgta tgcgatattt taagatgtct gagttttata aagcacaaca
+      961 tcagaaaatg taccctggtt ataagtacca gcctagaaag aataaagtta aaagataata
+     1021 atggtaatat ttatggtatt taataaagaa ttttgaaatt gatttaaata tgcttcttag
+     1081 agttacattc actgaagatt ataatgtaat attttgtgta ccccatttgc gttgagttat
+     1141 tctatagtaa ttattgtgtg ttctattaac gatgtattgc gatttatatc tgttatgcta
+     1201 acataacgta gttctaagca ctgtaatgcc atactgtttt agagggtgat gcttcctaaa
+     1261 atctccttac ataaagtaat acatggattt tactgccctg attctatcga aatatgctgt
+     1321 tttttttatt cgtttttatt tattttcaat aatttttttg taatataaat gtatagccat
+     1381 acatcttgaa ctccttacac caatacttca tatccattag ccattttcct ttataaacat
+     1441 atattaaacc tcatcccaaa tgcatctacc cactctttac attcacatcc ctattccttt
+     1501 aatatcttac gttccacttc ctcaaccata gagcattctt tataaatcac tttaatatgc
+     1561 tttacttcca cacactactg ctaccattgc cttgcacagt actcccctta ctcacacacc
+     1621 ttcaatcaca ctcctatctc catacaggac ccaacatgta ttaaacatta tccccctaca
+     1681 ccattttccc tcatcatcca atatgtttct actattatca cacaccgtct ctacctcccg
+     1741 ccaattttaa ctgtcttcat ttccacctac aactctctat ccacactttc tcaccctata
+     1801 aacatttaat acactcctac aatataccat cccatcctat tatcatatat actcctcctt
+     1861 ctcagatcac atcctctcca actccattca cacatctttt tctttacaca ccctcaccca
+     1921 cgctctccat acctcacgca aaccaatata cacataccca actcacacta aaaaattaaa
+     1981 ttttacctat ctattaaaga tatttaccct gtgttgtacc taatcc 
+//

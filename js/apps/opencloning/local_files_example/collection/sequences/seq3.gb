@@ -1,0 +1,11 @@
+LOCUS       seq1                       5 bp    DNA     linear   SYN 10-FEB-2026
+DEFINITION  description.
+ACCESSION  2
+VERSION  2
+KEYWORDS    .
+SOURCE      
+  ORGANISM  .
+            .
+ORIGIN      
+        1 ggggg     
+//

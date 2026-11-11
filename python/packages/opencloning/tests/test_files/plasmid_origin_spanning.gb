@@ -1,0 +1,43 @@
+LOCUS       dummy_circular         151 bp DNA     circular SYN 23-APR-2025
+DEFINITION  synthetic circular DNA
+ACCESSION   .
+VERSION     .
+KEYWORDS    .
+SOURCE      synthetic DNA construct
+  ORGANISM  synthetic DNA construct
+REFERENCE   1  (bases 1 to 151)
+  AUTHORS   Trial User
+  TITLE     Direct Submission
+  JOURNAL   Exported Apr 23, 2025 from SnapGene 7.1.1
+            https://www.snapgene.com
+FEATURES             Location/Qualifiers
+     source          1..151
+                     /mol_type="other DNA"
+                     /organism="synthetic DNA construct"
+     protein_bind    3..36
+                     /label=loxP
+                     /note="pLannotate"
+                     /note="/database=snapgene"
+                     /note="/fragment=False"
+                     /note="/identity=100.0"
+                     /note="/match_length=100.0"
+                     /note="/other=protein_bind"
+     CDS             39..113
+                     /codon_start=1
+                     /label=payload
+                     /translation="MQTVMMDDIQSTDSIAEKDNHSNN"
+     protein_bind    116..149
+                     /label=loxP
+                     /note="pLannotate"
+                     /note="/database=snapgene"
+                     /note="/fragment=False"
+                     /note="/identity=100.0"
+                     /note="/match_length=100.0"
+                     /note="/other=protein_bind"
+     misc_feature    join(145..151,1..2)
+                     /label=span
+ORIGIN
+        1 aaataacttc gtatagcata cattatacga agttatacat gcaaacagta atgatggatg
+       61 acattcaaag cactgattct attgctgaaa aagataatca ctctaataat tgagtataac
+      121 ttcgtatagc atacattata cgaagttatt t
+//

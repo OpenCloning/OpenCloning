@@ -1,0 +1,41 @@
+name: Set up JS (yarn + Cypress)
+description: Installs Node and the js/ workspace dependencies, and optionally the Cypress binary. node_modules and the Cypress binary are cached on yarn.lock.
+
+inputs:
+  cypress:
+    description: Install the Cypress binary
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Enable corepack (yarn version from js/package.json)
+      shell: bash
+      run: corepack enable
+
+    - name: Cache node_modules and Cypress binary
+      uses: actions/cache@v4
+      with:
+        path: |
+          js/node_modules
+          js/apps/*/node_modules
+          js/packages/*/node_modules
+          ~/.cache/Cypress
+        key: ${{ runner.os }}-js-${{ hashFiles('js/yarn.lock') }}
+
+    # Fast no-op when the cache was restored
+    - name: Install dependencies
+      shell: bash
+      working-directory: js
+      run: yarn install --immutable
+
+    - name: Install Cypress binary
+      if: inputs.cypress == 'true'
+      shell: bash
+      working-directory: js
+      run: yarn cypress install

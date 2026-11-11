@@ -1,0 +1,1161 @@
+Bacillus subtilis Protein Secretion Toolkit:
+- id: ODC_0331
+  name: BsubSecTagLP_1
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0331.gb
+- id: ODC_0332
+  name: BsubSecTagLP_2
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0332.gb
+- id: ODC_0333
+  name: BsubSecTagLP_3
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0333.gb
+- id: ODC_0334
+  name: BsubSecTagLP_4
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0334.gb
+- id: ODC_0335
+  name: BsubSecTagLP_5
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0335.gb
+- id: ODC_0336
+  name: BsubSecTagLP_6
+  path: Bacillus subtilis Protein Secretion Toolkit/Plasmids_Genbank/ODC_0336.gb
+Ecoli Nanobody Toolkit:
+- id: AB_araCpBAD
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_araCpBAD.gb
+- id: AB_araCpBADv2
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_araCpBADv2.gb
+- id: AB_araCpBADv3
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_araCpBADv3.gb
+- id: AB_pBAD
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_pBAD.gb
+- id: AB_pKat
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_pKat.gb
+- id: AB_pKatPu
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/AB_pKatPu.gb
+- id: BC_RBS_UTRcfps
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BC_RBS_UTRcfps.gb
+- id: BC_RJ_SD5
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BC_RJ_SD5.gb
+- id: BC_RJ_SD8
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BC_RJ_SD8.gb
+- id: BT1_RBS_UTRcfps
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RBS_UTRcfps.gb
+- id: BT1_RJ_B34_6H_TEVc
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RJ_B34_6H_TEVc.gb
+- id: BT1_RJ_BCD2_6H_TEVc
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RJ_BCD2_6H_TEVc.gb
+- id: BT1_RJ_SD5
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RJ_SD5.gb
+- id: BT1_RJ_SD8
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RJ_SD8.gb
+- id: BT1_RJ_SD8_6H_TEVc
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/BT1_RJ_SD8_6H_TEVc.gb
+- id: CD_FKBP
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_FKBP.gb
+- id: CD_FRB
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_FRB.gb
+- id: CD_LuxAB
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_LuxAB.gb
+- id: CD_NbB1
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_NbB1.gb
+- id: CD_NbLag14 (eGFP)
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_NbLag14 (eGFP).gb
+- id: CD_NbLag2 (eGFP)
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_NbLag2 (eGFP).gb
+- id: CD_NbVHHE
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_NbVHHE.gb
+- id: CD_NbVHHV
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_NbVHHV.gb
+- id: CD_W25
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_W25.gb
+- id: CD_W276
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_W276.gb
+- id: CD_ZA
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_ZA.gb
+- id: CD_ZB
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_ZB.gb
+- id: CD_ZBn
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_ZBn.gb
+- id: CD_eGFP
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/CD_eGFP.gb
+- id: DT4_LLinkerC
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/DT4_LLinkerC.gb
+- id: DT4_Linker14
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/DT4_Linker14.gb
+- id: DT4_Linker7
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/DT4_Linker7.gb
+- id: DT4_MLinkerC
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/DT4_MLinkerC.gb
+- id: EF_TermT7
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/EF_TermT7.gb
+- id: T1T3_LgBit
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T1T3_LgBit.gb
+- id: 'T1T3_NT7pd '
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T1T3_NT7pd .gb
+- id: 'T1T3_NT7pdo '
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T1T3_NT7pdo .gb
+- id: T1T3_T7Nev
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T1T3_T7Nev.gb
+- id: T1T3_T7Nwt_STOP
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T1T3_T7Nwt_STOP.gb
+- id: T3C_LLinkerN
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T3C_LLinkerN.gb
+- id: T3C_Linker14
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T3C_Linker14.gb
+- id: T3C_Linker28
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T3C_Linker28.gb
+- id: T3C_Linker7
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T3C_Linker7.gb
+- id: T3C_MLinkerN
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T3C_MLinkerN.gb
+- id: T4T5_CT7
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T4T5_CT7.gb
+- id: T4T5_SmBit
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T4T5_SmBit.gb
+- id: T4T5_T7Cwt_STOP
+  name: null
+  path: Ecoli Nanobody Toolkit/genbank_seq/T4T5_T7Cwt_STOP.gb
+Ecoli Protein Expression Toolkit:
+- id: ODC_0118
+  name: CE_meffBlue/Rtms5/ NF pocilloporin /Biobrick K1033902
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0118.gb
+- id: ODC_0119
+  name: CE_sarcGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0119.gb
+- id: ODC_0120
+  name: CE_beta-galactosidase
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0120.gb
+- id: ODC_0121
+  name: AF_lacZ pDest
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0121.gb
+- id: ODC_0122
+  name: AE_lacZ pDest
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0122.gb
+- id: ODC_0123
+  name: AF_high copy (pUC) ori/KanR
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0123.gb
+- id: ODC_0124
+  name: AF_medium copy (pET) ori/KanR
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0124.gb
+- id: ODC_0125
+  name: AB_T7
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0125.gb
+- id: ODC_0126
+  name: AB_T7_lacO
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0126.gb
+- id: ODC_0127
+  name: AB_pTac
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0127.gb
+- id: ODC_0128
+  name: BT1_BCD2
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0128.gb
+- id: ODC_0129
+  name: BT1_Riboj54_F1
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0129.gb
+- id: ODC_0130
+  name: BT1_Riboj_B34
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0130.gb
+- id: ODC_0131
+  name: BT1_BCD12
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0131.gb
+- id: ODC_0132
+  name: BT1_BCD23
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0132.gb
+- id: ODC_0133
+  name: BT1_BCD2_His
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0133.gb
+- id: ODC_0134
+  name: BT1_RiboJ_B34_His
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0134.gb
+- id: ODC_0135
+  name: BT1_BCD2_DsbA
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0135.gb
+- id: ODC_0136
+  name: BT1_BCD2_OmpT
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0136.gb
+- id: ODC_0137
+  name: BT1_BCD2_pelB
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0137.gb
+- id: ODC_0138
+  name: T1T2_Calm
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0138.gb
+- id: ODC_0139
+  name: T1T2_CBD
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0139.gb
+- id: ODC_0140
+  name: T1T2_Cex
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0140.gb
+- id: ODC_0141
+  name: T1T2_MBP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0141.gb
+- id: ODC_0142
+  name: T1T2_R5
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0142.gb
+- id: ODC_0143
+  name: T1T2_GST
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0143.gb
+- id: ODC_0144
+  name: T1T2_CipA
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0144.gb
+- id: ODC_0145
+  name: T1T2_S-Tag
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0145.gb
+- id: ODC_0146
+  name: T1T2_GB1
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0146.gb
+- id: ODC_0147
+  name: T1T2_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0147.gb
+- id: ODC_0148
+  name: T1T3_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0148.gb
+- id: ODC_0149
+  name: T1C_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0149.gb
+- id: ODC_0150
+  name: T1C_His_TEVcut
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0150.gb
+- id: ODC_0151
+  name: BT2_BCD2_His
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0151.gb
+- id: ODC_0152
+  name: BT2_RiboJ_B34
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0152.gb
+- id: ODC_0153
+  name: BC_B0034
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0153.gb
+- id: ODC_0154
+  name: BC_B0032
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0154.gb
+- id: ODC_0155
+  name: BC_RiboJ_RBS64
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0155.gb
+- id: ODC_0156
+  name: BC_RiboJ_B34
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0156.gb
+- id: ODC_0157
+  name: BC_BCD23
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0157.gb
+- id: ODC_0158
+  name: BC_BCD12
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0158.gb
+- id: ODC_0159
+  name: BC_BCD2
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0159.gb
+- id: ODC_0160
+  name: T2C_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0160.gb
+- id: ODC_0161
+  name: T2C_TEVcut
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0161.gb
+- id: ODC_0162
+  name: BC_BCD2_His_TEVcut
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0162.gb
+- id: ODC_0163
+  name: BC_BCD2_His_fuGFP_TEVcut
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0163.gb
+- id: ODC_0164
+  name: "T2T3_int_\u2206I"
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0164.gb
+- id: ODC_0165
+  name: T2T3_SUMO
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0165.gb
+- id: ODC_0166
+  name: T2T3_fuGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0166.gb
+- id: ODC_0167
+  name: T2T3_AmilCP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0167.gb
+- id: ODC_0168
+  name: T2T3_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0168.gb
+- id: ODC_0169
+  name: T3C_SUMO
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0169.gb
+- id: ODC_0170
+  name: T3C_TEV
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0170.gb
+- id: ODC_0171
+  name: "T3C_int_\u2206I"
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0171.gb
+- id: ODC_0172
+  name: T3C_fuGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0172.gb
+- id: ODC_0173
+  name: T3C_GS flexible linker
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0173.gb
+- id: ODC_0174
+  name: CD_OMMLV
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0174.gb
+- id: ODC_0175
+  name: CD_HIVRT
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0175.gb
+- id: ODC_0176
+  name: CD_Bst-LF
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0176.gb
+- id: ODC_0177
+  name: CD_OpenVent
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0177.gb
+- id: ODC_0178
+  name: CD_RNAseInhibitor
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0178.gb
+- id: ODC_0179
+  name: CD_gp32
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0179.gb
+- id: ODC_0180
+  name: CD_BsuLF
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0180.gb
+- id: ODC_0181
+  name: CD_UvsY
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0181.gb
+- id: ODC_0182
+  name: CD_UvsX
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0182.gb
+- id: ODC_0183
+  name: CE_T7RNApol_Stop
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0183.gb
+- id: ODC_0184
+  name: CD_PBCV-1_ligase
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0184.gb
+- id: ODC_0185
+  name: CD_HRP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0185.gb
+- id: ODC_0186
+  name: CD_TEV_protease
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0186.gb
+- id: ODC_0187
+  name: CD_SUMO_protease
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0187.gb
+- id: ODC_0188
+  name: CD_Calmodulin
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0188.gb
+- id: ODC_0189
+  name: CD_fuGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0189.gb
+- id: ODC_0190
+  name: CD_AmilCP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0190.gb
+- id: ODC_0191
+  name: CD_TthRNAseH
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0191.gb
+- id: ODC_0192
+  name: CD_EcRNAseH
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0192.gb
+- id: ODC_0193
+  name: DT4_Int_SaltS
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0193.gb
+- id: ODC_0194
+  name: DT4_Int_ThiolS
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0194.gb
+- id: ODC_0195
+  name: DT4_TEV
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0195.gb
+- id: ODC_0196
+  name: DT4_fuGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0196.gb
+- id: ODC_0197
+  name: DT4_GS flexible linker
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0197.gb
+- id: ODC_0198
+  name: DT5_TEVcut
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0198.gb
+- id: ODC_0199
+  name: DF_TEVcut_His_Stop_TZ
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0199.gb
+- id: ODC_0200
+  name: DF_TEVcut_fuGFP_His_Stop_TZ
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0200.gb
+- id: ODC_0201
+  name: T4T5_Int_ThiolS
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0201.gb
+- id: ODC_0202
+  name: T4T5_Int_SaltS
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0202.gb
+- id: ODC_0203
+  name: T4T5_AmilCP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0203.gb
+- id: ODC_0204
+  name: T4T5_fuGFP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0204.gb
+- id: ODC_0205
+  name: T4T5_GS flexible
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0205.gb
+- id: ODC_0206
+  name: T4E_3xStop
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0206.gb
+- id: ODC_0207
+  name: T5E_6H
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0207.gb
+- id: ODC_0208
+  name: T5E_Calm
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0208.gb
+- id: ODC_0209
+  name: T5E_CBD
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0209.gb
+- id: ODC_0210
+  name: T5E_Cex
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0210.gb
+- id: ODC_0211
+  name: T5E_MBP
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0211.gb
+- id: ODC_0212
+  name: T5E_R5
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0212.gb
+- id: ODC_0213
+  name: T5E_CipA
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0213.gb
+- id: ODC_0214
+  name: T5E_3xStop
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0214.gb
+- id: ODC_0215
+  name: EF_ECK9600
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0215.gb
+- id: ODC_0216
+  name: EF_T7term
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0216.gb
+- id: ODC_0217
+  name: EF_TZ
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0217.gb
+- id: ODC_0337
+  name: spisPink/spisCPBiobrickK1033925
+  path: Ecoli Protein Expression Toolkit/Plasmids_Genbank/ODC_0337.gb
+Molecular Diagnostics Toolkit:
+- id: ODC_0218
+  name: MERScontrol
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0218.gb
+- id: ODC_0219
+  name: Pfu_Ssod7 HiFi
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0219.gb
+- id: ODC_0220
+  name: gp32
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0220.gb
+- id: ODC_0221
+  name: Ecoli_opt_RNAseInhib
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0221.gb
+- id: ODC_0222
+  name: HIVRT
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0222.gb
+- id: ODC_0223
+  name: OMMLV
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0223.gb
+- id: ODC_0224
+  name: OpenVent
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0224.gb
+- id: ODC_0225
+  name: RNAseInhib
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0225.gb
+- id: ODC_0226
+  name: EcPPA
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0226.gb
+- id: ODC_0227
+  name: orfA1
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0227.gb
+- id: ODC_0228
+  name: orfA2
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0228.gb
+- id: ODC_0229
+  name: orfB3
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0229.gb
+- id: ODC_0230
+  name: orfE4
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0230.gb
+- id: ODC_0231
+  name: orfN5
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0231.gb
+- id: ODC_0232
+  name: SARSContol
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0232.gb
+- id: ODC_0233
+  name: Bst-LF
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0233.gb
+- id: ODC_0234
+  name: Bsu
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0234.gb
+- id: ODC_0235
+  name: UvsX
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0235.gb
+- id: ODC_0236
+  name: PBCV-1_ligase
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0236.gb
+- id: ODC_0237
+  name: TthRNAseH
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0237.gb
+- id: ODC_0238
+  name: EcRNAseH
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0238.gb
+- id: ODC_0239
+  name: TEV
+  path: Molecular Diagnostics Toolkit/Plasmids_Genbank/ODC_0239.gb
+Open Enzyme Collection:
+- id: ODC_0007
+  name: "9\xB0N-7 DNA polymerase"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0007.gb
+- id: ODC_0008
+  name: DNA Polymerase I, Large (Klenow) Fragment
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0008.gb
+- id: ODC_0009
+  name: "DNA Polymerase I, Large (Klenow) Fragment (3\u2032\u21925\u2032 exo-)"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0009.gb
+- id: ODC_0010
+  name: E. coli DNA Polymerase I
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0010.gb
+- id: ODC_0011
+  name: KlenTaq1 polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0011.gb
+- id: ODC_0012
+  name: KOD DNA polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0012.gb
+- id: ODC_0013
+  name: Pwo DNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0013.gb
+- id: ODC_0014
+  name: "Pyrococcus Sp. Heat-Stable (exo\u2013) DNA Polymerase (Deep Vent\u2122 (exo\u2013\
+    ) DNA Polymerase at NEB)"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0014.gb
+- id: ODC_0015
+  name: "Pyrococcus Sp. Heat-Stable DNA Polymerase (Deep Vent\u2122 at NEB)"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0015.gb
+- id: ODC_0016
+  name: Taq DNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0016.gb
+- id: ODC_0017
+  name: "Tli DNA polymerase (exo-)(available from NEB as VentR\xAE (exo-) DNA Polymerase)"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0017.gb
+- id: ODC_0018
+  name: Tth DNA polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0018.gb
+- id: ODC_0019
+  name: Bst DNA Polymerase, Full Length
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0019.gb
+- id: ODC_0020
+  name: Bst DNA Polymerase, Large Fragment
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0020.gb
+- id: ODC_0021
+  name: Bsu DNA Polymerase I, Large Fragment
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0021.gb
+- id: ODC_0022
+  name: phi29 DNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0022.gb
+- id: ODC_0023
+  name: "9\xB0N-7 DNA Polymerase chain terminating (NEB > Therminator DNA Pol)"
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0023.gb
+- id: ODC_0024
+  name: Sulfolobus DNA Polymerase IV
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0024.gb
+- id: ODC_0025
+  name: T4 DNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0025.gb
+- id: ODC_0026
+  name: T7 DNA Polymerase (unmodified)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0026.gb
+- id: ODC_0027
+  name: T5 DNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0027.gb
+- id: ODC_0028
+  name: T4-DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0028.gb
+- id: ODC_0029
+  name: E. coli DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0029.gb
+- id: ODC_0030
+  name: DNA Lligase III
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0030.gb
+- id: ODC_0031
+  name: DNA Ligase IV
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0031.gb
+- id: ODC_0032
+  name: 9 Degrees North DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0032.gb
+- id: ODC_0033
+  name: Pfu DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0033.gb
+- id: ODC_0034
+  name: Taq DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0034.gb
+- id: ODC_0035
+  name: T4 RNA Ligase 1
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0035.gb
+- id: ODC_0036
+  name: CIP (calf intestinal phosphatase)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0036.gb
+- id: ODC_0037
+  name: RNAse A
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0037.gb
+- id: ODC_0038
+  name: RNAse H
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0038.gb
+- id: ODC_0039
+  name: EcoRI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0039.gb
+- id: ODC_0040
+  name: EcoRI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0040.gb
+- id: ODC_0041
+  name: PstI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0041.gb
+- id: ODC_0042
+  name: PstI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0042.gb
+- id: ODC_0043
+  name: MMLV_RT (mut H)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0043.gb
+- id: ODC_0044
+  name: MMLV_RT (lack H)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0044.gb
+- id: ODC_0045
+  name: Thermus thermophilus (Tth) RT
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0045.gb
+- id: ODC_0046
+  name: T3 RNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0046.gb
+- id: ODC_0047
+  name: T7 RNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0047.gb
+- id: ODC_0048
+  name: SP6 RNA Polymerase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0048.gb
+- id: ODC_0049
+  name: Eco31I
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0049.gb
+- id: ODC_0050
+  name: Eco31IA methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0050.gb
+- id: ODC_0051
+  name: Eco31IB methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0051.gb
+- id: ODC_0052
+  name: SapI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0052.gb
+- id: ODC_0053
+  name: M1.SapI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0053.gb
+- id: ODC_0054
+  name: M2.SapI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0054.gb
+- id: ODC_0055
+  name: XbaI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0055.gb
+- id: ODC_0056
+  name: XbaI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0056.gb
+- id: ODC_0057
+  name: NotI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0057.gb
+- id: ODC_0058
+  name: NotI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0058.gb
+- id: ODC_0059
+  name: SfiI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0059.gb
+- id: ODC_0060
+  name: SfiI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0060.gb
+- id: ODC_0061
+  name: EcoRV
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0061.gb
+- id: ODC_0062
+  name: EcoRV methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0062.gb
+- id: ODC_0063
+  name: NcoI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0063.gb
+- id: ODC_0064
+  name: NcoI methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0064.gb
+- id: ODC_0065
+  name: HindIII
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0065.gb
+- id: ODC_0066
+  name: HindIII methyltransferase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0066.gb
+- id: ODC_0067
+  name: DpnI
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0067.gb
+- id: ODC_0068
+  name: Bst HF
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0068.gb
+- id: ODC_0069
+  name: ET SSB
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0069.gb
+- id: ODC_0070
+  name: T5 Exonuclease
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0070.gb
+- id: ODC_0071
+  name: HiFi Tth DNA Ligase
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0071.gb
+- id: ODC_0072
+  name: Dm dNK
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0072.gb
+- id: ODC_0073
+  name: TEV protease
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0073.gb
+- id: ODC_0074
+  name: T4 PNK
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0074.gb
+- id: ODC_0075
+  name: T4 BGT
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0075.gb
+- id: ODC_0076
+  name: T7 Endonuclease I
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0076.gb
+- id: ODC_0077
+  name: T4 Endonuclease V (T4 PDG)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0077.gb
+- id: ODC_0078
+  name: T4 g32
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0078.gb
+- id: ODC_0079
+  name: P45
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0079.gb
+- id: ODC_0080
+  name: Terminal transferase TdT (Bovine DNTT)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0080.gb
+- id: ODC_0081
+  name: DNA Topoisomerase 1B (Vaccinia Virus)
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0081.gb
+- id: ODC_0082
+  name: lambda red operon
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0082.gb
+- id: ODC_0083
+  name: UDG
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0083.gb
+- id: ODC_0084
+  name: Fpg
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0084.gb
+- id: ODC_0085
+  name: Endonuclease IV E. coli
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0085.gb
+- id: ODC_0086
+  name: Endonuclease VIII E. coli
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0086.gb
+- id: ODC_0087
+  name: Exonuclease III E. coli
+  path: Open Enzyme Collection/Plasmids_Genbank/ODC_0087.gb
+Open Plasmids:
+- id: ODC_0001
+  name: pInducible/pOpen_v4
+  path: Open Plasmids/Plasmids_Genbank/ODC_0001.gb
+- id: ODC_0002
+  name: pBuild/pOpen_v3
+  path: Open Plasmids/Plasmids_Genbank/ODC_0002.gb
+- id: ODC_0003
+  name: pYeast/pOpen_yeast
+  path: Open Plasmids/Plasmids_Genbank/ODC_0003.gb
+- id: ODC_0004
+  name: pTi
+  path: Open Plasmids/Plasmids_Genbank/ODC_0004.gb
+- id: ODC_0005
+  name: pTiR
+  path: Open Plasmids/Plasmids_Genbank/ODC_0005.gb
+- id: ODC_0006
+  name: pTiER
+  path: Open Plasmids/Plasmids_Genbank/ODC_0006.gb
+Open Reporters Collection:
+- id: ODC_0088
+  name: cjBlue/ BioBrick K592011
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0088.gb
+- id: ODC_0089
+  name: gfasPurple/gfasCP Biobrick K1033918
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0089.gb
+- id: ODC_0090
+  name: meffCFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0090.gb
+- id: ODC_0091
+  name: mmilCFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0091.gb
+- id: ODC_0092
+  name: meleCFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0092.gb
+- id: ODC_0093
+  name: efasCFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0093.gb
+- id: ODC_0094
+  name: aacuGFP1
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0094.gb
+- id: ODC_0095
+  name: aacuGFP2
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0095.gb
+- id: ODC_0096
+  name: afraGFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0096.gb
+- id: ODC_0097
+  name: amilGFP Biobrick K592010
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0097.gb
+- id: ODC_0098
+  name: eechGFP1
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0098.gb
+- id: ODC_0099
+  name: eechGFP2
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0099.gb
+- id: ODC_0100
+  name: eechGFP3
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0100.gb
+- id: ODC_0101
+  name: efasGFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0101.gb
+- id: ODC_0102
+  name: gfasGFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0102.gb
+- id: ODC_0103
+  name: plamGFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0103.gb
+- id: ODC_0104
+  name: amilRFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0104.gb
+- id: ODC_0105
+  name: meffRed/meffRFP Biobricks K592012
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0105.gb
+- id: ODC_0106
+  name: pporRFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0106.gb
+- id: ODC_0107
+  name: meleRFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0107.gb
+- id: ODC_0108
+  name: scubRFP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0108.gb
+- id: ODC_0109
+  name: eforRed/eforCP Biobrick K592012
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0109.gb
+- id: ODC_0110
+  name: amajLime/amajCFP/amFP486 BioBrick K1033916
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0110.gb
+- id: ODC_0111
+  name: EiraCFP Biobrick J97000
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0111.gb
+- id: ODC_0112
+  name: HRP
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0112.gb
+- id: ODC_0113
+  name: Firefly Luciferase [Photinus pyralis] (Fluc)
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0113.gb
+- id: ODC_0114
+  name: Luciferase [Luciola cruciata] (Japanese firefly)
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0114.gb
+- id: ODC_0115
+  name: Renilla luciferase
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0115.gb
+- id: ODC_0116
+  name: beta-lactamase
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0116.gb
+- id: ODC_0117
+  name: Calf Intestine Alkaline phosphatase (CIAP)
+  path: Open Reporters Collection/Plasmids_Genbank/ODC_0117.gb
+Open Yeast Collection:
+- id: ODC_0240
+  name: Sc-pAdh1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0240.gb
+- id: ODC_0241
+  name: Sc-pCCW12
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0241.gb
+- id: ODC_0242
+  name: Sc-pCUP1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0242.gb
+- id: ODC_0243
+  name: Sc-pCYC1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0243.gb
+- id: ODC_0244
+  name: Sc-pHis3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0244.gb
+- id: ODC_0245
+  name: Sc-pLeu2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0245.gb
+- id: ODC_0246
+  name: Sc-pMF2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0246.gb
+- id: ODC_0247
+  name: Sc-pMFA1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0247.gb
+- id: ODC_0248
+  name: Sc-pMFalpha2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0248.gb
+- id: ODC_0249
+  name: Sc-pRPL18B
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0249.gb
+- id: ODC_0250
+  name: Sc-pSAC6
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0250.gb
+- id: ODC_0251
+  name: Sc-pSte5
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0251.gb
+- id: ODC_0252
+  name: Sc-pTDH3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0252.gb
+- id: ODC_0253
+  name: Sc-pTrp1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0253.gb
+- id: ODC_0254
+  name: Sc-pUra3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0254.gb
+- id: ODC_0255
+  name: AB_Sc-pCCW12
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0255.gb
+- id: ODC_0256
+  name: AB_Sc-pCYC1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0256.gb
+- id: ODC_0257
+  name: AB_Pp-pGAP
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0257.gb
+- id: ODC_0258
+  name: AB_Pp-pAOX1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0258.gb
+- id: ODC_0259
+  name: ScLYS2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0259.gb
+- id: ODC_0260
+  name: ScMET17
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0260.gb
+- id: ODC_0261
+  name: ScAUR1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0261.gb
+- id: ODC_0262
+  name: Cre
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0262.gb
+- id: ODC_0263
+  name: FLP
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0263.gb
+- id: ODC_0264
+  name: GPP synthase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0264.gb
+- id: ODC_0265
+  name: GGPP synthase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0265.gb
+- id: ODC_0266
+  name: FPP synthase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0266.gb
+- id: ODC_0267
+  name: 4S-limonene-synthase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0267.gb
+- id: ODC_0268
+  name: limonene-3-hydroxylase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0268.gb
+- id: ODC_0269
+  name: S-linalool synthase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0269.gb
+- id: ODC_0270
+  name: carveol dehydrogenase
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0270.gb
+- id: ODC_0271
+  name: ScGal4-DNA-AD
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0271.gb
+- id: ODC_0272
+  name: ScGal4-DNA-BD
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0272.gb
+- id: ODC_0273
+  name: N1N2_SV40_NLS
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0273.gb
+- id: ODC_0274
+  name: Pp_aMF_sec_tag
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0274.gb
+- id: ODC_0275
+  name: Pp_aMF_noEAEA_sec_tag
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0275.gb
+- id: ODC_0276
+  name: Sc-tUBX6
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0276.gb
+- id: ODC_0277
+  name: Sc-tENO1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0277.gb
+- id: ODC_0278
+  name: Sc-tENO2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0278.gb
+- id: ODC_0279
+  name: Sc-tPRM9
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0279.gb
+- id: ODC_0280
+  name: Sc-tSSA1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0280.gb
+- id: ODC_0281
+  name: Sc-tTDH1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0281.gb
+- id: ODC_0282
+  name: Pp-tAOX1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0282.gb
+- id: ODC_0283
+  name: AConL-start-rev
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0283.gb
+- id: ODC_0284
+  name: AConL-start
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0284.gb
+- id: ODC_0285
+  name: AConL1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0285.gb
+- id: ODC_0286
+  name: AConL2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0286.gb
+- id: ODC_0287
+  name: AConL3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0287.gb
+- id: ODC_0288
+  name: AConL4
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0288.gb
+- id: ODC_0289
+  name: AConL5
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0289.gb
+- id: ODC_0290
+  name: AConR1
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0290.gb
+- id: ODC_0291
+  name: AConR2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0291.gb
+- id: ODC_0292
+  name: AConR3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0292.gb
+- id: ODC_0293
+  name: AConR4
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0293.gb
+- id: ODC_0294
+  name: AConR5
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0294.gb
+- id: ODC_0295
+  name: AConR-end
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0295.gb
+- id: ODC_0296
+  name: AConR-end-rev
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0296.gb
+- id: ODC_0297
+  name: ScHR5'-LEU2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0297.gb
+- id: ODC_0298
+  name: ScHR3'-LEU2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0298.gb
+- id: ODC_0299
+  name: ScHR5'-URA3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0299.gb
+- id: ODC_0300
+  name: ScHR3'-URA3
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0300.gb
+- id: ODC_0301
+  name: ScHR5'-HO
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0301.gb
+- id: ODC_0302
+  name: ScHR3'-HO
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0302.gb
+- id: ODC_0303
+  name: PpHR5'-NTS
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0303.gb
+- id: ODC_0304
+  name: PpHR3'-NTS
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0304.gb
+- id: ODC_0305
+  name: PpHR5'-RGI2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0305.gb
+- id: ODC_0306
+  name: PpHR3'-RGI2
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0306.gb
+- id: ODC_0307
+  name: PpHR5'-ENO
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0307.gb
+- id: ODC_0308
+  name: PpHR3'-ENO
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0308.gb
+- id: ODC_0309
+  name: PpHR5'-AOXTT
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0309.gb
+- id: ODC_0310
+  name: PpHR3'-AOXTT
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0310.gb
+- id: ODC_0311
+  name: Sc2micron
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0311.gb
+- id: ODC_0312
+  name: ScARS_CEN
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0312.gb
+- id: ODC_0313
+  name: Pichia PARS
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0313.gb
+- id: ODC_0314
+  name: oriT
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0314.gb
+- id: ODC_0315
+  name: ScADE2-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0315.gb
+- id: ODC_0316
+  name: ScHIS3-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0316.gb
+- id: ODC_0317
+  name: ScHygro-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0317.gb
+- id: ODC_0318
+  name: ScKanR-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0318.gb
+- id: ODC_0319
+  name: ScLEU2-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0319.gb
+- id: ODC_0320
+  name: ScNAT-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0320.gb
+- id: ODC_0321
+  name: ScTRP1-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0321.gb
+- id: ODC_0322
+  name: ScURA3-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0322.gb
+- id: ODC_0323
+  name: ScZeo-marker
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0323.gb
+- id: ODC_0324
+  name: OYC-bridge-AGAC-CGAA
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0324.gb
+- id: ODC_0325
+  name: OYC-bridge-AGAC-GCAA
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0325.gb
+- id: ODC_0326
+  name: OYC-CamR
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0326.gb
+- id: ODC_0327
+  name: OYC-SpecR
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0327.gb
+- id: ODC_0328
+  name: OYC-high-copy-origin
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0328.gb
+- id: ODC_0329
+  name: OYC-eforRed-dropout
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0329.gb
+- id: ODC_0330
+  name: pWV01-ori
+  path: Open Yeast Collection/Plasmids_Genbank/ODC_0330.gb

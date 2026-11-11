@@ -1,0 +1,23 @@
+{
+    "license": "MIT",
+    "name": "opencloning",
+    "version": "1.5.23",
+    "type": "module",
+    "private": true,
+    "homepage": "./",
+    "scripts": {
+        "start": "yarn run -T vite --force --port 3000",
+        "build": "yarn run -T vite build",
+        "test": "yarn run -T vitest"
+    },
+    "dependencies": {
+        "@opencloning/opencloning-elabftw": "workspace:*",
+        "@opencloning/store": "workspace:*",
+        "@opencloning/ui": "workspace:*",
+        "@opencloning/utils": "workspace:*",
+        "lodash-es": "^4.18.1",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-redux": "^8.1.3"
+    }
+}

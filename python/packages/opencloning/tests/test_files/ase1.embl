@@ -1,0 +1,99 @@
+ID   SPAPB1A10.09; ; ; genomic DNA; ; UNC; 2538 BP.
+XX
+AC   SPAPB1A10.09;
+XX
+DE
+XX
+OS   .
+OC   .
+XX
+FH   Key             Location/Qualifiers
+FH
+FT   5'UTR           1..173
+FT                   /systematic_id="SPAPB1A10.09"
+FT                   /db_xref="PMID:30566651"
+FT                   /feature_source="evidence=ECO:0000309; source=SO:0001238;
+FT                   condition=FYECO:0000126; during=GO:0072690; score=146.757;
+FT                   db_xref=PMID:30566651"
+FT   CDS             join(174..597,645..2416)
+FT                   /colour="2"
+FT                   /primary_name="ase1"
+FT                   /product="antiparallel microtubule cross-linking factor
+FT                   Ase1"
+FT                   /systematic_id="SPAPB1A10.09"
+FT                   /controlled_curation="term=orthologous to S. cerevisiae
+FT                   YOR058C; date=19700101"
+FT                   /controlled_curation="term=species distribution, conserved
+FT                   in eukaryotes; date=20081110"
+FT                   /controlled_curation="term=species distribution, conserved
+FT                   in metazoa; date=20081110"
+FT                   /controlled_curation="term=species distribution, conserved
+FT                   in vertebrates; date=20081110"
+FT                   /controlled_curation="term=species distribution,
+FT                   predominantly single copy (one to one); date=20081110"
+FT                   /controlled_curation="term=species distribution, conserved
+FT                   in fungi; date=20081110"
+FT                   /controlled_curation="term=species distribution, conserved
+FT                   in eukaryotes only; date=20081110"
+FT                   /translation="MQTVMMDDIQSTDSIAEKDNHSNNESNFTWKAFREQVEKHFSKIE
+FT                   RLHQVLGTDGDNSSLFELFTTAMNAQLHEMEQCQKKLEDDCQQRIDSIRFLVSSLKLTD
+FT                   DTSSLKIESPLIQCLNRLSMVEGQYMAQYDQKLSTIKEMYHKLESYCNRLGSPFVLPDF
+FT                   ENSFLSDVSDAFTESLRGRINEAEKEIDARLEVINSFEEEILGLWSELGVEPADVPQYE
+FT                   QLLESHTNRPNDVYVTQELIDQLCKQKEVFSAEKEKRSDHLKSIQSEVSNLWNKLQVSP
+FT                   NEQSQFGDSSNINQENISLWETELEKLHQLKKEHLPIFLEDCRQQILQLWDSLFYSEEQ
+FT                   RKSFTPMYEDIITEQVLTAHENYIKQLEAEVSANKSFLSLINRYASLIEGKKELEASSN
+FT                   DASRLTQRGRRDPGLLLREEKIRKRLSRELPKVQSLLIPEITAWEERNGRTFLFYDEPL
+FT                   LKICQEATQPKSLYRSASAAANRPKTATTTDSVNRTPSQRGRVAVPSTPSVRSASRAMT
+FT                   SPRTPLPRVKNTQNPSRSISAEPPSATSTANRRHPTANRIDINARLNSASRSRSANMIR
+FT                   QGANGSDSNMSSSPVSGNSNTPFNKFPNSVSRNTHFESKSPHPNYSRTPHETYSKASSK
+FT                   NVPLSPPKQRVVNEHALNIMSEKLQRTNLKEQTPEMDIENSSQNLPFSPMKISPIRASP
+FT                   VKTIPSSPSPTTNIFSAPLNNITNCTPMEDEWGEEGF*"
+FT   3'UTR           2417..2538
+FT                   /systematic_id="SPAPB1A10.09"
+FT                   /db_xref="PMID:21511999"
+XX
+SQ   Sequence 2538 BP; 852 A; 504 C; 444 G; 738 T; 0 other;
+     aagccatatc caaccaccat ttttgtgcca agcttttatg caaggttaat tccttgtact        60
+     gcttgttatg ttataatata tcaacatctt aacagttttc atatcttcct ttatattcta       120
+     ttaattgaat ttcaaacatc gttttattga gctcatttac atcaaccggt tcaatgcaaa       180
+     cagtaatgat ggatgacatt caaagcactg attctattgc tgaaaaagat aatcactcta       240
+     ataatgaatc taactttact tggaaagcgt ttcgtgaaca agtggaaaag catttttcta       300
+     aaattgaaag gcttcaccaa gtccttggaa cagatggaga caattcatca ttatttgagt       360
+     tgtttacaac ggcaatgaat gcccagcttc atgaaatgga acagtgccag aaaaaacttg       420
+     aagatgactg tcagcaaaga attgattcaa tcagattttt ggtttcctca ttaaagttaa       480
+     cggatgatac ttctagtctc aaaattgagt ctcctttaat tcagtgtttg aatcgtttgt       540
+     caatggtaga aggacaatat atggcacagt atgatcaaaa gttaagtacg attaaaggta       600
+     tgtaatcgtc tttaatttag acttgtgttt taactgatgt atagaaatgt atcacaaatt       660
+     ggagtcatat tgtaaccgct taggaagtcc gttcgtttta cctgattttg agaattcatt       720
+     tttatctgat gtatccgatg cttttactga atctttgaga ggacgcatca acgaagccga       780
+     aaaggagatt gatgcgagat tagaggttat taattccttt gaagaagaaa ttttgggttt       840
+     gtggtctgaa ctcggtgttg agcccgctga tgttccacaa tacgaacaat tgcttgaatc       900
+     ccatactaat cgaccaaatg atgtttatgt tactcaagaa cttatcgacc aactttgcaa       960
+     gcaaaaagaa gttttttccg ctgaaaaaga aaagagaagt gatcatttaa aaagtataca      1020
+     atcagaagtt agcaacttgt ggaataagct tcaagtttct cccaatgaac aaagtcaatt      1080
+     tggcgattca tcaaacatta atcaagaaaa tatttcatta tgggaaactg aacttgaaaa      1140
+     acttcatcag ttaaaaaagg agcatttacc cattttttta gaagactgtc gtcaacaaat      1200
+     tcttcagctt tgggattctc tgttttattc agaagaacaa agaaagtcct ttacacctat      1260
+     gtatgaagac attattacag agcaggttct tacggcccat gaaaactata taaagcaact      1320
+     agaggccgaa gtttctgcta ataagtcctt tttaagctta attaatcgct atgcctcttt      1380
+     aatagaagga aagaaagagc ttgaagctag ttctaatgat gcctctcgtc taacacaacg      1440
+     gggacgccgg gacccaggtt tacttctacg tgaagagaaa atccgtaagc gactttctag      1500
+     agaacttcct aaggttcagt cgctgcttat accagagatt acagcatggg aagaaagaaa      1560
+     tggaaggacg ttcctttttt atgatgaacc acttctcaag atttgccaag aggccactca      1620
+     accaaaatca ttatatagaa gtgcaagtgc tgccgcaaac cgcccgaaaa cagcaactac      1680
+     aacggactct gttaatagaa caccttctca acgagggcgt gtagctgtac cttcaacacc      1740
+     aagtgttagg tccgcttctc gagctatgac gagtccaagg acaccgcttc ctagagtaaa      1800
+     aaacactcaa aatccaagtc gttccattag tgcagaaccg ccatcagcaa ccagtaccgc      1860
+     caatagaaga caccccactg ctaatcgaat tgatataaac gctagattaa acagtgctag      1920
+     tcggtctcga agcgcgaaca tgataagaca aggggcaaat ggtagtgaca gcaatatgtc      1980
+     ttcttcaccc gtttctggaa attccaatac cccttttaac aagtttccaa attctgtatc      2040
+     tcgcaataca cattttgaat ccaagtcacc gcacccaaat tactctcgaa ctcctcatga      2100
+     aacgtattca aaggcttcat ctaagaacgt cccattaagt cctccaaagc agcgtgtagt      2160
+     taatgaacac gctttaaata ttatgtcgga aaaattgcaa agaactaatc tgaaagaaca      2220
+     aacacccgag atggacattg aaaacagctc gcagaacctt cctttttctc ctatgaagat      2280
+     atcccccata agagcatcac ccgtaaagac aattccatca tcaccgtccc ccactaccaa      2340
+     cattttttct gctccactca acaatattac aaattgtaca ccgatggagg atgaatgggg      2400
+     agaagaaggc ttttaagctt cttatttacc taatcgatca aatttaaata tacatatttt      2460
+     tgcatatgaa tacagcatat agataattca taaaagttta ttaactgagg tcataattaa      2520
+     aagactattt acacctaa                                                    2538
+//

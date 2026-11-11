@@ -1,0 +1,18 @@
+div.icon-corner {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    margin-left: .3em;
+    margin-bottom: .3em;
+}
+
+div.icon-corner button{
+    padding: 0;
+    border: none;
+    background: none;
+    color:#d32f2f;
+}
+
+div.icon-corner button:hover {
+    filter: brightness(70%);
+}

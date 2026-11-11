@@ -1,0 +1,306 @@
+button {
+    cursor: pointer;
+}
+
+.tf-tree .tf-nc, .tf-tree .tf-node-content {
+    border: 3px solid;
+    border-color: rgb(25, 118, 210);
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    /* height: calc(100vh - 114px - 10px); - moved to component to depend on presence of appbar */
+    background-color: white;
+}
+
+.tab-panels-container {
+    height: 100%;
+    overflow: auto;
+}
+
+.main-sequence-editor {
+    width: 70%;
+    margin: auto;
+}
+
+
+.node-corner {
+    position: absolute;
+    right: -1px;
+    top: 1px;
+    display: flex;
+    gap: .2em;
+}
+
+.overhang-representation {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: monospace;
+    font-size: small;
+    /* Prevent the removal of spaces that make sequences align correctly */
+    white-space: pre;
+    max-width: 300px;
+    overflow-x: auto;
+}
+
+div.before-node {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -38px);
+    z-index: 1;
+}
+
+div.before-node svg {
+    background-color: white;
+    cursor: pointer;
+}
+
+div.hang-from-node {
+    box-sizing: content-box;
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 40px);
+    border: 3px solid;
+    border-color: rgb(25, 118, 210);
+    border-radius: 100%;
+}
+
+/* To center the icon vertically */
+div.hang-from-node div {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.hang-from-node::before {
+    position: absolute;
+    border: 1px solid;
+    width: 0;
+    height: 30px;
+    display: block;
+    content: '';
+    top: -3%;
+    left: 50%;
+    margin-left: -1px;
+    transform: translate(0, -100%);
+}
+
+
+/* TODO: handle these */
+div.tf-tree.tf-ancestor-tree {
+    padding-bottom: 150px;
+}
+
+div.corner-id {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    font-family: sans-serif;
+    font-size: large;
+    color: rgb(25, 118, 210);
+    font-weight: bold;
+}
+
+button.github-icon svg {
+    padding: 0;
+    color: white;
+    font-size: 30px;
+}
+
+div.collapsed div {
+    margin: auto
+}
+
+div.collapsed button {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+/* Prevents scollbar from showing on small editors,
+   that was caused by overflowing numbers at the edges
+   of the x axis */
+
+span.node-text svg.veAxis {
+    width: 100%;
+}
+
+span.node-text > div:first-child {
+    margin: 20px
+}
+
+/* Cannot overwrite styles that are hard-coded, but we may want this */
+/* span.node-text div.tg-simple-dna-view {
+    overflow: visible;
+
+} */
+
+body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+html {
+    overflow: hidden;
+}
+
+div.select-source div.MuiFormControl-root {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div.select-source h2 {
+    margin-bottom: 5px;
+    font-size: x-large;
+}
+
+
+div.select-source {
+    width: 275px;
+}
+
+.fragment-picker {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+div.description-container {
+    margin: auto;
+    margin-bottom: 2em;
+    max-width: 600px;
+}
+
+div.description-container p {
+    /* Show line breaks */
+    white-space: pre-line;
+    text-align: left;
+}
+
+code {
+    background-color: lightgrey;
+    padding: 15px;
+    border-radius: 5px;
+    min-width: 40%;
+    box-shadow: inset 0px 0px 0px 3px gray;
+    margin-bottom: 30px;
+    white-space: pre-wrap;
+    display: inline-block;
+    text-align: left;
+    max-width: 50%;
+}
+
+.data-model-displayer {
+    text-align: center;
+}
+
+.data-model-displayer p {
+    font-size: large;
+}
+
+a.button-hyperlink {
+    text-decoration: none;
+    color: white;
+}
+
+div.dragging-file {
+    text-align: center;
+}
+
+.drag-file-wrapper {
+    border: 5px dashed;
+    border-color: darkgray;
+    width: 40%;
+    height: 400px;
+    padding: 10px;
+    margin: auto;
+    text-align: center;
+    border-radius: 40px;
+}
+
+.drag-file-container {
+    padding: 10px;
+}
+
+.drag-file-container .drag-file-close {
+    text-align: right;
+    color: red;
+    cursor: pointer;
+}
+
+.drag-file-container .drag-file-close svg {
+    font-size: 40px;
+}
+
+.drag-file-container .drag-file-close:hover {
+    /* 70% brightness */
+    filter: brightness(70%);
+}
+
+div.primer-designer {
+    margin: auto;
+    width: 60%;
+}
+
+
+div.pcr-unit.MuiAccordion-root:first-of-type {
+    border-radius: 1.2em;
+    overflow: clip;
+}
+
+div.pcr-unit.MuiAccordion-root {
+    border-radius: 1.2em;
+    overflow: clip;
+    margin-bottom: .5em;
+}
+
+.pcr-unit div.MuiAccordionSummary-root.MuiAccordionSummary-root {
+    min-height: 0;
+}
+
+.pcr-unit div.MuiAccordionSummary-content {
+    margin-top: .35em;
+    margin-bottom: .35em;
+}
+
+/* Vertical align the content and icon in alert banners */
+div.MuiPaper-root[role=alert] {
+    align-items: center;
+}
+
+div#global-error-message-wrapper {
+    position: relative;
+    top: 0;
+    z-index: 999;
+    max-width: 25em;
+}
+
+div#global-error-message-wrapper > div {
+    margin-left: 10px;
+    margin-bottom: 10px;
+    /* Allow line breaks in very long strings only when necessary */
+    word-break: break-word;
+}
+
+.finished-source {
+    /* Allow line breaks in very long strings only when necessary */
+    word-break: break-word;
+}
+
+.tab-panels-container {
+    text-align: center;
+}
+
+div[role="tooltip"] div.MuiTooltip-tooltip {
+    font-size: 1em;
+}

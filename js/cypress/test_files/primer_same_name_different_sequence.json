@@ -1,0 +1,22 @@
+{
+  "sequences": [],
+  "sources": [],
+  "description": "Deletion of the ORF of ase1 by homologous recombination in S.pombe",
+  "primers": [
+    {
+      "id": 1,
+      "name": "fwd",
+      "sequence": "ACGT"
+    },
+    {
+      "id": 2,
+      "name": "vector_rvs",
+      "sequence": "ACGT"
+    },
+    {
+      "id": 7,
+      "name": "ase1_rvs",
+      "sequence": "AA"
+    }
+  ]
+}

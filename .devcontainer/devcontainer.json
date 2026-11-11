@@ -1,0 +1,66 @@
+{
+  "name": "OpenCloning dev container",
+  // Mounts, capabilities and the Postgres sidecar are defined in docker-compose.yml
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "runServices": [
+    "db",
+    "app"
+  ],
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [
+    8000,
+    8001,
+    8002,
+    3000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "cloning API"
+    },
+    "8001": {
+      "label": "db API"
+    },
+    "8002": {
+      "label": "MCP server"
+    },
+    "3000": {
+      "label": "opencloning frontend"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck",
+        "skellock.just",
+        // python/
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "samuelcolvin.jinjahtml",
+        // js/
+        "dbaeumer.vscode-eslint",
+        "shelex.vscode-cy-helper",
+        "vitest.explorer"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteUser": "dev",
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": ""
+  },
+  "workspaceFolder": "/workspace",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/check-isolation.sh",
+  "postAttachCommand": "/usr/local/bin/check-isolation.sh",
+  // Runs before the firewall exists. Installs the workspace packages (deps are already in the image)
+  // and the JS deps; the node_modules volume takes dev ownership from the image directory.
+  // DB migrations/seeding stay manual: cd python && uv run opencloning-cli db migrate
+  "postCreateCommand": "cd /workspace/python && uv sync --frozen && cd /workspace/js && yarn install --immutable && yarn cypress install",
+  "waitFor": "postStartCommand"
+}

@@ -1,0 +1,19 @@
+# CI / local: run pytest in Docker against Postgres from docker-compose.postgres.yml.
+# Usage (from repo root):
+#   docker compose -f docker/docker-compose.postgres.yml -f docker/docker-compose.ci-tests.yml run --rm tests
+services:
+  tests:
+    image: manulera/opencloningbackend-test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256M
+    environment:
+      TMPDIR: /tmp
+      OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@postgres:5432/opencloning_test # Setting this for migrations to work
+      OPENCLONING_TEST_DATABASE_URL: postgresql+psycopg://dbuser:dbpassword@postgres:5432/opencloning_test
+      OPENCLONING_TEST_DATABASE_URL_READONLY: postgresql+psycopg://dbuser:dbpassword@postgres:5432/opencloning_test_readonly
+      NCBI_API_KEY: ${NCBI_API_KEY:-}
+      ADDGENE_TOKEN: ${ADDGENE_TOKEN:-}

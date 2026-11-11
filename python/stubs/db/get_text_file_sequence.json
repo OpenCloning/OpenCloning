@@ -1,0 +1,25 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences/61/text_file_sequence",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_text_file_sequence",
+  "params": null,
+  "response": {
+    "body": {
+      "file_content": "LOCUS       ase1_CDS_PCR            2269 bp    DNA     linear   UNK 01-JAN-1980\nDEFINITION  description.\nACCESSION   4\nVERSION     4\nKEYWORDS    .\nSOURCE      \n  ORGANISM  .\n            .\nFEATURES             Location/Qualifiers\n     CDS             join(13..436,484..2255)\n                     /gene=\"ase1\"\n                     /locus_tag=\"SPOM_SPAPB1A10.09\"\n                     /codon_start=1\n                     /product=\"antiparallel microtubule cross-linking factor\n                     Ase1\"\n                     /protein_id=\"CAC21482.1\"\n                     /translation=\"MQTVMMDDIQSTDSIAEKDNHSNNESNFTWKAFREQVEKHFSKIE\n                     RLHQVLGTDGDNSSLFELFTTAMNAQLHEMEQCQKKLEDDCQQRIDSIRFLVSSLKLTD\n                     DTSSLKIESPLIQCLNRLSMVEGQYMAQYDQKLSTIKEMYHKLESYCNRLGSPFVLPDF\n                     ENSFLSDVSDAFTESLRGRINEAEKEIDARLEVINSFEEEILGLWSELGVEPADVPQYE\n                     QLLESHTNRPNDVYVTQELIDQLCKQKEVFSAEKEKRSDHLKSIQSEVSNLWNKLQVSP\n                     NEQSQFGDSSNINQENISLWETELEKLHQLKKEHLPIFLEDCRQQILQLWDSLFYSEEQ\n                     RKSFTPMYEDIITEQVLTAHENYIKQLEAEVSANKSFLSLINRYASLIEGKKELEASSN\n                     DASRLTQRGRRDPGLLLREEKIRKRLSRELPKVQSLLIPEITAWEERNGRTFLFYDEPL\n                     LKICQEATQPKSLYRSASAAANRPKTATTTDSVNRTPSQRGRVAVPSTPSVRSASRAMT\n                     SPRTPLPRVKNTQNPSRSISAEPPSATSTANRRHPTANRIDINARLNSASRSRSANMIR\n                     QGANGSDSNMSSSPVSGNSNTPFNKFPNSVSRNTHFESKSPHPNYSRTPHETYSKASSK\n                     NVPLSPPKQRVVNEHALNIMSEKLQRTNLKEQTPEMDIENSSQNLPFSPMKISPIRASP\n                     VKTIPSSPSPTTNIFSAPLNNITNCTPMEDEWGEEGF\"\nORIGIN\n        1 taagcagtcg acatgcaaac agtaatgatg gatgacattc aaagcactga ttctattgct\n       61 gaaaaagata atcactctaa taatgaatct aactttactt ggaaagcgtt tcgtgaacaa\n      121 gtggaaaagc atttttctaa aattgaaagg cttcaccaag tccttggaac agatggagac\n      181 aattcatcat tatttgagtt gtttacaacg gcaatgaatg cccagcttca tgaaatggaa\n      241 cagtgccaga aaaaacttga agatgactgt cagcaaagaa ttgattcaat cagatttttg\n      301 gtttcctcat taaagttaac ggatgatact tctagtctca aaattgagtc tcctttaatt\n      361 cagtgtttga atcgtttgtc aatggtagaa ggacaatata tggcacagta tgatcaaaag\n      421 ttaagtacga ttaaaggtat gtaatcgtct ttaatttaga cttgtgtttt aactgatgta\n      481 tagaaatgta tcacaaattg gagtcatatt gtaaccgctt aggaagtccg ttcgttttac\n      541 ctgattttga gaattcattt ttatctgatg tatccgatgc ttttactgaa tctttgagag\n      601 gacgcatcaa cgaagccgaa aaggagattg atgcgagatt agaggttatt aattcctttg\n      661 aagaagaaat tttgggtttg tggtctgaac tcggtgttga gcccgctgat gttccacaat\n      721 acgaacaatt gcttgaatcc catactaatc gaccaaatga tgtttatgtt actcaagaac\n      781 ttatcgacca actttgcaag caaaaagaag ttttttccgc tgaaaaagaa aagagaagtg\n      841 atcatttaaa aagtatacaa tcagaagtta gcaacttgtg gaataagctt caagtttctc\n      901 ccaatgaaca aagtcaattt ggcgattcat caaacattaa tcaagaaaat atttcattat\n      961 gggaaactga acttgaaaaa cttcatcagt taaaaaagga gcatttaccc atttttttag\n     1021 aagactgtcg tcaacaaatt cttcagcttt gggattctct gttttattca gaagaacaaa\n     1081 gaaagtcctt tacacctatg tatgaagaca ttattacaga gcaggttctt acggcccatg\n     1141 aaaactatat aaagcaacta gaggccgaag tttctgctaa taagtccttt ttaagcttaa\n     1201 ttaatcgcta tgcctcttta atagaaggaa agaaagagct tgaagctagt tctaatgatg\n     1261 cctctcgtct aacacaacgg ggacgccggg acccaggttt acttctacgt gaagagaaaa\n     1321 tccgtaagcg actttctaga gaacttccta aggttcagtc gctgcttata ccagagatta\n     1381 cagcatggga agaaagaaat ggaaggacgt tcctttttta tgatgaacca cttctcaaga\n     1441 tttgccaaga ggccactcaa ccaaaatcat tatatagaag tgcaagtgct gccgcaaacc\n     1501 gcccgaaaac agcaactaca acggactctg ttaatagaac accttctcaa cgagggcgtg\n     1561 tagctgtacc ttcaacacca agtgttaggt ccgcttctcg agctatgacg agtccaagga\n     1621 caccgcttcc tagagtaaaa aacactcaaa atccaagtcg ttccattagt gcagaaccgc\n     1681 catcagcaac cagtaccgcc aatagaagac accccactgc taatcgaatt gatataaacg\n     1741 ctagattaaa cagtgctagt cggtctcgaa gcgcgaacat gataagacaa ggggcaaatg\n     1801 gtagtgacag caatatgtct tcttcacccg tttctggaaa ttccaatacc ccttttaaca\n     1861 agtttccaaa ttctgtatct cgcaatacac attttgaatc caagtcaccg cacccaaatt\n     1921 actctcgaac tcctcatgaa acgtattcaa aggcttcatc taagaacgtc ccattaagtc\n     1981 ctccaaagca gcgtgtagtt aatgaacacg ctttaaatat tatgtcggaa aaattgcaaa\n     2041 gaactaatct gaaagaacaa acacccgaga tggacattga aaacagctcg cagaaccttc\n     2101 ctttttctcc tatgaagata tcccccataa gagcatcacc cgtaaagaca attccatcat\n     2161 caccgtcccc cactaccaac attttttctg ctccactcaa caatattaca aattgtacac\n     2221 cgatggagga tgaatgggga gaagaaggct tttaaggcgc gcctgctta\n//",
+      "id": 61,
+      "overhang_crick_3prime": 0,
+      "overhang_watson_3prime": 0,
+      "sequence_file_format": "genbank",
+      "type": "TextFileSequence"
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

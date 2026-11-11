@@ -1,0 +1,6 @@
+[flake8]
+
+# E501: line too long
+# B008: Do not perform function calls in argument defaults. Annoying for fastapi.
+# E203: See https://github.com/PyCQA/pycodestyle/issues/373
+extend-ignore = E203,E501, B008

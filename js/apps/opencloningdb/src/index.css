@@ -1,0 +1,16 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.tab-panels-container {
+  overflow-x: auto !important;
+}
+
+.app-container {
+  overflow-x: auto;
+}

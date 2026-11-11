@@ -1,0 +1,20 @@
+{
+  "license": "MIT",
+  "name": "standalone-app",
+  "version": "0.1.50",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "yarn run -T vite",
+    "build": "yarn run -T vite build",
+    "preview": "yarn run -T vite preview"
+  },
+  "dependencies": {
+    "@opencloning/store": "workspace:*",
+    "@opencloning/ui": "workspace:*",
+    "@opencloning/utils": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^8.1.3"
+  }
+}

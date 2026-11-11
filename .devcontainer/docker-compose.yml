@@ -1,0 +1,63 @@
+# Dev container stack: the workspace container plus its own Postgres.
+# The app container shares the db network namespace, so .env.dev (localhost:5432) works unchanged.
+# Paths are relative to this file's directory (.devcontainer/).
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    # No ports published: only the dev container can reach it, and it does not clash with a host Postgres on 5432
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpassword
+      POSTGRES_DB: opencloning_dev
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ../python/docker/postgres/init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        TZ: Europe/London
+        CLAUDE_CODE_VERSION: stable
+    command: sleep infinity
+    network_mode: service:db
+    depends_on:
+      db:
+        condition: service_healthy
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    # Local dev defaults (DB URL, OIDC test mode, origins...), so shells don't need to source it.
+    # Changes need a container rebuild; sourcing .env.dev in a shell still overrides for that shell.
+    env_file:
+      - ../python/.env.dev
+    environment:
+      # .env.dev has a path relative to python/; make it work from any directory
+      ALEMBIC_CFG: /workspace/python/packages/opencloning-db/alembic.ini
+      CLAUDE_CONFIG_DIR: /home/dev/.claude
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      DISABLE_AUTOUPDATER: "1"
+    volumes:
+      - ..:/workspace:cached
+      - ../.git:/workspace/.git:ro
+      # - ./:/workspace/.devcontainer:ro
+      # Keep Linux node_modules (esbuild, rollup binaries) separate from any host install
+      - node_modules:/workspace/js/node_modules
+      - bashhistory:/commandhistory
+      - claude-config:/home/dev/.claude
+    tmpfs:
+      - /workspace/secrets
+
+volumes:
+  pgdata:
+  node_modules:
+  bashhistory:
+  claude-config:

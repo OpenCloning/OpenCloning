@@ -1,0 +1,26 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_sequences_search_by_uid_name_query",
+  "params": {
+    "name": "example_sequencing-sample"
+  },
+  "response": {
+    "body": {
+      "items": [],
+      "page": 1,
+      "pages": 0,
+      "size": 50,
+      "total": 0
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

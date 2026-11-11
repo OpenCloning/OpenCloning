@@ -1,0 +1,5 @@
+name	sequence_type
+template_sequence_allele	plasmid
+dup_in_file	allele
+dup_in_file	plasmid
+bulk_template_clear	locus

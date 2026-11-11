@@ -1,0 +1,26 @@
+# Docker compose file to run only the local Postgres server for opencloning-db.
+# To run: docker compose -f docker/docker-compose.postgres.yml up -d
+# CI reuses this file for Postgres; in-container tests also merge docker-compose.ci-tests.yml.
+services:
+  postgres:
+    image: postgres:18
+    container_name: opencloning-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpassword
+      POSTGRES_DB: opencloning_dev
+    volumes:
+      - opencloning_postgres_dev_data:/var/lib/postgresql
+      - ./postgres/init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  opencloning_postgres_dev_data:

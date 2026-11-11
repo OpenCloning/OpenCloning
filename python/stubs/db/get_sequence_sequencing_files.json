@@ -1,0 +1,23 @@
+{
+  "body": null,
+  "endpoint": "/db/sequences/61/sequencing_files",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "GET",
+  "name": "get_sequence_sequencing_files",
+  "params": null,
+  "response": {
+    "body": [
+      {
+        "id": 4,
+        "original_name": "run.ab1"
+      }
+    ],
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

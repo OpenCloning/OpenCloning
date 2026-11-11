@@ -1,7 +1,0 @@
-LOCUS       random                    31 bp    DNA     circular  03-OCT-2021
-FEATURES             Location/Qualifiers
-     misc_feature    13..20
-                     /label="hello_feature"
-ORIGIN      
-        1 AAAAGAATTC BBBBATATAT GCATCGATGC A  
-//

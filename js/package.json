@@ -1,0 +1,68 @@
+{
+    "license": "MIT",
+    "name": "open-cloning-workspace",
+    "version": "0.4.26",
+    "type": "module",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "resolutions": {
+        "lodash": "^4.18.1",
+        "shortid": "^2.2.17",
+        "jsondiffpatch": "^0.7.3",
+        "@opencloning/opencloning-elabftw": "workspace:*",
+        "@opencloning/opencloningdb": "workspace:*",
+        "@opencloning/store": "workspace:*",
+        "@opencloning/ui": "workspace:*",
+        "@opencloning/utils": "workspace:*"
+    },
+    "scripts": {
+        "start": "yarn workspace opencloning start",
+        "build": "./scripts/build_opencloning_app.sh",
+        "test": "vitest run",
+        "pack:all": "yarn workspace @opencloning/store pack --filename /tmp/@opencloning-store.tgz && yarn workspace @opencloning/utils pack --filename /tmp/@opencloning-utils.tgz && yarn workspace @opencloning/ui pack --filename /tmp/@opencloning-ui.tgz"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@clerk/testing": "patch:@clerk/testing@npm%3A2.2.37#~/.yarn/patches/@clerk-testing-npm-2.2.37-69582bb577.patch",
+        "@cypress/code-coverage": "^4.0.3",
+        "@cypress/react": "^9.0.2",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^14.3.1",
+        "@testing-library/user-event": "^14.6.1",
+        "@vitejs/plugin-react": "^6.1.1",
+        "@vitest/coverage-istanbul": "^3.2.4",
+        "@vitest/coverage-v8": "^3.2.4",
+        "@vitest/eslint-plugin": "^1.6.17",
+        "cypress": "^16.1.0",
+        "esbuild": "^0.28.2",
+        "eslint": "^9.39.4",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-plugin-cypress": "^5.3.0",
+        "eslint-plugin-import": "^2.32.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "globals": "^17.6.0",
+        "jsdom": "^22.1.0",
+        "msw": "^2.14.6",
+        "vite": "^8.3",
+        "vite-plugin-ejs": "^1.7.0",
+        "vite-plugin-istanbul": "^7.2.1",
+        "vitest": "^4.1.11"
+    },
+    "packageManager": "yarn@4.9.1"
+}
