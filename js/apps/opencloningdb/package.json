@@ -12,7 +12,7 @@
     "preview": "yarn run -T vite preview"
   },
   "dependencies": {
-    "@clerk/react": "^6.16.1",
+    "@clerk/react": "^6.18.6",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^5.18.0",
@@ -20,7 +20,7 @@
     "@opencloning/store": "workspace:*",
     "@opencloning/ui": "workspace:*",
     "@opencloning/utils": "workspace:*",
-    "@tanstack/react-query": "^5.100.10",
+    "@tanstack/react-query": "^5.107.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^8.1.3",
