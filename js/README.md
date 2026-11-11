@@ -32,10 +32,10 @@ nvm install 22.17
 nvm use 22.17
 ```
 
-To handle dependencies and build the site, [yarn 3](https://v3.yarnpkg.com/) is used.
+To handle dependencies and build the site, [yarn 4](https://yarnpkg.com/) is used (the exact version is set by `packageManager` in `package.json`, and corepack installs it).
 
 ```bash
-# Enable yarn 3 in the project (first time only)
+# Enable yarn in the project (first time only)
 corepack enable
 
 # Install dependencies (every time you pull changes)

@@ -37,3 +37,18 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "deps"
+
+  # GitHub Actions used by the workflows (/ = .github/workflows) and by the composite actions.
+  # `ci` prefix: these don't change what is published, so they don't trigger a release.
+  # All updates (including major) in one PR: CI on that PR shows if a new version breaks something.
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
