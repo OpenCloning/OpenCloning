@@ -117,6 +117,23 @@ jobs:
           flags: python
           fail_ci_if_error: true
 
+      # The JS tests read the committed stubs in python/stubs/db, so they must match what the backend
+      # generates. Generation is deterministic, so any difference means they were not regenerated.
+      # Uses its own database (opencloning_e2e), since `db stubs` reseeds the database it runs on.
+      - name: Check that the committed DB stubs are up to date
+        if: matrix.mode == 'lock'
+        env:
+          OPENCLONING_TESTING: '1'
+          OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_e2e
+        run: |
+          uv run opencloning-cli db stubs > /dev/null
+          if [ -n "$(git status --porcelain -- stubs)" ]; then
+            git status --short -- stubs
+            git diff --stat -- stubs
+            echo "::error::python/stubs/db is out of date. Regenerate it: cd python && OPENCLONING_TESTING=1 uv run opencloning-cli db stubs (reseeds the database in OPENCLONING_DB_URL)"
+            exit 1
+          fi
+
   pytest-docker:
     name: pytest (Docker image)
     needs: changes
