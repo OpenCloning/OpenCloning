@@ -61,7 +61,7 @@
         "msw": "^2.14.6",
         "vite": "^8.3",
         "vite-plugin-ejs": "^1.7.0",
-        "vite-plugin-istanbul": "^7.2.1",
+        "vite-plugin-istanbul": "^9.0.1",
         "vitest": "^4.1.11"
     },
     "packageManager": "yarn@4.9.1"
