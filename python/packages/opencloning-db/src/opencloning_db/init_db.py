@@ -12,6 +12,7 @@ from pathlib import Path
 
 import opencloning_linkml.datamodel.models as opencloning_models
 import pydna.opencloning_models as pydna_opencloning_models
+from pydna.dseqrecord import Dseqrecord
 from pydna.parsers import parse as pydna_parse
 from sqlalchemy import select
 from sqlalchemy.engine import Engine
@@ -33,6 +34,60 @@ from opencloning_db.models import (
     WorkspaceMembership,
     WorkspaceRole,
 )
+
+
+def _add_sequencing_check_examples(session: Session, ctx: WriteContext, workspace_id: int) -> None:
+    """Sequences with sequencing files that match (rotated / reverse complement), have substitutions or gaps,
+    or cannot be read, to demo the bulk sequencing check."""
+    c1 = Dseqrecord('GCTAAAGACAATTACATAACATACACGTCAGCACGAAACTTGTTGGCCCA', circular=True)
+    c2 = Dseqrecord('GTGTGAATCGCTTAAGGGTTAAGTAAGTGTGATGCATACGCCTTTACTTG', circular=True)
+    c3 = Dseqrecord('CTGTGTCCACCCCATCGGACTGGCATTTTTATTACACTCAGAAACAGAAC', circular=True)
+    l1 = Dseqrecord('TCGGGTAATTTTGACAGGTCACGCAGAGGCGCGCCCTCCTGAAGTGCGTG')
+    l2 = Dseqrecord('GACACTCGCTATGAATCTCTGATTTACCCACTCTGCCAAACTCCAGCGCG')
+    l3 = Dseqrecord('GTCAGTTCCATCACCCTAAGTAACCGAATAATGCGTTCGCTCTATTGACT')
+    examples = {
+        'seqcheck_circular_1': (
+            c1,
+            {'reverse_complement.fasta': c1.reverse_complement(), 'corrupt.ab1': b'not an ab1'},
+        ),
+        'seqcheck_circular_2': (
+            c2,
+            {
+                'substitutions.fasta': Dseqrecord('GTGTGCATCGCTTAAGGGTTCAGTAAGTGTGATGCATACGCATTTACTTG'),
+                'deletion.fasta': c2[:10] + c2[14:],
+            },
+        ),
+        'seqcheck_circular_3': (
+            c3,
+            {'rotated.fasta': c3.shifted(17), 'rotated_reverse_complement.fasta': c3.shifted(30).reverse_complement()},
+        ),
+        'seqcheck_linear_1': (l1, {'exact.fasta': l1, 'corrupt.gbk': b'not a genbank file'}),
+        'seqcheck_linear_2': (
+            l2,
+            {'truncated.fasta': l2[:40], 'insertion.fasta': l2[:25] + Dseqrecord('TTT') + l2[25:]},
+        ),
+        'seqcheck_linear_3': (
+            l3,
+            {
+                'reverse_complement.fasta': l3.reverse_complement(),
+                'substitutions.fasta': Dseqrecord('GTCCGTTCCCTCACACTAATTAACAGAATCATGCTTTCGATCTAGTGAAT'),
+            },
+        ),
+    }
+    tag = Tag(name='sequencing_check', workspace_id=workspace_id)
+    for name, (dseqr, files) in examples.items():
+        dseqr.name = name
+        dseqr.source = pydna_opencloning_models.UploadedFileSource(
+            file_name=f'{name}.gb', sequence_file_format='genbank', index_in_file=0
+        )
+        sequence = cloning_strategy_to_db(
+            pydna_opencloning_models.CloningStrategy.from_dseqrecords([dseqr]), session, ctx=ctx
+        )[0][-1]
+        sequence.tags.append(tag)
+        for file_name, content in files.items():
+            if not isinstance(content, bytes):
+                content = content.format('fasta').encode()
+            session.add(create_sequencing_file(sequence, content, file_name))
 
 
 def load_seed_data(engine: Engine) -> None:
@@ -194,4 +249,6 @@ def load_seed_data(engine: Engine) -> None:
             name='template_sequence_plasmid', sequence_type=SequenceType.plasmid, ctx=seed_ctx
         )
         session.add(template_plasmid)
+
+        _add_sequencing_check_examples(session, seed_ctx, workspace.id)
         session.commit()

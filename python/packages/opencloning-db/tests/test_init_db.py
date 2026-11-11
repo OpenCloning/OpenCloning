@@ -14,5 +14,5 @@ def test_init_db(postgres_test_config_write):
     reset_database(engine)
     load_seed_data(engine)
     with Session(engine) as session:
-        assert session.scalar(select(func.count()).select_from(Sequence)) == 56
-        assert session.scalar(select(func.count()).select_from(SequencingFile)) == 3
+        assert session.scalar(select(func.count()).select_from(Sequence)) == 62
+        assert session.scalar(select(func.count()).select_from(SequencingFile)) == 15
