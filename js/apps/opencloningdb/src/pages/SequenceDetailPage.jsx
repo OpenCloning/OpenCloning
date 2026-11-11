@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Typography, CircularProgress, Alert, Box, IconButton, TableContainer, Paper, Tooltip } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
-import { convertToTeselaJson, downloadBlob, file2base64, getTeselaJsonFromBase64 } from '@opencloning/utils/readNwrite';
+import { convertToTeselaJson, downloadBlob, readSequencingFile } from '@opencloning/utils/readNwrite';
 import SequenceViewer from '@opencloning/ui/components/SequenceViewer';
 import ResourceDetailHeader from '../components/ResourceDetailHeader';
 import SequenceTypeChip from '../components/SequenceTypeChip';
@@ -196,9 +196,7 @@ function SequenceDetailPage() {
   const handleSeeAlignmentsMutation = useMutation({
     mutationFn: async () => {
       const parsedFiles = await Promise.all(sequencingFiles.map(async (file) => {
-        const fileBlob = await file.getFile();
-        const base64str = await file2base64(fileBlob);
-        const fileContent = await getTeselaJsonFromBase64(base64str, file.name);
+        const { teselaJson: fileContent } = await readSequencingFile(await file.getFile());
         return { fileName: file.name, fileContent };
       }));
       return parsedFiles;

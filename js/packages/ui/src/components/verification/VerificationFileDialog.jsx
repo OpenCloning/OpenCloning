@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { batch, shallowEqual, useDispatch, useSelector, useStore } from 'react-redux';
 import { isEqual } from 'lodash-es';
-import { getTeselaJsonFromBase64, file2base64 } from '@opencloning/utils/readNwrite';
+import { getTeselaJsonFromBase64, readSequencingFile } from '@opencloning/utils/readNwrite';
 import SequencingFileRow from './SequencingFileRow';
 import { cloningActions } from '@opencloning/store/cloning';
 import useStoreEditor from '../../hooks/useStoreEditor';
@@ -66,10 +66,10 @@ export default function VerificationFileDialog({ id, dialogOpen, setDialogOpen }
 
     // Read the new sequencing files
     const parsedSequencingFiles = await Promise.all(newFiles.map(async (newFile) => {
-      const base64str = await file2base64(newFile);
+      const { base64str, teselaJson } = await readSequencingFile(newFile);
       return {
         sequence_id: id,
-        trace: (await getTeselaJsonFromBase64(base64str, newFile.name)).sequence,
+        trace: teselaJson.sequence,
         base64str,
         file_name: newFile.name,
         file_type: 'Sequencing file',

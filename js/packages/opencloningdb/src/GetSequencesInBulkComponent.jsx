@@ -13,7 +13,7 @@ import endpoints from './endpoints';
  * When loading by tag, the sequences can be restricted to some sequence types (none selected means all types),
  * defaultSequenceTypes sets the initial selection (e.g. ['plasmid']).
  *
- * onSequencesLoaded receives an array of { databaseId, name, textFileSequence }.
+ * onSequencesLoaded receives an array of { databaseId, name, seguid, textFileSequence }.
  */
 function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes = [] }) {
   const [mode, setMode] = React.useState('tags');
@@ -28,6 +28,7 @@ function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes =
       return data.map(({ sequence_ref, sequence }) => ({
         databaseId: sequence_ref.id,
         name: formatSequenceName(sequence_ref),
+        seguid: sequence_ref.seguid,
         textFileSequence: sequence,
       }));
     },

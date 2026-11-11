@@ -27,6 +27,7 @@ import BulkUploadTemplateSequencesButton from '../components/bulk_upload/BulkUpl
 import PageContainer from '../components/PageContainer';
 import SequenceTable from '../components/SequenceTable';
 import CreateTemplateSequenceButton from '../components/CreateTemplateSequenceButton';
+import CheckSequencingButton from '../components/CheckSequencingButton';
 import useRowSelection from '../hooks/useRowSelection';
 
 const MIN_WIDTH = 200;
@@ -143,6 +144,7 @@ function SequencesPage() {
           <BulkUploadTemplateSequencesButton />
           <CreateTemplateSequenceButton />
         </ButtonGroup>
+        <CheckSequencingButton />
         <TagEntitiesButton
           selectedEntities={selectedSequences}
           entityType="input_entities"
