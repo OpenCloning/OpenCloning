@@ -13,6 +13,7 @@ function expectLoadedSequences(spy, stubBody) {
   expect(sequences).to.deep.equal(stubBody.map(({ sequence_ref, sequence }) => ({
     databaseId: sequence_ref.id,
     name: formatSequenceName(sequence_ref),
+    seguid: sequence_ref.seguid,
     textFileSequence: sequence,
   })));
 }

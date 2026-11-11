@@ -10,7 +10,7 @@ import endpoints from './endpoints';
  * Load several sequences from OpenCloningDB, either all the sequences with any of the selected tags,
  * or the sequences picked by the user. Template sequences are not included (they have no content).
  *
- * onSequencesLoaded receives an array of { databaseId, name, textFileSequence }.
+ * onSequencesLoaded receives an array of { databaseId, name, seguid, textFileSequence }.
  */
 function GetSequencesInBulkComponent({ onSequencesLoaded }) {
   const [mode, setMode] = React.useState('tags');
@@ -24,6 +24,7 @@ function GetSequencesInBulkComponent({ onSequencesLoaded }) {
       return data.map(({ sequence_ref, sequence }) => ({
         databaseId: sequence_ref.id,
         name: formatSequenceName(sequence_ref),
+        seguid: sequence_ref.seguid,
         textFileSequence: sequence,
       }));
     },
