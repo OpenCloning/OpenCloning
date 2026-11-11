@@ -10,7 +10,7 @@ runs:
   using: composite
   steps:
     - name: Set up Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: '22'
 
@@ -19,7 +19,7 @@ runs:
       run: corepack enable
 
     - name: Cache node_modules and Cypress binary
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           js/node_modules
