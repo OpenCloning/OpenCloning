@@ -323,6 +323,50 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.dbAlertExists('Imported 1 template sequence successfully');
     cy.closeDbAlerts();
   });
+  it('can bulk link sequencing files', () => {
+    const bulkDir = 'cypress/test_files/bulk_sequencing_files';
+    const zips = [`${bulkDir}/bulk_sample1.zip`, `${bulkDir}/bulk_sample2.zip`];
+    const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
+    cy.intercept('POST', Cypress.getDbURL(endpoints.sequencingFilesBulk)).as('bulkLinkSequencingFiles');
+    cy.e2eLogin('/sequences?name=pREX0008', 'bootstrap+clerk_test@example.com', 'password');
+    cy.get('[data-testid="bulk-link-sequencing-files-button"]').click();
+    // Can download the template
+    cy.get('div[role="presentation"] a').contains('Download template').then((link) => {
+      cy.wrap(link).invoke('attr', 'href').should('include', '/bulk_submission_templates/bulk_link_sequencing_files.tsv');
+    });
+    cy.get('[data-testid="bulk-upload-upload-file"]').click();
+
+    // Errors from the backend are shown, and the same files can be selected again
+    const filesWithMissingZip = [`${bulkDir}/missing_zip.tsv`, zips[0]];
+    cy.get('[data-testid="bulk-link-sequencing-files-input"]').selectFile(filesWithMissingZip, { force: true });
+    cy.wait('@bulkLinkSequencingFiles').its('response.statusCode').should('equal', 400);
+    cy.dbAlertExists('Zip files in the table that were not submitted: not_submitted.zip');
+    cy.closeDbAlerts();
+    cy.get('[data-testid="bulk-link-sequencing-files-input"]').selectFile(filesWithMissingZip, { force: true });
+    cy.wait('@bulkLinkSequencingFiles');
+    cy.get('@bulkLinkSequencingFiles.all').should('have.length', 2);
+    cy.dbAlertExists('Zip files in the table that were not submitted: not_submitted.zip');
+    cy.closeDbAlerts();
+
+    // Successful submission, all files are sent in the same request
+    cy.get('[data-testid="bulk-link-sequencing-files-input"]').selectFile([`${bulkDir}/links.tsv`, ...zips], { force: true });
+    cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
+      expect(request.headers['content-type']).to.include('multipart/form-data');
+      const body = decodeBody(request.body);
+      ['links.tsv', 'bulk_sample1.zip', 'bulk_sample2.zip'].forEach((name) => {
+        expect(body).to.include(`name="files"; filename="${name}"`);
+      });
+      expect(response.statusCode).to.equal(200);
+      expect(response.body).to.deep.equal({ created: 2 });
+    });
+    cy.dbAlertExists('Linked 2 sequencing files successfully');
+    cy.closeDbAlerts();
+
+    // The files are linked to the sequence
+    cy.get('tbody tr button').contains('pREX0008').click();
+    cy.get('[data-testid="sequencing-file-row"]').contains('bulk_sample1.fastq').should('exist');
+    cy.get('[data-testid="sequencing-file-row"]').contains('bulk_sample2.fastq').should('exist');
+  });
   it('can bulk upload cloning strategies', () => {
     cy.e2eLogin('/sequences', 'bootstrap+clerk_test@example.com', 'password');
     cy.get('input[type="file"]').eq(1).selectFile([

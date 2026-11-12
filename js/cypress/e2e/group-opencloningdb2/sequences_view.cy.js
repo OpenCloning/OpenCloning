@@ -256,6 +256,7 @@ describe('SequencesPage', () => {
     cy.wait('@getSequences')
     cy.get('button').contains('Add to Design Tab').should('not.exist');
     cy.get('button').contains('Tag Sequences').should('not.exist');
+    cy.get('[data-testid="bulk-link-sequencing-files-button"]').should('not.exist');
 
     const selectedSequences = ['entry_clone_lacZ', 'expression_clone_lacZ'];
 

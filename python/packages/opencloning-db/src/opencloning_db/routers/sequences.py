@@ -855,7 +855,6 @@ def _read_single_fastq(upload: UploadFile, max_size_mb: int) -> tuple[str, bytes
         if not i.is_dir() and not any(p.startswith('.') or p == '__MACOSX' for p in PurePosixPath(i.filename).parts)
     ]
     fastqs = [i for i in real_files if i.filename.lower().endswith('.fastq')]
-    print(fastqs)
     if len(fastqs) != 1:
         raise ValueError(f'{upload.filename} contains {len(fastqs)} .fastq files instead of one')
     if fastqs[0].file_size > max_size_mb * 1024 * 1024:
