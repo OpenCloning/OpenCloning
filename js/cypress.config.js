@@ -40,6 +40,19 @@ export default defineConfig({
       }
 
       if (process.env.CYPRESS_TEST_GROUP === 'opencloningdb-clerk') {
+        on('task', {
+          // Remove users created by sign-up tests, so they don't pile up in the Clerk dev instance
+          async deleteClerkUser(userId) {
+            const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
+            });
+            if (!response.ok) {
+              throw new Error(`Failed to delete Clerk user ${userId}: ${response.status} ${await response.text()}`);
+            }
+            return null;
+          },
+        });
         return clerkSetup({ config });
       }
 
