@@ -323,6 +323,70 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.dbAlertExists('Imported 1 template sequence successfully');
     cy.closeDbAlerts();
   });
+  it('can bulk link sequencing files', () => {
+    const bulkDir = 'cypress/test_files/bulk_sequencing_files';
+    const zipInput = '[data-testid="bulk-link-sequencing-files-zip-input"]';
+    const tableInput = '[data-testid="bulk-link-sequencing-files-table-input"]';
+    const modal = '[data-testid="bulk-link-sequencing-files-modal"]';
+    const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
+    cy.intercept('POST', Cypress.getDbURL(endpoints.sequencingFilesBulk)).as('bulkLinkSequencingFiles');
+    cy.e2eLogin('/sequences?name=pREX0008', 'bootstrap+clerk_test@example.com', 'password');
+    cy.get('[data-testid="bulk-link-sequencing-files-button"]').should('exist');
+
+    // A zip without .final.fastq files shows an error, and no modal
+    cy.get(zipInput).selectFile(`${bulkDir}/no_final_fastq.zip`, { force: true });
+    cy.dbAlertExists('No .final.fastq files found in no_final_fastq.zip');
+    cy.closeDbAlerts();
+    cy.get(modal).should('not.exist');
+
+    // Only the .final.fastq files are read (not the .stats or the __MACOSX copies), and the sample
+    // that matches a sequence of the workspace (A1-P1 is a rotation of seqcheck_circular_1) is pre-filled
+    cy.get(zipInput).selectFile(`${bulkDir}/sequencing_run.zip`, { force: true });
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+      .should('contain.text', 'Found 2 .final.fastq files in sequencing_run.zip (1 match an existing sequence exactly).');
+    cy.get(modal).contains('button', 'Download sample table').click();
+    cy.readFile('cypress/downloads/sequencing_run_samples.tsv')
+      .should('equal', 'sample_name\tsequence_name\nA1-P1\tseqcheck_circular_1\nB2-P1\t\n');
+
+    // Samples that are not in the zip are caught before submitting
+    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sample.tsv`, { force: true });
+    cy.get(modal).contains('Samples not found in the zip file: Z9-P9');
+
+    // Errors from the backend are shown in the modal, and the same file can be selected again
+    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sequence.tsv`, { force: true });
+    cy.wait('@bulkLinkSequencingFiles').its('response.statusCode').should('equal', 400);
+    cy.get(modal).contains('Sequences not found: not_a_sequence');
+    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sequence.tsv`, { force: true });
+    cy.wait('@bulkLinkSequencingFiles');
+    cy.get('@bulkLinkSequencingFiles.all').should('have.length', 2);
+    cy.get(modal).contains('Sequences not found: not_a_sequence');
+
+    // Successful submission, all files are sent in the same request, with their sequence names
+    cy.get(tableInput).selectFile(`${bulkDir}/samples_filled.tsv`, { force: true });
+    cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
+      expect(request.headers['content-type']).to.include('multipart/form-data');
+      const body = decodeBody(request.body);
+      ['A1-P1.final.fastq', 'B2-P1.final.fastq'].forEach((name) => {
+        expect(body).to.include(`name="files"; filename="${name}"`);
+      });
+      ['seqcheck_circular_1', 'pREX0008'].forEach((name) => {
+        expect(body).to.match(new RegExp(`name="sequence_names"\\r\\n\\r\\n${name}\\r\\n`));
+      });
+      expect(response.statusCode).to.equal(200);
+      expect(response.body).to.deep.equal({ created: 2 });
+    });
+    cy.dbAlertExists('Linked 2 sequencing files successfully');
+    cy.closeDbAlerts();
+    cy.get(modal).should('not.exist');
+
+    // The files are linked to the sequences
+    cy.get('tbody tr button').contains('pREX0008').click();
+    cy.get('[data-testid="sequencing-file-row"]').contains('B2-P1.final.fastq').should('exist');
+    cy.get('[data-testid="sequencing-file-row"]').contains('A1-P1.final.fastq').should('not.exist');
+    cy.visit('/sequences?name=seqcheck_circular_1');
+    cy.get('tbody tr button').contains('seqcheck_circular_1').click();
+    cy.get('[data-testid="sequencing-file-row"]').contains('A1-P1.final.fastq').should('exist');
+  });
   it('can bulk upload cloning strategies', () => {
     cy.e2eLogin('/sequences', 'bootstrap+clerk_test@example.com', 'password');
     cy.get('input[type="file"]').eq(1).selectFile([

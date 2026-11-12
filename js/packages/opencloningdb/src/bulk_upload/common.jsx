@@ -4,6 +4,19 @@ import TagMultiSelect from '../TagMultiSelect';
 import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Info as InfoIcon, Warning as WarningIcon } from '@mui/icons-material';
 
 
+/** Scrollable container for the bulk tables, so that they fit in a BulkUploadModal. */
+export function BulkTableContainer({ children }) {
+  return (
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      sx={{ mb: 2, maxHeight: '55vh', overflowY: 'auto', flex: 1, minHeight: 0 }}
+    >
+      {children}
+    </TableContainer>
+  );
+}
+
 /**
  * Wraps a bulk upload preview table with the summary and the import / cancel buttons.
  * The tag field is shown if onBulkTagsChange is passed, onTagCreateError receives the error if creating a tag fails.
@@ -49,13 +62,9 @@ export function BulkUploadPreviewTableWrapper({
         {orderingText}
       </Typography>
 
-      <TableContainer
-        component={Paper}
-        variant="outlined"
-        sx={{ mb: 2, maxHeight: '55vh', overflowY: 'auto', flex: 1, minHeight: 0 }}
-      >
+      <BulkTableContainer>
         {children}
-      </TableContainer>
+      </BulkTableContainer>
 
       <Typography variant="body2" sx={{ mb: 2 }}>
         {summaryText}
@@ -106,11 +115,17 @@ export function BulkUploadPreviewTableWrapper({
 }
 
 export function StatusIcon({ status }) {
+  if (!status) {
+    return null;
+  }
   const isClear = status === 'clear';
   const isError = status === 'error';
   const isInfo = status === 'info';
+  const isPending = status === 'pending';
 
-  return isClear ? (
+  return isPending ? (
+    <CircularProgress size={20} data-testid="status-icon-pending" />
+  ) : isClear ? (
     <CheckCircleIcon color="success" />
   ) : isError ? (
     <CancelIcon color="error" />
@@ -122,10 +137,11 @@ export function StatusIcon({ status }) {
 }
 
 
-export function CommonTableRow({ status, issues, children }) {
+/** Table row with a status icon cell, the children cells and an issues cell. Other props are passed to the TableRow. */
+export function CommonTableRow({ status, issues = [], children, ...rowProps }) {
 
   return (
-    <TableRow>
+    <TableRow {...rowProps}>
       <TableCell align="center" padding="checkbox">
         <StatusIcon status={status} />
       </TableCell>

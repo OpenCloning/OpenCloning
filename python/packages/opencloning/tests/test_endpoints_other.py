@@ -177,6 +177,39 @@ class AlignSangerTest(unittest.TestCase):
         assert response.status_code == 400
 
 
+class SeguidTest(unittest.TestCase):
+
+    def test_seguid(self):
+        seq = 'AACGTTTGCA'
+        for circular in [True, False]:
+            response = client.post('/seguid', json={'sequence': seq, 'circular': circular})
+            assert response.status_code == 200
+            assert response.json() == Dseqrecord(seq, circular=circular).seq.seguid()
+        # Default is linear
+        response = client.post('/seguid', json={'sequence': seq})
+        assert response.json().startswith('ldseguid=')
+        assert response.json() == Dseqrecord(seq).seq.seguid()
+
+    def test_seguid_invariant_to_rotation_and_strand(self):
+        seq = Dseqrecord('AACGTTTGCA', circular=True)
+        expected = client.post('/seguid', json={'sequence': str(seq.seq), 'circular': True}).json()
+        for variant in [seq.shifted(3), seq.reverse_complement(), seq.shifted(5).reverse_complement()]:
+            response = client.post('/seguid', json={'sequence': str(variant.seq), 'circular': True})
+            assert response.json() == expected
+
+    def test_seguid_matches_genbank_sequence(self):
+        seq = parse(os.path.join(test_files, 'GIN11M86.gb'))[0].looped()
+        response = client.post('/seguid', json={'sequence': str(seq.seq), 'circular': True})
+        assert response.status_code == 200
+        assert response.json() == seq.seq.seguid()
+
+    def test_seguid_errors(self):
+        for seq in ['', 'ACGTZ', 'AC GT']:
+            response = client.post('/seguid', json={'sequence': seq, 'circular': True})
+            assert response.status_code == 400, seq
+            assert response.json()['detail'].startswith('Invalid sequence')
+
+
 class ValidateSyntaxTest(unittest.TestCase):
     def test_validate_syntax(self):
         syntax = Syntax.model_validate_json(open(os.path.join(test_files, 'syntax', 'moclo_syntax.json')).read())

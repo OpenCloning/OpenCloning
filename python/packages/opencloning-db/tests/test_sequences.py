@@ -2245,3 +2245,86 @@ def test_post_cloning_strategy_long_primer(sequences_client):
         json={'sources': [], 'sequences': [], 'primers': [{'id': 1, 'name': 'p', 'sequence': 'A' * 1001}]},
     )
     assert r.status_code == 422
+
+
+def _post_bulk_sequencing_files(ctx, pairs, token_key='token_owner_w1', sequence_names=None):
+    """pairs: [(sequence_name, file_name)], all files have the same dummy content."""
+    return ctx['client'].post(
+        '/sequences/sequencing_files/bulk',
+        headers=workspace_headers(ctx[token_key], ctx['w1']),
+        data={'sequence_names': sequence_names if sequence_names is not None else [name for name, _ in pairs]},
+        files=[('files', (file_name, b'@r\nACGT\n+\nIIII\n', 'application/octet-stream')) for _, file_name in pairs],
+    )
+
+
+def _sequencing_file_names(ctx, seq_id):
+    r = ctx['client'].get(
+        f'/sequences/{seq_id}/sequencing_files', headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    return sorted(f['original_name'] for f in r.json())
+
+
+def test_post_sequencing_files_bulk(sequences_client):
+    ctx = sequences_client
+    pairs = [
+        ('seq_with_sequencing_file', 'A1-P1.final.fastq'),
+        ('seq_with_sequencing_file', 'A1-P1-2.final.fastq'),
+        ('patch-linear-target', 'A1-P1.final.fastq'),
+    ]
+    r = _post_bulk_sequencing_files(ctx, pairs)
+    assert r.status_code == 200, r.text
+    assert r.json() == {'created': 3}
+    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == [
+        'A1-P1-2.final.fastq',
+        'A1-P1.final.fastq',
+        'hello_world.txt',
+    ]
+    assert _sequencing_file_names(ctx, ctx['seq_patch_linear_id']) == ['A1-P1.final.fastq']
+
+    # Submitting again fails, as the sequences already have files with those names
+    r = _post_bulk_sequencing_files(ctx, pairs[:2])
+    assert r.status_code == 400
+    assert r.json()['detail'] == (
+        'seq_with_sequencing_file already has a sequencing file called A1-P1-2.final.fastq; '
+        'seq_with_sequencing_file already has a sequencing file called A1-P1.final.fastq'
+    )
+
+
+@pytest.mark.parametrize(
+    'pairs, sequence_names, detail',
+    [
+        (
+            [('seq_with_sequencing_file', 'a.fastq')],
+            ['seq_with_sequencing_file', 'patch-linear-target'],
+            'Submit one sequence name per file',
+        ),
+        (
+            [('missing', 'a.fastq'), ('template_sequence', 'b.fastq'), ('seq_with_sequencing_file', 'c.fastq')],
+            None,
+            'Sequences not found: missing, template_sequence',
+        ),
+        (
+            [('seq_with_sequencing_file', 'hello_world.txt')],
+            None,
+            'seq_with_sequencing_file already has a sequencing file called hello_world.txt',
+        ),
+        (
+            [('patch-linear-target', 'a.fastq'), ('patch-linear-target', 'a.fastq')],
+            None,
+            'patch-linear-target already has a sequencing file called a.fastq',
+        ),
+    ],
+)
+def test_post_sequencing_files_bulk_errors(sequences_client, pairs, sequence_names, detail):
+    ctx = sequences_client
+    r = _post_bulk_sequencing_files(ctx, pairs, sequence_names=sequence_names)
+    assert r.status_code == 400
+    assert r.json()['detail'] == detail
+    # Nothing was linked
+    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == ['hello_world.txt']
+    assert _sequencing_file_names(ctx, ctx['seq_patch_linear_id']) == []
+
+
+def test_post_sequencing_files_bulk_viewer_forbidden(sequences_client):
+    r = _post_bulk_sequencing_files(sequences_client, [('seq_with_sequencing_file', 'a.fastq')], 'token_viewer_w1')
+    assert r.status_code == 403

@@ -1,6 +1,6 @@
 {
   "body": null,
-  "endpoint": "/db/sequencing_files/4/download",
+  "endpoint": "/db/sequencing_files/16/download",
   "headers": {
     "authorization": "Bearer __TEST_TOKEN__",
     "x-workspace-id": "1"

@@ -1,0 +1,3 @@
+[submodule "other_repos/tg-oss"]
+	path = other_repos/tg-oss
+	url = https://github.com/TeselaGen/tg-oss.git
