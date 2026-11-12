@@ -38,7 +38,7 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
         "@mui/icons-material": "^5.18.0",
-        "@mui/material": "^5.18.0",
+        "@mui/material": "^9.5.0",
         "@mui/x-data-grid": "^8.28.5",
         "@opencloning/store": "workspace:*",
         "@opencloning/utils": "workspace:*",
