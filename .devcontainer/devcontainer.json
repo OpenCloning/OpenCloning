@@ -43,7 +43,8 @@
         // js/
         "dbaeumer.vscode-eslint",
         "shelex.vscode-cy-helper",
-        "vitest.explorer"
+        "vitest.explorer",
+        "mechatroner.rainbow-csv"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/opt/venv/bin/python",

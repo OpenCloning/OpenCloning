@@ -1,4 +1,11 @@
+// @vitest-environment node
+// (jsdom Blobs have no arrayBuffer, which zip.js needs)
+import { TextReader } from '@zip.js/zip.js';
+import { getZipFileBlob } from '@opencloning/utils/readNwrite';
 import {
+  finalFastqFilesFromZip,
+  pairFastqFilesWithSequences,
+  sampleTableTsv,
   prepareLineRowsForValidation,
   prepareTemplateSequenceRowsForValidation,
   splitSpaceSeparatedField,
@@ -72,5 +79,54 @@ describe('prepareLineRowsForValidation', () => {
     expect(() => prepareLineRowsForValidation([
       { uid: '   ', plasmids: '', genotype: '', parent_uids: '' },
     ])).to.throw('File contains line rows without a UID');
+  });
+});
+
+
+async function runZip(paths) {
+  const blob = await getZipFileBlob(paths.map((name) => ({ name, reader: new TextReader(`content of ${name}`) })));
+  return new File([blob], 'run.zip');
+}
+
+describe('sequencing run zip files', () => {
+  const runPaths = [
+    'run/A1-P1/A1-P1.final.fastq',
+    'run/A1-P1/A1-P1_raw.fastq.gz',
+    'run/A1-P1/A1-P1.final_pLann.gbk',
+    'run/A1-P1-2/A1-P1-2.final.fastq',
+    'run/A1-P1-2/A1-P1-2.stats',
+    // Added by macOS
+    '__MACOSX/run/A1-P1/._A1-P1.final.fastq',
+    'run/A1-P1-2/._A1-P1-2.final.fastq',
+  ];
+
+  it('extracts the .final.fastq files, skipping hidden and __MACOSX files', async () => {
+    const files = await finalFastqFilesFromZip(await runZip(runPaths));
+    expect(files.map((file) => file.name).sort()).toEqual(['A1-P1-2.final.fastq', 'A1-P1.final.fastq']);
+    const file = files.find(({ name }) => name === 'A1-P1.final.fastq');
+    expect(await file.text()).toBe('content of run/A1-P1/A1-P1.final.fastq');
+  });
+
+  it('throws if two samples have the same file name', async () => {
+    const zip = await runZip(['run1/A1/A1.final.fastq', 'run2/A1/A1.final.fastq']);
+    await expect(finalFastqFilesFromZip(zip)).rejects.toThrow('Several files with the same name in the zip file: A1.final.fastq');
+  });
+
+  it('builds the sample table and pairs the filled rows with the files', async () => {
+    const files = await finalFastqFilesFromZip(await runZip(runPaths));
+    // Sorted by sample name, whatever the order in the zip
+    expect(sampleTableTsv([...files].reverse())).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
+    expect(sampleTableTsv(files)).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
+
+    const pairs = pairFastqFilesWithSequences(files, [
+      { sample_name: 'A1-P1', sequence_name: ' pREX0008 ' },
+      { sample_name: 'A1-P1-2', sequence_name: '' },
+    ]);
+    expect(pairs.map(({ sequenceName, file }) => [sequenceName, file.name])).toEqual([['pREX0008', 'A1-P1.final.fastq']]);
+
+    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'A1-P1', sequence_name: '' }]))
+      .toThrow('No sequence names were filled in the table');
+    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'B7', sequence_name: 'pREX0008' }]))
+      .toThrow('Samples not found in the zip file: B7');
   });
 });
