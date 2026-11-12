@@ -76,7 +76,7 @@ RUN uv sync --frozen --package opencloning-mcp --no-default-groups --no-editable
 FROM builder-prod-${APP_TARGET} AS builder-selected
 
 # FINAL IMAGE (default build target)
-FROM python:3.12-alpine3.21 AS production
+FROM python:3.14-alpine3.21 AS production
 
 # You need bash to run mafft and runtime libraries for MARS
 RUN apk update --no-cache && apk add --no-cache bash libstdc++ libgomp libgcc
