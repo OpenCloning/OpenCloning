@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "opencloningdb",
-  "version": "0.4.6",
+  "version": "2.2.0",
   "type": "module",
   "private": true,
   "scripts": {
