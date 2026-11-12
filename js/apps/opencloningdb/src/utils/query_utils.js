@@ -1,3 +1,5 @@
+import { SEQUENCE_TYPE_LABELS } from '@opencloning/opencloningdb/sequenceTypes';
+
 export function parseBoolean(value) {
   if (value === null || value === undefined || value === '') {
     return undefined;
@@ -57,14 +59,7 @@ export const SEQUENCE_TYPE_COLORS = {
   linear_dna: { color: 'default.main' },
 };
 
-export const SEQUENCE_TYPE_LABELS = {
-  locus: 'Locus',
-  allele: 'Allele',
-  plasmid: 'Plasmid',
-  pcr_product: 'PCR product',
-  restriction_fragment: 'Restriction fragment',
-  linear_dna: 'Linear DNA',
-};
+export { SEQUENCE_TYPE_LABELS };
 
 export const LINEAR_SEQUENCE_TYPES = {
   locus: 'Locus',

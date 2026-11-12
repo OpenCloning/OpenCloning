@@ -179,6 +179,25 @@ describe('assignSequenceToSyntaxPart', () => {
     const result = assignSequenceToSyntaxPart(sequenceData, enzymes, graph);
     expect(result).toEqual([]);
   })
+
+  it('ignores the fragments at the ends of linear sequences (e.g. PCR products)', () => {
+    const parts = [{left_overhang: 'TACT', right_overhang: 'AATG'}, {left_overhang: 'AATG', right_overhang: 'AGGT'}];
+    const graph = partsToEdgesGraph(parts);
+    const enzymes = [aliasedEnzymesByName["bsai"]];
+    // The part between the two cuts is found, the fragments up to the sequence ends are ignored
+    expect(assignSequenceToSyntaxPart({ sequence: sequenceBsaI, circular: false }, enzymes, graph))
+      .toEqual([{left_overhang: 'TACT', right_overhang: 'AATG', longestFeature: null}]);
+    // A single cut only gives fragments with a sequence end
+    expect(assignSequenceToSyntaxPart({ sequence: 'tgggtctcaTACTagagtc', circular: false }, enzymes, graph)).toEqual([]);
+  })
+
+  it('does not assign a sequence that the enzyme does not cut', () => {
+    const parts = [{left_overhang: 'TACT', right_overhang: 'AATG'}, {left_overhang: 'AATG', right_overhang: 'AGGT'}];
+    const graph = partsToEdgesGraph(parts);
+    const enzymes = [aliasedEnzymesByName["bsai"]];
+    expect(assignSequenceToSyntaxPart({ sequence: 'AAAAAAA', circular: true }, enzymes, graph)).toEqual([]);
+    expect(assignSequenceToSyntaxPart({ sequence: 'AAAAAAA', circular: false }, enzymes, graph)).toEqual([]);
+  })
 });
 
 describe('tripletsToTranslation', () => {

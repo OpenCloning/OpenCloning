@@ -157,11 +157,17 @@ def get_text_file_sequences(
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
     ids: list[int] = Query(description='Sequence IDs to retrieve', default_factory=list),
     tags: list[int] = Query(description='Retrieve all sequences with any of these tag IDs', default_factory=list),
+    sequence_types: list[SequenceType] = Query(
+        description='Only retrieve sequences of these types (only with tags)', default_factory=list
+    ),
 ):
     """Retrieve several sequences with their file content, either by ID or by tag, sorted by ID.
+    When retrieving by tag, the sequences can be filtered by type.
     Template sequences are not included, since they have no file content."""
     if bool(ids) == bool(tags):
         raise HTTPException(status_code=422, detail='Provide either ids or tags, but not both.')
+    if ids and sequence_types:
+        raise HTTPException(status_code=422, detail='sequence_types can only be used with tags.')
     _, session, workspace_id = ctx.destructure()
 
     query = select(Sequence).where(Sequence.workspace_id == workspace_id)
@@ -169,6 +175,8 @@ def get_text_file_sequences(
         query = query.where(Sequence.id.in_(ids))
     else:
         query = query.where(Sequence.tags.any(and_(Tag.id.in_(tags), Tag.workspace_id == workspace_id)))
+        if sequence_types:
+            query = query.where(Sequence.sequence_type.in_(sequence_types))
 
     count = session.scalar(select(func.count()).select_from(query.subquery()))
     if count > MAX_BULK_SEQUENCES:

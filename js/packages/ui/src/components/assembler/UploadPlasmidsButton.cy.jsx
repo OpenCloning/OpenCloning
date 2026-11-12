@@ -294,7 +294,10 @@ describe('<UploadPlasmidsButton />', () => {
         ];
         const mockDatabase = {
           name: 'MockDB',
-          GetSequencesInBulkComponent: ({ onSequencesLoaded }) => <button type="button" onClick={() => onSequencesLoaded(entries)}>Mock load</button>,
+          // Shows the default sequence types it receives, to check that plasmids are selected by default
+          GetSequencesInBulkComponent: ({ onSequencesLoaded, defaultSequenceTypes }) => (
+            <button type="button" data-default-types={JSON.stringify(defaultSequenceTypes)} onClick={() => onSequencesLoaded(entries)}>Mock load</button>
+          ),
         };
         const addPlasmidsSpy = cy.spy().as('addPlasmidsSpy');
         cy.mount(
@@ -306,7 +309,7 @@ describe('<UploadPlasmidsButton />', () => {
         );
         cy.get('[data-testid="load-plasmids-button"]').click();
         cy.get('[data-testid="load-plasmids-from-database"]').contains('From MockDB').click();
-        cy.contains('button', 'Mock load').click();
+        cy.contains('button', 'Mock load').should('have.attr', 'data-default-types', '["plasmid"]').click();
         // The bulk dialog closes and the valid / invalid dialog is shown
         cy.contains('button', 'Mock load').should('not.exist');
         cy.get('[data-testid="invalid-plasmids-box"]').contains('multi_part_db');
@@ -328,6 +331,33 @@ describe('<UploadPlasmidsButton />', () => {
         });
       });
     });
+  });
+
+  it('shows linear sequences with a single cut (e.g. PCR products) as invalid, without errors', () => {
+    // Linear, with a single BsaI site, so all its fragments end at the sequence ends
+    const pcrProduct = [
+      'LOCUS       pcr_product               28 bp    DNA     linear   UNK 01-JAN-1980',
+      'ORIGIN',
+      '        1 tgggtctcac cctagagtca cacaggac',
+      '//',
+    ].join('\n');
+    const mockDatabase = {
+      name: 'MockDB',
+      GetSequencesInBulkComponent: ({ onSequencesLoaded }) => <button type="button" onClick={() => onSequencesLoaded([{ databaseId: 1, name: 'pcr_product_db', textFileSequence: { file_content: pcrProduct } }])}>Mock load</button>,
+    };
+    cy.mount(
+      <ConfigProvider config={testConfig}>
+        <DatabaseProvider value={mockDatabase}>
+          <UploadPlasmidsButton addPlasmids={cy.spy()} syntax={mocloSyntax} />
+        </DatabaseProvider>
+      </ConfigProvider>,
+    );
+    cy.get('[data-testid="load-plasmids-button"]').click();
+    cy.get('[data-testid="load-plasmids-from-database"]').contains('From MockDB').click();
+    cy.contains('button', 'Mock load').click();
+    cy.get('[data-testid="invalid-plasmids-box"]').contains('pcr_product_db');
+    cy.get('[data-testid="valid-plasmids-box"]').should('not.exist');
+    cy.contains('button', 'Import valid plasmids').should('be.disabled');
   });
 
   it('shows an error if a database sequence cannot be parsed', () => {
