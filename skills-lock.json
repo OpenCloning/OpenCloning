@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "cypress-tap": {
+      "source": "cypress-io/ai-toolkit",
+      "sourceType": "github",
+      "skillPath": "skills/cypress-tap/SKILL.md",
+      "computedHash": "4e36fe8bd60bdbffb86e186da45478ba1cd757801c81dcf9e6ecefb50c5f632d",
+      "installMode": "copy"
+    }
+  }
+}
