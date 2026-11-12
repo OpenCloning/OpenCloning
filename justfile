@@ -64,6 +64,12 @@ db-migrate:
 db-seed *args:
     OPENCLONING_TESTING=1 uv run opencloning-cli db seed {{args}}
 
+# Regenerate the DB test stubs in python/stubs/db (reseeds the local DB, destructive)
+[group('backend')]
+[working-directory: 'python']
+db-stubs *args:
+    OPENCLONING_TESTING=1 uv run opencloning-cli db stubs {{args}}
+
 # Python tests, e.g. just pytest -k assembly
 [working-directory: 'python']
 [group('backend')]
