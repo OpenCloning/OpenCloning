@@ -1,6 +1,8 @@
 """Sequences routes: workspace scoping, filters, cloning strategy graph, and files."""
 
 import copy
+import io
+import zipfile
 from opencloning.dna_functions import read_dsrecord_from_json
 import opencloning_linkml.datamodel.models as opencloning_models
 import pytest
@@ -2245,3 +2247,118 @@ def test_post_cloning_strategy_long_primer(sequences_client):
         json={'sources': [], 'sequences': [], 'primers': [{'id': 1, 'name': 'p', 'sequence': 'A' * 1001}]},
     )
     assert r.status_code == 422
+
+
+def _zip(files: dict[str, bytes]) -> bytes:
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, 'w') as zf:
+        for name, content in files.items():
+            zf.writestr(name, content)
+    return buffer.getvalue()
+
+
+def _post_bulk_sequencing_files(ctx, files, token_key='token_owner_w1'):
+    return ctx['client'].post(
+        '/sequences/sequencing_files/bulk',
+        headers=workspace_headers(ctx[token_key], ctx['w1']),
+        files=[('files', (name, content, 'application/octet-stream')) for name, content in files.items()],
+    )
+
+
+def _sequencing_file_names(ctx, seq_id):
+    r = ctx['client'].get(
+        f'/sequences/{seq_id}/sequencing_files', headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    return sorted(f['original_name'] for f in r.json())
+
+
+BULK_ZIPS = {
+    'a.zip': _zip({'run/a.fastq': b'@a\nACGT\n+\nIIII\n', 'a.ab1': b'trace', 'notes.txt': b'x'}),
+    # macOS adds hidden copies of every file, which are ignored
+    'b.zip': _zip(
+        {'b.fastq': b'@b\nACGT\n+\nIIII\n', '__MACOSX/._b.fastq': b'x', '._b.fastq': b'x', '.hidden/c.fastq': b'x'}
+    ),
+}
+BULK_TABLE = b'sequence_name\tzip_file_name\nseq_with_sequencing_file\ta.zip\nseq_with_sequencing_file\tb.zip\n'
+
+
+def test_post_sequencing_files_bulk(sequences_client):
+    ctx = sequences_client
+    table = BULK_TABLE + b'patch-linear-target\ta.zip\n'
+    # Zip files not in the table are ignored
+    r = _post_bulk_sequencing_files(ctx, {'links.tsv': table, **BULK_ZIPS, 'unused.zip': b'not a zip'})
+    assert r.status_code == 200, r.text
+    assert r.json() == {'created': 3}
+    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == ['a.fastq', 'b.fastq', 'hello_world.txt']
+    assert _sequencing_file_names(ctx, ctx['seq_patch_linear_id']) == ['a.fastq']
+
+    # Submitting again fails, as the sequences already have files with those names
+    r = _post_bulk_sequencing_files(ctx, {'links.tsv': BULK_TABLE, **BULK_ZIPS})
+    assert r.status_code == 400
+    assert r.json()['detail'] == (
+        'seq_with_sequencing_file already has a sequencing file called a.fastq; '
+        'seq_with_sequencing_file already has a sequencing file called b.fastq'
+    )
+
+
+def test_post_sequencing_files_bulk_csv(sequences_client):
+    ctx = sequences_client
+    table = b'zip_file_name,sequence_name\nb.zip,seq_with_sequencing_file\n\n'
+    r = _post_bulk_sequencing_files(ctx, {'links.csv': table, **BULK_ZIPS})
+    assert r.status_code == 200, r.text
+    assert r.json() == {'created': 1}
+
+
+@pytest.mark.parametrize(
+    'files, detail',
+    [
+        ({**BULK_ZIPS}, 'Submit a single .csv or .tsv file and .zip files'),
+        ({'1.tsv': BULK_TABLE, '2.csv': BULK_TABLE, **BULK_ZIPS}, 'Submit a single .csv or .tsv file and .zip files'),
+        ({'links.tsv': BULK_TABLE, 'x.txt': b'', **BULK_ZIPS}, 'Submit a single .csv or .tsv file and .zip files'),
+        (
+            {'links.tsv': b'name\tzip_file_name\nx\ta.zip\n', **BULK_ZIPS},
+            'The table must have the columns sequence_name and zip_file_name',
+        ),
+        (
+            {'links.tsv': b'sequence_name\tzip_file_name\n\ta.zip\n', **BULK_ZIPS},
+            'The table must have at least one row, and no empty values',
+        ),
+        (
+            {'links.tsv': BULK_TABLE, 'a.zip': BULK_ZIPS['a.zip']},
+            'Zip files in the table that were not submitted: b.zip',
+        ),
+        (
+            {
+                'links.tsv': BULK_TABLE,
+                'a.zip': _zip({'a.txt': b'x'}),
+                'b.zip': _zip({'1.fastq': b'', '2.FASTQ': b''}),
+            },
+            'a.zip contains 0 .fastq files instead of one; b.zip contains 2 .fastq files instead of one',
+        ),
+        (
+            {'links.tsv': BULK_TABLE, 'a.zip': b'not a zip', 'b.zip': BULK_ZIPS['b.zip']},
+            'a.zip is not a valid zip file',
+        ),
+        (
+            {'links.tsv': BULK_TABLE + b'missing\ta.zip\ntemplate_sequence\tb.zip\n', **BULK_ZIPS},
+            'Sequences not found: missing, template_sequence',
+        ),
+        (
+            {'links.tsv': b'sequence_name\tzip_file_name\npatch-linear-target\ta.zip\npatch-linear-target\ta.zip\n'}
+            | BULK_ZIPS,
+            'patch-linear-target already has a sequencing file called a.fastq',
+        ),
+    ],
+)
+def test_post_sequencing_files_bulk_errors(sequences_client, files, detail):
+    ctx = sequences_client
+    r = _post_bulk_sequencing_files(ctx, files)
+    assert r.status_code == 400
+    assert r.json()['detail'] == detail
+    # Nothing was linked
+    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == ['hello_world.txt']
+
+
+def test_post_sequencing_files_bulk_viewer_forbidden(sequences_client):
+    r = _post_bulk_sequencing_files(sequences_client, {'links.tsv': BULK_TABLE, **BULK_ZIPS}, 'token_viewer_w1')
+    assert r.status_code == 403

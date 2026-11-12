@@ -1,6 +1,11 @@
 """Sequence, sequencing files, and cloning strategy endpoints."""
 
+import csv
+import io
+import os
+from pathlib import PurePosixPath
 import warnings
+import zipfile
 from typing import Annotated, List
 from urllib.parse import quote
 from opencloning.dna_functions import read_dsrecord_from_json
@@ -835,6 +840,102 @@ def post_sequence_sequencing_files(
 
     session.commit()
     return created
+
+
+def _read_single_fastq(upload: UploadFile, max_size_mb: int) -> tuple[str, bytes]:
+    """Return (name, content) of the single .fastq file in an uploaded zip, raise a ValueError otherwise."""
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(read_upload_with_limit(upload, max_size_mb)))
+    except zipfile.BadZipFile:
+        raise ValueError(f'{upload.filename} is not a valid zip file')
+    # Skip directories, hidden files (e.g. ._A1.fastq from macOS) and anything in __MACOSX/ or hidden folders
+    real_files = [
+        i
+        for i in zf.infolist()
+        if not i.is_dir() and not any(p.startswith('.') or p == '__MACOSX' for p in PurePosixPath(i.filename).parts)
+    ]
+    fastqs = [i for i in real_files if i.filename.lower().endswith('.fastq')]
+    print(fastqs)
+    if len(fastqs) != 1:
+        raise ValueError(f'{upload.filename} contains {len(fastqs)} .fastq files instead of one')
+    if fastqs[0].file_size > max_size_mb * 1024 * 1024:
+        raise ValueError(f'{fastqs[0].filename} in {upload.filename} exceeds the maximum size of {max_size_mb} MB')
+    return os.path.basename(fastqs[0].filename), zf.read(fastqs[0])
+
+
+@router.post('/sequences/sequencing_files/bulk')
+def post_sequencing_files_bulk(
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+    files: List[UploadFile] = File(...),
+):
+    """Link zipped .fastq files to sequences in bulk. Submit a table (.csv or .tsv) with the columns sequence_name
+    and zip_file_name, and the zip files, each containing a single .fastq file. Zip files that are not in the table
+    are ignored. If several sequences have the same name, the first one is used. Nothing is linked if there is any
+    error."""
+    _, session, workspace_id = ctx.destructure()
+    max_size_mb = get_config().max_sequencing_file_size_mb
+
+    tables = [f for f in files if (f.filename or '').lower().endswith(('.csv', '.tsv'))]
+    zips = {f.filename: f for f in files if (f.filename or '').lower().endswith('.zip')}
+    if len(tables) != 1 or len(tables) + len(zips) != len(files):
+        raise HTTPException(400, 'Submit a single .csv or .tsv file and .zip files')
+
+    delimiter = '\t' if tables[0].filename.lower().endswith('.tsv') else ','
+    reader = csv.DictReader(
+        io.StringIO(read_upload_with_limit(tables[0], max_size_mb).decode('utf-8-sig')), delimiter=delimiter
+    )
+    if not {'sequence_name', 'zip_file_name'}.issubset(reader.fieldnames or []):
+        raise HTTPException(400, 'The table must have the columns sequence_name and zip_file_name')
+    rows = [(r['sequence_name'].strip(), r['zip_file_name'].strip()) for r in reader if any(r.values())]
+    if not rows or not all(name and zip_name for name, zip_name in rows):
+        raise HTTPException(400, 'The table must have at least one row, and no empty values')
+
+    missing_zips = sorted({zip_name for _, zip_name in rows if zip_name not in zips})
+    if missing_zips:
+        raise HTTPException(400, f'Zip files in the table that were not submitted: {", ".join(missing_zips)}')
+
+    fastqs, zip_errors = {}, []
+    for zip_name in sorted({z for _, z in rows}):
+        try:
+            fastqs[zip_name] = _read_single_fastq(zips[zip_name], max_size_mb)
+        except ValueError as e:
+            zip_errors.append(str(e))
+    if zip_errors:
+        raise HTTPException(400, '; '.join(zip_errors))
+
+    sequences = {}
+    names = {name for name, _ in rows}
+    for seq in session.scalars(
+        select(Sequence).where(Sequence.workspace_id == workspace_id, Sequence.name.in_(names)).order_by(Sequence.id)
+    ):
+        sequences.setdefault(seq.name, seq)
+    missing_names = sorted(names - sequences.keys())
+    if missing_names:
+        raise HTTPException(400, f'Sequences not found: {", ".join(missing_names)}')
+
+    # Tuples of sequence_id, sequencing_file names to ensure that the same file is not
+    # added twice
+    taken = set(
+        session.execute(
+            select(SequencingFile.sequence_id, SequencingFile.original_name).where(
+                SequencingFile.sequence_id.in_([s.id for s in sequences.values()])
+            )
+        ).all()
+    )
+    conflicts = []
+    for name, zip_name in rows:
+        key = (sequences[name].id, fastqs[zip_name][0])
+        if key in taken:
+            conflicts.append(f'{name} already has a sequencing file called {key[1]}')
+        taken.add(key)
+    if conflicts:
+        raise HTTPException(400, '; '.join(sorted(set(conflicts))))
+
+    for name, zip_name in rows:
+        fastq_name, content = fastqs[zip_name]
+        session.add(create_sequencing_file(sequences[name], content, fastq_name))
+    session.commit()
+    return {'created': len(rows)}
 
 
 @router.delete('/sequences/{sequence_id}/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)

@@ -28,6 +28,7 @@ import PageContainer from '../components/PageContainer';
 import SequenceTable from '../components/SequenceTable';
 import CreateTemplateSequenceButton from '../components/CreateTemplateSequenceButton';
 import CheckSequencingButton from '../components/CheckSequencingButton';
+import BulkLinkSequencingFilesButton from '../components/bulk_upload/BulkLinkSequencingFilesButton';
 import useRowSelection from '../hooks/useRowSelection';
 
 const MIN_WIDTH = 200;
@@ -143,6 +144,7 @@ function SequencesPage() {
           <BulkUploadCloningStrategiesButton />
           <BulkUploadTemplateSequencesButton />
           <CreateTemplateSequenceButton />
+          <BulkLinkSequencingFilesButton />
         </ButtonGroup>
         <CheckSequencingButton />
         <TagEntitiesButton
