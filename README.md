@@ -138,3 +138,7 @@ Thanks to [@joyceykao](https://github.com/joyceykao) for discussions on how to a
 Thanks to [@maratumba](https://github.com/maratumba) for recommending the usage of FastAPI and for giving some general guidelines for the development of the backend and hosting.
 
 Thanks to the whole [Open Life Science](https://openlifesci.org/) organising team and community, which were incredibly helpful in setting the foundations of this project. Special thanks to [@DimmestP](https://github.com/DimmestP), who mentored [@manulera](https://github.com/DimmestP) during the program [OLS-4](https://openlifesci.org/ols-4).
+
+## Submodules
+
+I add submodules for agents to be able to give better suggestions (e.g. tg-oss).

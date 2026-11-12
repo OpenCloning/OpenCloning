@@ -88,7 +88,7 @@ const baseViewerProps = {
   rightClickOverrides,
 };
 
-function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation }) {
+function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation, readOnly = false }) {
   const store = useStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -141,32 +141,29 @@ function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation }) {
 
   const viewerProps = {
     ...baseViewerProps,
+    readOnly,
     isFullscreen,
   };
 
   React.useEffect(() => {
-    updateEditor(store, EDITOR_NAME, { ...baseViewerProps, sequenceData, sequenceDataHistory: {} });
-  }, [store, sequenceData]);
+    updateEditor(store, EDITOR_NAME, { ...baseViewerProps, readOnly, sequenceData, sequenceDataHistory: {} });
+  }, [store, sequenceData, readOnly]);
 
   React.useEffect(() => {
-    const editorUpdate = {};
+    const editorState = store.getState().VectorEditor?.[EDITOR_NAME];
+    let panelsShown = editorState?.panelsShown ?? baseViewerProps.panelsShown;
 
     if (alignmentData) {
       addAlignment(store, alignmentData);
-      const editorState = store.getState().VectorEditor?.[EDITOR_NAME];
-      const currentPanels = editorState?.panelsShown || [[]];
-      editorUpdate.panelsShown = updatePanelsShownWithAlignment(currentPanels);
+      panelsShown = updatePanelsShownWithAlignment(panelsShown);
     } else {
-      const editorState = store.getState().VectorEditor?.[EDITOR_NAME];
-      if (editorState?.panelsShown) {
-        editorUpdate.panelsShown = removePanelFromShown(editorState.panelsShown, 'simpleAlignment');
-      }
+      panelsShown = removePanelFromShown(panelsShown, 'simpleAlignment');
     }
 
-    editorUpdate.panelsShown[0].find((panel) => panel.id === 'rail').active = !sequenceData.circular;
-    editorUpdate.panelsShown[0].find((panel) => panel.id === 'circular').active = sequenceData.circular;
-
-    updateEditor(store, EDITOR_NAME, editorUpdate);
+    // A single active tab: the alignment if there is one, otherwise the map that matches the topology
+    const activePanelId = alignmentData ? 'simpleAlignment' : (sequenceData.circular ? 'circular' : 'rail');
+    const panelsWithActive = panelsShown[0].map((panel) => ({ ...panel, active: panel.id === activePanelId }));
+    updateEditor(store, EDITOR_NAME, { panelsShown: [panelsWithActive] });
 
   }, [sequenceData.circular, store, alignmentData]);
 
@@ -210,7 +207,7 @@ function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation }) {
         </IconButton>
       )}
       {fullscreenExitButton}
-      {annotationChanged && <AnnotationChangedAlert onSave={handleUpdateAnnotation} onCancel={clearHistory} />}
+      {annotationChanged && !readOnly && <AnnotationChangedAlert onSave={handleUpdateAnnotation} onCancel={clearHistory} />}
       <Editor
         editorName={EDITOR_NAME}
         {...viewerProps}

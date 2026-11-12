@@ -17,6 +17,17 @@ const READS = {
   ACGTACGTAC: { alignment: ['ACGTACGTAC', '--GTACGTAC'], identity: '80.00' },
 };
 
+/** Pick the sequences with the gibson_assembly tag in the bulk component. */
+function loadSequencesByTag() {
+  cy.wait('@getTags');
+  // Like clickMultiSelectOption, but the menu is closed with Escape (the page body has no size behind the modal)
+  cy.get('[data-testid="sequencing-check-modal"]').contains('label', 'Tags').siblings('div').first().click();
+  cy.get('div[role="presentation"]').contains('gibson_assembly').click();
+  cy.focused().type('{esc}');
+  cy.contains('button', 'Load sequences').click();
+  cy.wait('@getSequences');
+}
+
 describe('<SequencingCheckModal />', () => {
   beforeEach(() => {
     cy.setupOpenCloningDBTestAuth();
@@ -71,6 +82,9 @@ describe('<SequencingCheckModal />', () => {
           req.reply({ statusCode: 400, body: { detail: 'Alignment failed' }, delay: ALIGN_DELAY });
         } else if (trace === mutantBases) {
           req.reply({ body: ['ACGT', 'ACGA'], delay: ALIGN_DELAY });
+        } else if (trace === plasmidBases) {
+          // Only aligned when the exact match is viewed
+          req.reply({ body: [plasmidBases, plasmidBases], delay: ALIGN_DELAY });
         } else {
           req.reply({ body: READS[trace].alignment, delay: ALIGN_DELAY });
         }
@@ -83,19 +97,15 @@ describe('<SequencingCheckModal />', () => {
       );
 
       // Pick the sequences with the bulk component
-      cy.wait('@getTags');
-      // Like clickMultiSelectOption, but the menu is closed with Escape (the page body has no size behind the modal)
-      cy.get('[data-testid="sequencing-check-modal"]').contains('label', 'Tags').siblings('div').first().click();
-      cy.get('div[role="presentation"]').contains('gibson_assembly').click();
-      cy.focused().type('{esc}');
-      cy.contains('button', 'Load sequences').click();
-      cy.wait('@getSequences');
+      loadSequencesByTag();
 
       // Before the check: sequences in the original order, the one without files last
-      cy.get('[data-testid="sequencing-check-sequence-row"]').should('have.length', 5);
+      cy.get('[data-testid="sequencing-check-sequence-cell"]').should('have.length', 5);
       cy.get('[data-testid="sequencing-check-file-row"]').should('have.length', 8);
-      cy.get('[data-testid="sequencing-check-sequence-row"]').last().should('contain', 'NC_003424').and('contain', 'No sequencing data');
-      cy.get('[data-testid="sequencing-check-sequence-row"]').first().should('contain', 'pREP42-MCS+').and('contain', '(2 files)');
+      cy.get('[data-testid="sequencing-check-empty-row"]').should('have.length', 1).and('contain', 'NC_003424').and('contain', 'No sequencing data');
+      cy.get('[data-testid="sequencing-check-sequence-cell"]').last().should('contain', 'NC_003424');
+      // The sequence cell spans the rows of its files
+      cy.get('[data-testid="sequencing-check-sequence-cell"]').first().should('contain', 'pREP42-MCS+').and('have.attr', 'rowspan', '2');
       cy.get('@seguid.all').should('have.length', 0);
       cy.get('@alignSanger.all').should('have.length', 0);
 
@@ -107,13 +117,11 @@ describe('<SequencingCheckModal />', () => {
       // Sorted: error first, then lowest identity first, no sequencing data last
       const namesById = Object.fromEntries(stub.response.body.map(({ sequence_ref: ref }) => [ref.id, formatSequenceName(ref)]));
       const expectedOrder = [32, 28, 30, 31, 29].map((id) => namesById[id]);
-      cy.get('[data-testid="sequencing-check-sequence-row"]').should(($rows) => {
-        expect($rows.toArray().map((row) => row.querySelector('[data-testid="sequencing-check-sequence-name"]').innerText)).to.deep.equal(expectedOrder);
+      cy.get('[data-testid="sequencing-check-sequence-cell"]').should(($cells) => {
+        const cells = $cells.toArray();
+        expect(cells.map((cell) => cell.querySelector('[data-testid="sequencing-check-sequence-name"]').innerText)).to.deep.equal(expectedOrder);
+        expect(cells.map((cell) => cell.rowSpan)).to.deep.equal([1, 2, 1, 4, 1]);
       });
-      cy.get('[data-testid="sequencing-check-sequence-row"]').eq(0).should('contain', 'See the sequencing files below');
-      cy.get('[data-testid="sequencing-check-sequence-row"]').eq(1).find('[data-testid="sequencing-check-identity"]').should('have.text', '75.00');
-      cy.get('[data-testid="sequencing-check-sequence-row"]').eq(2).find('[data-testid="sequencing-check-identity"]').should('have.text', '80.00');
-      cy.get('[data-testid="sequencing-check-sequence-row"]').eq(3).find('[data-testid="sequencing-check-identity"]').should('have.text', '85.00');
 
       // Files sorted within each sequence, the exact match was found by seguid
       const expectedFiles = [
@@ -127,10 +135,10 @@ describe('<SequencingCheckModal />', () => {
         ['read_a.fa', '100.00'],
       ];
       cy.get('[data-testid="sequencing-check-file-row"]').should(($rows) => {
-        const actual = $rows.toArray().map((row) => {
-          const cells = row.querySelectorAll('td');
-          return [cells[1].innerText.trim(), cells[2].innerText.trim()];
-        });
+        const actual = $rows.toArray().map((row) => [
+          row.querySelector('[data-testid="sequencing-check-file-name"]').innerText.trim(),
+          row.querySelector('[data-testid="sequencing-check-identity"]').innerText.trim(),
+        ]);
         expect(actual).to.deep.equal(expectedFiles);
       });
       cy.get('[data-testid="sequencing-check-file-row"]').first().should('contain', 'Alignment failed');
@@ -150,9 +158,101 @@ describe('<SequencingCheckModal />', () => {
         }
       });
 
+      // The alignments and the files of the check are reused by the alignment viewer
+      cy.get('@downloadFile.all').should('have.length', 8);
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'read_c.fa').find('[aria-label="View alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"] .veTabActive.veTabAlignments').should('be.visible');
+      cy.get('@alignSanger.all').should('have.length', 7);
+      // The exact match was not aligned during the check, so it is aligned now, but not downloaded again
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'exact.fa').find('[aria-label="View alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"] .veTabActive.veTabAlignments').should('be.visible');
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('contain', 'exact.fa');
+      cy.get('@alignSanger.all').should((calls) => {
+        expect(calls).to.have.length(8);
+        expect(calls.at(-1).request.body.traces).to.deep.equal([plasmidBases]);
+      });
+      cy.get('@downloadFile.all').should('have.length', 8);
+      cy.get('[aria-label="Close alignment"]').click();
+
+      // Checking again only recomputes the seguids, and retries the alignment that failed (errors are not cached)
+      cy.get('[data-testid="sequencing-check-run-button"]').click();
+      cy.get('[data-testid="sequencing-check-run-button"]').should('not.be.disabled');
+      cy.get('[data-testid="sequencing-check-progress"]').should('contain', '8 / 8');
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'mutant.fa').should('contain', '75.00');
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'broken.fa').should('contain', 'Alignment failed');
+      cy.get('@alignSanger.all').should((calls) => {
+        expect(calls).to.have.length(9);
+        expect(calls.at(-1).request.body.traces).to.deep.equal(['ACGTTGCAAC']);
+      });
+      cy.get('@downloadFile.all').should('have.length', 8);
+      cy.get('@seguid.all').should('have.length', 4);
+
       // Pick other sequences goes back to the bulk component
       cy.contains('button', 'Pick other sequences').click();
       cy.contains('button', 'Load sequences').should('exist');
+    });
+  });
+
+  it('shows the alignment of a sequencing file below the table', () => {
+    cy.viewport(1400, 900);
+    cy.getStub('get_text_file_sequences_by_tag').then((stub) => {
+      const [plasmid] = stub.response.body;
+      const plasmidBases = convertToTeselaJson(plasmid.sequence).sequence.toUpperCase();
+      const mutantBases = (plasmidBases[0] === 'A' ? 'C' : 'A') + plasmidBases.slice(1);
+      const files = {
+        1: { name: 'mutant.fa', sequence: mutantBases },
+        2: { name: 'other.fa', sequence: plasmidBases },
+      };
+
+      cy.intercept('GET', Cypress.getDbURL('/sequences/*/sequencing_files'), (req) => {
+        const sequenceId = Number(req.url.split('/').at(-2));
+        req.reply(sequenceId === plasmid.sequence_ref.id ? [1, 2].map((id) => ({ id, original_name: files[id].name })) : []); // eslint-disable-line camelcase
+      });
+      cy.intercept('GET', Cypress.getDbURL('/sequencing_files/*/download'), (req) => {
+        const file = files[Number(req.url.split('/').at(-2))];
+        req.reply({ body: `>${file.name}\n${file.sequence}\n`, headers: { 'content-type': 'application/octet-stream' } });
+      });
+      cy.intercept('POST', `${BACKEND_URL}/align_sanger`, (req) => {
+        req.reply({ body: [plasmidBases, req.body.traces[0].toUpperCase()], delay: 200 });
+      }).as('alignSanger');
+
+      cy.mount(
+        <ConfigProvider config={testConfig}>
+          <SequencingCheckModal open onClose={() => {}} />
+        </ConfigProvider>,
+      );
+      loadSequencesByTag();
+
+      // No alignment shown by default
+      cy.get('[data-testid="sequencing-check-file-row"]').should('have.length', 2);
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('not.exist');
+
+      // The eye button aligns the file to its sequence (without running the check) and shows the alignment tab
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'mutant.fa').find('[aria-label="View alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"]').find('.MuiCircularProgress-root').should('exist');
+      cy.wait('@alignSanger').its('request.body').should((body) => {
+        expect(body.sequence.id).to.equal(plasmid.sequence.id);
+        expect(body.traces).to.deep.equal([mutantBases]);
+      });
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('contain', 'mutant.fa');
+      cy.get('[data-testid="sequencing-alignment-viewer"] .veTabActive.veTabAlignments').should('be.visible');
+      cy.get('[data-testid="sequencing-alignment-viewer"] .veTabActive').should('have.length', 1);
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'mutant.fa').should('have.class', 'Mui-selected');
+
+      // Another file replaces the alignment
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'other.fa').find('[aria-label="View alignment"]').click();
+      cy.wait('@alignSanger').its('request.body.traces').should('deep.equal', [plasmidBases]);
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('contain', 'other.fa').and('not.contain', 'mutant.fa');
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'mutant.fa').should('not.have.class', 'Mui-selected');
+
+      // Hide it with the eye button, show it again from the cache, and close it
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'other.fa').find('[aria-label="Hide alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('not.exist');
+      cy.get('[data-testid="sequencing-check-file-row"]').contains('tr', 'mutant.fa').find('[aria-label="View alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"] .veTabActive.veTabAlignments').should('be.visible');
+      cy.get('@alignSanger.all').should('have.length', 2);
+      cy.get('[aria-label="Close alignment"]').click();
+      cy.get('[data-testid="sequencing-alignment-viewer"]').should('not.exist');
     });
   });
 });

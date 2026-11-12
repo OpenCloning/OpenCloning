@@ -92,6 +92,23 @@ export function buildAlignmentConfig(id, sequenceData, alignmentTracks) {
 }
 
 /**
+ * Build the alignment config of sequencing files aligned to a sequence (response of the align_sanger endpoint).
+ * @param {Object} sequenceModel - The TextFileSequence that was aligned (its id names the alignment)
+ * @param {Object} sequenceData - The reference sequence data
+ * @param {Array} parsedFiles - [{ fileName, fileContent }], fileContent is getTeselaJsonFromBase64 output
+ * @param {Array} alignedSequences - align_sanger response: the aligned reference, then one aligned string per file
+ * @returns {Object} Alignment config for addAlignment
+ */
+export function buildSequencingAlignmentConfig(sequenceModel, sequenceData, parsedFiles, alignedSequences) {
+  const referenceTrack = buildReferenceTrack(sequenceData, alignedSequences[0]);
+  const otherTracks = parsedFiles.map((f, i) => {
+    const alignmentFile = { file_name: f.fileName, alignment: [alignedSequences[0], alignedSequences[i + 1]] }; // eslint-disable-line camelcase
+    return buildAlignmentTrack(f.fileContent, alignmentFile);
+  });
+  return buildAlignmentConfig(sequenceModel.id, sequenceData, [referenceTrack, ...otherTracks]);
+}
+
+/**
  * Remove a panel from panelsShown by id.
  * @param {Array} panelsShown - Current panelsShown array (array of arrays)
  * @param {string} panelId - The panel id to remove
