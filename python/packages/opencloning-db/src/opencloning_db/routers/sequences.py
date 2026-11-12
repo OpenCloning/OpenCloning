@@ -412,6 +412,7 @@ def _seguid_query(seguid: str, workspace_id: int) -> Select[tuple[Sequence]]:
             Sequence.seguid == seguid,
             Sequence.workspace_id == workspace_id,
         )
+        .order_by(Sequence.id)
         .options(
             selectinload(InputEntity.tags),
             selectinload(Sequence.instances),

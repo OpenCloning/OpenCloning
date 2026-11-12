@@ -259,10 +259,13 @@ export async function finalFastqFilesFromZip(zipFile) {
   return files;
 }
 
-/** Table to fill by hand with the sequence each sample should be linked to, sorted by sample name. */
-export function sampleTableTsv(files) {
+/**
+ * Table to fill by hand with the sequence each sample should be linked to, sorted by sample name.
+ * sequenceNames ({ sampleName: sequenceName }) pre-fills the sequence names that are already known.
+ */
+export function sampleTableTsv(files, sequenceNames = {}) {
   const sampleNames = files.map(fastqSampleName).sort((a, b) => a.localeCompare(b));
-  return `${['sample_name\tsequence_name', ...sampleNames.map((name) => `${name}\t`)].join('\n')}\n`;
+  return `${['sample_name\tsequence_name', ...sampleNames.map((name) => `${name}\t${sequenceNames[name] ?? ''}`)].join('\n')}\n`;
 }
 
 /**

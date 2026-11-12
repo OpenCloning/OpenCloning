@@ -117,6 +117,7 @@ describe('sequencing run zip files', () => {
     // Sorted by sample name, whatever the order in the zip
     expect(sampleTableTsv([...files].reverse())).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
     expect(sampleTableTsv(files)).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
+    expect(sampleTableTsv(files, { 'A1-P1-2': 'pREX0008' })).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\tpREX0008\n');
 
     const pairs = pairFastqFilesWithSequences(files, [
       { sample_name: 'A1-P1', sequence_name: ' pREX0008 ' },

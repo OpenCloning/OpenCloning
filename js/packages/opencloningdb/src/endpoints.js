@@ -16,6 +16,7 @@ const endpoints = {
   sequenceSequencingFiles: (id) => `/sequences/${e(id)}/sequencing_files`,
   sequencingFilesBulk: '/sequences/sequencing_files/bulk',
   sequenceSearch: '/sequences/search',
+  sequencesBySeguid: (seguid) => `/sequences/by-seguid/${e(seguid)}`,
   sequencesValidateUpload: '/sequences/validate-upload',
   sequencesBulk: '/sequences/bulk',
   sequencesCloningStrategyBulkValidate: '/sequences/cloning_strategy/bulk/validate',
