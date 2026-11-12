@@ -1211,7 +1211,7 @@ wheels = [
 
 [[package]]
 name = "opencloning"
-version = "2.1.0"
+version = "2.2.0"
 source = { editable = "packages/opencloning" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1266,7 +1266,7 @@ requires-dist = [
 
 [[package]]
 name = "opencloning-cli"
-version = "2.1.0"
+version = "2.2.0"
 source = { editable = "packages/opencloning-cli" }
 dependencies = [
     { name = "opencloning-db" },
@@ -1281,7 +1281,7 @@ requires-dist = [
 
 [[package]]
 name = "opencloning-db"
-version = "2.1.0"
+version = "2.2.0"
 source = { editable = "packages/opencloning-db" }
 dependencies = [
     { name = "alembic" },
@@ -1306,8 +1306,8 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "opencloning", editable = "packages/opencloning" },
     { name = "opencloning-linkml", specifier = ">=1.0.0" },
-    { name = "pydantic", extras = ["email"], specifier = ">=2.14.3" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.8,<4" },
+    { name = "pydantic", extras = ["email"], specifier = ">=2.14.3" },
     { name = "pydna", specifier = ">=5.5.16" },
     { name = "pyjwt", extras = ["crypto"], specifier = ">=2.10.1,<3" },
     { name = "sqlalchemy", specifier = ">=2.0.41,<3" },
