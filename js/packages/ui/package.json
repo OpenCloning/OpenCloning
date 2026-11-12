@@ -46,10 +46,10 @@
         "@teselagen/ove": "^0.8.42",
         "@teselagen/range-utils": "^0.3.20",
         "@teselagen/sequence-utils": "^0.3.42",
-        "@zip.js/zip.js": "^2.8.26",
-        "axios": "^1.20.0",
+        "@zip.js/zip.js": "^2.24.0",
+        "axios": "^1.21.0",
         "lodash-es": "^4.18.1",
-        "react-draggable": "^4.5.0"
+        "react-draggable": "^4.7.2"
     },
     "peerDependencies": {
         "react": "^18.3.1",
