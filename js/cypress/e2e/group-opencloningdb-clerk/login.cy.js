@@ -13,6 +13,16 @@ function signInBootstrap() {
 }
 
 describe('clerk sign in', () => {
+  // Set only once sign-up completes, so afterEach deletes the user even if later assertions fail
+  let createdUserId = null;
+
+  afterEach(() => {
+    if (createdUserId) {
+      cy.task('deleteClerkUser', createdUserId);
+      createdUserId = null;
+    }
+  });
+
   it('signs in and lands on sequences', () => {
     signInBootstrap();
   });
@@ -37,6 +47,7 @@ describe('clerk sign in', () => {
         const missing = (attempt.missingFields || []).join(', ') || 'none';
         throw new Error(`Sign-up status is ${attempt.status} (missing: ${missing})`);
       }
+      createdUserId = attempt.createdUserId;
       await win.Clerk.setActive({ session: attempt.createdSessionId });
     });
     cy.visit('/sequences');
