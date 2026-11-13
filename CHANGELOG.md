@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/OpenCloning/OpenCloning/compare/v2.2.1...v2.2.2) (2026-11-13)
+
+
+### Bug Fixes
+
+* Fix too many requests to the db when checking sequencing data ([#115](https://github.com/OpenCloning/OpenCloning/issues/115)) ([16f5f10](https://github.com/OpenCloning/OpenCloning/commit/16f5f10c1262f522bd11fcad321f294825ebe0d1))
+
 ## [2.2.1](https://github.com/OpenCloning/OpenCloning/compare/v2.2.0...v2.2.1) (2026-11-13)
 
 

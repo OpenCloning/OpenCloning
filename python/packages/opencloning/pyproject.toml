@@ -1,6 +1,6 @@
 [project]
 name = "opencloning"
-version = "2.2.1"  # x-release-please-version
+version = "2.2.2"  # x-release-please-version
 description = "Backend of OpenCloning, a web application to generate molecular cloning strategies in json format, and share them with others."
 readme = "README.md"
 license = "MIT"
