@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/OpenCloning/OpenCloning/compare/v2.2.0...v2.2.1) (2026-11-13)
+
+
+### Miscellaneous Chores
+
+* release 2.2.1 ([#112](https://github.com/OpenCloning/OpenCloning/issues/112)) ([db2879a](https://github.com/OpenCloning/OpenCloning/commit/db2879ab0c34c1fd4f773dab6149712a3cfe2e34))
+
 ## [2.2.0](https://github.com/OpenCloning/OpenCloning/compare/v2.1.1...v2.2.0) (2026-11-12)
 
 
