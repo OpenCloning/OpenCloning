@@ -6,3 +6,17 @@ import '@testing-library/jest-dom/vitest';
 afterEach(() => {
   cleanup();
 });
+
+// jsdom's Blob does not implement stream(), which undici's Response (used by msw's
+// XHR interceptor) requires when the body is a Blob.
+if (typeof Blob !== 'undefined' && typeof Blob.prototype.stream !== 'function') {
+  Blob.prototype.stream = function stream() {
+    const blob = this;
+    return new ReadableStream({
+      async start(controller) {
+        controller.enqueue(new Uint8Array(await blob.arrayBuffer()));
+        controller.close();
+      },
+    });
+  };
+}
