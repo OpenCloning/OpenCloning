@@ -7,6 +7,9 @@ describe('Test verification files', () => {
 
   it('Can upload sequencing files', () => {
     cy.get('.MuiToolbar-root .MuiButtonBase-root').contains('File').siblings('input').selectFile('cypress/test_files/cloning_strategy_with_sequencing.json', { force: true });
+    // The file is in an old version of the model, so a warning is shown. Close it, since it can cover the sequence icons.
+    cy.openCloningAlertExists('migrated to the latest version');
+    cy.closeAlerts();
     cy.get('#sequence-1 svg[data-testid="RuleIcon"]').click();
 
     cy.get('button').contains('Submit files').click();

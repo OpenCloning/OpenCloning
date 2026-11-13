@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { batch, useDispatch, useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import useBackendHttpClient from '../../../../../hooks/useBackendHttpClient';
 import useStoreEditor from '../../../../../hooks/useStoreEditor';
 import error2String from '@opencloning/utils/error2String';
@@ -66,17 +66,15 @@ export default function useDesignPrimers({
     }
 
     const validPrimers = primers.filter((p) => p !== null);
-    batch(() => {
-      usedPCRSources.forEach((pcrSource, index) => {
-        dispatch(addPrimersToPCRSource({
-          fwdPrimer: validPrimers[index * 2],
-          revPrimer: validPrimers[index * 2 + 1],
-          sourceId: pcrSource.id,
-        }));
-      });
-      dispatch(setMainSequenceId(null));
-      dispatch(setCurrentTab(0));
+    usedPCRSources.forEach((pcrSource, index) => {
+      dispatch(addPrimersToPCRSource({
+        fwdPrimer: validPrimers[index * 2],
+        revPrimer: validPrimers[index * 2 + 1],
+        sourceId: pcrSource.id,
+      }));
     });
+    dispatch(setMainSequenceId(null));
+    dispatch(setCurrentTab(0));
     setPrimers([]);
     onTabChange(null, 0);
     document.getElementById(`source-${usedPCRSources[0].id}`)?.scrollIntoView();
