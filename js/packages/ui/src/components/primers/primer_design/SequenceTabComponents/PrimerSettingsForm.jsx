@@ -18,12 +18,14 @@ function PrimerSettingsForm({
               value={homology_length}
               onChange={(e) => { updateSettings({ homology_length: Number(e.target.value) }); }}
               type="number"
-              InputProps={{
-                endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                sx: { width: '10em' },
-              }}
               error={homology_length < primerDesignMinimalValues.homology_length}
               helperText={homology_length < primerDesignMinimalValues.homology_length ? `Min. ${primerDesignMinimalValues.homology_length} bp` : ''}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                  sx: { width: '10em' },
+                }
+              }}
             />
           </FormControl>
         </Box>
@@ -35,12 +37,14 @@ function PrimerSettingsForm({
               value={target_tm}
               onChange={(e) => { updateSettings({ target_tm: Number(e.target.value) }); }}
               type="number"
-              InputProps={{
-                endAdornment: <InputAdornment position="end">°C</InputAdornment>,
-                sx: { width: '10em' },
-              }}
               error={target_tm < primerDesignMinimalValues.target_tm}
               helperText={target_tm < primerDesignMinimalValues.target_tm ? `Min. ${primerDesignMinimalValues.target_tm} °C` : ''}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">°C</InputAdornment>,
+                  sx: { width: '10em' },
+                }
+              }}
             />
           </FormControl>
 
@@ -51,12 +55,14 @@ function PrimerSettingsForm({
               value={minimal_hybridization_length}
               onChange={(e) => { updateSettings({ minimal_hybridization_length: Number(e.target.value) }); }}
               type="number"
-              InputProps={{
-                endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                sx: { width: '10em' },
-              }}
               error={minimal_hybridization_length < primerDesignMinimalValues.hybridization_length}
               helperText={minimal_hybridization_length < primerDesignMinimalValues.hybridization_length ? `Min. ${primerDesignMinimalValues.hybridization_length} bp` : ''}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                  sx: { width: '10em' },
+                }
+              }}
             />
           </FormControl>
         </Box>

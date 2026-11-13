@@ -58,13 +58,15 @@ export default function CreateTemplateSequenceButton() {
         open={dialogOpen}
         onClose={handleClose}
         data-testid="create-template-sequence-dialog"
-        PaperProps={{
-          component: 'form',
-          onSubmit: (e) => {
-            e.preventDefault();
-            if (!submissionAllowed) return;
-            createMutation.mutate({ name: name.trim(), sequence_type: sequenceType });
-          },
+        slotProps={{
+          paper: {
+            component: 'form',
+            onSubmit: (e) => {
+              e.preventDefault();
+              if (!submissionAllowed) return;
+              createMutation.mutate({ name: name.trim(), sequence_type: sequenceType });
+            },
+          }
         }}
       >
         <DialogTitle>Create Template Sequence</DialogTitle>

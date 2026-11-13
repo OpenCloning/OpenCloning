@@ -85,7 +85,7 @@ describe('Test primer designer functionality', () => {
     // Click on the name, that should set a single position selection
     cy.contains('.sequenceNameText', 'pFA6a-5FLAG-hphMX6').click({ force: true });
     getBottomButton('Choose region', 0).click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').contains('Select a region (not a single position) to amplify');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').contains('Select a region (not a single position) to amplify');
 
     // Click on the hphMX6 feature
     cy.contains('svg', 'hphMX6').click();
@@ -103,7 +103,7 @@ describe('Test primer designer functionality', () => {
     getBottomButton('Choose region', 1).click();
 
     // There should be no error message, but there is an info one, so we need that class
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('not.exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('not.exist');
 
     // Go to "Other settings" tab
     getStepButton('Other settings').click();
@@ -119,7 +119,7 @@ describe('Test primer designer functionality', () => {
     // Get an error for very high hyb. length
     setInputValue('Min. hybridization length', '100000', '.primer-design');
     cy.get('button').contains('Design primers').click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('exist');
     clearInputValue('Min. hybridization length', '.primer-design');
     setInputValue('Min. hybridization length', '2', '.primer-design');
 
@@ -178,7 +178,7 @@ describe('Test primer designer functionality', () => {
     cy.get('button').contains('Recombine').click();
 
     // There should be no errors shown
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('not.exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('not.exist');
 
     cy.contains('li', 'PCR with primers forward and reverse').should('exist');
     cy.contains('li', 'Homologous recombination').should('exist');
@@ -224,12 +224,12 @@ describe('Test primer designer functionality', () => {
     // Error if setting with single position selection
     cy.get('.sequenceNameText').contains('pREP42-MCS+').click({ force: true });
     getBottomButton('Choose region', 0).click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('exist');
 
     // Select ars1 feature
     cy.contains('svg', 'ars1').click();
     getBottomButton('Choose region', 0).click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('not.exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('not.exist');
 
     // Go to next tab
     getStepButton('Seq 2').click();
@@ -252,7 +252,7 @@ describe('Test primer designer functionality', () => {
     // Submit a high hybridization to get an error
     setInputValue('Min. hybridization length', '100000', '.primer-design');
     cy.get('button').contains('Design primers').click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('exist');
     clearInputValue('Min. hybridization length', '.primer-design');
     setInputValue('Min. hybridization length', '2', '.primer-design');
 
@@ -318,7 +318,7 @@ describe('Test primer designer functionality', () => {
     cy.get('button').contains('Submit').first().click();
 
     // There should be no errors shown
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('not.exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('not.exist');
 
     cy.contains('li', 'PCR with primers pREP42-MCS+_fwd and pREP42-MCS+_rvs').should('exist');
     cy.contains('li', 'PCR with primers NC_003424_fwd and NC_003424_rvs').should('exist');
@@ -713,12 +713,12 @@ describe('Test primer designer functionality', () => {
     cy.get('button').contains('Design primers').click();
     clickMultiSelectOption('Purpose of primers', 'Gateway BP reaction', 'li');
     // No alert is visible (Request is not sent)
-    cy.get('.open-cloning div.MuiAlert-standardError').should('not.exist');
+    cy.get('.open-cloning div.MuiAlert-colorError').should('not.exist');
     // Select the wrong donor vector
     clickMultiSelectOption('Donor vector', 'pcDNA', 'li');
-    cy.get('.open-cloning div.MuiAlert-standardError').contains('At least two').should('exist');
+    cy.get('.open-cloning div.MuiAlert-colorError').contains('At least two').should('exist');
     // Also shows the att sites present in the wrong donor vector
-    cy.get('.open-cloning div.MuiAlert-standardError').contains('attR1').should('exist');
+    cy.get('.open-cloning div.MuiAlert-colorError').contains('attR1').should('exist');
     // Select the correct donor vector
     clickMultiSelectOption('Donor vector', 'pDONR221', 'li');
     cy.get('button').contains('Design primers').click();
@@ -741,11 +741,11 @@ describe('Test primer designer functionality', () => {
     // Click on the name, that should set a single position selection
     cy.contains('.sequenceNameText', 'NC_000913').click({ force: true });
     getBottomButton('Choose region', 0).click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').contains('Select a region (not a single position) to amplify');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').contains('Select a region (not a single position) to amplify');
 
     cy.get('svg.veRowViewAnnotationPosition title').filter(':contains("Feature (CDS) - lacZ")').first().click({ force: true });
     getBottomButton('Choose region', 0).click();
-    cy.get('.main-sequence-editor div.MuiAlert-standardError').should('not.exist');
+    cy.get('.main-sequence-editor div.MuiAlert-colorError').should('not.exist');
 
     // We still should not be able to submit
     checkCurrentStep('Replaced region');
@@ -756,14 +756,14 @@ describe('Test primer designer functionality', () => {
     // The other site should have been set to attP1
     checkInputValue('Right attP site', 'attP1-[569:801](+)', '.primer-design');
     // There should be an error
-    cy.contains('.primer-design div.MuiAlert-standardError', 'No recommended primer tails found').should('exist');
+    cy.contains('.primer-design div.MuiAlert-colorError', 'No recommended primer tails found').should('exist');
 
     // Invert the selection
     clickMultiSelectOption('Right attP site', 'attP2', '.primer-design');
     checkInputValue('Left attP site', 'attP1-[569:801](+)', '.primer-design');
 
     // There should be an info message
-    cy.contains('.primer-design div.MuiAlert-standardInfo', 'Primers tails designed based on pDONR™ 221').should('exist');
+    cy.contains('.primer-design div.MuiAlert-colorInfo', 'Primers tails designed based on pDONR™ 221').should('exist');
 
     // We still should not be able to submit (there should be Ns in the nucleotide sequences)
     getBottomButton('Choose region', 1).click();

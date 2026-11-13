@@ -113,34 +113,38 @@ function LoadPlasmidsMenuButton({ onFilesSelected, extraOptions }) {
 }
 
 function ImportPlasmidsDialog({ validPlasmids, invalidPlasmids, onImport, onCancel }) {
-  return <Dialog
-    maxWidth="lg"
-    fullWidth
-    open={invalidPlasmids.length > 0 || validPlasmids.length > 0}
-    onClose={onCancel}
-    PaperProps={{ style: { maxHeight: '80vh' } }}
-  >
-    <DialogActions sx={{ justifyContent: 'center', position: 'sticky', top: 0, zIndex: 99, background: '#fff', py: 2 }}>
-      <Button sx={{ p: 1.5, fontSize: '1rem' }} disabled={validPlasmids.length === 0} variant="contained" color="success" onClick={onImport}>Import valid plasmids</Button>
-      <Button sx={{ p: 1.5, fontSize: '1rem' }} variant="contained" color="error" onClick={onCancel}>Cancel</Button>
-    </DialogActions>
-    {invalidPlasmids.length > 0 && (
-      <Box data-testid="invalid-plasmids-box">
-        <DialogTitle>Invalid Plasmids</DialogTitle>
-        <DialogContent>
-          <PlasmidSyntaxTable plasmids={invalidPlasmids} />
-        </DialogContent>
-      </Box>
-    )}
-    {validPlasmids.length > 0 && (
-      <Box data-testid="valid-plasmids-box">
-        <DialogTitle>Valid Plasmids</DialogTitle>
-        <DialogContent>
-          <PlasmidSyntaxTable plasmids={validPlasmids} />
-        </DialogContent>
-      </Box>
-    )}
-  </Dialog>
+  return (
+    <Dialog
+      maxWidth="lg"
+      fullWidth
+      open={invalidPlasmids.length > 0 || validPlasmids.length > 0}
+      onClose={onCancel}
+      slotProps={{
+        paper: { style: { maxHeight: '80vh' } }
+      }}
+    >
+      <DialogActions sx={{ justifyContent: 'center', position: 'sticky', top: 0, zIndex: 99, background: '#fff', py: 2 }}>
+        <Button sx={{ p: 1.5, fontSize: '1rem' }} disabled={validPlasmids.length === 0} variant="contained" color="success" onClick={onImport}>Import valid plasmids</Button>
+        <Button sx={{ p: 1.5, fontSize: '1rem' }} variant="contained" color="error" onClick={onCancel}>Cancel</Button>
+      </DialogActions>
+      {invalidPlasmids.length > 0 && (
+        <Box data-testid="invalid-plasmids-box">
+          <DialogTitle>Invalid Plasmids</DialogTitle>
+          <DialogContent>
+            <PlasmidSyntaxTable plasmids={invalidPlasmids} />
+          </DialogContent>
+        </Box>
+      )}
+      {validPlasmids.length > 0 && (
+        <Box data-testid="valid-plasmids-box">
+          <DialogTitle>Valid Plasmids</DialogTitle>
+          <DialogContent>
+            <PlasmidSyntaxTable plasmids={validPlasmids} />
+          </DialogContent>
+        </Box>
+      )}
+    </Dialog>
+  );
 }
 
 function UploadPlasmidsButton({ addPlasmids, syntax }) {

@@ -29,10 +29,10 @@ function ChipMultiSelect({ label, options, value, onChange, loading, disabled, s
         const ids = newValue.map((opt) => opt.id);
         onChange(ids);
       }}
-      renderTags={(tagValue, getTagProps) =>
+      renderValue={(tagValue, getItemProps) =>
         tagValue.map((option, index) => (
           <Chip
-            {...getTagProps({ index })}
+            {...getItemProps({ index })}
             key={option.id}
             label={option.label}
             size="small"
@@ -46,8 +46,10 @@ function ChipMultiSelect({ label, options, value, onChange, loading, disabled, s
           label={label}
           variant="outlined"
           placeholder={selectedOptions.length === 0 ? placeholder : undefined}
-          // Keep the label above the input, so that it does not cover the placeholder
-          InputLabelProps={placeholder ? { ...params.InputLabelProps, shrink: true } : params.InputLabelProps}
+          slotProps={{
+            ...params.slotProps,
+            inputLabel: placeholder ? { ...params.slotProps.inputLabel, shrink: true } : params.slotProps.inputLabel
+          }}
         />
       )}
       loading={loading}

@@ -120,9 +120,11 @@ function SourcePCRorHybridization({ source, requestStatus, sendSourceRequest }) 
             inputRef={minimalAnnealingRef}
             type="number"
             defaultValue={12}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-              sx: { '& input': { textAlign: 'center' } },
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                sx: { '& input': { textAlign: 'center' } },
+              }
             }}
           />
         </FormControl>
@@ -134,8 +136,10 @@ function SourcePCRorHybridization({ source, requestStatus, sendSourceRequest }) 
                 inputRef={allowedMismatchesRef}
                 type="number"
                 defaultValue={0}
-                InputProps={{
-                  sx: { '& input': { textAlign: 'center' } },
+                slotProps={{
+                  input: {
+                    sx: { '& input': { textAlign: 'center' } },
+                  }
                 }}
               />
             </FormControl>

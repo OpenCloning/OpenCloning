@@ -22,8 +22,10 @@ function CreatePrimerFromSequenceForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={nameError !== ''}
-          FormHelperTextProps={{ component: 'div' }}
           helperText={<CustomFormHelperText>{nameError}</CustomFormHelperText>}
+          slotProps={{
+            formHelperText: { component: 'div' }
+          }}
         />
       </FormControl>
       <FormControl sx={{ m: 1, pb: 2, display: { width: '60%' } }}>
@@ -31,9 +33,10 @@ function CreatePrimerFromSequenceForm({
           label="Sequence"
           value={sequence}
           onChange={(e) => setSequence(e.target.value)}
-          inputProps={{ id: 'sequence' }}
-          FormHelperTextProps={{ component: 'div' }}
-        />
+          slotProps={{
+            htmlInput: { id: 'sequence' },
+            formHelperText: { component: 'div' }
+          }} />
       </FormControl>
     </div>
   );

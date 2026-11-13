@@ -151,9 +151,11 @@ function SourceAssembly({ source, requestStatus, sendSourceRequest }) {
               onChange={(e) => { setMinimalHomology(e.target.value); }}
               type="number"
               defaultValue={20}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                sx: { '& input': { textAlign: 'center' } },
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                  sx: { '& input': { textAlign: 'center' } },
+                }
               }}
             />
           </FormControl>

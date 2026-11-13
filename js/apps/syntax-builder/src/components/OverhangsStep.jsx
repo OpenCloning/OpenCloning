@@ -169,7 +169,6 @@ function OverhangsField() {
 
 
   return (
-
     <Paper data-testid="overhangs-step" sx={{ p: 1.5 }}>
       <Typography variant="h6" gutterBottom>
           Overhangs
@@ -191,21 +190,23 @@ function OverhangsField() {
         value={localValue}
         onChange={handleChange}
         placeholder="ACGT&#10;TATG&#10;CATG&#10;&#10;TATG&#10;TTCT&#10;ATCC"
-        inputProps={{
-          style: {
-            fontFamily: 'monospace',
-            fontSize: '0.875rem',
-            textTransform: 'uppercase'
-          }
-        }}
         sx={{
           '& .MuiInputBase-input': {
             fontFamily: 'monospace',
           }
         }}
+        slotProps={{
+          htmlInput: {
+            style: {
+              fontFamily: 'monospace',
+              fontSize: '0.875rem',
+              textTransform: 'uppercase'
+            }
+          }
+        }}
       />
     </Paper>
-  )
+  );
 }
 
 

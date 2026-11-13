@@ -32,12 +32,14 @@ function DownloadPrimersDialog({ primers, open, onClose }) {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (event) => {
-          event.preventDefault();
-          handleDownload();
-        },
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (event) => {
+            event.preventDefault();
+            handleDownload();
+          },
+        }
       }}
     >
       <DialogTitle>Save Primers to File</DialogTitle>

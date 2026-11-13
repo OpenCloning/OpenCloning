@@ -44,12 +44,14 @@ function EditSequenceNameDialog({ id, dialogOpen, setDialogOpen }) {
     <Dialog
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: async (event) => {
-          event.preventDefault();
-          changeName(name);
-        },
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: async (event) => {
+            event.preventDefault();
+            changeName(name);
+          },
+        }
       }}
     >
       <DialogTitle>Rename sequence</DialogTitle>

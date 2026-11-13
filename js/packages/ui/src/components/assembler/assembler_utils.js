@@ -14,7 +14,7 @@ export function tripletsToTranslation(triplets) {
   return triplets.map(triplet =>
     /[^ACGT]/i.test(triplet) ? ' - ' :
       getAminoAcidFromSequenceTriplet(triplet).threeLettersName.replace('Stop', '***')
-  ).join('')
+  ).join('');
 }
 
 export function partDataToDisplayData(data) {

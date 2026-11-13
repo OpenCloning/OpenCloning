@@ -113,12 +113,14 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
     <Dialog
       open={dialogOpen}
       onClose={handleClose}
-      PaperProps={{
-        component: 'form',
-        sx: { width: '40%' },
-        onSubmit: handleSubmit,
-      }}
       data-testid="submit-to-database-component"
+      slotProps={{
+        paper: {
+          component: 'form',
+          sx: { width: '40%' },
+          onSubmit: handleSubmit,
+        }
+      }}
     >
       <DialogTitle>{`Save ${resourceType} to ${database.name}`}</DialogTitle>
       <DialogContent>
@@ -131,7 +133,6 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
         <Button type="submit" disabled={isSubmitting || submissionData === null || !database.isSubmissionDataValid(submissionData)}>{isSubmitting ? <CircularProgress /> : 'Submit'}</Button>
       </DialogActions>
     </Dialog>
-
   );
 }
 

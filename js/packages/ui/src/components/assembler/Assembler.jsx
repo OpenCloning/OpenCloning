@@ -163,7 +163,7 @@ function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, a
   const thisCategory = categories.find((category) => category.id === item.category)
   const allowedPlasmids = thisCategory ? plasmids.filter((d) => d.key === thisCategory.key) : [];
 
-  return(
+  return (
     <Box sx={{ width: '250px', border: 3, borderColor, borderRadius: 4, p: 2 }}>
       <FormControl data-testid="category-select" fullWidth sx={{ mb: 2 }}>
         <InputLabel>Category</InputLabel>
@@ -189,19 +189,19 @@ function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, a
               options={allowedPlasmids.map((item) => item.id)}
               getOptionLabel={(id) => formatItemName(plasmids.find((d) => d.id === id))}
               renderInput={(params) => <TextField {...params} label="Plasmids" />}
-              componentsProps={{
-                popper: {
-                  sx: { minWidth: 'max-content' },
-                },
-              }}
               renderOption={(props, option) => {
                 const { key, ...restProps } = props
                 const plasmid = plasmids.find((d) => d.id === option)
                 return (
-                  <MenuItem key={key} {...restProps} sx={{ backgroundColor: plasmid.type === 'loadedFile' ? '#dcedc8' : undefined }}>
+                  <Box component="li" key={key} {...restProps} sx={{ backgroundColor: plasmid.type === 'loadedFile' ? '#dcedc8' : undefined }}>
                     {formatItemName(plasmid)}
-                  </MenuItem>
+                  </Box>
                 )}}
+              slotProps={{
+                popper: {
+                  sx: { minWidth: 'max-content' },
+                },
+              }}
             />
           </FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -210,7 +210,7 @@ function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, a
         </>
       )}
     </Box>
-  )
+  );
 }
 
 export function AssemblerComponent({ plasmids, categories, assemblyEnzymes, addAlert, appInfo }) {
@@ -453,31 +453,35 @@ function SyntaxOverviewButton({ syntax }) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState('detailed')
   const msa = React.useMemo(() => syntax ? graphToMSA(partsToGraph(syntax.parts)) : [], [syntax])
-  return <>
-    <Button color="success" onClick={() => setOpen(true)} data-testid="assembler-syntax-overview-button">Syntax Overview</Button>
-    {open && <Dialog
-      open={open}
-      onClose={() => setOpen(false)}
-      fullWidth
-      fullScreen
-      maxWidth="xl"
-      PaperProps={{ sx: { height: '90vh' } }}
-    >
-      <DialogTitle>Syntax overview</DialogTitle>
-      <DialogContent>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={mode === 'detailed'}
-              onChange={(e) => setMode(e.target.checked ? 'detailed' : 'compact')}
-            />
-          }
-          label={mode === 'compact' ? 'Compact' : 'Detailed'}
-        />
-        <SyntaxOverviewTable msa={msa} mode={mode} parts={syntax.parts} />
-      </DialogContent>
-    </Dialog>}
-  </>
+  return (
+    <>
+      <Button color="success" onClick={() => setOpen(true)} data-testid="assembler-syntax-overview-button">Syntax Overview</Button>
+      {open && <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        fullScreen
+        maxWidth="xl"
+        slotProps={{
+          paper: { sx: { height: '90vh' } }
+        }}
+      >
+        <DialogTitle>Syntax overview</DialogTitle>
+        <DialogContent>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={mode === 'detailed'}
+                onChange={(e) => setMode(e.target.checked ? 'detailed' : 'compact')}
+              />
+            }
+            label={mode === 'compact' ? 'Compact' : 'Detailed'}
+          />
+          <SyntaxOverviewTable msa={msa} mode={mode} parts={syntax.parts} />
+        </DialogContent>
+      </Dialog>}
+    </>
+  );
 }
 
 function Assembler() {

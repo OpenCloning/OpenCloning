@@ -21,24 +21,29 @@ function PrimerResultForm({
           value={name}
           onChange={(e) => updatePrimerName(e.target.value)}
           error={nameError !== ''}
-          FormHelperTextProps={{ component: 'div' }}
           helperText={nameError}
+          slotProps={{
+            formHelperText: { component: 'div' }
+          }}
         />
       </FormControl>
       <FormControl sx={{ mx: 1, width: '60%' }}>
         <TextField
           label="Sequence"
           value={sequence}
-          inputProps={{
-            id: 'sequence',
-            style: { fontSize: '0.8rem' }, // Reduce font size
-          }}
           disabled
-          helperText=" " // Add an empty helper text to maintain consistent height
+          // Add an empty helper text to maintain consistent height
+          helperText=" "
           sx={{
             '& .MuiInputBase-root': {
               height: '56px', // Maintain the default height of TextField
             },
+          }}
+          slotProps={{
+            htmlInput: {
+              id: 'sequence',
+              style: { fontSize: '0.8rem' }, // Reduce font size
+            }
           }}
         />
       </FormControl>

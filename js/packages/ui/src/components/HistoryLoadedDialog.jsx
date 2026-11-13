@@ -8,19 +8,21 @@ function HistoryLoadedDialog({ fileLoaderFunctions }) {
     <Dialog
       open
       onClose={clear}
-      PaperProps={{
-        component: 'form',
-        onSubmit: async (event) => {
-          event.preventDefault();
-          if (selectedOption === 'replace') {
-            replaceState();
-          } else {
-            addState();
-          }
-          clear();
-        },
-      }}
       className="history-loaded-dialog"
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: async (event) => {
+            event.preventDefault();
+            if (selectedOption === 'replace') {
+              replaceState();
+            } else {
+              addState();
+            }
+            clear();
+          },
+        }
+      }}
     >
       <DialogTitle>History loaded</DialogTitle>
       <DialogContent>

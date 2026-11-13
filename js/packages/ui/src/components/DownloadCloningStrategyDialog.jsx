@@ -18,23 +18,25 @@ function DownloadCloningStrategyDialog({ open, setOpen }) {
       open={open}
       className="download-cloning-strategy-dialog"
       onClose={() => setOpen(false)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: async (event) => {
-          event.preventDefault();
-          setOpen(false);
-          const cloningState = store.getState().cloning;
-          if (extension === '.zip') {
-            try {
-              await downloadStateAsZip(cloningState, fileName + extension);
-            } catch (error) {
-              console.error(error);
-              addAlert({ message: error.message, severity: 'error' });
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: async (event) => {
+            event.preventDefault();
+            setOpen(false);
+            const cloningState = store.getState().cloning;
+            if (extension === '.zip') {
+              try {
+                await downloadStateAsZip(cloningState, fileName + extension);
+              } catch (error) {
+                console.error(error);
+                addAlert({ message: error.message, severity: 'error' });
+              }
+            } else {
+              downloadStateAsJson(cloningState, fileName + extension);
             }
-          } else {
-            downloadStateAsJson(cloningState, fileName + extension);
-          }
-        },
+          },
+        }
       }}
     >
       <DialogTitle>Save cloning strategy to file</DialogTitle>

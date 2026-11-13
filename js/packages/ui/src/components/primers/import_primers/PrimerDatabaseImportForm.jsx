@@ -64,10 +64,12 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
               className="sequence"
               disabled
               fullWidth
-              InputProps={{
-                sx: {
-                  fontFamily: 'monospace',
-                },
+              slotProps={{
+                input: {
+                  sx: {
+                    fontFamily: 'monospace',
+                  },
+                }
               }}
             />
           </div>
