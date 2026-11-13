@@ -89,7 +89,7 @@ function CloningSpeedDial() {
     // <Box sx={{ position: 'absolute', bottom: 0, right: 0 }}>
     <Box sx={{ position: 'fixed', bottom: 10, left: 10, zIndex: 1000 }} data-testid="cloning-speed-dial">
       <SpeedDial icon={<BuildIcon />} ariaLabel="Cloning tools" direction="up" >
-        { database && Boolean(database.locateSequenceInDatabase) && <SpeedDialAction icon={<SyncIcon />} tooltipTitle="Synchronize sequences with database" onClick={locateSequencesInDatabaseAction} /> }
+        { database && Boolean(database.locateSequenceInDatabase) && <SpeedDialAction icon={<SyncIcon />} slotProps={{ tooltip: { title: 'Synchronize sequences with database' } }} onClick={locateSequencesInDatabaseAction} /> }
       </SpeedDial>
 
     </Box>

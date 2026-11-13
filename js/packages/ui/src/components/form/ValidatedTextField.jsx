@@ -3,7 +3,7 @@ import React from 'react';
 import CustomFormHelperText from './CustomFormHelperText';
 
 function ValidatedTextField({ id, value, onInputChange, errorChecker, updateValidationStatus, required, submissionAttempted, floatingHelperText, initialHelperText = '', ...rest }) {
-  const defaultPars = { inputProps: { style: { fontSize: 14 } }, FormHelperTextProps: { component: 'div' } };
+  const defaultPars = { slotProps: { htmlInput: { style: { fontSize: 14 } }, formHelperText: { component: 'div' } } };
   const [error, setError] = React.useState(false);
   const [helperText, setHelperText] = React.useState(initialHelperText);
   const [touched, setTouched] = React.useState(false);

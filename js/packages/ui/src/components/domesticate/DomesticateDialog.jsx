@@ -227,8 +227,10 @@ export default function DomesticateDialog({ open, onClose, initialContext, mainS
             onChange={(ev) => setPrefix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
             fullWidth
             disabled={Boolean(category)}
-            inputProps={{ maxLength: 4 }}
             helperText={category ? 'Clear category to edit' : 'Exactly 4 A/C/G/T when no category'}
+            slotProps={{
+              htmlInput: { maxLength: 4 }
+            }}
           />
           <TextField
             margin="dense"
@@ -237,7 +239,9 @@ export default function DomesticateDialog({ open, onClose, initialContext, mainS
             onChange={(ev) => setSuffix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
             fullWidth
             disabled={Boolean(category)}
-            inputProps={{ maxLength: 4 }}
+            slotProps={{
+              htmlInput: { maxLength: 4 }
+            }}
           />
           <Box sx={{ mt: 1 }}>
             <FormControl component="fieldset" variant="standard" required error={enzymes.length === 0}>

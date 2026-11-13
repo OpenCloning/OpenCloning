@@ -92,9 +92,11 @@ function SourceHomologousRecombination({ source, requestStatus, sendSourceReques
             inputRef={minimalHomologyRef}
             type="number"
             defaultValue={40}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-              sx: { '& input': { textAlign: 'center' } },
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                sx: { '& input': { textAlign: 'center' } },
+              }
             }}
           />
         </FormControl>

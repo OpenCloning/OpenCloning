@@ -70,11 +70,13 @@ function RestrictionSpacerForm() {
             value={fillerBases}
             onChange={(e) => updateEnzymeSettings({ filler_bases: e.target.value })}
             variant="outlined"
-            inputProps={{
-              id: 'sequence',
-            }}
             error={stringIsNotDNA(fillerBases)}
             helperText={stringIsNotDNA(fillerBases) ? 'Invalid DNA sequence' : ''}
+            slotProps={{
+              htmlInput: {
+                id: 'sequence',
+              }
+            }}
           />
         </FormControl>
       </Box>

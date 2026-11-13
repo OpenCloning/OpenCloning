@@ -35,8 +35,10 @@ export default function EditTextDialog({
           value={tempValue}
           onChange={handleChange}
           placeholder={placeholder}
-          inputProps={maxLength ? { maxLength } : undefined}
           sx={{ mt: 1 }}
+          slotProps={{
+            htmlInput: maxLength ? { maxLength } : undefined
+          }}
         />
       </DialogContent>
       <DialogActions>

@@ -57,10 +57,12 @@ function AppLayout() {
             value={currentTab}
             onChange={(_, newValue) => navigate(newValue)}
             textColor="inherit"
-            TabIndicatorProps={{
-              sx: {
-                backgroundColor: 'white',
-              },
+            slotProps={{
+              indicator: {
+                sx: {
+                  backgroundColor: 'white',
+                },
+              }
             }}
           >
             <Tab label="Sequences" value="/sequences" />

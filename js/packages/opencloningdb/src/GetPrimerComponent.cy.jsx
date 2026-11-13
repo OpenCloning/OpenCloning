@@ -49,7 +49,8 @@ describe('<GetPrimerComponent />', () => {
     cy.wait('@getPrimer');
     cy.get('@setPrimerSpy').should('have.been.calledWithMatch', { name: PRIMER_NAME });
 
-    cy.get('.MuiAutocomplete-clearIndicator').click();
+    // The clear indicator is hidden (visibility: hidden) until the field is hovered/focused
+    cy.get('.MuiAutocomplete-clearIndicator').click({ force: true });
 
     cy.get('@setPrimerSpy').should('have.been.calledWith', null);
     cy.get('@setErrorSpy').should('have.been.calledWith', '');

@@ -53,11 +53,13 @@ function PrimerSpacerForm({ open = true }) {
                   variant="outlined"
                   size="small"
                   disabled={disabled}
-                  inputProps={{
-                    id: 'sequence',
-                  }}
                   error={error !== ''}
                   helperText={disabled ? 'Not editable (adjacent fragment is not amplified)' : error}
+                  slotProps={{
+                    htmlInput: {
+                      id: 'sequence',
+                    }
+                  }}
                 />
               </FormControl>
             );

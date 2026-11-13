@@ -98,46 +98,52 @@ function GlobalPrimerSettingsSection() {
                         type="number"
                         value={form.primer_dna_conc}
                         onChange={onChange('primer_dna_conc')}
-                        inputProps={{ min: 0, step: '1' }}
                         variant="standard"
                         required
                         disabled={!editing}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">nM</InputAdornment>,
-                        }}
                         error={!fieldsValid.primer_dna_conc}
                         helperText={!fieldsValid.primer_dna_conc ? 'Must be greater than 0' : ''}
-                    />
+                        slotProps={{
+                            input: {
+                                endAdornment: <InputAdornment position="end">nM</InputAdornment>,
+                            },
+
+                            htmlInput: { min: 0, step: '1' }
+                        }} />
                     <TextField
                         label="Monovalent ions"
                         type="number"
                         value={form.primer_salt_monovalent}
                         onChange={onChange('primer_salt_monovalent')}
-                        inputProps={{ min: 0, step: '0.1' }}
                         variant="standard"
                         required
                         disabled={!editing}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">mM</InputAdornment>,
-                        }}
                         error={!fieldsValid.primer_salt_monovalent}
                         helperText={!fieldsValid.primer_salt_monovalent ? 'Must be greater than 0' : ''}
-                    />
+                        slotProps={{
+                            input: {
+                                endAdornment: <InputAdornment position="end">mM</InputAdornment>,
+                            },
+
+                            htmlInput: { min: 0, step: '0.1' }
+                        }} />
                     <TextField
                         label="Divalent ions"
                         type="number"
                         value={form.primer_salt_divalent}
                         onChange={onChange('primer_salt_divalent')}
-                        inputProps={{ min: 0, step: '0.1' }}
                         variant="standard"
                         required
                         disabled={!editing}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">mM</InputAdornment>,
-                        }}
                         error={!fieldsValid.primer_salt_divalent}
                         helperText={!fieldsValid.primer_salt_divalent ? 'Must be greater than 0' : ''}
-                    />
+                        slotProps={{
+                            input: {
+                                endAdornment: <InputAdornment position="end">mM</InputAdornment>,
+                            },
+
+                            htmlInput: { min: 0, step: '0.1' }
+                        }} />
                     {!editing ? (
                         <Stack direction="row" justifyContent="center">
                             <Button variant="contained" onClick={() => setEditing(true)}>Edit</Button>

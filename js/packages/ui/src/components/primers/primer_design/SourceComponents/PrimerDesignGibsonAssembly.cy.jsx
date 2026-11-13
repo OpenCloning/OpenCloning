@@ -120,6 +120,9 @@ describe('<GibsonAmplifyAndCircularControls />', () => {
   it('calls setAmplified with all true values when targets changeor circularAssembly changes', () => {
     cy.mount(<TestComponent />);
 
+    // On mount all fragments are set to amplified, so turn two of them off first
+    cy.get('input[type="checkbox"]').eq(0).should('be.checked').click();
+    cy.get('input[type="checkbox"]').eq(2).should('be.checked').click();
     cy.get('input[type="checkbox"]').eq(0).should('not.be.checked');
     cy.get('input[type="checkbox"]').eq(2).should('not.be.checked');
     cy.get('input[type="checkbox"]').last().click();

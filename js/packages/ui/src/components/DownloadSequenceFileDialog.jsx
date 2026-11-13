@@ -24,25 +24,27 @@ function DownloadSequenceFileDialog({ id, dialogOpen, setDialogOpen, downloadCal
     <Dialog
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (event) => {
-          event.preventDefault();
-          setDialogOpen(false);
-          if (extension === '.json' || extension === '.zip') {
-            dispatch(exportSubStateThunk(fileName + extension, id, extension.slice(1)));
-            return;
-          }
-          const {cloning} = store.getState();
-          const seqCopy = structuredClone(cloning.teselaJsonCache[id]);
-          const pcrPrimers = getPCRPrimers(cloning, id);
-          seqCopy.primers = [...seqCopy.primers, ...pcrPrimers];
-          if (downloadCallback) {
-            downloadCallback(fileName + extension, seqCopy);
-          } else {
-            downloadSequence(fileName + extension, seqCopy);
-          }
-        },
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (event) => {
+            event.preventDefault();
+            setDialogOpen(false);
+            if (extension === '.json' || extension === '.zip') {
+              dispatch(exportSubStateThunk(fileName + extension, id, extension.slice(1)));
+              return;
+            }
+            const {cloning} = store.getState();
+            const seqCopy = structuredClone(cloning.teselaJsonCache[id]);
+            const pcrPrimers = getPCRPrimers(cloning, id);
+            seqCopy.primers = [...seqCopy.primers, ...pcrPrimers];
+            if (downloadCallback) {
+              downloadCallback(fileName + extension, seqCopy);
+            } else {
+              downloadSequence(fileName + extension, seqCopy);
+            }
+          },
+        }
       }}
     >
       <DialogTitle>Save sequence to file</DialogTitle>

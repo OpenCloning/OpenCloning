@@ -62,7 +62,7 @@ describe('RepositoryId Source', () => {
     // Can clear the input
     cy.get('li#source-1').contains('Plasmid name').siblings('div').children('input')
       .click();
-    cy.get('li#source-1 button.MuiAutocomplete-clearIndicator').click();
+    cy.get('li#source-1 button.MuiAutocomplete-clearIndicator').click({ force: true });
     cy.get('body').click(0, 0);
 
     // When clicking in the input, displays message
@@ -183,7 +183,7 @@ describe('RepositoryId Source', () => {
     // Can clear the input
     cy.get('li#source-1').contains('Plasmid name').siblings('div').children('input')
       .click();
-    cy.get('li#source-1 button.MuiAutocomplete-clearIndicator').click();
+    cy.get('li#source-1 button.MuiAutocomplete-clearIndicator').click({ force: true });
     cy.get('body').click(0, 0);
 
     clickMultiSelectOption('Plasmid name', 'BBa_B0012', 'li#source-1');

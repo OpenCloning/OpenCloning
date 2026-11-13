@@ -65,7 +65,7 @@ function CollectionSource({ source, requestStatus, sendSourceRequest }) {
             labelId="select-collection-source"
             label="Select a sequence"
             // Limits the height of the dropdown (adds scroll)
-            MenuProps={{ PaperProps: { style: { maxHeight: 250 } } }}
+            MenuProps={{ slotProps: { paper: { style: { maxHeight: 250 } } } }}
           >
             <MenuItem onClick={turnIntoBlankSource} value="">
               <AddCircleIcon color="success" />

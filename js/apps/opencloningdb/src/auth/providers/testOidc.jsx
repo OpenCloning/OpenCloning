@@ -136,8 +136,10 @@ export function TestSignUpPage() {
         <TextField
           label="Subject"
           value={subject}
-          inputProps={{ pattern: '^[^\\|]+$' }}
           onChange={(event) => setSubject(event.target.value)}
+          slotProps={{
+            htmlInput: { pattern: '^[^\\|]+$' }
+          }}
         />
         <TextField
           label="Email"
@@ -148,8 +150,10 @@ export function TestSignUpPage() {
         <TextField
           label="Display name"
           value={displayName}
-          inputProps={{ pattern: '^[^\\|]+$' }}
           onChange={(event) => setDisplayName(event.target.value)}
+          slotProps={{
+            htmlInput: { pattern: '^[^\\|]+$' }
+          }}
         />
         <Button type="submit" variant="contained" disabled={!canSubmit}>
           Create user

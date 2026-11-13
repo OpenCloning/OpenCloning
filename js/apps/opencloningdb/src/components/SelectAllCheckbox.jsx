@@ -28,7 +28,9 @@ function SelectAllCheckbox({ ids, selectedIds, toggleRow, ariaLabel = 'select al
       indeterminate={someSelected}
       disabled={!ids.length}
       onChange={toggleAll}
-      inputProps={{ 'aria-label': ariaLabel }}
+      slotProps={{
+        input: { 'aria-label': ariaLabel }
+      }}
     />
   );
 }

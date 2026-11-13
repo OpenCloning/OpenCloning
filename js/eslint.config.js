@@ -6,6 +6,7 @@ import vitest from '@vitest/eslint-plugin';
 import globals from 'globals';
 
 export default [
+  { ignores: ['**/build/**', '**/dist/**', '**/coverage/**', '**/node_modules/**'] },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
@@ -30,21 +31,19 @@ export default [
     rules: {
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+      'react-hooks/set-state-in-effect': 'warn',
       'max-len': ['error', { code: 300 }],
       'react/prop-types': 0,
       'react/jsx-no-target-blank': 0,
       'object-curly-newline': 0,
-      'import/prefer-default-export': 0,
-      'indent': ['error', 2],
       'no-unused-vars': 'warn',
       'no-console': 'warn',
-      'camelcase': ['warn', { properties: 'always' }],
+      'camelcase': ['warn', { properties: 'never', ignoreDestructuring: true }],
       ...vitest.configs.recommended.rules,
     },
     settings: {
       react: {
-        version: 'detect'
+        version: '18.3'
       }
     }
   },

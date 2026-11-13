@@ -45,12 +45,14 @@ function TabPanelEBICSettings() {
                   value={max_inside}
                   onChange={(e) => { updateSettings({ max_inside: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                    sx: { width: '10em' },
-                  }}
                   error={max_inside < 0}
                   helperText={max_inside < 0 ? 'Max inside must be greater than 0' : ''}
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
+                  }}
                 />
               </FormControl>
 
@@ -60,12 +62,14 @@ function TabPanelEBICSettings() {
                   value={max_outside}
                   onChange={(e) => { updateSettings({ max_outside: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                    sx: { width: '10em' },
-                  }}
                   error={max_outside < 0}
                   helperText={max_outside < 0 ? 'Max outside must be greater than 0' : ''}
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
+                  }}
                 />
               </FormControl>
             </Box>
@@ -77,9 +81,11 @@ function TabPanelEBICSettings() {
                   value={target_tm}
                   onChange={(e) => { updateSettings({ target_tm: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">°C</InputAdornment>,
-                    sx: { width: '10em' },
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">°C</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
                   }}
                 />
               </FormControl>
@@ -90,9 +96,11 @@ function TabPanelEBICSettings() {
                   value={target_tm_tolerance}
                   onChange={(e) => { updateSettings({ target_tm_tolerance: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">°C</InputAdornment>,
-                    sx: { width: '10em' },
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">°C</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
                   }}
                 />
               </FormControl>
@@ -105,9 +113,11 @@ function TabPanelEBICSettings() {
                   value={padding_left}
                   onChange={(e) => { updateSettings({ padding_left: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                    sx: { width: '10em' },
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
                   }}
                 />
               </FormControl>
@@ -117,9 +127,11 @@ function TabPanelEBICSettings() {
                   value={padding_right}
                   onChange={(e) => { updateSettings({ padding_right: Number(e.target.value) }); }}
                   type="number"
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">bp</InputAdornment>,
-                    sx: { width: '10em' },
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">bp</InputAdornment>,
+                      sx: { width: '10em' },
+                    }
                   }}
                 />
               </FormControl>
