@@ -1,6 +1,6 @@
 import { Button, FormControl } from '@mui/material';
 import React from 'react';
-import { batch, shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import SingleInputSelector from './SingleInputSelector';
 import { CopySequenceThunk } from '@opencloning/utils/thunks';
 import { cloningActions } from '@opencloning/store/cloning';
@@ -14,10 +14,8 @@ function SourceCopySequence({ source }) {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    batch(() => {
-      dispatch(deleteSourceAndItsChildren(source.id));
-      dispatch(CopySequenceThunk(id, source.id));
-    });
+    dispatch(deleteSourceAndItsChildren(source.id));
+    dispatch(CopySequenceThunk(id, source.id));
   };
 
   return (

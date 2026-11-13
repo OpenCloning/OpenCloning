@@ -16,7 +16,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { batch, shallowEqual, useDispatch, useSelector, useStore } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector, useStore } from 'react-redux';
 import { isEqual } from 'lodash-es';
 import { getTeselaJsonFromBase64, readSequencingFile } from '@opencloning/utils/readNwrite';
 import SequencingFileRow from './SequencingFileRow';
@@ -103,14 +103,12 @@ export default function VerificationFileDialog({ id, dialogOpen, setDialogOpen }
     }
 
     // Add the files to the store
-    batch(() => {
-      dispatch(removeFilesAssociatedToSequence(id));
-      alignments.forEach((alignment) => {
-        const { trace, base64str, ...rest } = alignment;
-        dispatch(addFile(rest));
-      });
-      alignments.forEach(({ base64str, file_name }) => { setVerificationFileContent(`verification-${id}-${file_name}`, base64str); });
+    dispatch(removeFilesAssociatedToSequence(id));
+    alignments.forEach((alignment) => {
+      const { trace, base64str, ...rest } = alignment;
+      dispatch(addFile(rest));
     });
+    alignments.forEach(({ base64str, file_name }) => { setVerificationFileContent(`verification-${id}-${file_name}`, base64str); });
     setLoadingMessage('');
   }, [id, dispatch, httpClient, store, sequence]);
 

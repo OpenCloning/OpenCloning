@@ -1,5 +1,5 @@
 import React from 'react';
-import { batch, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
 import { setWorkspaceHeader, clearWorkspaceHeader } from '@opencloning/opencloningdb';
 import { useOidcAuth } from '../auth/OidcAuthContext';
@@ -21,26 +21,22 @@ export default function useChangeWorkspace() {
       setRememberedWorkspaceId(workspace.id);
       queryClient.clear();
       setWorkspaceHeader(workspace.id);
-      batch(() => {
-        dispatch(
-          setWorkspace({
-            id: workspace.id,
-            name: workspace.name,
-            role: workspace.role ?? null,
-          }),
-        );
-        dispatch(resetCloningState());
-      });
+      dispatch(
+        setWorkspace({
+          id: workspace.id,
+          name: workspace.name,
+          role: workspace.role ?? null,
+        }),
+      );
+      dispatch(resetCloningState());
     },
     [dispatch, queryClient],
   );
 
   const clearWorkspace = React.useCallback(() => {
     clearWorkspaceHeader();
-    batch(() => {
-      dispatch(setWorkspace(null));
-      dispatch(resetCloningState());
-    });
+    dispatch(setWorkspace(null));
+    dispatch(resetCloningState());
     queryClient.clear();
   }, [dispatch, queryClient]);
 

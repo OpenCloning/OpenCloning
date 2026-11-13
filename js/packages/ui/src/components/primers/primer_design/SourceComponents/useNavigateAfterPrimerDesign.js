@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { batch, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { cloningActions } from '@opencloning/store/cloning';
 import useStoreEditor from '../../../../hooks/useStoreEditor';
 
@@ -10,14 +10,12 @@ export default function useNavigateAfterPrimerDesign() {
   const { updateStoreEditor } = useStoreEditor();
 
   return useCallback((primaryAction, inputSequenceId) => {
-    batch(() => {
-      primaryAction();
-      dispatch(setMainSequenceId(inputSequenceId));
-      updateStoreEditor('mainEditor', inputSequenceId);
-      dispatch(setCurrentTab(3));
-      setTimeout(() => {
-        document.querySelector('.tab-panels-container')?.scrollTo({ top: 0, behavior: 'instant' });
-      }, 300);
-    });
+    primaryAction();
+    dispatch(setMainSequenceId(inputSequenceId));
+    updateStoreEditor('mainEditor', inputSequenceId);
+    dispatch(setCurrentTab(3));
+    setTimeout(() => {
+      document.querySelector('.tab-panels-container')?.scrollTo({ top: 0, behavior: 'instant' });
+    }, 300);
   }, [dispatch, updateStoreEditor]);
 }

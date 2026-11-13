@@ -1,5 +1,5 @@
 import React from 'react';
-import { batch, useDispatch, useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import { cloningActions } from '@opencloning/store/cloning';
 import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
 import { graftState, getGraftSequenceId, mergeStates } from '@opencloning/utils/network';
@@ -66,9 +66,7 @@ export default function useCloningHistoryLoader() {
         throw new Error(`Unknown apply mode: ${mode}`);
       }
 
-      batch(() => {
-        dispatch(setCloningState(newState));
-      });
+      dispatch(setCloningState(newState));
 
       await loadFilesToVerificationStore(verificationFiles, idShift);
     } catch (e) {

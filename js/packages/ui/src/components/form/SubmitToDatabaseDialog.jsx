@@ -1,6 +1,6 @@
 import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
-import { batch, useDispatch, useSelector, useStore } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import useDatabase from '../../hooks/useDatabase';
 import { cloningActions } from '@opencloning/store/cloning';
 import { getSubState } from '@opencloning/utils/network';
@@ -48,13 +48,11 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
         const oldPrimer = store.getState().cloning.primers.find((p) => p.id === id);
         const primerDatabaseId = await database.submitPrimerToDatabase({ submissionData, primer: oldPrimer });
         const newPrimer = { ...oldPrimer, database_id: primerDatabaseId };
-        batch(() => {
-          dispatch(cloningActions.editPrimer(newPrimer));
-          dispatch(cloningActions.addAlert({
-            message: 'Primer created successfully',
-            severity: 'success',
-          }));
-        });
+        dispatch(cloningActions.editPrimer(newPrimer));
+        dispatch(cloningActions.addAlert({
+          message: 'Primer created successfully',
+          severity: 'success',
+        }));
       } else if (resourceType === 'sequence') {
         const substate = getSubState(store.getState(), id, true);
         let databaseId;
@@ -68,15 +66,13 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
           setIsSubmitting(false);
           return;
         }
-        batch(() => {
-          primerMappings.forEach((mapping) => dispatch(cloningActions.addDatabaseIdToPrimer(mapping)));
-          dispatch(cloningActions.addDatabaseIdToSequence({ databaseId, id }));
-          sequenceMappings.forEach(({databaseId, localId}) => dispatch(cloningActions.addDatabaseIdToSequence({ databaseId, id: localId })));
-          dispatch(cloningActions.addAlert({
-            message: 'Sequence created successfully',
-            severity: 'success',
-          }));
-        });
+        primerMappings.forEach((mapping) => dispatch(cloningActions.addDatabaseIdToPrimer(mapping)));
+        dispatch(cloningActions.addDatabaseIdToSequence({ databaseId, id }));
+        sequenceMappings.forEach(({databaseId, localId}) => dispatch(cloningActions.addDatabaseIdToSequence({ databaseId, id: localId })));
+        dispatch(cloningActions.addAlert({
+          message: 'Sequence created successfully',
+          severity: 'success',
+        }));
       }
     } catch (error) {
       console.error(error);

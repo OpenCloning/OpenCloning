@@ -1,5 +1,5 @@
 import React from 'react';
-import { batch, useDispatch, useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import useCloningAlerts from '../hooks/useCloningAlerts';
 import useCloningHistoryLoader from '../hooks/useCloningHistoryLoader';
 import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
@@ -116,17 +116,15 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
       }
       try {
         const { sources, sequences, warnings } = await processSequenceFiles(files, httpClient);
-        batch(() => {
-          // If there is only one source and it is empty, delete it
-          const emptyPlaceholder = getEmptyPlaceholderSource(cloningState.sources);
-          if (emptyPlaceholder) {
-            dispatch(deleteSourceAndItsChildren(emptyPlaceholder.id));
-          }
-          for (let i = 0; i < sources.length; i += 1) {
-            dispatch(addSourceAndItsOutputSequence({ source: sources[i], sequence: sequences[i] }));
-          }
-          warnings.forEach((warning) => addAlert({ message: warning, severity: 'warning' }));
-        });
+        // If there is only one source and it is empty, delete it
+        const emptyPlaceholder = getEmptyPlaceholderSource(cloningState.sources);
+        if (emptyPlaceholder) {
+          dispatch(deleteSourceAndItsChildren(emptyPlaceholder.id));
+        }
+        for (let i = 0; i < sources.length; i += 1) {
+          dispatch(addSourceAndItsOutputSequence({ source: sources[i], sequence: sequences[i] }));
+        }
+        warnings.forEach((warning) => addAlert({ message: warning, severity: 'warning' }));
       } catch (e) {
         console.error(e);
         addAlert({
