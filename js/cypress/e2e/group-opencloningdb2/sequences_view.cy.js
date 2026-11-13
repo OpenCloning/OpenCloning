@@ -111,7 +111,13 @@ describe('SequencesPage', () => {
     // lacZ_PCR_product has linked primers
     cy.wait('@getSequences');
     for (const name of ['entry_clone_lacZ', 'pREX0008', 'lacZ_PCR_product']) {
-      cy.intercept('GET', Cypress.getDbURL(endpoints.sequences, '*')).as(`getSequences-${name}`);
+      // Match only the search for this name: "Back to Sequences" remounts the list page,
+      // which refetches /sequences without filters, possibly after this intercept is registered.
+      cy.intercept({
+        method: 'GET',
+        url: Cypress.getDbURL(endpoints.sequences, '*'),
+        query: { name },
+      }).as(`getSequences-${name}`);
       cy.setInputValue('Name', name, '[data-testid="sequences-page"]');
       cy.get('[data-testid="sequences-page"] button').contains('Search').click();
       cy.wait(`@getSequences-${name}`).then(({ response }) => {
@@ -256,6 +262,7 @@ describe('SequencesPage', () => {
     cy.wait('@getSequences')
     cy.get('button').contains('Add to Design Tab').should('not.exist');
     cy.get('button').contains('Tag Sequences').should('not.exist');
+    cy.get('[data-testid="bulk-link-sequencing-files-button"]').should('not.exist');
 
     const selectedSequences = ['entry_clone_lacZ', 'expression_clone_lacZ'];
 

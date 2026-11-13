@@ -17,6 +17,120 @@
             "display_name": "Bootstrap User",
             "id": 1
           },
+          "id": 86,
+          "name": "seqcheck_linear_3",
+          "sample_uids": [],
+          "seguid": "ldseguid=_XemvgSI5rviFQb7d_2kp7JouwQ",
+          "sequence_type": "linear_dna",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 85,
+          "name": "seqcheck_linear_2",
+          "sample_uids": [],
+          "seguid": "ldseguid=eG3ATEdW44h7aDMfcAlZnN2j65o",
+          "sequence_type": "linear_dna",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 84,
+          "name": "seqcheck_linear_1",
+          "sample_uids": [],
+          "seguid": "ldseguid=IlAdBBErYDJWgZyRKjYCE5PYwmo",
+          "sequence_type": "linear_dna",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 83,
+          "name": "seqcheck_circular_3",
+          "sample_uids": [],
+          "seguid": "cdseguid=zFx5hMYHKdTysVxHIFaDD5ZWxOs",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 82,
+          "name": "seqcheck_circular_2",
+          "sample_uids": [],
+          "seguid": "cdseguid=agbObHtt5qQjxxCEInm0gWYjz_w",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
+          "id": 81,
+          "name": "seqcheck_circular_1",
+          "sample_uids": [],
+          "seguid": "cdseguid=t87sd9-LRtENEta2-yadhxRDAh8",
+          "sequence_type": "plasmid",
+          "tags": [
+            {
+              "id": 12,
+              "name": "sequencing_check"
+            }
+          ],
+          "type": "sequence"
+        },
+        {
+          "created_at": "2000-01-01T00:00:00Z",
+          "created_by": {
+            "display_name": "Bootstrap User",
+            "id": 1
+          },
           "id": 80,
           "name": "template_sequence_plasmid",
           "sample_uids": [],
@@ -850,130 +964,12 @@
             }
           ],
           "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 21,
-          "name": "lacZ_PCR_product",
-          "sample_uids": [],
-          "seguid": "ldseguid=xnlrvJOWvC1omQRF7QUknDGGgIs",
-          "sequence_type": "pcr_product",
-          "tags": [
-            {
-              "id": 4,
-              "name": "gateway"
-            }
-          ],
-          "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 20,
-          "name": "pcDNA6.2_C-YFP-DEST",
-          "sample_uids": [],
-          "seguid": "cdseguid=deBUtglinRcbMhjD7EvBjXUKhGg",
-          "sequence_type": "plasmid",
-          "tags": [
-            {
-              "id": 4,
-              "name": "gateway"
-            }
-          ],
-          "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 19,
-          "name": "pDONR221",
-          "sample_uids": [],
-          "seguid": "cdseguid=NHJEzJ3E7cnPasODRhCfZ_3OlGU",
-          "sequence_type": "plasmid",
-          "tags": [
-            {
-              "id": 4,
-              "name": "gateway"
-            }
-          ],
-          "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 18,
-          "name": "NC_000913",
-          "sample_uids": [],
-          "seguid": "ldseguid=dZybNlCfzY6Eg0hg0Ymc5Y6aoTI",
-          "sequence_type": "locus",
-          "tags": [
-            {
-              "id": 4,
-              "name": "gateway"
-            }
-          ],
-          "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 13,
-          "name": "pREX0008",
-          "sample_uids": [
-            "example_sequencing-sample"
-          ],
-          "seguid": "cdseguid=B1Hf10-i7VRt7sgFiDRwUj6K8xQ",
-          "sequence_type": "plasmid",
-          "tags": [
-            {
-              "id": 3,
-              "name": "example_sequencing"
-            }
-          ],
-          "type": "sequence"
-        },
-        {
-          "created_at": "2000-01-01T00:00:00Z",
-          "created_by": {
-            "display_name": "Bootstrap User",
-            "id": 1
-          },
-          "id": 12,
-          "name": "3xHA-ase1",
-          "sample_uids": [
-            "crispr_hdr-sample"
-          ],
-          "seguid": "ldseguid=3LN-NLtnubkWGEtAvOqu_pdcebQ",
-          "sequence_type": "allele",
-          "tags": [
-            {
-              "id": 2,
-              "name": "crispr_hdr"
-            }
-          ],
-          "type": "sequence"
         }
       ],
       "page": 1,
       "pages": 2,
       "size": 50,
-      "total": 58
+      "total": 64
     },
     "headers": {
       "content-type": "application/json"

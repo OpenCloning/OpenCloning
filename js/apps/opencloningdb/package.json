@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "opencloningdb",
-  "version": "0.4.6",
+  "version": "2.2.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -24,6 +24,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^8.1.3",
-    "react-router-dom": "^6.30.6"
+    "react-router-dom": "^7.18.5"
   }
 }

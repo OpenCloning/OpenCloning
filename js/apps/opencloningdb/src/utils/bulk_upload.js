@@ -1,3 +1,4 @@
+import { extractFilesFromZip } from '@opencloning/utils/readNwrite';
 import { SEQUENCE_TYPE_LABELS } from './query_utils';
 
 export const VALID_TEMPLATE_SEQUENCE_TYPE_KEYS = Object.keys(SEQUENCE_TYPE_LABELS);
@@ -240,4 +241,48 @@ export function getSequenceRowsInfo(rows) {
     errorRowsCount,
     totalRowsCount,
   };
+}
+
+const FINAL_FASTQ_SUFFIX = '.final.fastq';
+
+/** Sample name of a sequencing run file, e.g. 'A1-P1' for 'A1-P1.final.fastq'. */
+export const fastqSampleName = (file) => file.name.slice(0, -FINAL_FASTQ_SUFFIX.length);
+
+/** The *.final.fastq files of a zipped sequencing run, with one folder per sample. */
+export async function finalFastqFilesFromZip(zipFile) {
+  const files = await extractFilesFromZip(zipFile, (path) => path.toLowerCase().endsWith(FINAL_FASTQ_SUFFIX));
+  const names = files.map((file) => file.name);
+  const repeated = [...new Set(names.filter((name, i) => names.indexOf(name) !== i))];
+  if (repeated.length > 0) {
+    throw new Error(`Several files with the same name in the zip file: ${repeated.join(', ')}`);
+  }
+  return files;
+}
+
+/**
+ * Table to fill by hand with the sequence each sample should be linked to, sorted by sample name.
+ * sequenceNames ({ sampleName: sequenceName }) pre-fills the sequence names that are already known.
+ */
+export function sampleTableTsv(files, sequenceNames = {}) {
+  const sampleNames = files.map(fastqSampleName).sort((a, b) => a.localeCompare(b));
+  return `${['sample_name\tsequence_name', ...sampleNames.map((name) => `${name}\t${sequenceNames[name] ?? ''}`)].join('\n')}\n`;
+}
+
+/**
+ * Pair the fastq files with the sequence names of the filled sample table (rows of delimitedFileToJson).
+ * Rows without sequence name are skipped. Returns [{ sequenceName, file }].
+ */
+export function pairFastqFilesWithSequences(files, rows) {
+  const filesBySample = Object.fromEntries(files.map((file) => [fastqSampleName(file), file]));
+  const filledRows = rows
+    .map((row) => ({ sampleName: String(row.sample_name ?? '').trim(), sequenceName: String(row.sequence_name ?? '').trim() }))
+    .filter(({ sequenceName }) => sequenceName);
+  if (filledRows.length === 0) {
+    throw new Error('No sequence names were filled in the table');
+  }
+  const unknownSamples = filledRows.filter(({ sampleName }) => !filesBySample[sampleName]).map(({ sampleName }) => sampleName);
+  if (unknownSamples.length > 0) {
+    throw new Error(`Samples not found in the zip file: ${unknownSamples.join(', ')}`);
+  }
+  return filledRows.map(({ sampleName, sequenceName }) => ({ sequenceName, file: filesBySample[sampleName] }));
 }

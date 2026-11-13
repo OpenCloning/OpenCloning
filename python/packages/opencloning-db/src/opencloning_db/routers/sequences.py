@@ -9,7 +9,7 @@ from opencloning.endpoints.endpoint_utils import read_upload_with_limit
 from opencloning.pydantic_models import BaseCloningStrategy
 from opencloning_db.config import get_config
 import opencloning_linkml.datamodel.models as opencloning_models
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Response
 from fastapi import status
 
 from opencloning_db.models import BaseSequence
@@ -412,6 +412,7 @@ def _seguid_query(seguid: str, workspace_id: int) -> Select[tuple[Sequence]]:
             Sequence.seguid == seguid,
             Sequence.workspace_id == workspace_id,
         )
+        .order_by(Sequence.id)
         .options(
             selectinload(InputEntity.tags),
             selectinload(Sequence.instances),
@@ -835,6 +836,55 @@ def post_sequence_sequencing_files(
 
     session.commit()
     return created
+
+
+@router.post('/sequences/sequencing_files/bulk')
+def post_sequencing_files_bulk(
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+    sequence_names: List[str] = Form(...),
+    files: List[UploadFile] = File(...),
+):
+    """Link sequencing files to sequences in bulk: files[i] is linked to the sequence called sequence_names[i]
+    (the first one if several sequences have that name). Nothing is linked if there is any error."""
+    _, session, workspace_id = ctx.destructure()
+    if len(sequence_names) != len(files):
+        raise HTTPException(400, 'Submit one sequence name per file')
+    max_size_mb = get_config().max_sequencing_file_size_mb
+    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
+
+    sequences = {}
+    for seq in session.scalars(
+        select(Sequence)
+        .where(Sequence.workspace_id == workspace_id, Sequence.name.in_(sequence_names))
+        .order_by(Sequence.id)
+    ):
+        sequences.setdefault(seq.name, seq)
+    missing_names = sorted(set(sequence_names) - sequences.keys())
+    if missing_names:
+        raise HTTPException(400, f'Sequences not found: {", ".join(missing_names)}')
+
+    # Tuples of sequence_id, sequencing_file names to ensure that the same file is not
+    # added twice
+    taken = set(
+        session.execute(
+            select(SequencingFile.sequence_id, SequencingFile.original_name).where(
+                SequencingFile.sequence_id.in_([s.id for s in sequences.values()])
+            )
+        ).all()
+    )
+    conflicts = []
+    for name, upload in zip(sequence_names, files):
+        key = (sequences[name].id, upload.filename)
+        if key in taken:
+            conflicts.append(f'{name} already has a sequencing file called {upload.filename}')
+        taken.add(key)
+    if conflicts:
+        raise HTTPException(400, '; '.join(sorted(set(conflicts))))
+
+    for name, upload, content in zip(sequence_names, files, contents):
+        session.add(create_sequencing_file(sequences[name], content, upload.filename))
+    session.commit()
+    return {'created': len(files)}
 
 
 @router.delete('/sequences/{sequence_id}/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)

@@ -8,7 +8,7 @@ WORKDIR /app
 # Copy everything (Yarn workspaces need the full structure)
 COPY . /app
 
-RUN corepack enable
+RUN npm install -g corepack@latest && corepack enable
 RUN yarn install --immutable
 
 # Add build argument for base URL with a default value

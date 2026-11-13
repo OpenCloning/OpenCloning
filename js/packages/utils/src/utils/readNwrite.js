@@ -158,6 +158,26 @@ export const downloadCloningStrategyAsSvg = async (fileName) => {
   downloadTextFile(svgString, fileName);
 };
 
+/**
+ * Extract the files of a zip whose path (e.g. 'run/A1/A1.fastq') matches filter, as Files named like the
+ * file without its folder (e.g. 'A1.fastq'). Directories, hidden files and folders, and anything in
+ * __MACOSX/ (e.g. the ._A1.fastq copies that macOS adds) are skipped.
+ */
+export async function extractFilesFromZip(zipFile, filter) {
+  const zipReader = new ZipReader(new BlobReader(zipFile));
+  try {
+    const entries = (await zipReader.getEntries()).filter((entry) => !entry.directory
+      && !entry.filename.split('/').some((part) => part.startsWith('.') || part === '__MACOSX')
+      && filter(entry.filename));
+    return await Promise.all(entries.map(async (entry) => new File(
+      [await entry.getData(new BlobWriter())],
+      entry.filename.split('/').pop(),
+    )));
+  } finally {
+    await zipReader.close();
+  }
+}
+
 export async function parseHistoryFile(file) {
   const isZipFile = file.name.endsWith('.zip');
   const isJsonFile = file.name.endsWith('.json');
@@ -277,6 +297,16 @@ export async function getTeselaJsonFromBase64(ab1Base64, fileName = null) {
     const fileNameError = fileName || 'file';
     throw new Error(`Error parsing ${fileNameError}: ${error.message}`);
   }
+}
+
+/**
+ * Read a sequencing file (ab1, fasta, genbank, fastq...) and parse it.
+ * Returns the base64 content (to store it) and the parsed teselaJson (e.g. teselaJson.sequence is the trace).
+ */
+export async function readSequencingFile(file) {
+  const base64str = await file2base64(file);
+  const teselaJson = await getTeselaJsonFromBase64(base64str, file.name);
+  return { base64str, teselaJson };
 }
 
 export function formatTemplate(data, url) {

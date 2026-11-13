@@ -60,6 +60,16 @@ RUN chmod 755 /usr/local/bin/init-firewall.sh /usr/local/bin/check-isolation.sh 
 
 ENV DEVCONTAINER=true
 ENV PATH="/opt/venv/bin:/home/${USERNAME}/.local/bin:${PATH}"
+
+RUN apt-get update && apt-get install -y --no-install-recommends mafft unzip cmake
+
+RUN curl -fsSL -o v0.2.6.tar.gz https://github.com/manulera/MARS/archive/refs/tags/v0.2.6.tar.gz \
+  && tar -xzf v0.2.6.tar.gz \
+  && cd MARS-0.2.6 \
+  && ./pre-install.sh \
+  && make -f Makefile \
+  && mv mars /usr/local/bin/mars
+
 WORKDIR /workspace
 USER $USERNAME
 

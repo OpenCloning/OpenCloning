@@ -57,11 +57,11 @@
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^7.1.1",
         "globals": "^17.14.0",
-        "jsdom": "^22.1.0",
+        "jsdom": "^31.0.0",
         "msw": "^2.14.6",
         "vite": "^8.3",
         "vite-plugin-ejs": "^1.7.0",
-        "vite-plugin-istanbul": "^7.2.1",
+        "vite-plugin-istanbul": "^9.0.1",
         "vitest": "^4.1.11"
     },
     "packageManager": "yarn@4.9.1"
