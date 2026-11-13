@@ -1,7 +1,7 @@
 {
     "license": "MIT",
     "name": "@opencloning/opencloning-elabftw",
-    "version": "2.2.1",
+    "version": "2.2.2",
     "type": "module",
     "main": "./src/index.js",
     "exports": {
