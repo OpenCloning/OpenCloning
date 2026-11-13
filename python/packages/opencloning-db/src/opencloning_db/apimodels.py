@@ -467,6 +467,7 @@ class SequenceSearchResult(ApiModel):
 class SequenceWithTextFile(ApiModel):
     sequence_ref: SequenceRef
     sequence: opencloning_models.TextFileSequence
+    sequencing_files: list[SequencingFileRef]
 
 
 class SequenceValidationRow(ApiModel):

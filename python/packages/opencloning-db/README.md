@@ -69,6 +69,15 @@ Uploaded files are rejected with HTTP 413 when they exceed the configured size. 
 | `MAX_SEQUENCING_FILE_SIZE_MB` | `20` | Each file uploaded to `/sequences/{id}/sequencing_files` |
 | `MAX_REQUEST_BODY_SIZE_MB` | `100` | Whole request body of any endpoint, enforced while it is received (before uploads are written to temporary files) |
 
+## Database connections
+
+Each process (each gunicorn worker) has its own connection pool, and can open up to `DB_POOL_SIZE + DB_MAX_OVERFLOW` connections to Postgres. Keep `GUNICORN_WORKERS * (DB_POOL_SIZE + DB_MAX_OVERFLOW)`, plus any other clients of the database, below the connection limit of the Postgres server. When all the connections of a worker are in use, requests wait for a free one (up to 30 s) instead of failing.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `DB_POOL_SIZE` | `5` | Connections kept open in the pool of each process (database API only) |
+| `DB_MAX_OVERFLOW` | `4` | Extra connections each process can open when the pool is in use (database API only) |
+
 ## Database migrations (Alembic)
 
 Schema changes are defined in **`opencloning_db.models`** and applied with **Alembic** in this package (`alembic/`, `alembic.ini`). Edit the models first, generate or adjust the revision under `alembic/versions/`, then run migrations against each database.

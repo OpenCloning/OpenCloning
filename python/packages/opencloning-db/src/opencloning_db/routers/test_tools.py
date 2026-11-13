@@ -16,7 +16,7 @@ def _dispose_engine() -> None:
     if db_module._engine is not None:
         db_module._engine.dispose()
         db_module._engine = None
-        db_module._bound_database_url = None
+        db_module._bound_engine_settings = None
 
 
 @router.post('/reset-db', status_code=status.HTTP_204_NO_CONTENT)

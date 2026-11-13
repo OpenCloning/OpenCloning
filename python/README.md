@@ -57,6 +57,15 @@ File uploads are size-limited; requests above the limit are rejected with HTTP 4
 | `MAX_SEQUENCING_FILE_SIZE_MB` | `20` | Maximum size (MB) of each uploaded sequencing file (database API only) |
 | `MAX_REQUEST_BODY_SIZE_MB` | `100` | Maximum size (MB) of any request body, enforced while it is received, so oversized uploads are rejected before they are written to temporary files |
 
+## Database connections
+
+Each process (each gunicorn worker) has its own connection pool, and can open up to `DB_POOL_SIZE + DB_MAX_OVERFLOW` connections to Postgres. Keep `GUNICORN_WORKERS * (DB_POOL_SIZE + DB_MAX_OVERFLOW)`, plus any other clients of the database, below the connection limit of the Postgres server. When all the connections of a worker are in use, requests wait for a free one (up to 30 s) instead of failing.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `DB_POOL_SIZE` | `5` | Connections kept open in the pool of each process (database API only) |
+| `DB_MAX_OVERFLOW` | `4` | Extra connections each process can open when the pool is in use (database API only) |
+
 ## Logging and request IDs
 
 Both apps log one JSON object per line to stdout, for all loggers (app code, gunicorn, uvicorn, libraries). Every response carries an `X-Request-ID` header, and the same `request_id` is stamped on every log record of that request, so an error shown in the frontend can be traced to the server logs. Each request produces one `request_completed` event (method, route template, status, duration). Request bodies, query strings, headers and client IPs are never logged.

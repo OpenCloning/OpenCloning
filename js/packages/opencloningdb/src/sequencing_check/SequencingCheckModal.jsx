@@ -1,6 +1,5 @@
 import React from 'react';
-import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material';
-import error2String from '@opencloning/utils/error2String';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import BulkUploadModal from '../bulk_upload/BulkUploadModal';
 import { BulkTableContainer } from '../bulk_upload/common';
 import GetSequencesInBulkComponent from '../GetSequencesInBulkComponent';
@@ -9,7 +8,7 @@ import SequencingAlignmentViewer from './SequencingAlignmentViewer';
 import useSequencingCheck from './useSequencingCheck';
 
 function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenceName }) {
-  const { rows, filesLoading, filesError, run, isRunning, progress } = useSequencingCheck(sequences);
+  const { rows, run, isRunning, progress } = useSequencingCheck(sequences);
   // { sequence, file } of the alignment shown below the table, null if none
   const [selectedAlignment, setSelectedAlignment] = React.useState(null);
   const onViewAlignment = (sequence, file) => setSelectedAlignment(sequence ? { sequence, file } : null);
@@ -20,7 +19,6 @@ function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenc
         Each sequencing file is aligned to its sequence (exact matches are detected without aligning).
         Sequences are sorted by percentage identity, lowest first.
       </Typography>
-      {filesError && <Alert severity="error" sx={{ mb: 2 }}>Could not load the sequencing files: {error2String(filesError)}</Alert>}
       {/* Scrolls when the alignment is shown, so that the buttons stay visible */}
       <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         <BulkTableContainer>
@@ -52,7 +50,7 @@ function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenc
         <Button
           variant="contained"
           onClick={() => run()}
-          disabled={isRunning || filesLoading || progress.total === 0}
+          disabled={isRunning || progress.total === 0}
           data-testid="sequencing-check-run-button"
         >
           {isRunning ? <CircularProgress size={24} /> : 'Check sequencing files'}

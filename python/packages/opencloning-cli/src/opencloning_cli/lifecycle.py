@@ -51,7 +51,7 @@ def _dispose_engine() -> None:
     if _db_module._engine is not None:
         _db_module._engine.dispose()
         _db_module._engine = None
-        _db_module._bound_database_url = None
+        _db_module._bound_engine_settings = None
 
 
 def _require_testing_seed_enabled() -> None:

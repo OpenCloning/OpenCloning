@@ -39,7 +39,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       },
       {
         "sequence": {
@@ -68,7 +69,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       },
       {
         "sequence": {
@@ -97,7 +99,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       },
       {
         "sequence": {
@@ -126,7 +129,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       },
       {
         "sequence": {
@@ -157,7 +161,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       }
     ],
     "headers": {

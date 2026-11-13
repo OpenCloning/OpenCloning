@@ -13,7 +13,8 @@ import endpoints from './endpoints';
  * When loading by tag, the sequences can be restricted to some sequence types (none selected means all types),
  * defaultSequenceTypes sets the initial selection (e.g. ['plasmid']).
  *
- * onSequencesLoaded receives an array of { databaseId, name, seguid, textFileSequence }.
+ * onSequencesLoaded receives an array of { databaseId, name, seguid, textFileSequence, sequencingFiles },
+ * where sequencingFiles are the references ({ id, original_name }) of the sequencing files of the sequence.
  */
 function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes = [] }) {
   const [mode, setMode] = React.useState('tags');
@@ -25,11 +26,12 @@ function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes =
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: async (params) => {
       const { data } = await openCloningDBHttpClient.get(endpoints.sequenceTextFiles, { params });
-      return data.map(({ sequence_ref, sequence }) => ({
+      return data.map(({ sequence_ref, sequence, sequencing_files }) => ({
         databaseId: sequence_ref.id,
         name: formatSequenceName(sequence_ref),
         seguid: sequence_ref.seguid,
         textFileSequence: sequence,
+        sequencingFiles: sequencing_files,
       }));
     },
     onSuccess: (sequences) => {
