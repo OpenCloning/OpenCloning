@@ -13,7 +13,7 @@
         "directory": "js/packages/opencloning-elabftw"
     },
     "dependencies": {
-        "@mui/icons-material": "^5.18.0",
+        "@mui/icons-material": "^9.5.0",
         "@mui/material": "^9.5.0",
         "@opencloning/ui": "workspace:*",
         "@opencloning/utils": "workspace:*",

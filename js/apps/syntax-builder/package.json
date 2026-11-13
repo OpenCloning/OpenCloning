@@ -10,7 +10,7 @@
     "preview": "yarn run -T vite preview"
   },
   "dependencies": {
-    "@mui/x-data-grid": "^8.28.5",
+    "@mui/x-data-grid": "^9.18.0",
     "@opencloning/ui": "workspace:*",
     "@opencloning/utils": "workspace:*",
     "graphology": "^0.26.0",

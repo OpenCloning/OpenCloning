@@ -12,7 +12,7 @@ describe('Test load template functionality', () => {
 
     // Load first template
     cy.contains('.MuiAccordionSummary-root', 'MoClo YTK').click();
-    cy.contains('.MuiAccordionSummary-root', 'MoClo YTK').parent().find('.MuiAccordionDetails-root').contains('CDS self-replicating')
+    cy.contains('.MuiAccordionSummary-root', 'MoClo YTK').closest('.MuiAccordion-root').find('.MuiAccordionDetails-root').contains('CDS self-replicating')
       .click();
 
     // The dialog should be closed

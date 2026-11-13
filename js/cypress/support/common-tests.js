@@ -84,7 +84,7 @@ Cypress.Commands.add('openCloningDbTablePaginationTest', (resourcePlural, pageTe
   cy.wait('@list').then(({ response }) => {
     expect(response.body.total).to.be.greaterThan(10);
   });
-  cy.get(`${pageTestId} .MuiTablePagination-select`).click();
+  cy.get(`${pageTestId} .MuiTablePagination-select[role="combobox"]`).click();
   cy.get('ul[role="listbox"] li').contains(/^10$/).click();
   cy.wait('@list').then(({ request }) => {
     expect(request.query).to.have.property('page', '1');
