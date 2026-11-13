@@ -161,8 +161,8 @@ def get_text_file_sequences(
         description='Only retrieve sequences of these types (only with tags)', default_factory=list
     ),
 ):
-    """Retrieve several sequences with their file content, either by ID or by tag, sorted by ID.
-    When retrieving by tag, the sequences can be filtered by type.
+    """Retrieve several sequences with their file content and their sequencing files (without content),
+    either by ID or by tag, sorted by ID. When retrieving by tag, the sequences can be filtered by type.
     Template sequences are not included, since they have no file content."""
     if bool(ids) == bool(tags):
         raise HTTPException(status_code=422, detail='Provide either ids or tags, but not both.')
@@ -189,6 +189,8 @@ def get_text_file_sequences(
         selectinload(Sequence.tags),
         selectinload(Sequence.instances),
         selectinload(Sequence.created_by),
+        # file_content of the sequencing files is deferred, so only their id and name are loaded
+        selectinload(Sequence.sequencing_files),
         undefer(Sequence.file_content),
     ).order_by(Sequence.id)
     db_sequences = session.scalars(query).all()
@@ -202,7 +204,15 @@ def get_text_file_sequences(
             )
 
     return [
-        SequenceWithTextFile(sequence_ref=sequence_ref(s), sequence=s.to_pydantic_sequence()) for s in db_sequences
+        SequenceWithTextFile(
+            sequence_ref=sequence_ref(s),
+            sequence=s.to_pydantic_sequence(),
+            sequencing_files=[
+                SequencingFileRef(id=f.id, original_name=f.original_name)
+                for f in sorted(s.sequencing_files, key=lambda f: f.id)
+            ],
+        )
+        for s in db_sequences
     ]
 
 

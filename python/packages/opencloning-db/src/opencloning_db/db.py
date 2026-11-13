@@ -30,26 +30,31 @@ from opencloning_db.utils import guess_sequence_type, unique_and_sorted
 from opencloning_db.models import require_real_sequence
 
 _engine = None
-_bound_database_url: str | None = None
+_bound_engine_settings: tuple[str, int, int] | None = None
 
 
 def reset_runtime_state(config: Config | None = None) -> None:
-    global _engine, _bound_database_url
+    global _engine, _bound_engine_settings
     if _engine is not None:
         _engine.dispose()
     _engine = None
-    _bound_database_url = None
+    _bound_engine_settings = None
     set_config(config)
 
 
 def get_engine(config: Config):
-    """Return the DB engine; rebuild when ``config.database_url`` changes."""
-    global _engine, _bound_database_url
-    url = config.database_url
-    if _engine is None or _bound_database_url != url:
-        # hide_parameters: keep bound values (sequences, emails) out of exception messages and logs
-        _engine = create_engine(url, hide_parameters=True)
-        _bound_database_url = url
+    """Return the DB engine; rebuild when the database URL or the pool settings of ``config`` change."""
+    global _engine, _bound_engine_settings
+    settings = (config.database_url, config.db_pool_size, config.db_max_overflow)
+    if _engine is None or _bound_engine_settings != settings:
+        _engine = create_engine(
+            config.database_url,
+            pool_size=config.db_pool_size,
+            max_overflow=config.db_max_overflow,
+            # hide_parameters: keep bound values (sequences, emails) out of exception messages and logs
+            hide_parameters=True,
+        )
+        _bound_engine_settings = settings
     return _engine
 
 

@@ -19,6 +19,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    command: ["postgres", "-c", "max_connections=22"]
 
   app:
     build:

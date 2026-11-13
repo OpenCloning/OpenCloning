@@ -99,8 +99,13 @@ def _load_config_from_env() -> 'Config':
         )
 
     optional_settings = {}
-    if os.environ.get('MAX_SEQUENCING_FILE_SIZE_MB'):
-        optional_settings['max_sequencing_file_size_mb'] = os.environ['MAX_SEQUENCING_FILE_SIZE_MB']
+    for env_name, setting in (
+        ('MAX_SEQUENCING_FILE_SIZE_MB', 'max_sequencing_file_size_mb'),
+        ('DB_POOL_SIZE', 'db_pool_size'),
+        ('DB_MAX_OVERFLOW', 'db_max_overflow'),
+    ):
+        if os.environ.get(env_name):
+            optional_settings[setting] = os.environ[env_name]
     return Config(
         database_url=os.environ['OPENCLONING_DB_URL'],
         oidc_config=OidcConfig.from_env(),
@@ -135,6 +140,19 @@ class Config(BaseModel):
         default=20,
         gt=0,
         description='Maximum size (in MB) of each uploaded sequencing file.',
+    )
+    # Each process (e.g. gunicorn worker) has its own pool, so it can open up to
+    # db_pool_size + db_max_overflow connections. Keep workers * (pool + overflow) below the
+    # Postgres connection limit, requests then wait for a free connection instead of failing.
+    db_pool_size: int = Field(
+        default=5,
+        gt=0,
+        description='Connections kept open in the pool of each process.',
+    )
+    db_max_overflow: int = Field(
+        default=4,
+        ge=0,
+        description='Extra connections each process can open when the pool is in use.',
     )
 
 

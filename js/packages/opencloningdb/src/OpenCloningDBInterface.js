@@ -66,28 +66,35 @@ async function submitSequencingFileToDatabase({ databaseId, sequencingFiles }) {
     return resp.data;
   } catch (e) {
     console.error(e);
-    throw new Error(e.response?.data?.detail || e.message || 'Error submitting sequencing files');
+    throw new Error(e.response?.data?.detail || e.message || 'Error submitting sequencing files', { cause: e });
   }
 }
 
+/**
+ * A sequencing file { id, name, getFile } from its reference in the API ({ id, original_name }),
+ * getFile is async and downloads the file content (as a File).
+ */
+export function sequencingFileFromRef({ id, original_name: name }) {
+  return {
+    id,
+    name,
+    getFile: async () => {
+      const downloadResp = await openCloningDBHttpClient.get(endpoints.sequencingFileDownload(id), {
+        responseType: 'blob',
+      });
+      return new File([downloadResp.data], name);
+    },
+  };
+}
+
 async function getSequencingFiles(databaseId) {
-  // Returns array of { name, getFile } where getFile is async and returns the file content
+  // Returns array of { id, name, getFile } where getFile is async and returns the file content
   try {
     const resp = await openCloningDBHttpClient.get(endpoints.sequenceSequencingFiles(databaseId));
-    const files = resp.data || [];
-    return files.map((fileInfo) => ({
-      id: fileInfo.id,
-      name: fileInfo.original_name,
-      getFile: async () => {
-        const downloadResp = await openCloningDBHttpClient.get(endpoints.sequencingFileDownload(fileInfo.id), {
-          responseType: 'blob',
-        });
-        return new File([downloadResp.data], fileInfo.original_name);
-      },
-    }));
+    return (resp.data || []).map(sequencingFileFromRef);
   } catch (e) {
     console.error(e);
-    throw new Error(e.response?.data?.detail || e.message || 'Error getting sequencing files');
+    throw new Error(e.response?.data?.detail || e.message || 'Error getting sequencing files', { cause: e });
   }
 }
 

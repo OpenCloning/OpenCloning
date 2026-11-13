@@ -39,7 +39,8 @@
             }
           ],
           "type": "sequence"
-        }
+        },
+        "sequencing_files": []
       }
     ],
     "headers": {

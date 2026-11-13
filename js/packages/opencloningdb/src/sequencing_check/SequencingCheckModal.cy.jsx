@@ -17,6 +17,18 @@ const READS = {
   ACGTACGTAC: { alignment: ['ACGTACGTAC', '--GTACGTAC'], identity: '80.00' },
 };
 
+/**
+ * Return the sequences by tag with their sequencing files, fileIdsBySequenceId maps sequence ids
+ * to file ids (missing means no files), files maps file ids to { name }.
+ */
+function interceptSequencesWithFiles(stub, fileIdsBySequenceId, files) {
+  const body = stub.response.body.map((item) => ({
+    ...item,
+    sequencing_files: (fileIdsBySequenceId[item.sequence_ref.id] ?? []).map((id) => ({ id, original_name: files[id].name })),
+  }));
+  cy.interceptOpenCloningDBStub({ ...stub, response: { ...stub.response, body } }, { alias: 'getSequences' });
+}
+
 /** Pick the sequences with the gibson_assembly tag in the bulk component. */
 function loadSequencesByTag() {
   cy.wait('@getTags');
@@ -57,10 +69,8 @@ describe('<SequencingCheckModal />', () => {
       };
       const filesBySequenceId = { 28: [1, 2], 29: [], 30: [3], 31: [4, 5, 6, 7], 32: [8] };
 
-      cy.intercept('GET', Cypress.getDbURL('/sequences/*/sequencing_files'), (req) => {
-        const sequenceId = Number(req.url.split('/').at(-2));
-        req.reply(filesBySequenceId[sequenceId].map((id) => ({ id, original_name: files[id].name }))); // eslint-disable-line camelcase
-      }).as('getSequencingFiles');
+      // The files come with the sequences, any request to list them fails the test (unstubbed request)
+      interceptSequencesWithFiles(stub, filesBySequenceId, files);
       cy.intercept('GET', Cypress.getDbURL('/sequencing_files/*/download'), (req) => {
         const file = files[Number(req.url.split('/').at(-2))];
         req.reply({ body: `>${file.name}\n${file.sequence}\n`, headers: { 'content-type': 'application/octet-stream' } });
@@ -204,10 +214,7 @@ describe('<SequencingCheckModal />', () => {
         2: { name: 'other.fa', sequence: plasmidBases },
       };
 
-      cy.intercept('GET', Cypress.getDbURL('/sequences/*/sequencing_files'), (req) => {
-        const sequenceId = Number(req.url.split('/').at(-2));
-        req.reply(sequenceId === plasmid.sequence_ref.id ? [1, 2].map((id) => ({ id, original_name: files[id].name })) : []); // eslint-disable-line camelcase
-      });
+      interceptSequencesWithFiles(stub, { [plasmid.sequence_ref.id]: [1, 2] }, files);
       cy.intercept('GET', Cypress.getDbURL('/sequencing_files/*/download'), (req) => {
         const file = files[Number(req.url.split('/').at(-2))];
         req.reply({ body: `>${file.name}\n${file.sequence}\n`, headers: { 'content-type': 'application/octet-stream' } });

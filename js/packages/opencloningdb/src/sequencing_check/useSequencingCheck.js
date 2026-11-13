@@ -1,13 +1,11 @@
 import React from 'react';
-import { useMutation, useQueries } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import useBackendHttpClient from '@opencloning/ui/hooks/useBackendHttpClient';
 import { convertToTeselaJson } from '@opencloning/utils/readNwrite';
 import error2String from '@opencloning/utils/error2String';
-import OpenCloningDBInterface from '../OpenCloningDBInterface';
+import { sequencingFileFromRef } from '../OpenCloningDBInterface';
 import { MAX_CONCURRENT_CHECKS, buildSortedRows, percentIdentity, runWithConcurrency } from './sequencingCheckUtils';
 import useSequencingQueries from './useSequencingQueries';
-
-const { getSequencingFiles } = OpenCloningDBInterface;
 
 /**
  * Compare a sequencing file to its reference sequence. Plasmids are expected to match exactly, so if the
@@ -40,42 +38,20 @@ async function checkSequencingFile({ httpClient, getParsedFile, getAlignment }, 
 }
 
 /**
- * Defined outside the hook so that its reference is stable: useQueries then only re-runs it (and returns
- * a new object) when one of the queries changes, so filesData can be used as a memo dependency.
- * filesData[i] is the list of files of the i-th sequence, undefined while loading.
- */
-function combineFilesQueries(queries) {
-  return {
-    filesData: queries.map((query) => query.data),
-    filesError: queries.find((query) => query.error)?.error,
-    filesLoading: queries.some((query) => query.isPending),
-  };
-}
-
-/**
  * Check sequences (output of GetSequencesInBulkComponent) against their sequencing files.
  *
- * The sequencing files of each sequence are listed on mount, run() checks all the files, at most
- * MAX_CONCURRENT_CHECKS at the same time, and the rows are updated as each check finishes.
+ * The sequencing files of each sequence come with the sequences (no request per sequence, which would
+ * open many database connections at once), run() checks all the files, at most MAX_CONCURRENT_CHECKS
+ * at the same time, and the rows are updated as each check finishes.
  */
 export default function useSequencingCheck(sequences) {
   const httpClient = useBackendHttpClient();
   const { getParsedFile, getAlignment } = useSequencingQueries();
   const [results, setResults] = React.useState({});
 
-  // Same query key as the sequence detail page, so the cache is shared
-  const { filesData, filesError, filesLoading } = useQueries({
-    queries: sequences.map(({ databaseId }) => ({
-      queryKey: ['sequence', databaseId, 'sequencing_files'],
-      queryFn: () => getSequencingFiles(databaseId),
-      retry: false,
-    })),
-    combine: combineFilesQueries,
-  });
-
   const filesBySequenceId = React.useMemo(() => Object.fromEntries(
-    sequences.map(({ databaseId }, i) => [databaseId, filesData[i]]),
-  ), [sequences, filesData]);
+    sequences.map(({ databaseId, sequencingFiles }) => [databaseId, sequencingFiles.map(sequencingFileFromRef)]),
+  ), [sequences]);
 
   const references = React.useMemo(() => Object.fromEntries(sequences.map((sequence) => {
     const { circular, sequence: bases } = convertToTeselaJson(sequence.textFileSequence);
@@ -105,8 +81,6 @@ export default function useSequencingCheck(sequences) {
 
   return {
     rows,
-    filesLoading,
-    filesError,
     run: mutation.mutate,
     isRunning: mutation.isPending,
     progress: { done, total: jobs.length },

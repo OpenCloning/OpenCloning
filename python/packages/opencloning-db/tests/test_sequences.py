@@ -1319,6 +1319,25 @@ def test_get_text_file_sequences_by_ids(sequences_client):
 
 
 @readonly_db
+def test_get_text_file_sequences_include_sequencing_files(sequences_client):
+    """Each sequence comes with its sequencing files (id and name only), so they don't need one request each."""
+    ids = [sequences_client['seq_with_sequencing_file_id'], sequences_client['pcr_product_id']]
+    r = sequences_client['client'].get(
+        '/sequences/text_file_sequences',
+        headers=workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1']),
+        params=[('ids', str(i)) for i in ids],
+    )
+    assert r.status_code == 200, r.text
+    files_by_id = {item['sequence_ref']['id']: item['sequencing_files'] for item in r.json()}
+    assert files_by_id == {
+        sequences_client['seq_with_sequencing_file_id']: [
+            {'id': sequences_client['sequencing_file_id'], 'original_name': 'hello_world.txt'}
+        ],
+        sequences_client['pcr_product_id']: [],
+    }
+
+
+@readonly_db
 def test_get_text_file_sequences_by_tag(sequences_client):
     c = sequences_client['client']
     r = c.get(

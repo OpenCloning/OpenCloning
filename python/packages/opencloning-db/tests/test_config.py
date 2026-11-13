@@ -4,6 +4,7 @@ import os
 from pydantic import ValidationError
 from opencloning_db.config import Config, OidcConfig
 import opencloning_db.config as app_config
+import opencloning_db.db as db_module
 
 _TEST_DATABASE_URL = 'postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_dev'
 common_args = Config(
@@ -68,6 +69,44 @@ class TestConfig(unittest.TestCase):
             ):
                 with self.assertRaises(ValidationError):
                     app_config._load_config_from_env()
+
+    def test_db_pool_settings(self):
+        env = {
+            'OPENCLONING_DB_URL': 'postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_dev',
+            'OIDC_ISSUER_URL': 'https://idp.example.dev',
+        }
+        with patch.dict(os.environ, env, clear=True):
+            cfg = app_config._load_config_from_env()
+        self.assertEqual((cfg.db_pool_size, cfg.db_max_overflow), (5, 4))
+
+        with patch.dict(os.environ, {**env, 'DB_POOL_SIZE': '3', 'DB_MAX_OVERFLOW': '0'}, clear=True):
+            cfg = app_config._load_config_from_env()
+        self.assertEqual((cfg.db_pool_size, cfg.db_max_overflow), (3, 0))
+
+        for env_name, value in (('DB_POOL_SIZE', '0'), ('DB_MAX_OVERFLOW', '-1'), ('DB_POOL_SIZE', 'abc')):
+            with (
+                self.subTest(env_name=env_name, value=value),
+                patch.dict(os.environ, {**env, env_name: value}, clear=True),
+            ):
+                with self.assertRaises(ValidationError):
+                    app_config._load_config_from_env()
+
+    def test_engine_uses_db_pool_settings(self):
+        cfg = Config(
+            database_url='postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_dev',
+            oidc_config=OidcConfig(issuer_url='https://idp.example.dev', authorized_parties=['http://localhost:3000']),
+            db_pool_size=3,
+            db_max_overflow=2,
+        )
+        previous = (db_module._engine, db_module._bound_engine_settings)
+        try:
+            engine = db_module.get_engine(cfg)
+            self.assertEqual((engine.pool.size(), engine.pool._max_overflow), (3, 2))
+            self.assertIs(db_module.get_engine(cfg), engine)
+            # Changing the pool settings rebuilds the engine
+            self.assertIsNot(db_module.get_engine(cfg.model_copy(update={'db_max_overflow': 1})), engine)
+        finally:
+            db_module._engine, db_module._bound_engine_settings = previous
 
     def test_config_is_frozen(self):
         cfg = Config(
