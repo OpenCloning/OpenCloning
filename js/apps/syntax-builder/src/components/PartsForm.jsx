@@ -63,7 +63,7 @@ export default function PartsForm() {
   const renderValidatedCell = useCallback((field, params) => {
     const errorMessage = validateField(field, params.value, params.row)
     return (
-      <Tooltip title={errorMessage || ''} placement="top" arrow>
+      <Tooltip title={errorMessage || ''} placement="top">
         <Box className={field} sx={{
           color: errorMessage ? 'error.main' : 'inherit',
           fontWeight: errorMessage ? 'bold' : 'normal',
@@ -178,7 +178,7 @@ export default function PartsForm() {
       renderCell: (params) => {
         const errorMessage = validateField('color', params.value)
         return (
-          <Tooltip title={errorMessage || ''} placement="top" arrow>
+          <Tooltip title={errorMessage || ''} placement="top">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box sx={{
                 width: 20, height: 20,
@@ -228,18 +228,18 @@ export default function PartsForm() {
         disableColumnMenu
         hideFooter
         autoHeight
-        sx={{
+        sx={(theme) => ({
           '& .MuiDataGrid-cell': { fontSize: '0.875rem' },
           '& .MuiDataGrid-columnHeader': { fontWeight: 'bold' },
           '& .problematic-row': {
-            backgroundColor: 'rgba(255, 152, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 152, 0, 0.25)' }
+            backgroundColor: theme.alpha(theme.palette.warning.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.warning.main, 0.25) }
           },
           '& .error-row': {
-            backgroundColor: 'rgba(255, 0, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.25)' }
+            backgroundColor: theme.alpha(theme.palette.error.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.error.main, 0.25) }
           }
-        }}
+        })}
       />
 
       <EditTextDialog

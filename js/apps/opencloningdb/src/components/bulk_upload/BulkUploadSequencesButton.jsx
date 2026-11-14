@@ -86,7 +86,6 @@ export default function BulkUploadSequencesButton() {
   return (
     <>
       <Tooltip
-        arrow
         title={(
           <span style={{ fontSize: '1.2em' }}>
             Upload sequence files (.fasta, .gb, .dna, .gbk, .ape)

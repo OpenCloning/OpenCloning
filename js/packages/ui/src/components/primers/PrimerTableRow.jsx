@@ -29,12 +29,12 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
   return (
     <tr>
       <td className="icons">
-        <Tooltip arrow title={deleteMessage} placement="top">
+        <Tooltip title={deleteMessage} placement="top">
           <IconButton onClick={() => (canBeDeleted && deletePrimer(primerDetails.id))}>
             {isSavedToDatabase ? <ClearIcon /> : <DeleteIcon />}
           </IconButton>
         </Tooltip>
-        <Tooltip arrow title={isSavedToDatabase ? `Stored in ${database.name}` : 'Edit'} placement="top">
+        <Tooltip title={isSavedToDatabase ? `Stored in ${database.name}` : 'Edit'} placement="top">
           {isSavedToDatabase ? (
             <IconButton
               onClick={() => window.open(database.getPrimerLink(primerDetails.database_id), '_blank')}
@@ -51,7 +51,7 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
         <PrimerInfoIcon primerDetails={primerDetails} pcrDetails={pcrDetails} />
         {database && !primerDetails.database_id && (
           <>
-            <Tooltip arrow title={`Save to ${database.name}`} placement="top">
+            <Tooltip title={`Save to ${database.name}`} placement="top">
               <IconButton onClick={() => setSaveToDatabaseDialogOpen(true)}>
                 <database.SubmitIcon />
               </IconButton>

@@ -228,7 +228,7 @@ function WorkspaceMembersSection({ workspaceId }) {
                 key={member.id}
                 disableGutters
                 secondaryAction={(
-                  <Tooltip title={isSelf ? 'Cannot remove yourself' : 'Remove member'} arrow>
+                  <Tooltip title={isSelf ? 'Cannot remove yourself' : 'Remove member'}>
                     <span>
                       <IconButton
                         edge="end"

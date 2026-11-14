@@ -36,6 +36,10 @@ Never hard-code a colour (`'green'`, `'#1976d2'`, `rgb(...)`). Use a palette tok
 `'primary.main'`, `'error.main'`, `'text.secondary'` or `'divider'`. If none fits, add a token to the
 theme and use it.
 
+- Text on the app bar inherits its colour: don't set `'white'`, set nothing (or `color="inherit"`).
+- Translucent colours: `sx={(theme) => ({ backgroundColor: theme.alpha(theme.palette.error.main, 0.15) })}`.
+- In CSS, use the theme's CSS variables: `var(--opencloning-palette-primary-main)`.
+
 ## `className` is for tests only
 
 Cypress selects many elements by class name, so keep existing class names when you restyle an element.
@@ -64,7 +68,11 @@ own `mb: 2`.
 
 Components get the theme from `OpenCloningThemeProvider`
 (`@opencloning/ui/providers/ThemeProvider`). `<OpenCloning />`, each app root and `cy.mount` already
-render it. Wrap any new app root or test harness in it too.
+render it. Wrap any new app root or test harness in it too. Only the outermost one sets the theme
+(its CSS variables are set on `:root`); nested ones just render their children. In component tests,
+pass theme options with `cy.mount(component, { themeOptions })`.
+
+Theme defaults: Tooltips have an arrow (don't pass `arrow`), and Alerts centre their icon vertically.
 
 Pages that embed OpenCloning can override the theme with MUI theme options, through the
 `themeOptions` prop of `<OpenCloning />` and `OpenCloningThemeProvider`, or the `themeOptions` option

@@ -12,7 +12,7 @@
   transform: translate(-50%, -50%);
   width: 80%;
   max-width: 800px;
-  background-color: #fff;
+  background-color: var(--opencloning-palette-background-paper);
   box-shadow: 24;
   padding: 32px;
   border-radius: 16px;

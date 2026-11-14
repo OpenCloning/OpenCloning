@@ -21,11 +21,11 @@ function PCRUnitWrapper({ index, children, onDelete }) {
         expandIcon={<ExpandMoreIcon />}
         aria-controls={`${index}-content`}
         id={`${index}-header`}
-        sx={{ backgroundColor: 'lightgray' }}
+        sx={{ backgroundColor: 'grey.300' }}
       >
         {(index !== 0) && (
-        <Tooltip onClick={onDelete} title="Delete primer pair" arrow placement="left">
-          <CancelIcon color="gray" />
+        <Tooltip onClick={onDelete} title="Delete primer pair" placement="left">
+          <CancelIcon color="action" />
         </Tooltip>
         )}
         <ListItemText sx={{ my: 0 }}>

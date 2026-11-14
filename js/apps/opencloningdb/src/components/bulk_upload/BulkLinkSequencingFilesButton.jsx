@@ -97,7 +97,7 @@ export default function BulkLinkSequencingFilesButton() {
 
   return (
     <>
-      <Tooltip arrow title={<span style={{ fontSize: '1.2em' }}>Link the .final.fastq files of a zipped sequencing run to sequences</span>}>
+      <Tooltip title={<span style={{ fontSize: '1.2em' }}>Link the .final.fastq files of a zipped sequencing run to sequences</span>}>
         <Button onClick={() => zipInput.current?.click()} disabled={readZip.isPending} data-testid="bulk-link-sequencing-files-button">
           {readZip.isPending ? <CircularProgress size={24} /> : 'Link sequencing files'}
         </Button>

@@ -135,12 +135,12 @@ function AssemblerProductTable({
         disableColumnMenu
         hideFooter
         autoHeight
-        sx={{
+        sx={(theme) => ({
           '& .error-row': {
-            backgroundColor: 'rgba(255, 0, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.25)' },
+            backgroundColor: theme.alpha(theme.palette.error.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.error.main, 0.25) },
           },
-        }}
+        })}
       />
       <EditTextDialog
         open={editDialog.open}
@@ -193,7 +193,7 @@ function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, a
                 const { key, ...restProps } = props
                 const plasmid = plasmids.find((d) => d.id === option)
                 return (
-                  <Box component="li" key={key} {...restProps} sx={{ backgroundColor: plasmid.type === 'loadedFile' ? '#dcedc8' : undefined }}>
+                  <Box component="li" key={key} {...restProps} sx={(theme) => ({ backgroundColor: plasmid.type === 'loadedFile' ? theme.alpha(theme.palette.success.main, 0.15) : undefined })}>
                     {formatItemName(plasmid)}
                   </Box>
                 )}}

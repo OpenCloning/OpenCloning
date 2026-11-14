@@ -8,7 +8,7 @@ body {
   min-height: 100%;
   padding-bottom: 100px;
   overflow-y: scroll;
-  background-color: rgb(240, 240, 240);
+  background-color: var(--opencloning-palette-grey-100);
 }
 
 #root {
@@ -20,7 +20,7 @@ body {
 }
 
 .app-content {
-  background-color: rgb(240, 240, 240);
+  background-color: var(--opencloning-palette-grey-100);
 }
 
 .header-actions {
@@ -31,8 +31,8 @@ body {
   padding-top: 10px;
   padding-left: 1.5px;
   padding-right: 1.5px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.12);
-  background-color: rgb(240, 240, 240);;
+  border-bottom: 2px solid var(--opencloning-palette-divider);
+  background-color: var(--opencloning-palette-grey-100);
   display: flex;
   gap: 4px;
   justify-content: space-between;

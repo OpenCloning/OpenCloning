@@ -20,7 +20,7 @@ function HeaderWithTooltip() {
     const title = (
         <Box>
             Global Primer Settings
-            <Tooltip title={tooltipMessage} arrow placement="right">
+            <Tooltip title={tooltipMessage} placement="right">
                 <IconButton size="small">
                     <InfoIcon />
                 </IconButton>

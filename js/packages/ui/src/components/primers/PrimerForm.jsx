@@ -85,14 +85,14 @@ function PrimerForm({
       {touched
       && (
       <IconButton type="submit" sx={{ height: 'fit-content' }}>
-        <Tooltip title={submissionAllowed ? 'Save changes' : 'Incorrect values'} arrow placement="top">
+        <Tooltip title={submissionAllowed ? 'Save changes' : 'Incorrect values'} placement="top">
           <CheckCircleIcon size={25} className={submissionAllowed ? '' : 'form-invalid'} color={submissionAllowed ? 'success' : 'grey'} />
         </Tooltip>
       </IconButton>
       )}
       {cancelForm !== null && (
       <IconButton onClick={cancelForm} type="button" sx={{ height: 'fit-content' }}>
-        <Tooltip title="Discard changes" arrow placement="top">
+        <Tooltip title="Discard changes" placement="top">
           <CancelIcon color="error" />
         </Tooltip>
       </IconButton>

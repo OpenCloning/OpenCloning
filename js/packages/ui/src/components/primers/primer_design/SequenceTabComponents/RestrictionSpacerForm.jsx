@@ -62,7 +62,7 @@ function RestrictionSpacerForm() {
             label={(
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 5&apos; filler bases
-                <Tooltip arrow placement="top" title="These bases are added to the 5&apos; end of the primer to ensure proper restriction enzyme digestion.">
+                <Tooltip placement="top" title="These bases are added to the 5&apos; end of the primer to ensure proper restriction enzyme digestion.">
                   <InfoIcon sx={{ fontSize: '1.2em', ml: 0.5 }} />
                 </Tooltip>
               </Box>

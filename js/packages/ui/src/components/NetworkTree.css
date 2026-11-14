@@ -47,7 +47,7 @@
 }
 
 .tf-tree li li:before {
-    border-top: 2px solid #000;
+    border-top: 2px solid var(--opencloning-palette-text-primary);
     content: "";
     display: block;
     height: .0625em;
@@ -89,7 +89,7 @@
 }
 
 .tf-tree .tf-nc:after, .tf-tree .tf-nc:before, .tf-tree .tf-node-content:after, .tf-tree .tf-node-content:before {
-    border-left: 2px solid #000;
+    border-left: 2px solid var(--opencloning-palette-text-primary);
     content: "";
     display: block;
     height: 1.2em;

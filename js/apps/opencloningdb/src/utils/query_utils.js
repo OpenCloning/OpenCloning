@@ -54,9 +54,9 @@ export const SEQUENCE_TYPE_COLORS = {
   locus: { color: 'secondary.main' },
   allele: { color: 'warning.main' },
   plasmid: { color: 'primary.main' },
-  pcr_product: { color: '#dd2d4a' },
+  pcr_product: { color: 'error.main' },
   restriction_fragment: { color: 'success.main' },
-  linear_dna: { color: 'default.main' },
+  linear_dna: { color: 'text.primary' },
 };
 
 export { SEQUENCE_TYPE_LABELS };

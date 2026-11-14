@@ -40,7 +40,6 @@ export default function BulkUploadCloningStrategiesButton() {
   return (
     <>
       <Tooltip
-        arrow
         title={(
           <span style={{ fontSize: '1.2em' }}>
             Upload OpenCloning JSON files (cloning strategy files) or SnapGene (.dna) files
