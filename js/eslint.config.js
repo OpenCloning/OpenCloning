@@ -47,6 +47,29 @@ export default [
       }
     }
   },
+  // Styling conventions (.claude/skills/mui-styling). Warnings while old code is migrated (styling-plan.md).
+  {
+    files: ['{apps,packages}/*/src/**/*.jsx'],
+    ignores: ['**/*.cy.jsx'],
+    rules: {
+      'react/forbid-dom-props': ['warn', { forbid: [
+        { propName: 'style', message: 'Use an MUI component with sx instead (see .claude/skills/mui-styling)' },
+      ] }],
+      'react/forbid-component-props': ['warn', { forbid: [
+        { propName: 'style', message: 'Use sx instead' },
+      ] }],
+      'react/forbid-elements': ['warn', { forbid: [
+        { element: 'button', message: 'use Button or IconButton' },
+        { element: 'a', message: 'use Link' },
+        ...['table', 'thead', 'tbody', 'tr', 'th', 'td'].map((element) => ({ element, message: 'use the MUI Table components' })),
+        ...['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].map((element) => ({ element, message: 'use Typography' })),
+      ] }],
+      'no-restricted-syntax': ['warn', {
+        selector: 'Literal[value=/^(#[0-9a-fA-F]{3,8}|rgba?\\(.*\\))$/]',
+        message: 'Use a theme palette token instead of a hard-coded colour',
+      }],
+    },
+  },
   {
     files: ['cypress/**/*.{js,jsx}', '**/*.cy.{js,jsx}', '**/*.test.js'],
     plugins: {

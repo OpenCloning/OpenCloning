@@ -20,6 +20,8 @@
         "./components/verification": "./src/components/verification/index.js",
         "./providers/ConfigProvider": "./src/providers/index.js",
         "./providers/DatabaseContext": "./src/providers/DatabaseContext.jsx",
+        "./providers/ThemeProvider": "./src/providers/ThemeProvider.jsx",
+        "./theme": "./src/theme/index.js",
         "./hooks": "./src/hooks/index.js",
         "./hooks/useLoadDatabaseFile": "./src/hooks/useLoadDatabaseFile.js",
         "./hooks/useAlerts": "./src/hooks/useAlerts.js",

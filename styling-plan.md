@@ -1,0 +1,108 @@
+# Frontend styling: plan
+
+Goal: readable, consistent styling in `js/`. That means one MUI theme for shared styles, components for
+repeated patterns, and fewer native HTML elements and CSS files. The rules for new code are in
+[`.claude/skills/mui-styling/SKILL.md`](.claude/skills/mui-styling/SKILL.md).
+
+## Starting point (Nov 2026)
+
+| Signal | Count | Where it concentrates |
+|---|---|---|
+| `sx={{…}}` | 445 in 135 files | `apps/opencloningdb` (150), `packages/ui` (221) |
+| `style={{…}}` | 134 in 63 files | bulk-upload tables, `NetworkNode`, primers |
+| CSS files | 12 (~800 lines) | `packages/ui/src/index.css` is 306 lines |
+| Native elements | ~120 `div`, 41 raw `<a target="_blank">`, native tables and buttons | `packages/ui` (`FinishedSource.jsx` alone has 48) |
+| `className` | 170 uses | 69 of 115 class names have no CSS rule: they are test hooks only |
+
+There was no MUI theme: every shared look was an MUI default, a CSS file, or a repeated inline value.
+
+Problems found:
+
+- **Library CSS leaks into the host page.** `PrimerList.css` styles bare `table`, `th`, `td` and
+  `tr:hover`, and `index.css` styles bare `code`, `button`, `html` and `body` (including
+  `overflow: hidden`). `@opencloning/ui` is embedded in other pages, so these rules apply there too.
+  `apps/opencloningdb/src/index.css` already overrides them with `!important`.
+- **Tests depend on class names.** Cypress uses class selectors ~926 times, so restyling must keep class
+  names.
+- **Theme values are written by hand.** The primary blue is hard-coded as `rgb(25, 118, 210)` three times
+  in CSS. "Saved to database" is the literal `'green'` four times in `NetworkNode.jsx`, with a
+  `'default'` fallback that is not a valid CSS colour.
+
+## Theme
+
+Defined in `js/packages/ui/src/theme/` (`createOpenCloningTheme`, exported as `@opencloning/ui/theme`),
+and provided by `OpenCloningThemeProvider` (`@opencloning/ui/providers/ThemeProvider`) in
+`<OpenCloning />`, each app root and `cy.mount`.
+
+A page that embeds OpenCloning can override the theme with MUI theme options, which are merged on top
+of ours: `<OpenCloning themeOptions={…} />`, `StandAloneOpenCloning({ config, element, themeOptions })`
+or `<OpenCloningThemeProvider themeOptions={…}>`.
+
+Planned contents:
+
+- **Palette:** a token for "saved to database", and the syntax-builder grey `rgb(240, 240, 240)` as
+  `background.default`.
+- **Typography:** a `sequence` variant for monospace sequences (written inline 20 times).
+- **Component overrides:** CSS that targets `.Mui*` classes moves to `styleOverrides` (vertical alignment
+  of alerts, tooltip font size). `arrow` becomes the Tooltip default (39 uses).
+- **CSS variables:** `cssVariables: true`, so the remaining CSS can use
+  `var(--mui-palette-primary-main)` instead of literals.
+- **Deliberately not defaulted:** `fullWidth` (131 uses) and `size="small"` (64 uses). Their use is
+  mixed, and a hidden default makes a call site harder to read.
+
+## Shared components
+
+| Component | Evidence | Replaces |
+|---|---|---|
+| `ExternalLink` | 41 `target="_blank" rel=…` in 11 files; MUI `Link` used 5 times | the ~12 `…Message` functions in `FinishedSource.jsx` |
+| `SequenceText` | 20 inline `monospace` | `.sequence`, `.sequence-cell`, inline `fontFamily` |
+| `FileUploadButton` | 16 `type="file"` inputs, 15 `display: 'none'` | hidden-input boilerplate in 15 files |
+| `PreviewTable` (`columns` prop) | 5 bulk-upload tables with the same shell and hand-written `<col>` widths | ~30 lines per file |
+| `DetailTable` | `TableContainer component={Paper} sx={{ maxWidth: 800 }}` ×10 | `opencloningdb` detail pages |
+| Dialog scaffold | 18 dialog files, 16 with the same title/content/actions shape | build on `ConfirmMutationDialog`, `EditTextDialog` |
+| `Stack` in parents | `mb: 2` ×34, `mt: 1` ×19; `Stack` imported in 2 files | per-child margins |
+| Filter field width | `MIN_WIDTH` defined in 3 pages, used 12 times | set once in `UrlParamsForm` / `SearchBarTextField` |
+
+Shared primitives go in `js/packages/ui/src/components/common/`.
+
+## Steps
+
+Each step is one PR. Small visual changes are acceptable, but there is no visual regression testing,
+so every step from 3 onwards attaches before/after screenshots of the main screens for review.
+
+- [x] **1. Guardrails.** Conventions in the `mui-styling` skill. ESLint warnings for `style` props,
+  native elements and colour literals in `src/**/*.jsx`. Pre-commit hook rejecting new `.css` files,
+  with the existing ones allowlisted.
+- [x] **2. Theme foundation.** Empty theme and `OpenCloningThemeProvider`, wired into `<OpenCloning />`,
+  the `opencloning`, `opencloningdb` and `syntax-builder` apps, and `cy.mount`. `themeOptions` lets an
+  embedding page override the theme. No visual change.
+- [ ] **3. Global overrides into the theme.** Move `.Mui*` overrides to `styleOverrides`. Replace
+  hard-coded colours with tokens. Turn on CSS variables.
+- [ ] **4. Stop the leaks.** Scope the bare `table`/`code`/`button` rules. Move `html`/`body` styles out
+  of the library into the apps (no embedder relies on them).
+  - [ ] Separate PR with screenshots: `CssBaseline` in each app root, replacing the hand-written resets in
+    `test-app` and `standalone-app`.
+- [ ] **5. Shared primitives.** Add `ExternalLink`, `SequenceText` and `FileUploadButton`, and adopt them.
+- [ ] **6. Area sweeps**, one PR each:
+  - [ ] `packages/ui/.../sources/`
+  - [ ] `packages/ui/.../primers/` (native table → MUI `Table`)
+  - [ ] `packages/ui/.../navigation/`
+  - [ ] `packages/ui/.../assembler/`
+  - [ ] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`)
+  - [ ] `apps/syntax-builder`
+- [ ] **7. Clean up.** Delete emptied CSS files (and their entries in the pre-commit allowlist). Make the
+  ESLint rules errors. `github-icon`, `import-primers-container` and `primer-designer` already look
+  unused.
+
+## Decisions
+
+- **The library sets no `html`/`body` styles.** No embedder relies on them, so step 4 moves them into the
+  apps without an opt-in import.
+- **An embedding page can override the theme**, with `themeOptions` (built in step 2).
+- **The migration does not need to be pixel-identical.** Small visual changes are fine; screenshots are
+  for review.
+- **`CssBaseline` goes in the apps, never in the library.** `CssBaseline` is an MUI component that adds a
+  small global CSS reset: no `body` margin, `box-sizing: border-box`, the theme's background colour and
+  font on `body`, and smoother font rendering. In the library it would restyle the host page. In each app
+  root it replaces the hand-written resets. It slightly changes spacing and fonts, so it gets its own PR
+  in step 4.
