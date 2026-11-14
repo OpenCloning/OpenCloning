@@ -18,19 +18,21 @@ import './index.css';
  * @param {Object} options - Configuration options
  * @param {Object} options.config - Configuration object for OpenCloning
  * @param {HTMLElement} options.element - DOM element where to mount the component
+ * @param {Object} [options.themeOptions] - MUI theme options that override the OpenCloning theme
  * @returns {Function} Cleanup function that unmounts the component
  *
  * @example
  * const container = document.getElementById('opencloning-container');
  * const cleanup = StandAloneOpenCloning({
  *   config: { /* config object *\/ },
- *   element: container
+ *   element: container,
+ *   themeOptions: { palette: { primary: { main: '#00695c' } } }, // optional
  * });
  *
  * // Later, to unmount:
  * cleanup();
  */
-export function StandAloneOpenCloning({ config, element }) {
+export function StandAloneOpenCloning({ config, element, themeOptions }) {
   if (!config) {
     throw new Error('StandAloneOpenCloning requires a config object');
   }
@@ -52,7 +54,7 @@ export function StandAloneOpenCloning({ config, element }) {
   root.render(
     React.createElement(Provider, { store },
       React.createElement(ConfigProvider, { config },
-        React.createElement(OpenCloning)
+        React.createElement(OpenCloning, { themeOptions })
       )
     )
   );

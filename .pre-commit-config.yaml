@@ -132,3 +132,25 @@ repos:
         pass_filenames: false
         files: ^js/(.*/)?(package\.json|[^/]+\.config\.[cm]?js|.*\.(js|jsx|mjs|cjs))$
         exclude: ^js/.*/(node_modules|dist|build)/
+      # Styles go in the MUI theme, a component or sx (see .claude/skills/mui-styling).
+      # The excluded files are being migrated (styling-plan.md): remove each one from the list when it is deleted.
+      - id: no-new-css-files
+        name: no new CSS files (use the MUI theme, a component or sx; see .claude/skills/mui-styling)
+        language: fail
+        entry: 'New CSS files are not allowed:'
+        files: ^js/(apps|packages)/.*\.css$
+        exclude: |
+          (?x)^js/(
+            apps/opencloningdb/src/index\.css|
+            apps/standalone-app/src/index\.css|
+            apps/syntax-builder/src/index\.css|
+            apps/test-app/src/index\.css|
+            packages/ui/src/index\.css|
+            packages/ui/src/components/NetworkTree\.css|
+            packages/ui/src/components/assembler/assembly_component\.module\.css|
+            packages/ui/src/components/navigation/MainAppBar\.css|
+            packages/ui/src/components/primers/PrimerForm\.css|
+            packages/ui/src/components/primers/PrimerList\.css|
+            packages/ui/src/components/primers/import_primers/styles\.css|
+            packages/ui/src/components/sources/SourceBox\.css
+          )$

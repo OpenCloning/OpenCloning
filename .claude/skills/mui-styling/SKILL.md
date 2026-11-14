@@ -1,0 +1,77 @@
+---
+name: mui-styling
+description: Where styles go in the JS frontend (MUI theme, shared components, sx, style, CSS). Use when adding or changing styling, colours, layout, or native HTML elements in js/apps or js/packages, or when adding a .css file.
+---
+
+# MUI styling conventions
+
+The migration to these rules is tracked in [`styling-plan.md`](../../../styling-plan.md). Old code
+still breaks them. Follow them in new code, and in old code you are already changing.
+
+## Where a style goes
+
+Use the first option that fits:
+
+1. **Theme** (`js/packages/ui/src/theme/`): anything that should look the same everywhere, such as
+   colours, typography and component defaults.
+2. **A named component**: anything repeated three or more times, or that means something in the domain
+   (`ExternalLink`, `SequenceText`). Shared ones live in `js/packages/ui/src/components/common/`.
+3. **`sx`**: one-off layout on a single element. Use theme tokens, not literals:
+
+   ```jsx
+   // ✅
+   <Box sx={{ mb: 2, color: 'text.secondary' }}>
+   // ❌
+   <Box sx={{ marginBottom: '16px', color: '#666' }}>
+   ```
+
+4. **`style`**: only on plain DOM elements that have no MUI equivalent (e.g. `<col>`), and only for a
+   value computed at render time.
+5. **CSS files**: no new ones. A pre-commit hook rejects them. `NetworkTree.css` (tree lines drawn with
+   pseudo-elements) is expected to stay as CSS.
+
+## Colours
+
+Never hard-code a colour (`'green'`, `'#1976d2'`, `rgb(...)`). Use a palette token such as
+`'primary.main'`, `'error.main'`, `'text.secondary'` or `'divider'`. If none fits, add a token to the
+theme and use it.
+
+## `className` is for tests only
+
+Cypress selects many elements by class name, so keep existing class names when you restyle an element.
+Do not attach styles to a class; use the options above.
+
+## Native elements
+
+Replace native controls and text with MUI components:
+
+| Native | MUI |
+|---|---|
+| `<button>` | `Button`, `IconButton` |
+| `<a>` | `Link`, or `ExternalLink` for `target="_blank"` |
+| `<table>`, `<tr>`, `<td>`, ... | `Table`, `TableRow`, `TableCell`, ... |
+| `<h1>`...`<h6>`, `<p>` | `Typography` |
+
+Keep plain structural elements (`div`, `span`, `ul`, `li`, `form`). Turning a bare `<div>` into a
+`<Box>` adds an import and makes nothing clearer. Use `Box` when the element needs `sx`.
+
+## Spacing between siblings
+
+Put the spacing on the parent with `Stack` (`<Stack spacing={2}>`), rather than giving every child its
+own `mb: 2`.
+
+## Theme provider
+
+Components get the theme from `OpenCloningThemeProvider`
+(`@opencloning/ui/providers/ThemeProvider`). `<OpenCloning />`, each app root and `cy.mount` already
+render it. Wrap any new app root or test harness in it too.
+
+Pages that embed OpenCloning can override the theme with MUI theme options, through the
+`themeOptions` prop of `<OpenCloning />` and `OpenCloningThemeProvider`, or the `themeOptions` option
+of `StandAloneOpenCloning`. Never set styles on `html` or `body` in the library, and never render
+`CssBaseline` there: they would restyle the host page. Global resets belong in the app roots.
+
+## Lint
+
+ESLint warns about `style` props, native elements and colour literals in `src/**/*.jsx`. Do not add new
+warnings of these kinds.
