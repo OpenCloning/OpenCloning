@@ -4,21 +4,16 @@ import { Delete as DeleteIcon, Download as DownloadIcon, AddCircle as AddCircleI
 import { useDownloadData } from './useDownloadData'
 import { useFormData, validatePart, validateField } from '../context/FormDataContext'
 import { DataGrid, GridActionsCellItem, useGridApiRef } from '@mui/x-data-grid'
-import { getSvgByGlyph, EditTextDialog } from '@opencloning/ui/components/assembler'
+import { getSvgByGlyph, EditTextDialog, partKey } from '@opencloning/ui/components/assembler'
 import GlyphEditCell from './GlyphEditCell'
 import SectionWrapper from './SectionWrapper'
 
-// Check if a part has a problematic overhang
-const isPartProblematic = (part, problematicNodes) => {
-  if (!problematicNodes || problematicNodes.length === 0) return false
-  return problematicNodes.includes(`${part.left_overhang}-${part.right_overhang}`)
-}
 // Columns that hold a sequence
 const SEQUENCE_FIELDS = ['left_overhang', 'right_overhang', 'left_inside', 'right_inside'];
 
 
 export default function PartsForm() {
-  const { parts, addDefaultPart, setParts, problematicNodes, graphErrorMessage, mermaidString } = useFormData()
+  const { parts, addDefaultPart, setParts, problematicParts, graphErrorMessage, mermaidString } = useFormData()
   const [infoDialog, setInfoDialog] = React.useState({ open: false, rowId: null, value: '' })
   const apiRef = useGridApiRef()
 
@@ -38,8 +33,8 @@ export default function PartsForm() {
 
   const getRowClassName = useCallback((params) => {
     if (!validatePart(params.row)) return 'error-row'
-    return isPartProblematic(params.row, problematicNodes) ? 'problematic-row' : ''
-  }, [problematicNodes])
+    return problematicParts.includes(partKey(params.row)) ? 'problematic-row' : ''
+  }, [problematicParts])
 
   const handleInfoSave = useCallback((newValue) => {
     setParts(prevParts =>
