@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { graphToMSA, partsToGraph, graphHasCycle, partsToEdgesGraph } from '@opencloning/ui/components/assembler';
+import { getSyntaxLayout, partKey, partsToEdgesGraph } from '@opencloning/ui/components/assembler';
 import { usePlasmidsLogic } from '@opencloning/ui/components/assembler';
 import cssColors from './css_colors';
 
@@ -59,18 +59,22 @@ export const validatePart = (part) => {
   return !Object.keys(part).some(key => Boolean(validateField(key, part[key])));
 }
 
-function validateGraph(graph) {
-  if (!graph) return { error: 'Invalid paths entered', nodes: [] }
-  // All parts must be have in and out links
-  const nodesWithMissingLinks = graph.nodes().filter(node => graph.inDegree(node) === 0 || graph.outDegree(node) === 0);
-  if (nodesWithMissingLinks.length > 0) {
-    return { error: `Parts with missing links: ${nodesWithMissingLinks.join(', ')}`, nodes: nodesWithMissingLinks }
+// Checks that the parts form a syntax in which every part can be used in an assembly.
+// Returns the message to display ('' if there are no problems) and the keys of the parts with problems.
+// See the README for how the order of the overhangs is worked out from the parts.
+export function validateSyntaxParts(parts) {
+  const { order, incompleteParts, unreachableOverhangs } = getSyntaxLayout(parts);
+  const messages = [];
+  if (incompleteParts.length > 0) {
+    messages.push(`Parts that are not in a complete assembly: ${incompleteParts.map(partKey).join(', ')}.`);
   }
-  // The graph should form a cycle
-  if (!graphHasCycle(graph)) {
-    return { error: 'The graph does not form a cycle. Please check the overhangs.', nodes: [] }
+  if (unreachableOverhangs.length > 0) {
+    messages.push(
+      `Overhangs that cannot be reached from the first overhang (${order[0]}): ${unreachableOverhangs.join(', ')}. `
+      + 'If a part goes around the first overhang, list it after the other parts.'
+    );
   }
-  return { error: '', nodes: [] }
+  return { error: messages.join(' '), problematicParts: incompleteParts.map(partKey) };
 }
 
 const FormDataContext = React.createContext();
@@ -110,9 +114,6 @@ export function FormDataProvider({ children }) {
   const [syntaxName, setSyntaxName] = React.useState('');
   const [parts, setParts] = React.useState([]);
   const [overhangNames, setOverhangNames] = React.useState({});
-  const [graph, setGraph] = React.useState(null);
-  const [graphErrorMessage, setGraphErrorMessage] = React.useState('');
-  const [problematicNodes, setProblematicNodes] = React.useState([]);
   const [relatedDois, setRelatedDois] = React.useState(['']);
   const [submitters, setSubmitters] = React.useState(['']);
   const [assemblyEnzymes, setAssemblyEnzymes] = React.useState(['BsaI']);
@@ -162,35 +163,9 @@ export function FormDataProvider({ children }) {
     setParts(prevParts => [...prevParts, { ...makeDefaultPart(), id: Math.max(...prevParts.map(part => part.id), 0) + 1 }]);
   }, []);
 
-  React.useEffect(() => {
-    setGraphErrorMessage('');
-    setProblematicNodes([]);
-    if (parts.length > 0) {
-      try {
-        const validParts = parts.filter(validatePart);
-        const thisGraph = partsToGraph(validParts);
-        const { error, nodes: problemNodes } = validateGraph(thisGraph);
-        setGraphErrorMessage(error);
-        setProblematicNodes(problemNodes);
-        // This is just to test if it gives errors
-        graphToMSA(thisGraph);
-        setGraph(thisGraph);
-      } catch (error) {
-        if (error.message.includes('given graph is not acyclic')) {
-          setGraphErrorMessage('Multiple independent cycles detected in the graph, or cycle that does not include all parts. Please check the overhangs.');
-        }
-        else if (error.message.includes('could not find source node "undefined"')) {
-          setGraphErrorMessage('Not enough parts to form a graph');
-        }
-        else {
-          setGraphErrorMessage(error.message);
-        }
-        setGraph(null);
-      }
-    } else {
-      setGraph(null);
-    }
-  }, [parts]);
+  // Parts with invalid fields (e.g. while they are being typed) are left out of the preview and the checks
+  const validParts = React.useMemo(() => parts.filter(validatePart), [parts]);
+  const { error: graphErrorMessage, problematicParts } = React.useMemo(() => validateSyntaxParts(validParts), [validParts]);
 
   const resetFormData = React.useCallback(() => {
     setParts([]);
@@ -216,9 +191,9 @@ export function FormDataProvider({ children }) {
     parts,
     setParts,
     resetFormData,
-    graph,
+    validParts,
     graphErrorMessage,
-    problematicNodes,
+    problematicParts,
     addDefaultPart,
     overhangNames,
     setOverhangNames,
@@ -231,7 +206,7 @@ export function FormDataProvider({ children }) {
     mermaidString,
   }), [
     relatedDois, setRelatedDois, submitters, setSubmitters, assemblyEnzymes, setAssemblyEnzymes, domesticationEnzyme, setDomesticationEnzyme, parts, setParts,
-    resetFormData, graph, graphErrorMessage, problematicNodes, addDefaultPart, overhangNames, setOverhangNames, updateOverhangName, syntaxName, setSyntaxName,
+    resetFormData, validParts, graphErrorMessage, problematicParts, addDefaultPart, overhangNames, setOverhangNames, updateOverhangName, syntaxName, setSyntaxName,
     linkedPlasmids, setLinkedPlasmids, uploadPlasmids, mermaidString]);
 
   return (

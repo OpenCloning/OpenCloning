@@ -18,7 +18,7 @@ import EditTextDialog from '../form/EditTextDialog';
 import useCombinatorialAssembly from './useCombinatorialAssembly';
 import ExistingSyntaxDialog from './ExistingSyntaxDialog';
 import error2String from '@opencloning/utils/error2String';
-import { categoryFilter, downloadAssemblerFilesAsZip, getFilesToExportFromAssembler, getCloningStrategyFilesFromAssembler, getDefaultAssemblyOutputName, MAX_OUTPUT_NAME_LENGTH, sanitizeOutputName } from './assembler_utils';
+import { downloadAssemblerFilesAsZip, getFilesToExportFromAssembler, getCloningStrategyFilesFromAssembler, getDefaultAssemblyOutputName, MAX_OUTPUT_NAME_LENGTH, sanitizeOutputName } from './assembler_utils';
 import useBackendHttpClient from '../../hooks/useBackendHttpClient';
 import useCloningAlerts from '../../hooks/useCloningAlerts';
 import useDatabase from '../../hooks/useDatabase';
@@ -26,7 +26,6 @@ import UploadPlasmidsButton from './UploadPlasmidsButton';
 import { useConfig } from '../../providers';
 import { isEqual } from 'lodash-es';
 import SyntaxOverviewTable from './SyntaxOverviewTable';
-import { graphToMSA, partsToGraph } from './graph_utils';
 
 
 const { setState: setCloningState, setCurrentTab: setCurrentTabAction } = cloningActions;
@@ -155,9 +154,8 @@ function AssemblerProductTable({
   );
 }
 
-function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, assembly }) {
+function AssemblerBox({ item, index, setCategory, setId, categories, allowedCategories, plasmids, assembly }) {
 
-  const allowedCategories = categories.filter((category) => categoryFilter(category, categories, index === 0 ? null : assembly[index - 1].category))
   const isCompleted = item.category !== '' && item.plasmidIds.length > 0
   const borderColor = isCompleted ? 'success.main' : 'primary.main'
   const thisCategory = categories.find((category) => category.id === item.category)
@@ -231,7 +229,7 @@ export function AssemblerComponent({ plasmids, categories, assemblyEnzymes, addA
     setFilesToUpload(null)
   }, [])
 
-  const { assembly, setCategory, setId, expandedAssemblies, assemblyComplete, canBeSubmitted, currentCategories } = useCombinatorialAssembly({ onValueChange: clearAssemblySelection, categories, plasmids })
+  const { assembly, setCategory, setId, getAllowedCategories, expandedAssemblies, assemblyComplete, canBeSubmitted, currentCategories } = useCombinatorialAssembly({ onValueChange: clearAssemblySelection, categories, plasmids })
   const { requestSources, requestAssemblies } = useAssembler()
 
   const onOutputNameChange = React.useCallback((index, name) => {
@@ -313,7 +311,7 @@ export function AssemblerComponent({ plasmids, categories, assemblyEnzymes, addA
 
       <Stack direction="row" alignItems="center" spacing={1} sx={{ overflowX: 'auto', my: 2 }}>
         {options.map((item, index) =>
-          <AssemblerBox key={index} {...{item, index, setCategory, setId, categories, plasmids, assembly}} />
+          <AssemblerBox key={index} {...{item, index, setCategory, setId, categories, plasmids, assembly}} allowedCategories={getAllowedCategories(index)} />
         )}
       </Stack>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, my: 2 }}>
@@ -399,6 +397,8 @@ function categoriesFromSyntaxAndPlasmids(syntax, plasmids) {
       newCategories.push({
         left_overhang,
         right_overhang,
+        // Not a part of the syntax: it is only there because of the plasmid
+        fromPlasmid: true,
         left_name: syntax.overhangNames[left_overhang] || null,
         right_name: syntax.overhangNames[right_overhang] || null,
         key: `${left_overhang}-${right_overhang}`,
@@ -452,7 +452,6 @@ function LoadSyntaxButton({ setSyntax, addPlasmids, clearPlasmids }) {
 function SyntaxOverviewButton({ syntax }) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState('detailed')
-  const msa = React.useMemo(() => syntax ? graphToMSA(partsToGraph(syntax.parts)) : [], [syntax])
   return (
     <>
       <Button color="success" onClick={() => setOpen(true)} data-testid="assembler-syntax-overview-button">Syntax Overview</Button>
@@ -477,7 +476,7 @@ function SyntaxOverviewButton({ syntax }) {
             }
             label={mode === 'compact' ? 'Compact' : 'Detailed'}
           />
-          <SyntaxOverviewTable msa={msa} mode={mode} parts={syntax.parts} />
+          <SyntaxOverviewTable parts={syntax.parts} mode={mode} />
         </DialogContent>
       </Dialog>}
     </>

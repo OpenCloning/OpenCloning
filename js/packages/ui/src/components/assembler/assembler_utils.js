@@ -2,6 +2,7 @@ import { isRangeWithinRange } from '@teselagen/range-utils';
 import { getComplementSequenceString, getAminoAcidFromSequenceTriplet, getDigestFragmentsForRestrictionEnzymes, getReverseComplementSequenceString } from '@teselagen/sequence-utils';
 import { allSimplePaths } from 'graphology-simple-path';
 import { openCycleAtNode } from './graph_utils';
+import { arcLength, goesAroundOrigin } from './syntax_layout';
 import { downloadBlob, formatStateForJsonExport, getZipFileBlob } from '@opencloning/utils/readNwrite';
 import { getGraftSequenceId } from '@opencloning/utils/network';
 import { TextReader} from '@zip.js/zip.js';
@@ -158,12 +159,34 @@ export function arrayCombinations(sets) {
     );
 };
 
-export function categoryFilter(category, categories, previousCategoryId) {
-  if (previousCategoryId === null) {
-    return category.left_overhang === categories[0].left_overhang
+/**
+ * The categories that can be chosen for the next part of an assembly, given the categories chosen so far.
+ * order is the order of the overhangs around the circle (see syntax_layout.js).
+ */
+export function getNextCategories(categories, chosenCategories, order) {
+  if (chosenCategories.length === 0) {
+    // Every assembly has exactly one part that starts at the origin or goes around it, so we start with that one.
+    // Categories that only exist because of a plasmid (not defined in the syntax) can only start at the origin.
+    return categories.filter((category) => (
+      category.left_overhang === order[0] || (!category.fromPlasmid && goesAroundOrigin(category, order))
+    ));
   }
-  const previousCategory = categories.find((category) => category.id === previousCategoryId)
-  return previousCategory?.right_overhang === category.left_overhang
+  const first = chosenCategories[0];
+  const previous = chosenCategories[chosenCategories.length - 1];
+  if (!first || !previous) return [];
+  // The next part starts where the previous one ends, and must not go past the start of the first one
+  const stepsLeft = arcLength(order, previous.right_overhang, first.left_overhang);
+  return categories.filter((category) => (
+    category.left_overhang === previous.right_overhang
+    && arcLength(order, category.left_overhang, category.right_overhang) <= stepsLeft
+  ));
+}
+
+/** An assembly is complete when its last part ends where its first part starts */
+export function isAssemblyComplete(chosenCategories) {
+  const first = chosenCategories[0];
+  const last = chosenCategories[chosenCategories.length - 1];
+  return Boolean(first && last) && last.right_overhang === first.left_overhang;
 }
 
 export function getDefaultAssemblyOutputName(assemblyIndex, expandedAssemblies, plasmids) {

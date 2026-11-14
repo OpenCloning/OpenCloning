@@ -546,3 +546,99 @@ describe('<AssemblerComponent /> with plasmids from a database', () => {
     });
   });
 });
+
+describe('<AssemblerComponent /> with a category that goes around the first overhang', () => {
+  // The overhangs go CCCT -> AACG -> TATG -> ATCC -> back to CCCT
+  const circleCategories = [
+    ['Alpha', 'CCCT-AACG'],
+    ['Beta', 'AACG-TATG'],
+    ['Gamma', 'TATG-ATCC'],
+    ['Delta', 'ATCC-CCCT'],
+    // Covers two steps
+    ['Composite', 'AACG-ATCC'],
+    // Its counterpart, which goes around the first overhang (ATCC -> CCCT -> AACG)
+    ['Around', 'ATCC-AACG'],
+  ].map(([displayName, key], index) => {
+    const [left_overhang, right_overhang] = key.split('-');
+    return { id: index + 1, displayName, left_overhang, right_overhang, key };
+  });
+  const circlePlasmids = [
+    { ...mockPlasmids[0], id: 1, plasmid_name: 'Around plasmid', left_overhang: 'ATCC', right_overhang: 'AACG', key: 'ATCC-AACG' },
+    { ...mockPlasmids[0], id: 2, plasmid_name: 'Composite plasmid', left_overhang: 'AACG', right_overhang: 'ATCC', key: 'AACG-ATCC' },
+  ];
+
+  const selectCategory = (name) => {
+    cy.get('[data-testid="category-select"]').last().click();
+    cy.get('li[role="option"]').contains(name).click();
+  };
+  const selectedCategories = (names) => {
+    cy.get('[data-testid="category-select"]').should('have.length', names.length);
+    names.forEach((name, index) => {
+      cy.get('[data-testid="category-select"]').eq(index).contains(name).should('exist');
+    });
+  };
+
+  beforeEach(() => {
+    cy.mount(
+      <ConfigProvider config={testConfig}>
+        <AssemblerComponent
+          plasmids={circlePlasmids}
+          categories={circleCategories}
+          assemblyEnzymes={['assembly_enzyme']}
+          addAlert={cy.stub().as('addAlert')}
+          appInfo={{}}
+        />
+      </ConfigProvider>,
+    );
+  });
+
+  it('can start an assembly with the category that goes around the first overhang', () => {
+    // The first category starts at the first overhang or goes around it
+    cy.get('[data-testid="category-select"]').should('have.length', 1);
+    cy.get('[data-testid="category-select"]').last().click();
+    cy.get('li[role="option"]').should('have.length', 2);
+    cy.get('li[role="option"]').eq(0).should('have.text', 'Alpha');
+    cy.get('li[role="option"]').eq(1).should('have.text', 'Around');
+    cy.get('li[role="option"]').contains('Around').click();
+
+    // The next category starts where it ends
+    cy.get('[data-testid="category-select"]').last().click();
+    cy.get('li[role="option"]').should('have.length', 2);
+    cy.get('li[role="option"]').eq(0).should('have.text', 'Beta');
+    cy.get('li[role="option"]').eq(1).should('have.text', 'Composite');
+    cy.get('li[role="option"]').contains('Composite').click();
+
+    // The assembly is complete, since Composite ends where Around starts
+    selectedCategories(['Around', 'Composite']);
+
+    // And it can be submitted
+    cy.intercept('POST', 'http://localhost:8000/repository_id*', { statusCode: 200, body: dummyResponse }).as('fetchSource');
+    cy.intercept('POST', 'http://localhost:8000/restriction_and_ligation*', (req) => {
+      expect(req.body.sequences).to.have.length(2);
+      req.reply({ statusCode: 200, body: dummyResponse2 });
+    }).as('assembly');
+    cy.get('[data-testid="assembler-submit-button"]').should('not.exist');
+    cy.get('[data-testid="plasmid-select"]').eq(0).find('input').click();
+    cy.get('li').contains('Around plasmid').click();
+    cy.get('[data-testid="plasmid-select"]').eq(1).find('input').click();
+    cy.get('li').contains('Composite plasmid').click();
+    cy.get('[data-testid="assembler-submit-button"]').click();
+    cy.wait('@assembly');
+    cy.get('[data-testid="assembler-product-table"]').contains('Around plasmid').should('exist');
+    cy.get('[data-testid="assembler-product-table"]').contains('Composite plasmid').should('exist');
+  });
+
+  it('fills in the categories that are the only option, until the assembly gets back to where it started', () => {
+    selectCategory('Around');
+    selectCategory('Beta');
+    // Gamma is the only category that starts where Beta ends, and it ends where Around starts
+    selectedCategories(['Around', 'Beta', 'Gamma']);
+  });
+
+  it('does not offer a category that would go past the start of the assembly', () => {
+    selectCategory('Alpha');
+    selectCategory('Composite');
+    // Delta and Around start where Composite ends, but Around would go past the start of Alpha
+    selectedCategories(['Alpha', 'Composite', 'Delta']);
+  });
+});

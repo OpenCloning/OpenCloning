@@ -21,57 +21,9 @@ export function validateOverhangPaths(paths) {
     }
   }
 
-  // Build ordering from first path
-  const nodeOrder = [...paths[0]]
-  const nodePositions = new Map()
-  paths[0].forEach((node, index) => {
-    nodePositions.set(node, index)
-  })
-
-  // Validate subsequent paths respect ordering
-  for (let pathIndex = 1; pathIndex < paths.length; pathIndex++) {
-    const path = paths[pathIndex]
-
-    // First node must exist in previous paths
-    const firstNode = path[0]
-    if (!nodePositions.has(firstNode)) {
-      return {
-        isValid: false,
-        error: `Path ${pathIndex + 1} starts with "${firstNode}" which doesn't exist in previous paths`
-      }
-    }
-
-    let lastPosition = nodePositions.get(firstNode)
-
-    // Process remaining nodes in path
-    for (let i = 1; i < path.length; i++) {
-      const node = path[i]
-
-      if (nodePositions.has(node)) {
-        // Node exists - check ordering
-        const nodePosition = nodePositions.get(node)
-        if (nodePosition < lastPosition) {
-          return {
-            isValid: false,
-            error: `Path ${pathIndex + 1} violates ordering: "${node}" appears before "${path[i - 1]}"`
-          }
-        }
-        lastPosition = nodePosition
-      } else {
-        // New node - add to ordering after last position
-        const insertPosition = lastPosition + 1
-        nodeOrder.splice(insertPosition, 0, node)
-        // Update all positions after insertion
-        nodePositions.clear()
-        nodeOrder.forEach((n, idx) => {
-          nodePositions.set(n, idx)
-        })
-        lastPosition = insertPosition
-      }
-    }
-  }
-
-  return { isValid: true, error: '', nodeOrder }
+  // The order of the overhangs and whether the parts form complete assemblies is checked for all the
+  // parts together (see validateSyntaxParts), since a path can start anywhere and go around the first overhang
+  return { isValid: true, error: '' }
 }
 
 const exampleText = "CCCT\nAACG\nTATG\nATCC\nGCTG\nTACA\nGAGT\nCCGA\nCGCT\nCCCT\n\nTATG\nTTCT\nATCC\n\nATCC\nTGGC\nGCTG\nCCGA\nCAAT\nCCCT";
@@ -176,6 +128,7 @@ function OverhangsField() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
             Enter overhangs, one per line. Use empty lines to separate paths. Each overhang must be at least 3 DNA bases (ACGT).
+            The overhangs form a circle that starts at the first overhang, so the first path should end where it starts.
         </Typography>
       </Box>
       {errorMessage && (
@@ -213,10 +166,16 @@ function OverhangsField() {
 
 function OverhangsStep({ setOverhangsStep }) {
 
+  const { graphErrorMessage } = useFormData();
 
   return (
     <Box data-testid="overhangs-step-container" sx={{ p: 3 }}>
       <OverhangsField />
+      {graphErrorMessage && (
+        <Alert severity="warning" sx={{ my: 2 }}>
+          {graphErrorMessage}
+        </Alert>
+      )}
       <OverhangsPreview />
       <Button variant="contained" onClick={() => setOverhangsStep(false)}>Next</Button>
     </Box>

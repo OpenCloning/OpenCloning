@@ -45,22 +45,26 @@ export function AssemblerPartContainer({ children }) {
   )
 }
 
-function AssemblerPart( { data, showRight = true } ) {
+// showLeft and showRight can be set to false to draw only one side of the part (the overhang and the inside sequence
+// of the other side are not shown)
+function AssemblerPart( { data, showLeft = true, showRight = true } ) {
   const { left_overhang: leftOverhang, right_overhang: rightOverhang, left_inside: leftInside, right_inside: rightInside, glyph } = data
   const { leftTranslationOverhang, leftTranslationInside, rightTranslationOverhang, rightTranslationInside, leftOverhangRc, rightOverhangRc, leftInsideRc, rightInsideRc } = partDataToDisplayData(data)
 
   return (
 
     <AssemblerPartContainer>
-      <DisplayOverhang overhang={leftOverhang} overhangRc={leftOverhangRc} translation={leftTranslationOverhang} isRight={false} />
-      {leftInside && (
+      {showLeft && (
+        <DisplayOverhang overhang={leftOverhang} overhangRc={leftOverhangRc} translation={leftTranslationOverhang} isRight={false} />
+      )}
+      {showLeft && leftInside && (
         <DisplayInside inside={leftInside} insideRc={leftInsideRc} translation={leftTranslationInside} isRight={false} />
       )}
       <AssemblerPartCore color={data.color || 'lightgray'} glyph={glyph} />
-      {rightInside && (
+      {showRight && rightInside && (
         <DisplayInside inside={rightInside} insideRc={rightInsideRc} translation={rightTranslationInside} isRight={true} />
       )}
-      { showRight && (
+      {showRight && (
         <DisplayOverhang overhang={rightOverhang} overhangRc={rightOverhangRc} translation={rightTranslationOverhang} isRight={true} />
       )}
     </AssemblerPartContainer>

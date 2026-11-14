@@ -46,14 +46,18 @@ describe('Test assembler functionality', () => {
     // Select the next category and one or two plasmids for each category
     cy.get('[data-testid="category-select"]').last().click();
     cy.get('li[role="option"]').contains('AACG').click();
-    cy.get('[data-testid="plasmid-select"]').last().click();
+
+    // Category 5 is filled in automatically: the other category that starts at GCTG (GCTG-AACG, which only
+    // exists because of some plasmids) would go past the start of the assembly
+    cy.get('[data-testid="category-select"]').should('have.length', 4);
+    cy.get('[data-testid="category-select"]').eq(2).contains('5').should('exist');
+
+    cy.get('[data-testid="plasmid-select"]').eq(1).click();
     cy.get('li[role="option"]').first().click();
-    // cy.get('[data-testid="plasmid-select"]').last().click();
+    // cy.get('[data-testid="plasmid-select"]').eq(1).click();
     // cy.get('li[role="option"]').eq(1).click();
 
-    cy.get('[data-testid="category-select"]').last().click();
-    cy.get('li[role="option"]').contains('5').click();
-    cy.get('[data-testid="plasmid-select"]').last().click();
+    cy.get('[data-testid="plasmid-select"]').eq(2).click();
     cy.get('li[role="option"]').first().click();
     // cy.get('[data-testid="plasmid-select"]').last().click();
     // cy.get('li[role="option"]').eq(1).click();
@@ -139,13 +143,15 @@ describe('Test assembler functionality', () => {
     // Category 3b should have been auto-filled
     cy.get('[data-testid="category-select"]').contains('3b').should('be.visible');
 
-    // Select 4, 5, 6
+    // Select 4
     cy.get('[data-testid="category-select"]').last().click();
     cy.get('li[role="option"]').contains('4 (Terminator)').click();
 
-    cy.get('[data-testid="category-select"]').last().click();
-    cy.get('li[role="option"]').contains('5').click();
+    // Category 5 should have been auto-filled, since the other category that starts where 4 ends (GCTG-AACG,
+    // which only exists because of some plasmids) would go past the start of the assembly
+    cy.get('[data-testid="category-select"]').contains('5 (Assembly connector)').should('be.visible');
 
+    // Select 6
     cy.get('[data-testid="category-select"]').last().click();
     cy.get('li[role="option"]').contains('6').click();
 
