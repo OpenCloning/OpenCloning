@@ -2,8 +2,13 @@ import React from 'react';
 import { ThemeProvider } from '@mui/material';
 import { createOpenCloningTheme } from '../theme';
 
+const IsInsideOpenCloningTheme = React.createContext(false);
+
 /**
  * OpenCloningThemeProvider - Provides the OpenCloning MUI theme to its children
+ *
+ * The theme's CSS variables are set on :root, so only the outermost OpenCloningThemeProvider sets the
+ * theme: nested ones (e.g. the one in <OpenCloning /> inside an app) just render their children.
  *
  * @param {Object} props
  * @param {Object} [props.themeOptions] - MUI theme options that override the OpenCloning theme.
@@ -11,11 +16,17 @@ import { createOpenCloningTheme } from '../theme';
  * @param {React.ReactNode} props.children - Child components
  */
 export function OpenCloningThemeProvider({ themeOptions, children }) {
-  const theme = React.useMemo(() => createOpenCloningTheme(themeOptions), [themeOptions]);
+  const isNested = React.useContext(IsInsideOpenCloningTheme);
+  const theme = React.useMemo(() => (isNested ? null : createOpenCloningTheme(themeOptions)), [isNested, themeOptions]);
+  if (isNested) {
+    return children;
+  }
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <IsInsideOpenCloningTheme.Provider value>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </IsInsideOpenCloningTheme.Provider>
   );
 }
 

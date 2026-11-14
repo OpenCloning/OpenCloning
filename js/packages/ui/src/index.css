@@ -4,14 +4,23 @@ button {
 
 .tf-tree .tf-nc, .tf-tree .tf-node-content {
     border: 3px solid;
-    border-color: rgb(25, 118, 210);
+    border-color: var(--opencloning-palette-primary-main);
+}
+
+/* Nodes saved in the database (the class is set in NetworkNode) */
+.tf-tree .in-database > .tf-nc {
+    border-color: var(--opencloning-palette-savedToDatabase-main);
+}
+
+.tf-tree .in-database > .tf-nc .corner-id {
+    color: var(--opencloning-palette-savedToDatabase-main);
 }
 
 .app-container {
     display: flex;
     flex-direction: column;
     /* height: calc(100vh - 114px - 10px); - moved to component to depend on presence of appbar */
-    background-color: white;
+    background-color: var(--opencloning-palette-background-default);
 }
 
 .tab-panels-container {
@@ -53,7 +62,7 @@ div.before-node {
 }
 
 div.before-node svg {
-    background-color: white;
+    background-color: var(--opencloning-palette-background-default);
     cursor: pointer;
 }
 
@@ -66,7 +75,7 @@ div.hang-from-node {
     left: 50%;
     transform: translate(-50%, 40px);
     border: 3px solid;
-    border-color: rgb(25, 118, 210);
+    border-color: var(--opencloning-palette-primary-main);
     border-radius: 100%;
 }
 
@@ -104,7 +113,7 @@ div.corner-id {
     top: 0px;
     font-family: sans-serif;
     font-size: large;
-    color: rgb(25, 118, 210);
+    color: var(--opencloning-palette-primary-main);
     font-weight: bold;
 }
 
@@ -208,18 +217,13 @@ code {
     font-size: large;
 }
 
-a.button-hyperlink {
-    text-decoration: none;
-    color: white;
-}
-
 div.dragging-file {
     text-align: center;
 }
 
 .drag-file-wrapper {
     border: 5px dashed;
-    border-color: darkgray;
+    border-color: var(--opencloning-palette-grey-500);
     width: 40%;
     height: 400px;
     padding: 10px;
@@ -234,7 +238,7 @@ div.dragging-file {
 
 .drag-file-container .drag-file-close {
     text-align: right;
-    color: red;
+    color: var(--opencloning-palette-error-main);
     cursor: pointer;
 }
 
@@ -273,11 +277,6 @@ div.pcr-unit.MuiAccordion-root {
     margin-bottom: .35em;
 }
 
-/* Vertical align the content and icon in alert banners */
-div.MuiPaper-root[role=alert] {
-    align-items: center;
-}
-
 div#global-error-message-wrapper {
     position: relative;
     top: 0;
@@ -299,8 +298,4 @@ div#global-error-message-wrapper > div {
 
 .tab-panels-container {
     text-align: center;
-}
-
-div[role="tooltip"] div.MuiTooltip-tooltip {
-    font-size: 1em;
 }

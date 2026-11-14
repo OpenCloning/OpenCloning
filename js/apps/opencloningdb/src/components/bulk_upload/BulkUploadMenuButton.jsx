@@ -32,7 +32,7 @@ export default function BulkUploadMenuButton({
 
   return (
     <>
-      <Tooltip arrow title={tooltip}>
+      <Tooltip title={tooltip}>
         <Button
           onClick={handleOpen}
           data-testid={dataTestId}

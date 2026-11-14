@@ -33,7 +33,7 @@ function ResourceDetailHeader({
             {afterTitle && <Box variant="h5" sx={{ mx: 1 }}>&mdash;</Box>}
             {afterTitle}
             {EditorComponent !== null && (
-              <Tooltip title={editorIconToolTipText} arrow placement="right">
+              <Tooltip title={editorIconToolTipText} placement="right">
                 <IconButton onClick={() => setIsEditing(true)}>
                   <EditIcon fontSize="small" />
                 </IconButton>

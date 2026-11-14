@@ -4,7 +4,7 @@ import React from 'react'
 
 function DetailPageSectionAction({ icon, onClick, title = '' }) {
   return (
-    <Tooltip title={title} arrow placement="top">
+    <Tooltip title={title} placement="top">
       <IconButton onClick={onClick}>
         {icon}
       </IconButton>

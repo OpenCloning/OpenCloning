@@ -405,7 +405,7 @@ describe('<AssemblerComponent /> with plasmids from a database', () => {
       cy.get('input').click();
     });
     // Plasmids from the database are not highlighted (only those uploaded from files)
-    cy.get('li').contains('DB Plasmid 10').should('not.have.css', 'background-color', 'rgb(220, 237, 200)');
+    cy.get('li').contains('DB Plasmid 10').should('not.have.css', 'background-color', 'rgba(46, 125, 50, 0.15)');
     cy.get('li').contains('DB Plasmid 10').click();
     cy.get('[data-testid="plasmid-select"]').eq(1).within(() => {
       cy.get('input').click();

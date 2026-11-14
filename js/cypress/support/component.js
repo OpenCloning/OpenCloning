@@ -28,7 +28,7 @@ import { OpenCloningThemeProvider } from '@opencloning/ui/providers/ThemeProvide
 import '@cypress/code-coverage/support';
 
 Cypress.Commands.add('mount', (component, options = {}) => {
-  const { reduxStore = store, ...mountOptions } = options;
+  const { reduxStore = store, themeOptions, ...mountOptions } = options;
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -42,7 +42,7 @@ Cypress.Commands.add('mount', (component, options = {}) => {
     React.createElement(
       QueryClientProvider,
       { client: queryClient },
-      React.createElement(OpenCloningThemeProvider, null, component),
+      React.createElement(OpenCloningThemeProvider, { themeOptions }, component),
     ),
   );
   return mount(wrapped, mountOptions);

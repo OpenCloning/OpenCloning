@@ -7,7 +7,7 @@ import { SEQUENCE_TYPE_COLORS, SEQUENCE_TYPE_LABELS } from '../utils/query_utils
 function SequenceTypeChip({ sequenceType, ...rest }) {
   if (!sequenceType) return null;
 
-  const config = SEQUENCE_TYPE_COLORS[sequenceType] ?? { color: 'default' };
+  const config = SEQUENCE_TYPE_COLORS[sequenceType] ?? {};
   const label = SEQUENCE_TYPE_LABELS[sequenceType] ?? sequenceType;
 
   const {sx, ...restRest} = rest;

@@ -29,7 +29,7 @@ function SampleUidBadge({ uid, canDelete = false }) {
       data-testid="sample-uid-badge-with-delete"
       sx={{ ...sampleUidBadgeSx, display: 'inline-flex', alignItems: 'center', gap: 0.5 }}
     >
-      <Tooltip title="Remove sample UID" arrow placement="top">
+      <Tooltip title="Remove sample UID" placement="top">
         {deleteSequenceUIDMutation.isPending ? <CircularProgress size={10} /> : (
           <ClearIcon
             onClick={() => deleteSequenceUIDMutation.mutate(uid)}

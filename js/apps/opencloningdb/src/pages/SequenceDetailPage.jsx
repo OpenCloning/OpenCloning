@@ -38,12 +38,12 @@ function SequencingFileRow({ file, sequenceId, onGetFile }) {
       </ListItemIcon>
       <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.875rem', flexShrink: 0 }}>{file.name}</Box>
       <Box className="file-actions" sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
-        <Tooltip title="Download" placement="top" arrow>
+        <Tooltip title="Download" placement="top">
           <IconButton size="small" onClick={() => onGetFile(file.getFile)}>
             <DownloadIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete" placement="top" arrow>
+        <Tooltip title="Delete" placement="top">
           <span>
             <DeleteSequencingFileButton sequenceId={sequenceId} fileId={file.id} />
           </span>

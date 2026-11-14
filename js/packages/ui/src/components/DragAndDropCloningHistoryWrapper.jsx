@@ -20,7 +20,7 @@ function DragAndDropCloningHistoryWrapper({ children }) {
           <div className="drag-file-wrapper">
             <div className="drag-file-container">
               <div className="drag-file-close">
-                <Tooltip arrow title="Close (back to cloning)" placement="top">
+                <Tooltip title="Close (back to cloning)" placement="top">
                   <CancelIcon type="button" onClick={handleDragLeave} className="cancel-icon" />
                 </Tooltip>
               </div>

@@ -38,15 +38,18 @@ A page that embeds OpenCloning can override the theme with MUI theme options, wh
 of ours: `<OpenCloning themeOptions={…} />`, `StandAloneOpenCloning({ config, element, themeOptions })`
 or `<OpenCloningThemeProvider themeOptions={…}>`.
 
-Planned contents:
+The theme is also available as CSS variables with the `opencloning` prefix
+(`var(--opencloning-palette-primary-main)`). They are set on `:root`, so only the outermost
+`OpenCloningThemeProvider` sets the theme, and nested ones (e.g. `<OpenCloning />` inside an app) just
+render their children.
 
-- **Palette:** a token for "saved to database", and the syntax-builder grey `rgb(240, 240, 240)` as
-  `background.default`.
-- **Typography:** a `sequence` variant for monospace sequences (written inline 20 times).
-- **Component overrides:** CSS that targets `.Mui*` classes moves to `styleOverrides` (vertical alignment
-  of alerts, tooltip font size). `arrow` becomes the Tooltip default (39 uses).
-- **CSS variables:** `cssVariables: true`, so the remaining CSS can use
-  `var(--mui-palette-primary-main)` instead of literals.
+Contents:
+
+- [x] **Palette:** `savedToDatabase`, for nodes of the cloning history saved in the database.
+- [ ] **Typography:** a `sequence` variant for monospace sequences (written inline 20 times), added with
+  `SequenceText` in step 5.
+- [x] **Component overrides:** alerts vertically centred, tooltips with an arrow and `1rem` text.
+- [x] **CSS variables**, for the CSS that is left.
 - **Deliberately not defaulted:** `fullWidth` (131 uses) and `size="small"` (64 uses). Their use is
   mixed, and a hidden default makes a call site harder to read.
 
@@ -76,8 +79,15 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
 - [x] **2. Theme foundation.** Empty theme and `OpenCloningThemeProvider`, wired into `<OpenCloning />`,
   the `opencloning`, `opencloningdb` and `syntax-builder` apps, and `cy.mount`. `themeOptions` lets an
   embedding page override the theme. No visual change.
-- [ ] **3. Global overrides into the theme.** Move `.Mui*` overrides to `styleOverrides`. Replace
-  hard-coded colours with tokens. Turn on CSS variables.
+- [x] **3. Global overrides into the theme.** Global `.Mui*` overrides moved to the theme, and the 39
+  explicit `arrow` props removed. Colours in JSX and CSS replaced with palette tokens and CSS variables
+  (translucent highlights use `theme.alpha`). CSS variables on. Left for later steps:
+  - `.Mui*` overrides scoped to one component (`select-source`, `pcr-unit`, `collapsed`): step 6.
+  - Colours in rules that leak (`PrimerList.css` table rules, `code`): step 4.
+  - `--border-color` in `assembly_component.module.css`: step 6 (assembler).
+  - `github-icon` rule: unused, step 7.
+  - `standalone-app` toggle button: stays. It is plain HTML outside React, so it can't rely on the
+    theme's CSS variables (they are removed when OpenCloning unmounts).
 - [ ] **4. Stop the leaks.** Scope the bare `table`/`code`/`button` rules. Move `html`/`body` styles out
   of the library into the apps (no embedder relies on them).
   - [ ] Separate PR with screenshots: `CssBaseline` in each app root, replacing the hand-written resets in

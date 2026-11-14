@@ -19,7 +19,7 @@ export default function ButtonWithMenu({ children, menuItems }) {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
-        sx={{ color: 'white' }}
+        color="inherit"
       >
         {children}
       </Button>

@@ -86,7 +86,7 @@ function PlasmidSyntaxTable({ plasmids, maxHeight = 500 }) {
             flexWrap: 'wrap',
             gap: 0.5,
             width: '100%',
-            ...(params.row.multipleParts ? { backgroundColor: 'red' } : {}),
+            ...(params.row.multipleParts ? { backgroundColor: 'error.main' } : {}),
           }}
           >
             {noParts ? '-' : parts.map((part, idx) => (

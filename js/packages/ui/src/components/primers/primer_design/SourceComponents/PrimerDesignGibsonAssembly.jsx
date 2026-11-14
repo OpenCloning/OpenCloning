@@ -18,7 +18,6 @@ function AmplifySectionTitle() {
         Amplify
       </Typography>
       <Tooltip
-        arrow
         placement="top"
         title="Checked sequences will be amplified by PCR with designed primers. Unchecked sequences are used directly in the assembly without amplification."
       >

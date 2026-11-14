@@ -38,7 +38,7 @@ function SourceBox({ children, sourceId }) {
   return (
     <div className="select-source">
       <div className="icon-corner">
-        <Tooltip title={tooltipText} arrow placement="top">
+        <Tooltip title={tooltipText} placement="top">
           <button type="submit" onClick={onClickDeleteSource}>
             <DeleteIcon sx={{ fontSize: '2em' }} />
           </button>
