@@ -169,9 +169,17 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     `HeaderActions`, background in `App`, overhang columns in the `sequence` typography). Colour
     literals in the colour column replaced with palette tokens. Screenshots: identical except the
     border of the colour swatches (`#ccc` → `grey.400`).
-- [ ] **7. Clean up.** Delete emptied CSS files (and their entries in the pre-commit allowlist). Make the
-  ESLint rules errors. `github-icon`, `import-primers-container` and `primer-designer` already look
-  unused.
+- [x] **7. Clean up.** The ESLint styling rules are errors: the last 23 warnings (outside the swept areas)
+  are fixed, and the rules of `packages/ui/src/index.css` for those components moved into them (app
+  container, tab panels, main editor, alerts, description, data model, drag and drop). Emptied CSS files
+  were deleted along the way (8 of 12), and `github-icon`, `import-primers-container`, `primer-designer`
+  and `collapsed` with them. Screenshots: identical except the description (1px) and the heading of
+  the drag and drop overlay (now `Typography` `h5`, slightly smaller).
+  - CSS that is left: `packages/ui/src/index.css` (only the cloning tree: nodes, corner ids, the
+    buttons above and below nodes, and `.overhang-representation`), `NetworkTree.css` (tree lines), and
+    the page styles of `apps/opencloningdb` and `standalone-app`.
+  - [ ] Possible follow-up: move the tree rules of `index.css` next to `NetworkTree.css`, and the
+    "saved to database" colour from the `in-database` class to `sx` in `NetworkNode`.
 
 ## Decisions
 

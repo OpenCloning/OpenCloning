@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tooltip } from '@mui/material';
+import { Tooltip, Box } from '@mui/material';
 import { VisibilityOff as VisibilityOffIcon, Visibility as VisibilityIcon, AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { isEqual } from 'lodash-es';
 import Source from './sources/Source';
@@ -106,7 +106,7 @@ function NetWorkNode({ sourceId }) {
 
   return (
     <SequenceWrapper {...{ sequenceId, sequenceIsTemplate, isSavedToDatabase }}>
-      <li id={`source-${sourceId}`} className={className} style={{ marginBottom: ancestorsHidden ? '30px' : undefined }}>
+      <Box component="li" id={`source-${sourceId}`} className={className} sx={{ mb: ancestorsHidden ? '30px' : undefined }}>
         <span className="tf-nc">
           <span className="node-text">
             <SourceBox {...{ sourceId }}>
@@ -144,13 +144,13 @@ function NetWorkNode({ sourceId }) {
           </span>
         </span>
         {parentSourceIds.length > 0 && (
-          <ul style={ancestorsHidden ? { visibility: 'hidden', height: 0, overflow: 'hidden' } : undefined}>
+          <Box component="ul" sx={ancestorsHidden ? { visibility: 'hidden', height: 0, overflow: 'hidden' } : undefined}>
             {parentSourceIds.map((id) => (
               <MemoizedNetWorkNode sourceId={id} key={`node-${id}`} />
             ))}
-          </ul>
+          </Box>
         )}
-      </li>
+      </Box>
     </SequenceWrapper>
   );
 }

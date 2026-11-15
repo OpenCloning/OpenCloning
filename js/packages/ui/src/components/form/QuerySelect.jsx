@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Autocomplete, TextField, FormControl, FormHelperText, InputLabel, ListItemButton, MenuItem, Select, Button } from '@mui/material';
+import { Autocomplete, TextField, FormControl, FormHelperText, InputLabel, ListItemButton, MenuItem, Select, Button, Box } from '@mui/material';
 import QueryStatusWrapper from './QueryStatusWrapper';
 import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 
@@ -56,7 +56,7 @@ export default function QuerySelect({
     if (noOptionsAction) {
       return <ListItemButton onClick={() => noOptionsAction.onClick(inputValue)}>
         <AddCircleIcon color="success" />
-        <em style={{ marginLeft: 8 }}>{noOptionsAction.label}</em>
+        <Box component="em" sx={{ ml: 1 }}>{noOptionsAction.label}</Box>
       </ListItemButton>
     }
     return undefined;

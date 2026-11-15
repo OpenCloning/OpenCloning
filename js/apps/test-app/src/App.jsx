@@ -1,11 +1,12 @@
 import React from 'react';
+import { Box } from '@mui/material';
 import { OpenCloning } from '@opencloning/ui/components';
 
 function App() {
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <Box sx={{ width: '100%', height: '100vh' }}>
       <OpenCloning />
-    </div>
+    </Box>
   );
 }
 

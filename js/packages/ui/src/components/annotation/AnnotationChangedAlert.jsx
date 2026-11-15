@@ -4,7 +4,7 @@ import { Alert, Button } from '@mui/material';
 function AnnotationChangedAlert({ onSave, onCancel }) {
   return (
     <Alert
-      style={{maxWidth: '500px', margin: '10px auto'}}
+      sx={{ maxWidth: 500, mx: 'auto', my: '10px' }}
       severity="info"
       data-testid="annotation-changed-alert"
       action={

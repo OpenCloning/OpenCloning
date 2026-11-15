@@ -5,7 +5,7 @@ import { getReverseComplementSequenceString, getSequenceDataBetweenRange } from 
 import defaultMainEditorProps from '../config/defaultMainEditorProps';
 import { cloningActions } from '@opencloning/store/cloning';
 import useCloningAlerts from '../hooks/useCloningAlerts';
-import { Alert, Button } from '@mui/material';
+import { Alert, Button, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 import useUpdateAnnotationInMainSequence from './annotation/useUpdateAnnotationInMainSequence';
 import useStoreEditor from '../hooks/useStoreEditor';
@@ -164,7 +164,7 @@ function MainSequenceEditor() {
   }, []);
 
   return (
-    <div style={{ textAlign: 'left' }} ref={topDivRef}>
+    <Box sx={{ textAlign: 'left' }} ref={topDivRef}>
       {annotationChanged &&
       <AnnotationChangedAlert onSave={updateAnnotationInMainSequence} onCancel={onAnnotationCancel} />
       }
@@ -180,7 +180,7 @@ function MainSequenceEditor() {
           mainSequenceId={mainSequenceId}
         />
       }
-    </div>
+    </Box>
   );
 }
 export default React.memo(MainSequenceEditor);

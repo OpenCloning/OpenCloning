@@ -99,5 +99,5 @@ of `StandAloneOpenCloning`. Never set styles on `html` or `body` in the library,
 
 ## Lint
 
-ESLint warns about `style` props, native elements and colour literals in `src/**/*.jsx`. Do not add new
-warnings of these kinds.
+ESLint reports `style` props, native elements and hex/`rgb()` colour literals in `src/**/*.jsx` as
+errors. `<col>` takes its width with `Box component="col"` and `sx`.
