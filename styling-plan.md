@@ -27,6 +27,11 @@ Problems found:
 - **Theme values are written by hand.** The primary blue is hard-coded as `rgb(25, 118, 210)` three times
   in CSS. "Saved to database" is the literal `'green'` four times in `NetworkNode.jsx`, with a
   `'default'` fallback that is not a valid CSS colour.
+- **The sequence editor's CSS also leaks into the host page.** `@teselagen/ove` imports its own `ove.css`
+  (~12,000 lines, including Blueprint's CSS), which styles `html` and `*` (`box-sizing`), `body` (14px
+  system font, line height, text colour) and bare elements such as `p` and `small`. It is loaded with the
+  library, so every page that embeds OpenCloning gets it. It is a dependency's CSS, so the steps below
+  don't remove it: it would need a scoped copy of the file, or an upstream fix in OVE.
 
 ## Theme
 
@@ -97,10 +102,27 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
   - `code`: replaced by the `CodeBlock` component (`components/common/`).
   - Bare table rules: scoped to the native primer table. MUI tables were also getting them, so their grey
     header and row hover are now in the theme.
-  - [ ] Separate PR with screenshots: `CssBaseline` in each app root, replacing the hand-written resets in
-    `test-app` and `standalone-app`. Until then `test-app` shows the browser's default 8px body margin
-    (it never loaded its own `index.css`, and relied on the library's).
+  - [x] Separate PR with screenshots: `CssBaseline` in the `opencloning`, `opencloningdb`,
+    `syntax-builder` and `test-app` roots, replacing their `margin: 0` rules. `test-app` also gets
+    `OpenCloningThemeProvider`, and its unused `index.css` is deleted, so the 8px body margin is gone.
+    - The body font changes from Blueprint's 14px system font (from `ove.css`) to the theme's 16px.
+      MUI components are unchanged. Text that inherits from `body` is slightly larger, e.g. in tree
+      nodes and in the sequence editor.
+    - The app bar title was sized in `em`, so it grew with the body font, and `OpenCloning.jsx`
+      subtracts a fixed app bar height from `100vh`. Its size and line height are now in `rem`.
+    - `CssBaseline` sets the `body` background, overriding `syntax-builder`'s `index.css`. Its page
+      styles moved to `GlobalStyles`, after `CssBaseline`.
+    - `standalone-app` keeps its `index.css`: it stands in for a non-React host page.
 - [ ] **5. Shared primitives.** Add `ExternalLink`, `SequenceText` and `FileUploadButton`, and adopt them.
+  Apps import them from `@opencloning/ui/components/common`.
+  - [x] `ExternalLink`: all native `<a target="_blank">` in the library, and syntax-builder's links.
+    `Button`s with an `href` stay `Button`s. The app bar's Documentation link is still nested in a
+    `Button`: step 6 (navigation).
+  - [x] `SequenceText`, and the `sequence` typography in the theme, for sequences in text, table cells
+    (`sx={{ typography: 'sequence' }}`) and text fields (`sequenceInputSx`). The `.sequence`, `#sequence`
+    and `.sequence-cell` rules are deleted. File names and IDs stay monospace with their own `sx`: they
+    are not sequences. syntax-builder's overhang columns keep their `index.css` rule (step 6).
+  - [ ] `FileUploadButton`
 - [ ] **6. Area sweeps**, one PR each:
   - [ ] `packages/ui/.../sources/`
   - [ ] `packages/ui/.../primers/` (native table → MUI `Table`)

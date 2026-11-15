@@ -7,6 +7,7 @@ import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import GetRequestMultiSelect from '../form/GetRequestMultiSelect';
 import { formatSequenceLocationString } from '@opencloning/utils/other';
 import { getExternalHttpClient } from '@opencloning/utils/httpClients';
+import ExternalLink from '../common/ExternalLink';
 
 // External urls (not the backend): no auth token, only whitelisted urls
 const httpClient = getExternalHttpClient();
@@ -195,12 +196,12 @@ function AssemblyIdSelector({ setAssemblyId, setHasAnnotation = () => {}, onAsse
         <Alert severity="warning">
           {!exactMatch ? 'Using assembly ID' : 'Newer assembly exists:'}
           {' '}
-          <a href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${newerAssembly}`} target="_blank" rel="noopener noreferrer">{newerAssembly}</a>
+          <ExternalLink href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${newerAssembly}`}>{newerAssembly}</ExternalLink>
         </Alert>
       )}
       {pairedAccessionWithAnnotation && (
         <Alert severity="warning">
-          Equivalent assembly <a href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${pairedAccessionWithAnnotation}`} target="_blank" rel="noopener noreferrer">{pairedAccessionWithAnnotation}</a> has annotation.
+          Equivalent assembly <ExternalLink href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${pairedAccessionWithAnnotation}`}>{pairedAccessionWithAnnotation}</ExternalLink> has annotation.
         </Alert>
       )}
       {pairedAccessionLookupFailed && (

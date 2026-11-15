@@ -11,6 +11,10 @@ const themeOptions = {
     // Sequences and sources that are saved in the database
     savedToDatabase: { main: '#008000' },
   },
+  typography: {
+    // DNA sequences (see SequenceText): monospace, at the size of the surrounding text
+    sequence: { fontFamily: 'monospace' },
+  },
   components: {
     MuiAlert: {
       styleOverrides: {

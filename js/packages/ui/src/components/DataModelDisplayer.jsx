@@ -2,6 +2,7 @@ import { isEqual } from 'lodash-es';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import CodeBlock from './common/CodeBlock';
+import ExternalLink from './common/ExternalLink';
 
 function DataModelDisplayer() {
   const { sources,  sequences, primers } = useSelector((state) => state.cloning, isEqual);
@@ -17,7 +18,7 @@ function DataModelDisplayer() {
       <p>
         Visit the
         {' '}
-        <a href="https://opencloning.github.io/OpenCloning_LinkML" target="_blank" rel="noopener noreferrer">data model documentation</a>
+        <ExternalLink href="https://opencloning.github.io/OpenCloning_LinkML">data model documentation</ExternalLink>
         .
       </p>
 

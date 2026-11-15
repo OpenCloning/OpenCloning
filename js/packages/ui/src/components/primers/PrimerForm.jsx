@@ -5,6 +5,7 @@ import ValidatedTextField from '../form/ValidatedTextField';
 
 import './PrimerForm.css';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
+import { sequenceInputSx } from '../common/SequenceText';
 
 function PrimerForm({
   primer = { name: '', sequence: '', id: null }, submitPrimer, cancelForm, existingNames, disabledSequenceText = '',
@@ -72,7 +73,7 @@ function PrimerForm({
         label="Sequence"
         value={sequence}
         onInputChange={onSequenceChange}
-        sx={{ m: 1, display: { width: '60%' } }}
+        sx={[{ m: 1, display: { width: '60%' } }, sequenceInputSx]}
         className="sequence"
         submissionAttempted={submissionAttempted}
         required

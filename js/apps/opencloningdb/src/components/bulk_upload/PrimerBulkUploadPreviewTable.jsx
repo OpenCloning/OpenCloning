@@ -16,7 +16,7 @@ function PrimerBulkUploadPreviewTableRow({ row }) {
       <TableCell sx={{ maxWidth: 300 }}>
         <Box
           sx={{
-            fontFamily: 'monospace',
+            typography: 'sequence',
             overflowX: 'auto',
             whiteSpace: 'nowrap',
             maxWidth: 300,

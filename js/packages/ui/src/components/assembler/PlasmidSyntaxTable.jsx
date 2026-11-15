@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid'
 function PartChip({ name, overhang}) {
   const label = name ? `${overhang} (${name})` : overhang;
   return (
-    <Chip label={label} size="small" sx={{ fontSize: '0.7rem', height: 20, fontFamily: 'monospace' }}
+    <Chip label={label} size="small" sx={{ typography: 'sequence', fontSize: '0.7rem', height: 20 }}
     />
   )
 }

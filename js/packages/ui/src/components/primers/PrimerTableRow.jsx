@@ -5,6 +5,7 @@ import SubmitToDatabaseDialog from '../form/SubmitToDatabaseDialog';
 import useDatabase from '../../hooks/useDatabase';
 import PrimerDetailsTds from './primer_details/PrimerDetailsTds';
 import PrimerInfoIcon from './primer_details/PrimerInfoIcon';
+import SequenceText from '../common/SequenceText';
 
 function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick, pcrDetails }) {
   const [saveToDatabaseDialogOpen, setSaveToDatabaseDialogOpen] = useState(false);
@@ -73,7 +74,7 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
         primerDetails={primerDetails}
         pcrDetails={pcrDetails}
       />
-      <td className="sequence">{primerDetails.sequence}</td>
+      <td className="sequence"><SequenceText>{primerDetails.sequence}</SequenceText></td>
     </tr>
   );
 }

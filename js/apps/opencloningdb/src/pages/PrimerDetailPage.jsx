@@ -80,7 +80,7 @@ function PrimerDetailPage() {
         />
       </TopButtonSection>
       <DetailPageSection title="Sequence" data-testid="sequence">
-        <Typography sx={{ mt: 1, fontFamily: 'monospace' }}>{primer.sequence}</Typography>
+        <Typography sx={{ mt: 1, typography: 'sequence' }}>{primer.sequence}</Typography>
       </DetailPageSection>
       <DetailPageSection title="Linked templates" data-testid="linked-templates">
         <TableContainer component={Paper} sx={{ maxWidth: 800 }}>

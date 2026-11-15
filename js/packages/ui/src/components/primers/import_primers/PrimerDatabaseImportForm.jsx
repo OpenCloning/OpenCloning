@@ -5,6 +5,7 @@ import { Alert, Button, TextField } from '@mui/material';
 import useDatabase from '../../../hooks/useDatabase';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
 import { isEqual } from 'lodash-es';
+import { sequenceInputSx } from '../../common/SequenceText';
 
 function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
   const existingNames = useSelector((state) => state.cloning.primers.map((p) => p.name), isEqual);
@@ -64,13 +65,7 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
               className="sequence"
               disabled
               fullWidth
-              slotProps={{
-                input: {
-                  sx: {
-                    fontFamily: 'monospace',
-                  },
-                }
-              }}
+              sx={sequenceInputSx}
             />
           </div>
         )}

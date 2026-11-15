@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, TextField, Paper, Alert, Button } from '@mui/material';
 import { useFormData, validateOverhang } from '../context/FormDataContext';
 import OverhangsPreview from './OverhangsPreview';
+import { sequenceInputSx } from '@opencloning/ui/components/common';
 
 export function validateOverhangPaths(paths) {
   if (!paths || paths.length === 0) {
@@ -143,15 +144,10 @@ function OverhangsField() {
         value={localValue}
         onChange={handleChange}
         placeholder="ACGT&#10;TATG&#10;CATG&#10;&#10;TATG&#10;TTCT&#10;ATCC"
-        sx={{
-          '& .MuiInputBase-input': {
-            fontFamily: 'monospace',
-          }
-        }}
+        sx={sequenceInputSx}
         slotProps={{
           htmlInput: {
             style: {
-              fontFamily: 'monospace',
               fontSize: '0.875rem',
               textTransform: 'uppercase'
             }
