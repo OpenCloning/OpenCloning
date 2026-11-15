@@ -5,6 +5,7 @@ import { getInputSequencesFromSourceId } from '@opencloning/store/cloning_utils'
 import { cloningActions } from '@opencloning/store/cloning';
 import useDatabase from '../../hooks/useDatabase';
 import { useConfig } from '../../hooks/useConfig';
+import SourceTitle from './SourceTitle';
 
 const { replaceSource } = cloningActions;
 
@@ -72,7 +73,7 @@ function SourceTypeSelector({ source }) {
 
   return (
     <>
-      {!sourceType && (<h2 className="empty-source-title">{inputSequences.length === 0 ? 'Import a sequence' : 'Use this sequence'}</h2>)}
+      {!sourceType && (<SourceTitle className="empty-source-title">{inputSequences.length === 0 ? 'Import a sequence' : 'Use this sequence'}</SourceTitle>)}
       <FormControl fullWidth>
         <InputLabel id={`select-source-${sourceId}-label`}>Source type</InputLabel>
         <Select

@@ -28,7 +28,7 @@ function SourceCopySequence({ source }) {
           inputSequenceIds={allSequenceIds}
         />
       </FormControl>
-      <Button type="submit" variant="contained" style={{ marginTop: 15 }}>Copy sequence</Button>
+      <Button type="submit" variant="contained" sx={{ mt: 2 }}>Copy sequence</Button>
     </form>
   );
 }

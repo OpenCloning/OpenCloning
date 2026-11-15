@@ -133,6 +133,5 @@ repos:
             packages/ui/src/components/navigation/MainAppBar\.css|
             packages/ui/src/components/primers/PrimerForm\.css|
             packages/ui/src/components/primers/PrimerList\.css|
-            packages/ui/src/components/primers/import_primers/styles\.css|
-            packages/ui/src/components/sources/SourceBox\.css
+            packages/ui/src/components/primers/import_primers/styles\.css
           )$

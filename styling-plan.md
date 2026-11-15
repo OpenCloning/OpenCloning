@@ -128,7 +128,14 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     with a ref, now `hidden` instead of `style={{ display: 'none' }}`. Tests that select inputs by
     position (`input[type="file"]').eq(n)`) still find them in the same order.
 - [ ] **6. Area sweeps**, one PR each:
-  - [ ] `packages/ui/.../sources/`
+  - [x] `packages/ui/.../sources/`: no styling warnings left (21 before). `SourceBox.css` deleted, and
+    the source rules of `index.css` (`.select-source`, `.fragment-picker`, `.pcr-unit`,
+    `.finished-source`, and the unused `.collapsed`) moved into the components. New: `SourceTitle`
+    for the title of a source box, and `CheckboxField` (`components/form/`) for the 9 checkboxes
+    with a label on their own line. The delete button is an `IconButton`. The PCR accordion repeats
+    its margins under `&.Mui-expanded`, since MUI's expanded style is more specific than `sx`.
+    Screenshots of every source box in 9 examples, the empty source and a PCR form: the delete icon
+    is 3px smaller, and titles are a few px taller (`Typography` line height).
   - [ ] `packages/ui/.../primers/` (native table → MUI `Table`)
   - [ ] `packages/ui/.../navigation/`
   - [ ] `packages/ui/.../assembler/`
