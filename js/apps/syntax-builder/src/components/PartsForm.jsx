@@ -8,6 +8,9 @@ import { getSvgByGlyph, EditTextDialog, partKey } from '@opencloning/ui/componen
 import GlyphEditCell from './GlyphEditCell'
 import SectionWrapper from './SectionWrapper'
 
+// Columns that hold a sequence
+const SEQUENCE_FIELDS = ['left_overhang', 'right_overhang', 'left_inside', 'right_inside'];
+
 
 export default function PartsForm() {
   const { parts, addDefaultPart, setParts, problematicParts, graphErrorMessage, mermaidString } = useFormData()
@@ -59,7 +62,8 @@ export default function PartsForm() {
     const errorMessage = validateField(field, params.value, params.row)
     return (
       <Tooltip title={errorMessage || ''} placement="top">
-        <Box className={field} sx={{
+        <Box sx={{
+          typography: SEQUENCE_FIELDS.includes(field) ? 'sequence' : undefined,
           color: errorMessage ? 'error.main' : 'inherit',
           fontWeight: errorMessage ? 'bold' : 'normal',
           width: '100%'
@@ -111,7 +115,7 @@ export default function PartsForm() {
       editable: true,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src={getSvgByGlyph(params.value)} alt={params.value} style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+          <Box component="img" src={getSvgByGlyph(params.value)} alt={params.value} sx={{ width: 24, height: 24, objectFit: 'contain' }} />
           <span>{params.value}</span>
         </Box>
       ),
@@ -178,10 +182,11 @@ export default function PartsForm() {
               <Box sx={{
                 width: 20, height: 20,
                 backgroundColor: errorMessage ? 'transparent' : (params.value || 'transparent'),
-                border: errorMessage ? '2px solid red' : '1px solid #ccc',
-                borderRadius: '4px'
+                border: errorMessage ? 2 : 1,
+                borderColor: errorMessage ? 'error.main' : 'grey.400',
+                borderRadius: 1,
               }} />
-              <span style={{ color: errorMessage ? 'red' : 'inherit', fontFamily: 'monospace' }}>{params.value}</span>
+              <Box component="span" sx={{ color: errorMessage ? 'error.main' : 'inherit', fontFamily: 'monospace' }}>{params.value}</Box>
             </Box>
           </Tooltip>
         )

@@ -4,7 +4,6 @@ import { CssBaseline, GlobalStyles } from '@mui/material';
 // Import UI package styles (includes all component styles)
 import '@opencloning/ui';
 import { OpenCloningThemeProvider } from '@opencloning/ui/providers/ThemeProvider';
-import './index.css';
 import App from './App';
 
 // Single scrollbar: only the body scrolls (no overflow on html).

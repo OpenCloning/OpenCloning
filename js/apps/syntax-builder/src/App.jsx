@@ -24,7 +24,7 @@ export function AppContent() {
   }, [overhangsStep, parts]);
 
   return (
-    <Box className="app-content">
+    <Box sx={{ bgcolor: 'grey.100' }}>
       <Container >
         {renderContent()}
       </Container>
