@@ -42,18 +42,18 @@ function SourceKnownGenomeRegion({ source, requestStatus, sendSourceRequest }) {
 
     return (
       <div>
-      <div style={{ marginBottom: '1em', marginTop: '2em' }}>Could not retrieve genome sequence.</div>
+      <Box sx={{ mb: 2, mt: 4 }}>Could not retrieve genome sequence.</Box>
       <SubmitButtonBackendAPI requestStatus={requestStatus} onClick={() => setConnectAttempt(connectAttempt + 1)}>Retry</SubmitButtonBackendAPI>
       </div>
   )
   }
   return (
-    <div style={{ marginBottom: '1em', marginTop: '2em', textAlign: 'center' }}>
+    <Box sx={{ mb: 2, mt: 4, textAlign: 'center' }}>
       <div>Loading genome sequence...</div>
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
         <CircularProgress />
       </Box>
-    </div>
+    </Box>
   )
 }
 

@@ -29,7 +29,6 @@
     margin: auto;
 }
 
-
 .node-corner {
     position: absolute;
     right: -1px;
@@ -97,7 +96,6 @@ div.hang-from-node::before {
     transform: translate(0, -100%);
 }
 
-
 /* TODO: handle these */
 div.tf-tree.tf-ancestor-tree {
     padding-bottom: 150px;
@@ -119,15 +117,6 @@ button.github-icon svg {
     font-size: 30px;
 }
 
-div.collapsed div {
-    margin: auto
-}
-
-div.collapsed button {
-    margin-bottom: 0px;
-    margin-top: 0px;
-}
-
 /* Prevents scollbar from showing on small editors,
    that was caused by overflowing numbers at the edges
    of the x axis */
@@ -145,27 +134,6 @@ span.node-text > div:first-child {
     overflow: visible;
 
 } */
-
-div.select-source div.MuiFormControl-root {
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-div.select-source h2 {
-    margin-bottom: 5px;
-    font-size: x-large;
-}
-
-
-div.select-source {
-    width: 275px;
-}
-
-.fragment-picker {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    text-align: center;
-}
 
 div.description-container {
     margin: auto;
@@ -226,27 +194,6 @@ div.primer-designer {
     width: 60%;
 }
 
-
-div.pcr-unit.MuiAccordion-root:first-of-type {
-    border-radius: 1.2em;
-    overflow: clip;
-}
-
-div.pcr-unit.MuiAccordion-root {
-    border-radius: 1.2em;
-    overflow: clip;
-    margin-bottom: .5em;
-}
-
-.pcr-unit div.MuiAccordionSummary-root.MuiAccordionSummary-root {
-    min-height: 0;
-}
-
-.pcr-unit div.MuiAccordionSummary-content {
-    margin-top: .35em;
-    margin-bottom: .35em;
-}
-
 div#global-error-message-wrapper {
     position: relative;
     top: 0;
@@ -257,11 +204,6 @@ div#global-error-message-wrapper {
 div#global-error-message-wrapper > div {
     margin-left: 10px;
     margin-bottom: 10px;
-    /* Allow line breaks in very long strings only when necessary */
-    word-break: break-word;
-}
-
-.finished-source {
     /* Allow line breaks in very long strings only when necessary */
     word-break: break-word;
 }

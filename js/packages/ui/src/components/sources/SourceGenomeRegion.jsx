@@ -339,7 +339,7 @@ function SourceGenomeRegionCustomCoordinates({ source, requestStatus, sendSource
       )}
       {sequenceAccession && (
         <>
-          <Box component="fieldset" sx={{ p: 1, mb: 1 }} style={{ borderRadius: '.5em', boxShadow: null }}>
+          <Box component="fieldset" sx={{ p: 1, mb: 1, borderRadius: '.5em' }}>
             <legend><FormLabel>Sequence coordinates</FormLabel></legend>
             <FormControl fullWidth>
               <TextField

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useStore } from 'react-redux';
-import { Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { cloningActions } from '@opencloning/store/cloning';
-import './SourceBox.css';
 import VerifyDeleteDialog from './VerifyDeleteDialog';
 import useStoreEditor from '../../hooks/useStoreEditor';
 import { isSequenceInputOfAnySource } from '@opencloning/store/cloning_utils';
@@ -36,14 +35,19 @@ function SourceBox({ children, sourceId }) {
     }
   };
   return (
-    <div className="select-source">
-      <div className="icon-corner">
+    <Box className="select-source" sx={{ width: 275, '& .MuiFormControl-root': { my: '5px' } }}>
+      <Box className="icon-corner" sx={{ position: 'absolute', top: 0, right: 0 }}>
         <Tooltip title={tooltipText} placement="top">
-          <button type="submit" onClick={onClickDeleteSource}>
-            <DeleteIcon sx={{ fontSize: '2em' }} />
-          </button>
+          <IconButton
+            aria-label="Delete source and children"
+            color="error"
+            onClick={onClickDeleteSource}
+            sx={{ p: 0, '&:hover': { bgcolor: 'transparent', filter: 'brightness(70%)' } }}
+          >
+            <DeleteIcon fontSize="medium" />
+          </IconButton>
         </Tooltip>
-      </div>
+      </Box>
       <VerifyDeleteDialog
         dialogOpen={dialogOpen}
         setDialogOpen={setDialogOpen}
@@ -53,7 +57,7 @@ function SourceBox({ children, sourceId }) {
         }}
       />
       {children}
-    </div>
+    </Box>
   );
 }
 

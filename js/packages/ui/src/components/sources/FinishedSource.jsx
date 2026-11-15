@@ -254,14 +254,14 @@ function IGEMMessage({ source }) {
         {` in backbone ${backbone} from `}
         <ExternalLink href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX">2024 iGEM Distribution</ExternalLink>
       </div>
-      <div style={{ marginTop: '10px' }}>
+      <Box sx={{ mt: 1 }}>
         {'Annotated with '}
         <ExternalLink href="https://github.com/mmcguffi/pLannotate">
           pLannotate
         </ExternalLink>
         {', see report '}
         <ExternalLink href={`https://github.com/manulera/annotated-igem-distribution/blob/master/results/reports/${indexInCollection}.csv`}>here</ExternalLink>
-      </div>
+      </Box>
     </>
   );
 }
@@ -310,9 +310,9 @@ function FileMessage({ source }) {
         <div>
           {`${common},`}
         </div>
-        <div style={{ marginTop: '5px' }}>
+        <Box sx={{ mt: 0.5 }}>
           {coordinates}
-        </div>
+        </Box>
       </>
     );
   }
@@ -339,7 +339,7 @@ function GenomeCoordinatesMessage({ source }) {
   const coordinateString = source.coordinates.replace('complement(','').replace(')','');
   return (
     <>
-      <h4 style={{ marginBottom: '5px' }}>Genome region</h4>
+      <Typography component="h4" sx={{ fontSize: '1.125rem', fontWeight: 'fontWeightLight', mb: 0.5 }}>Genome region</Typography>
       {source.assembly_accession && (
         <div>
           <strong>Assembly:</strong>
@@ -436,10 +436,11 @@ function FinishedSource({ sourceId }) {
     default: message = '';
   }
   return (
-    <div className="finished-source">
+    // Long names break only where necessary
+    <Box className="finished-source" sx={{ wordBreak: 'break-word' }}>
       <div />
       {message}
-    </div>
+    </Box>
   );
 }
 

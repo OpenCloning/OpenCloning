@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import React from 'react';
 import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { useDispatch, useStore } from 'react-redux';
@@ -6,6 +6,7 @@ import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import { classNameToEndPointMap } from '@opencloning/utils/sourceFunctions';
 import ObjectTable from '../ObjectTable';
 import { cloningActions } from '@opencloning/store/cloning';
+import SourceTitle from './SourceTitle';
 
 function CollectionSource({ source, requestStatus, sendSourceRequest }) {
   const { id: sourceId, options, image: imageInfo, title, description } = source;
@@ -53,8 +54,8 @@ function CollectionSource({ source, requestStatus, sendSourceRequest }) {
   const selectedOptionObject = options.find((option) => option.name === selectedOption);
   return (
     <div className="collection-source">
-      {title && <h2>{title}</h2>}
-      {description && <p>{description}</p>}
+      {title && <SourceTitle>{title}</SourceTitle>}
+      {description && <Typography sx={{ mb: 1 }}>{description}</Typography>}
       {image && <img src={image} width={imageWidth} alt="Collection source icon" />}
       <form onSubmit={onSubmit}>
         <FormControl fullWidth>
@@ -69,7 +70,7 @@ function CollectionSource({ source, requestStatus, sendSourceRequest }) {
           >
             <MenuItem onClick={turnIntoBlankSource} value="">
               <AddCircleIcon color="success" />
-              <em style={{ marginLeft: 8 }}>Add your own</em>
+              <Box component="em" sx={{ ml: 1 }}>Add your own</Box>
             </MenuItem>
             {options.map((option) => (
               <MenuItem key={option.name} value={option.name}>

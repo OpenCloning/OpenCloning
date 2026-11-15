@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, FormControl, FormControlLabel, InputAdornment, TextField } from '@mui/material';
+import { Box, Button, FormControl, InputAdornment, TextField } from '@mui/material';
 
 import { doesSourceHaveOutput, getInputSequencesFromSourceId, getPcrTemplateSequenceId } from '@opencloning/store/cloning_utils';
 import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
@@ -9,6 +9,7 @@ import PrimerDesignSourceForm from '../primers/primer_design/SourceComponents/Pr
 import { cloningActions } from '@opencloning/store/cloning';
 import useStoreEditor from '../../hooks/useStoreEditor';
 import LabelWithTooltip from '../form/LabelWithTooltip';
+import CheckboxField from '../form/CheckboxField';
 
 function SourcePCRorHybridization({ source, requestStatus, sendSourceRequest }) {
   // Represents a PCR if inputs != [], else is a oligo hybridization
@@ -87,11 +88,11 @@ function SourcePCRorHybridization({ source, requestStatus, sendSourceRequest }) 
     };
     return (
       <Button variant="contained" color="success" sx={{ mt: 1 }} onClick={goToPrimerDesign}>
-        <span style={{ fontSize: '1.2em', marginRight: 12 }}>✨</span>
+        <Box component="span" sx={{ fontSize: '1.2em', mr: 1.5 }}>✨</Box>
         {' '}
         Design primers
         {' '}
-        <span style={{ fontSize: '1.2em', marginLeft: 12 }}>✨</span>
+        <Box component="span" sx={{ fontSize: '1.2em', ml: 1.5 }}>✨</Box>
       </Button>
     );
   }
@@ -143,14 +144,11 @@ function SourcePCRorHybridization({ source, requestStatus, sendSourceRequest }) 
                 }}
               />
             </FormControl>
-            <FormControl fullWidth>
-              <FormControlLabel
-                control={<Checkbox checked={addPrimerFeatures} onChange={() => setAddPrimerFeatures(!addPrimerFeatures)} />}
-                label={(
-                  <LabelWithTooltip label="Add primer features" tooltip="Add features representing the primers to the PCR product" />
-            )}
-              />
-            </FormControl>
+            <CheckboxField
+              checked={addPrimerFeatures}
+              onChange={() => setAddPrimerFeatures(!addPrimerFeatures)}
+              label={<LabelWithTooltip label="Add primer features" tooltip="Add features representing the primers to the PCR product" />}
+            />
           </>
         )}
         {forwardPrimerId && reversePrimerId && (

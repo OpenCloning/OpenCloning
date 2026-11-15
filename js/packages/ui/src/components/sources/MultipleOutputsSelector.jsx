@@ -1,7 +1,7 @@
 import { SimpleCircularOrLinearView } from '@teselagen/ove';
 import React from 'react';
 import { ArrowForward, ArrowBack } from '@mui/icons-material';
-import { Button, IconButton } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import { convertToTeselaJson } from '@opencloning/utils/readNwrite';
 import OverhangsDisplay from '../OverhangsDisplay';
 import SubSequenceDisplayer from './SubSequenceDisplayer';
@@ -59,12 +59,12 @@ function MultipleOutputsSelector({
         </IconButton>
       </div>
 
-      <div className="fragment-picker">
+      <Box className="fragment-picker" sx={{ mt: 0.5, mb: 1, textAlign: 'center' }}>
         <SubSequenceDisplayerComponent {...{ source: sources[safeSelectedOutput], sourceId }} />
         <AssemblyPlanDisplayerComponent {...{ source: sources[safeSelectedOutput] }} />
         <CircularOrLinearViewComponent {...{ sequenceData: seq, editorName, height: 'auto' }} />
         <OverhangsDisplayComponent {...{ sequenceData: seq, sequence: sequences[safeSelectedOutput] }} />
-      </div>
+      </Box>
       <form onSubmit={chooseFragment}>
         <Button fullWidth type="submit" variant="contained">Choose product</Button>
       </form>
