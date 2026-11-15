@@ -1,27 +1,27 @@
 import React from 'react';
+import { Box } from '@mui/material';
 
 const TabPanel = React.forwardRef(({ children, value, index, ...other }, ref) => {
-  const style = value === index ? {
-    visibility: 'visible',
-
-  } : {
+  // Hidden panels stay mounted (they keep their state), but take no space
+  const sx = value === index ? { visibility: 'visible' } : {
     visibility: 'hidden',
     position: 'absolute',
     width: '1px',
-    height: '0px',
+    height: 0,
     overflow: 'hidden',
   };
 
   return (
-    <div
+    <Box
+      ref={ref}
       role="tabpanel"
-      style={style}
+      sx={sx}
       id={`tab-panel-${index}`}
       aria-labelledby={`tab-${index}`}
       {...other}
     >
       {children}
-    </div>
+    </Box>
   );
 });
 
