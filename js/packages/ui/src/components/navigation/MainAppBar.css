@@ -18,7 +18,10 @@
 }
 
 .app-name {
-    font-size: 4em;
+    /* rem, not em or unitless: the height of the app bar must not depend on the page's body font
+       (OpenCloning.jsx subtracts a fixed app bar height from 100vh) */
+    font-size: 3.5rem;
+    line-height: 4.5rem;
     font-weight: 200;
     text-align: center;
 }
