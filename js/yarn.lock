@@ -10637,6 +10637,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "syntax-builder@workspace:apps/syntax-builder"
   dependencies:
+    "@mui/material": "npm:^9.5.0"
     "@mui/icons-material": "npm:^9.5.0"
     "@mui/x-data-grid": "npm:^9.18.0"
     "@opencloning/ui": "workspace:*"
@@ -10695,6 +10696,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "test-app@workspace:apps/test-app"
   dependencies:
+    "@mui/material": "npm:^9.5.0"
     "@opencloning/store": "workspace:*"
     "@opencloning/ui": "workspace:*"
     react: "npm:^18.3.1"

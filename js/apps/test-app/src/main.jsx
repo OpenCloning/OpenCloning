@@ -1,8 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { CssBaseline } from '@mui/material';
 import store from '@opencloning/store';
 import { ConfigProvider } from '@opencloning/ui/providers/ConfigProvider';
+import { OpenCloningThemeProvider } from '@opencloning/ui/providers/ThemeProvider';
 // Import UI package styles (includes all component styles)
 import '@opencloning/ui';
 import App from './App';
@@ -22,7 +24,10 @@ const config = {
 root.render(
   <Provider store={store}>
     <ConfigProvider config={config}>
-      <App />
+      <OpenCloningThemeProvider>
+        <CssBaseline />
+        <App />
+      </OpenCloningThemeProvider>
     </ConfigProvider>
   </Provider>
 );
