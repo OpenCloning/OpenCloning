@@ -136,7 +136,13 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     its margins under `&.Mui-expanded`, since MUI's expanded style is more specific than `sx`.
     Screenshots of every source box in 9 examples, the empty source and a PCR form: the delete icon
     is 3px smaller, and titles are a few px taller (`Typography` line height).
-  - [ ] `packages/ui/.../primers/` (native table → MUI `Table`)
+  - [x] `packages/ui/.../primers/` (native table → MUI `Table`): no styling warnings left (51 before).
+    `PrimerList.css`, `PrimerForm.css` and `import_primers/styles.css` deleted, with the unused
+    `.import-primers-container` and `.primer-designer` rules. The primer table is an MUI `Table`
+    (`size="small"`, so 14px text instead of 16px), the import modal gets the theme's shadow (its CSS
+    `box-shadow: 24` was invalid), and `OrientationPicker` is a grid instead of a layout `<table>` (its
+    e2e selector is now `.orientation-picker span`). The primer design e2e tests are viewport-sensitive:
+    at the default 1000×660, 4 of them can fail to select a region in the editor, at 1600×1000 they pass.
   - [ ] `packages/ui/.../navigation/`
   - [ ] `packages/ui/.../assembler/`
   - [ ] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`)

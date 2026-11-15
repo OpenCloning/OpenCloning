@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
-import { Button, Modal, Box } from '@mui/material';
+import { Button, Modal, Box, Stack, Typography } from '@mui/material';
 import useCloningAlerts from '../../../hooks/useCloningAlerts';
-import './styles.css';
 
 import { primersFromTextFile } from '@opencloning/utils/fileParsers';
 import PrimersImportTable from './ImportPrimersTable';
@@ -43,18 +42,34 @@ function ImportPrimersButton({ addPrimer }) {
       <FileUploadButton
         onFiles={handleFileUpload}
         accept=".csv,.tsv"
-        tooltip={<span style={{ fontSize: '1.4em' }}>Upload a .csv or .tsv file with headers &apos;name&apos; and &apos;sequence&apos;</span>}
+        tooltip={<Box component="span" sx={{ fontSize: '1.4em' }}>Upload a .csv or .tsv file with headers &apos;name&apos; and &apos;sequence&apos;</Box>}
       >
         Import from file
       </FileUploadButton>
 
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box className="import-primers-modal-content">
-          <h2 style={{ textAlign: 'center' }}>Import Primers Preview</h2>
+        <Box
+          className="import-primers-modal-content"
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80%',
+            maxWidth: 800,
+            maxHeight: '80vh',
+            overflow: 'auto',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 4,
+          }}
+        >
+          <Typography variant="h5" component="h2" sx={{ textAlign: 'center', mb: 2 }}>Import Primers Preview</Typography>
 
           <PrimersImportTable importedPrimers={importedPrimers} />
 
-          <Box className="import-primers-modal-buttons">
+          <Stack direction="row" spacing={2} className="import-primers-modal-buttons" sx={{ justifyContent: 'flex-end' }}>
             <Button
               variant="outlined"
               color="error"
@@ -70,7 +85,7 @@ function ImportPrimersButton({ addPrimer }) {
             >
               Import Valid Primers
             </Button>
-          </Box>
+          </Stack>
         </Box>
       </Modal>
     </>

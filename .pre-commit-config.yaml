@@ -130,8 +130,5 @@ repos:
             packages/ui/src/index\.css|
             packages/ui/src/components/NetworkTree\.css|
             packages/ui/src/components/assembler/assembly_component\.module\.css|
-            packages/ui/src/components/navigation/MainAppBar\.css|
-            packages/ui/src/components/primers/PrimerForm\.css|
-            packages/ui/src/components/primers/PrimerList\.css|
-            packages/ui/src/components/primers/import_primers/styles\.css
+            packages/ui/src/components/navigation/MainAppBar\.css
           )$

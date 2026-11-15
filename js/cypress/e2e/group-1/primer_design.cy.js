@@ -245,9 +245,9 @@ describe('Test primer designer functionality', () => {
     cy.contains('svg g', 'ars1').should('not.have.class', 'ann-reverse');
 
     // Click on the Reverse radio button
-    cy.get('table span').contains('Reverse').first().click({ force: true });
+    cy.get('.orientation-picker span').contains('Reverse').first().click({ force: true });
     cy.contains('svg g', 'ars1').should('have.class', 'ann-reverse');
-    cy.get('table span').contains('Reverse').first().click({ force: true });
+    cy.get('.orientation-picker span').contains('Reverse').first().click({ force: true });
 
     // Submit a high hybridization to get an error
     setInputValue('Min. hybridization length', '100000', '.primer-design');
@@ -646,7 +646,7 @@ describe('Test primer designer functionality', () => {
     // Set the other settings (Impossible to remove the zero)
     setInputValue('Min. hybridization length', '1', '.primer-design');
     setInputValue('Target hybridization Tm', '4', '.primer-design');
-    cy.get('table span').contains('Reverse').first().click({ force: true });
+    cy.get('.orientation-picker span').contains('Reverse').first().click({ force: true });
     // Submit and check that the right values are being submitted
     cy.intercept({ method: 'POST', url: 'http://127.0.0.1:8000/primer_design/simple_pair*'}).as('primerDesign');
     getBottomButton('Design primers', 1).click();

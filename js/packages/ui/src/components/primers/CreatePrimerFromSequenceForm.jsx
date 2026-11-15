@@ -1,7 +1,5 @@
 import React from 'react';
-import { FormControl, TextField } from '@mui/material';
-import './PrimerForm.css';
-import './PrimerList.css';
+import { Box, FormControl, TextField } from '@mui/material';
 import CustomFormHelperText from '../form/CustomFormHelperText';
 
 function CreatePrimerFromSequenceForm({
@@ -15,7 +13,7 @@ function CreatePrimerFromSequenceForm({
     nameError = 'Name is required';
   }
   return (
-    <div className="primer-result-form">
+    <Box className="primer-result-form" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <FormControl sx={{ m: 1, pb: 2, display: { width: '30%' } }}>
         <TextField
           label="Name"
@@ -38,7 +36,7 @@ function CreatePrimerFromSequenceForm({
             formHelperText: { component: 'div' }
           }} />
       </FormControl>
-    </div>
+    </Box>
   );
 }
 

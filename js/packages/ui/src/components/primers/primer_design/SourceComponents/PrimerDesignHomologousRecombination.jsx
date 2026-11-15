@@ -1,4 +1,4 @@
-import { Alert, Button, FormControl } from '@mui/material';
+import { Alert, Button, FormControl, Typography } from '@mui/material';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import SingleInputSelector from '../../../sources/SingleInputSelector';
@@ -35,7 +35,7 @@ function PrimerDesignHomologousRecombination({ source, primerDesignType }) {
   return (
     <form onSubmit={onSubmit}>
       <Alert severity="info" icon={false} sx={{ textAlign: 'left' }}>
-        <p style={{ marginBottom: 4 }}>
+        <Typography variant="inherit" sx={{ mb: 0.5 }}>
           Use this to design
           {' '}
           <strong>primers with homology arms</strong>
@@ -52,13 +52,13 @@ function PrimerDesignHomologousRecombination({ source, primerDesignType }) {
           {' '}
           {primerDesignType === 'homologous_recombination' ? 'homologous recombination' : 'CRISPR cut + homologous repair'}
           .
-        </p>
-        <p>
+        </Typography>
+        <Typography variant="inherit">
           If you haven&apos;t, import a
           {' '}
           <strong>target sequence</strong>
           , then select it below.
-        </p>
+        </Typography>
       </Alert>
       <FormControl fullWidth>
         <SingleInputSelector

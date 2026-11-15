@@ -1,4 +1,4 @@
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
 import { Delete as DeleteIcon, Edit as EditIcon, Clear as ClearIcon } from '@mui/icons-material';
 import SubmitToDatabaseDialog from '../form/SubmitToDatabaseDialog';
@@ -28,8 +28,8 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
   }
 
   return (
-    <tr>
-      <td className="icons">
+    <TableRow>
+      <TableCell className="icons" sx={{ width: '15%', whiteSpace: 'nowrap' }}>
         <Tooltip title={deleteMessage} placement="top">
           <IconButton onClick={() => (canBeDeleted && deletePrimer(primerDetails.id))}>
             {isSavedToDatabase ? <ClearIcon /> : <DeleteIcon />}
@@ -67,15 +67,15 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
             )}
           </>
         )}
-      </td>
-      <td className="name">{primerDetails.name}</td>
+      </TableCell>
+      <TableCell className="name">{primerDetails.name}</TableCell>
       <PrimerDetailsTds
         primerId={primerDetails.id}
         primerDetails={primerDetails}
         pcrDetails={pcrDetails}
       />
-      <td className="sequence"><SequenceText>{primerDetails.sequence}</SequenceText></td>
-    </tr>
+      <TableCell className="sequence"><SequenceText>{primerDetails.sequence}</SequenceText></TableCell>
+    </TableRow>
   );
 }
 
