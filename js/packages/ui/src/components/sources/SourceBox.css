@@ -11,6 +11,7 @@ div.icon-corner button{
     border: none;
     background: none;
     color: var(--opencloning-palette-error-main);
+    cursor: pointer;
 }
 
 div.icon-corner button:hover {

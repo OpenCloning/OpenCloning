@@ -72,7 +72,14 @@ render it. Wrap any new app root or test harness in it too. Only the outermost o
 (its CSS variables are set on `:root`); nested ones just render their children. In component tests,
 pass theme options with `cy.mount(component, { themeOptions })`.
 
-Theme defaults: Tooltips have an arrow (don't pass `arrow`), and Alerts centre their icon vertically.
+Theme defaults: Tooltips have an arrow (don't pass `arrow`), Alerts centre their icon vertically, and
+table rows highlight on hover (don't pass `hover`) under a grey header row.
+
+## CSS that stays
+
+Every selector in the library's CSS must be scoped under an OpenCloning class (e.g.
+`.primer-table-container th`), never a bare element (`th`, `button`, `code`): the library CSS is loaded
+in other people's pages.
 
 Pages that embed OpenCloning can override the theme with MUI theme options, through the
 `themeOptions` prop of `<OpenCloning />` and `OpenCloningThemeProvider`, or the `themeOptions` option

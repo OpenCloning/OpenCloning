@@ -11,6 +11,7 @@
         "test": "yarn run -T vitest"
     },
     "dependencies": {
+        "@mui/material": "^9.5.0",
         "@opencloning/opencloning-elabftw": "workspace:*",
         "@opencloning/store": "workspace:*",
         "@opencloning/ui": "workspace:*",

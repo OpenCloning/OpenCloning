@@ -1,7 +1,3 @@
-button {
-    cursor: pointer;
-}
-
 .tf-tree .tf-nc, .tf-tree .tf-node-content {
     border: 3px solid;
     border-color: var(--opencloning-palette-primary-main);
@@ -150,19 +146,6 @@ span.node-text > div:first-child {
 
 } */
 
-body {
-    margin: 0px;
-    padding: 0px;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-html {
-    overflow: hidden;
-}
-
 div.select-source div.MuiFormControl-root {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -194,19 +177,6 @@ div.description-container p {
     /* Show line breaks */
     white-space: pre-line;
     text-align: left;
-}
-
-code {
-    background-color: lightgrey;
-    padding: 15px;
-    border-radius: 5px;
-    min-width: 40%;
-    box-shadow: inset 0px 0px 0px 3px gray;
-    margin-bottom: 30px;
-    white-space: pre-wrap;
-    display: inline-block;
-    text-align: left;
-    max-width: 50%;
 }
 
 .data-model-displayer {
