@@ -1,16 +1,16 @@
 import React from 'react'
 import { Upload as UploadIcon } from '@mui/icons-material'
-import { Box, Button } from '@mui/material'
+import { Box } from '@mui/material'
 import { useLinkedPlasmids } from '../context/FormDataContext';
 import SectionWrapper from './SectionWrapper';
 import { PlasmidSyntaxTable } from '@opencloning/ui/components/assembler';
+import { FileUploadButton } from '@opencloning/ui/components/common';
 
 function UploadPlasmidsButton({ onFileChange }) {
-  const fileInputRef = React.useRef(null);
-  return (<>
-    <Button size="small" variant="contained" startIcon={<UploadIcon />} onClick={() => fileInputRef.current.click()}>Upload linked plasmids</Button>
-    <input type="file" multiple ref={fileInputRef} style={{ display: 'none' }} onChange={(event) => onFileChange(Array.from(event.target.files))} accept=".gbk,.gb,.fasta,.fa,.dna" />
-  </>
+  return (
+    <FileUploadButton size="small" variant="contained" startIcon={<UploadIcon />} onFiles={onFileChange} multiple accept=".gbk,.gb,.fasta,.fa,.dna">
+      Upload linked plasmids
+    </FileUploadButton>
   )
 }
 

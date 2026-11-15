@@ -113,7 +113,7 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     - `CssBaseline` sets the `body` background, overriding `syntax-builder`'s `index.css`. Its page
       styles moved to `GlobalStyles`, after `CssBaseline`.
     - `standalone-app` keeps its `index.css`: it stands in for a non-React host page.
-- [ ] **5. Shared primitives.** Add `ExternalLink`, `SequenceText` and `FileUploadButton`, and adopt them.
+- [x] **5. Shared primitives.** Add `ExternalLink`, `SequenceText` and `FileUploadButton`, and adopt them.
   Apps import them from `@opencloning/ui/components/common`.
   - [x] `ExternalLink`: all native `<a target="_blank">` in the library, and syntax-builder's links.
     `Button`s with an `href` stay `Button`s. The app bar's Documentation link is still nested in a
@@ -122,7 +122,11 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     (`sx={{ typography: 'sequence' }}`) and text fields (`sequenceInputSx`). The `.sequence`, `#sequence`
     and `.sequence-cell` rules are deleted. File names and IDs stay monospace with their own `sx`: they
     are not sequences. syntax-builder's overhang columns keep their `index.css` rule (step 6).
-  - [ ] `FileUploadButton`
+  - [x] `FileUploadButton` (a `Button`, with its hidden input right after it; `onFiles` gets an array of
+    files) where a plain button opens the file picker: 5 places. File pickers opened from a menu or a card
+    (app bar File menu, bulk upload menus, Load Plasmids menu, sequencing files) keep their `<input>`
+    with a ref, now `hidden` instead of `style={{ display: 'none' }}`. Tests that select inputs by
+    position (`input[type="file"]').eq(n)`) still find them in the same order.
 - [ ] **6. Area sweeps**, one PR each:
   - [ ] `packages/ui/.../sources/`
   - [ ] `packages/ui/.../primers/` (native table → MUI `Table`)

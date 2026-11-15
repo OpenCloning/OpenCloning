@@ -101,7 +101,7 @@ export default function BulkUploadLinesButton() {
       />
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         accept=".csv,.tsv"
         ref={hiddenFileInput}

@@ -85,7 +85,7 @@ function LoadPlasmidsMenuButton({ onFilesSelected, extraOptions }) {
   }
 
   return <>
-    <input multiple type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={onFileInputChange} accept=".gbk,.gb,.fasta,.fa,.dna" data-testid="load-plasmids-file-input" />
+    <input multiple type="file" ref={fileInputRef} hidden onChange={onFileInputChange} accept=".gbk,.gb,.fasta,.fa,.dna" data-testid="load-plasmids-file-input" />
     <Button
       color="primary"
       onClick={(event) => setAnchorEl(event.currentTarget)}

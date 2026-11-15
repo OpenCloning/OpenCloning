@@ -131,7 +131,7 @@ function StartingPage({ setOverhangsStep }) {
                   <input
                     type="file"
                     ref={fileInputRef}
-                    style={{ display: 'none' }}
+                    hidden
                     onChange={onFileChange}
                     accept=".json,.tsv,.csv"
                   />
