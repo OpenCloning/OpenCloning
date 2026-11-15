@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, TableCell } from '@mui/material';
 import { getPrimerRowsInfo, primerRowStatus, rowIssues } from '../../utils/bulk_upload';
-import { BulkUploadPreview, CommonTableRow } from '@opencloning/opencloningdb';
+import { BulkUploadPreview, CommonTableRow, PreviewTable } from '@opencloning/opencloningdb';
 
 
 
@@ -30,31 +30,20 @@ function PrimerBulkUploadPreviewTableRow({ row }) {
   );
 }
 
+const COLUMNS = [
+  { label: 'Name', width: '22%' },
+  { label: 'UID', width: '12%' },
+  { label: 'Sequence', width: '36%' },
+  { label: 'Issues', width: '30%' },
+];
+
 function TableComponent({ rows }) {
   return (
-    <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
-      <colgroup>
-        <col style={{ width: '48px' }} />
-        <col style={{ width: '22%' }} />
-        <col style={{ width: '12%' }} />
-        <col style={{ width: '36%' }} />
-        <col style={{ width: '30%' }} />
-      </colgroup>
-      <TableHead sx={{ textAlign: 'center' }}>
-        <TableRow sx={{ textAlign: 'center' }}>
-          <TableCell padding="checkbox"></TableCell>
-          <TableCell>Name</TableCell>
-          <TableCell>UID</TableCell>
-          <TableCell>Sequence</TableCell>
-          <TableCell>Issues</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row, index) => (
-          <PrimerBulkUploadPreviewTableRow key={`${row.name}-${row.sequence}-${index}`} row={row} />
-        ))}
-      </TableBody>
-    </Table>
+    <PreviewTable columns={COLUMNS}>
+      {rows.map((row, index) => (
+        <PrimerBulkUploadPreviewTableRow key={`${row.name}-${row.sequence}-${index}`} row={row} />
+      ))}
+    </PreviewTable>
   );
 }
 

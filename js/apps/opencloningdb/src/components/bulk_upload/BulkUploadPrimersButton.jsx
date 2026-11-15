@@ -6,6 +6,7 @@ import { normalizePrimerSubmission } from '../../utils/bulk_upload';
 import BulkUploadMenuButton from './BulkUploadMenuButton';
 import { BULK_SUBMISSION_TEMPLATES } from './bulkSubmissionTemplates';
 import useBulkUploadFlow from './useBulkUploadFlow';
+import ButtonTooltipText from '../ButtonTooltipText';
 
 
 export default function BulkUploadPrimersButton() {
@@ -90,9 +91,9 @@ export default function BulkUploadPrimersButton() {
         onUploadClick={handleUploadClick}
         templatePath={BULK_SUBMISSION_TEMPLATES.primers}
         tooltip={(
-          <span style={{ fontSize: '1.2em' }}>
+          <ButtonTooltipText>
             Upload a .csv or .tsv file with headers name, sequence, uid
-          </span>
+          </ButtonTooltipText>
         )}
       />
 

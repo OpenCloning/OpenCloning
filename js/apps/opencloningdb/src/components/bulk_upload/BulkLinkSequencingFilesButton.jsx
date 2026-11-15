@@ -9,6 +9,7 @@ import { delimitedFileToJson } from '@opencloning/utils/fileParsers';
 import error2String from '@opencloning/utils/error2String';
 import useAppAlerts from '../../hooks/useAppAlerts';
 import { fastqSampleName, finalFastqFilesFromZip, pairFastqFilesWithSequences, sampleTableTsv } from '../../utils/bulk_upload';
+import ButtonTooltipText from '../ButtonTooltipText';
 
 /** Call mutate with the selected file, and clear the input so that the same file can be selected again. */
 const onFileSelected = (mutate) => (event) => {
@@ -97,7 +98,7 @@ export default function BulkLinkSequencingFilesButton() {
 
   return (
     <>
-      <Tooltip title={<span style={{ fontSize: '1.2em' }}>Link the .final.fastq files of a zipped sequencing run to sequences</span>}>
+      <Tooltip title={<ButtonTooltipText>Link the .final.fastq files of a zipped sequencing run to sequences</ButtonTooltipText>}>
         <Button onClick={() => zipInput.current?.click()} disabled={readZip.isPending} data-testid="bulk-link-sequencing-files-button">
           {readZip.isPending ? <CircularProgress size={24} /> : 'Link sequencing files'}
         </Button>

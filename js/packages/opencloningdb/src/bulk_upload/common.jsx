@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, TableContainer, Paper, Button, CircularProgress, Box, TableRow, TableCell, FormControl } from '@mui/material';
+import { Typography, TableContainer, Paper, Button, CircularProgress, Box, Table, TableBody, TableHead, TableRow, TableCell, FormControl } from '@mui/material';
 import TagMultiSelect from '../TagMultiSelect';
 import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Info as InfoIcon, Warning as WarningIcon } from '@mui/icons-material';
 
@@ -138,6 +138,30 @@ export function StatusIcon({ status }) {
 
 
 /** Table row with a status icon cell, the children cells and an issues cell. Other props are passed to the TableRow. */
+/**
+ * The table of a bulk upload preview: a status column, then `columns` ([{ label, width }], the last one
+ * for the issues), with a fixed layout. Its rows (children) are CommonTableRow.
+ */
+export function PreviewTable({ columns, children }) {
+  return (
+    <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
+      <colgroup>
+        <Box component="col" sx={{ width: 48 }} />
+        {columns.map(({ label, width }) => <Box component="col" key={label} sx={{ width }} />)}
+      </colgroup>
+      <TableHead>
+        <TableRow>
+          <TableCell padding="checkbox" />
+          {columns.map(({ label }) => <TableCell key={label}>{label}</TableCell>)}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {children}
+      </TableBody>
+    </Table>
+  );
+}
+
 export function CommonTableRow({ status, issues = [], children, ...rowProps }) {
 
   return (

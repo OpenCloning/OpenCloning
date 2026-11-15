@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip } from '@mui/material';
+import { Box, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip } from '@mui/material';
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import { StatusIcon } from '../bulk_upload/common';
 import { formatIdentity } from './sequencingCheckUtils';
@@ -48,12 +48,12 @@ export default function SequencingCheckTable({ rows, renderSequenceName = defaul
   return (
     <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }} data-testid="sequencing-check-table">
       <colgroup>
-        <col style={{ width: '30%' }} />
-        <col style={{ width: '48px' }} />
-        <col style={{ width: '35%' }} />
-        <col style={{ width: '10%' }} />
-        <col style={{ width: '56px' }} />
-        <col style={{ width: '25%' }} />
+        <Box component="col" sx={{ width: '30%' }} />
+        <Box component="col" sx={{ width: '48px' }} />
+        <Box component="col" sx={{ width: '35%' }} />
+        <Box component="col" sx={{ width: '10%' }} />
+        <Box component="col" sx={{ width: '56px' }} />
+        <Box component="col" sx={{ width: '25%' }} />
       </colgroup>
       <TableHead>
         <TableRow>

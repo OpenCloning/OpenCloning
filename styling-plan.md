@@ -154,7 +154,16 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     palette token. `AssemblerPart` keeps the same DOM (tests read the lines of a sequence by position),
     and its container has the class `assembler-part-container` (tests select `[class*="container"]`).
     Screenshots of the MoClo YTK syntax and 8 parts of its overview: all pixel-identical.
-  - [ ] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`)
+  - [x] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`): no styling warnings left
+    in `apps/opencloningdb` (29 before) nor in `packages/opencloningdb`. `PreviewTable` (`columns` prop, in
+    `packages/opencloningdb/src/bulk_upload/common.jsx`) is used by the 5 bulk upload previews,
+    `DetailTable` by the 10 tables of the detail pages, and `ButtonTooltipText` by the 7 action buttons
+    with a larger tooltip. `<col>` widths use `Box component="col"`. Screenshots of the 5 previews and the
+    tables of 5 detail pages: all pixel-identical (the seeded sequences have no detail tables, so
+    `SequenceDetailPage` is not covered). The DB e2e tests were not run: they reset the local database.
+    - [ ] Not done: the dialog scaffold and `Stack` rows from the table above. Filter field width:
+      `MIN_WIDTH` is 200 in the sequences and primers pages but 150 (and 1.5×) in the lines page, so a
+      single width would change the lines filters. Decide the width first.
   - [ ] `apps/syntax-builder`
 - [ ] **7. Clean up.** Delete emptied CSS files (and their entries in the pre-commit allowlist). Make the
   ESLint rules errors. `github-icon`, `import-primers-container` and `primer-designer` already look
