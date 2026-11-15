@@ -1,12 +1,12 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { TableCell } from '@mui/material';
 import {
   formatLineBulkList,
   getLineBulkRowsInfo,
   lineBulkRowIssues,
   lineBulkRowStatus,
 } from '../../utils/bulk_upload';
-import { BulkUploadPreview, CommonTableRow } from '@opencloning/opencloningdb';
+import { BulkUploadPreview, CommonTableRow, PreviewTable } from '@opencloning/opencloningdb';
 
 function LineBulkUploadPreviewTableRow({ row }) {
   const issues = lineBulkRowIssues(row);
@@ -22,33 +22,21 @@ function LineBulkUploadPreviewTableRow({ row }) {
   );
 }
 
+const COLUMNS = [
+  { label: 'UID', width: '18%' },
+  { label: 'Genotype', width: '22%' },
+  { label: 'Plasmids', width: '22%' },
+  { label: 'Parent UIDs', width: '18%' },
+  { label: 'Issues', width: '20%' },
+];
+
 function TableComponent({ rows }) {
   return (
-    <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
-      <colgroup>
-        <col style={{ width: '48px' }} />
-        <col style={{ width: '18%' }} />
-        <col style={{ width: '22%' }} />
-        <col style={{ width: '22%' }} />
-        <col style={{ width: '18%' }} />
-        <col style={{ width: '20%' }} />
-      </colgroup>
-      <TableHead sx={{ textAlign: 'center' }}>
-        <TableRow sx={{ textAlign: 'center' }}>
-          <TableCell padding="checkbox"></TableCell>
-          <TableCell>UID</TableCell>
-          <TableCell>Genotype</TableCell>
-          <TableCell>Plasmids</TableCell>
-          <TableCell>Parent UIDs</TableCell>
-          <TableCell>Issues</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row, index) => (
-          <LineBulkUploadPreviewTableRow key={`${row.uid}-${index}`} row={row} />
-        ))}
-      </TableBody>
-    </Table>
+    <PreviewTable columns={COLUMNS}>
+      {rows.map((row, index) => (
+        <LineBulkUploadPreviewTableRow key={`${row.uid}-${index}`} row={row} />
+      ))}
+    </PreviewTable>
   );
 }
 

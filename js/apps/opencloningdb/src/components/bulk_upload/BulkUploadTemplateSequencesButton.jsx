@@ -10,6 +10,7 @@ import { error2String } from '@opencloning/utils';
 import BulkUploadMenuButton from './BulkUploadMenuButton';
 import { BULK_SUBMISSION_TEMPLATES } from './bulkSubmissionTemplates';
 import useBulkUploadFlow from './useBulkUploadFlow';
+import ButtonTooltipText from '../ButtonTooltipText';
 
 const VALID_TYPES_HINT = VALID_TEMPLATE_SEQUENCE_TYPE_KEYS.join(', ');
 
@@ -95,13 +96,13 @@ export default function BulkUploadTemplateSequencesButton() {
         onUploadClick={handleUploadClick}
         templatePath={BULK_SUBMISSION_TEMPLATES.templateSequences}
         tooltip={(
-          <span style={{ fontSize: '1.2em' }}>
+          <ButtonTooltipText>
             Upload a .csv or .tsv file with headers name, sequence_type (case-insensitive).
             {' '}
             Valid sequence_type values:
             {' '}
             {VALID_TYPES_HINT}
-          </span>
+          </ButtonTooltipText>
         )}
       />
 

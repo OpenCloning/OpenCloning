@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { SubmitCloningStrategiesInBulkComponent } from '@opencloning/opencloningdb';
 import useAppAlerts from '../../hooks/useAppAlerts';
 import { FileUploadButton } from '@opencloning/ui/components/common';
+import ButtonTooltipText from '../ButtonTooltipText';
 
 export default function BulkUploadCloningStrategiesButton() {
   const { addAlert } = useAppAlerts();
@@ -37,9 +38,9 @@ export default function BulkUploadCloningStrategiesButton() {
         multiple
         data-testid="bulk-upload-cloning-strategies-button"
         tooltip={(
-          <span style={{ fontSize: '1.2em' }}>
+          <ButtonTooltipText>
             Upload OpenCloning JSON files (cloning strategy files) or SnapGene (.dna) files
-          </span>
+          </ButtonTooltipText>
         )}
       >
         Upload sequences with history
