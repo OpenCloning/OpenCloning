@@ -21,7 +21,7 @@ function CustomTableRow({ primer }) {
         <Tooltip title={msg} placement="top">{icon}</Tooltip>
       </TableCell>
       <TableCell>{name}</TableCell>
-      <TableCell className="sequence-cell">{sequence}</TableCell>
+      <TableCell className="sequence-cell" sx={{ typography: 'sequence' }}>{sequence}</TableCell>
     </TableRow>
   );
 }

@@ -16,6 +16,7 @@ import LoadCloningHistoryWrapper from '../LoadCloningHistoryWrapper';
 import useCloningHistoryLoader from '../../hooks/useCloningHistoryLoader';
 import GithubCornerRight from './GithubCornerRight';
 import { getExternalHttpClient } from '@opencloning/utils/httpClients';
+import ExternalLink from '../common/ExternalLink';
 
 // External urls (not the backend): no auth token, only whitelisted urls
 const httpClient = getExternalHttpClient();
@@ -173,7 +174,7 @@ function MainAppBar() {
                   {item.display}
                 </MenuItem>
               ))}
-              <MenuItem><a style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" href="https://docs.opencloning.org">Documentation</a></MenuItem>
+              <MenuItem><ExternalLink color="inherit" underline="none" href="https://docs.opencloning.org">Documentation</ExternalLink></MenuItem>
               <MenuItem onClick={() => { setOpenExampleDialog(true); handleMenuClose(); }}>Examples</MenuItem>
               <MenuItem onClick={() => { setOpenTemplateDialog(true); handleMenuClose(); }}>Templates</MenuItem>
               <MenuItem onClick={() => { setOpenFeedbackDialog(true); handleMenuClose(); }}>Feedback</MenuItem>
@@ -186,7 +187,7 @@ function MainAppBar() {
             <input type="file" ref={setFileInput} style={{ display: 'none' }} onChange={onFileChange} accept=".json,.zip" />
             {fileList && <LoadCloningHistoryWrapper fileList={fileList} clearFiles={() => setFileList([])} />}
             <ButtonWithMenu menuItems={helpMenu}>About</ButtonWithMenu>
-            <Button><a style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" href="https://docs.opencloning.org">Documentation</a></Button>
+            <Button><ExternalLink color="inherit" underline="none" href="https://docs.opencloning.org">Documentation</ExternalLink></Button>
             <Button onClick={() => setOpenExampleDialog(true)}>Examples</Button>
             <Button onClick={() => setOpenTemplateDialog(true)}>Templates</Button>
             <Button onClick={() => setOpenFeedbackDialog(true)}>Feedback</Button>

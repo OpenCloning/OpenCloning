@@ -27,6 +27,7 @@ import { useConfig } from '../../providers';
 import { isEqual } from 'lodash-es';
 import SyntaxOverviewTable from './SyntaxOverviewTable';
 import { graphToMSA, partsToGraph } from './graph_utils';
+import ExternalLink from '../common/ExternalLink';
 
 
 const { setState: setCloningState, setCurrentTab: setCurrentTabAction } = cloningActions;
@@ -515,7 +516,7 @@ function Assembler() {
   return (
     <>
       <Alert severity="warning" sx={{ maxWidth: '400px', margin: 'auto', fontSize: '.9rem', mb: 2 }}>
-        The Assembler is experimental. Use with caution. Visit <a href="https://docs.opencloning.org/assembler" target="_blank">the documentation</a> for more information.
+        The Assembler is experimental. Use with caution. Visit <ExternalLink href="https://docs.opencloning.org/assembler">the documentation</ExternalLink> for more information.
       </Alert>
       <ButtonGroup>
         <LoadSyntaxButton setSyntax={setSyntax} addPlasmids={addPlasmids} clearPlasmids={clearPlasmids} />

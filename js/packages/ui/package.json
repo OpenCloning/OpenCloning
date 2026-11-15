@@ -12,6 +12,7 @@
         ".": "./src/index.js",
         "./components": "./src/components/index.js",
         "./components/assembler": "./src/components/assembler/index.js",
+        "./components/common": "./src/components/common/index.js",
         "./components/dummy": "./src/components/dummy/index.js",
         "./components/form/GetRequestMultiSelect": "./src/components/form/GetRequestMultiSelect.jsx",
         "./components/form/RetryAlert": "./src/components/form/RetryAlert.jsx",

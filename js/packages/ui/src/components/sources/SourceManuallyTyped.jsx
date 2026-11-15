@@ -3,6 +3,7 @@ import { Checkbox, FormControl, FormControlLabel, TextField } from '@mui/materia
 import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import ValidatedTextField from '../form/ValidatedTextField';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
+import { sequenceInputSx } from '../common/SequenceText';
 
 function SourceManuallyTyped({ source, requestStatus, sendSourceRequest }) {
   const { id: sourceId } = source;
@@ -74,6 +75,7 @@ function SourceManuallyTyped({ source, requestStatus, sendSourceRequest }) {
         value={userInput}
         onInputChange={onInputChange}
         className="sequence"
+        sx={sequenceInputSx}
         submissionAttempted={submissionAttempted}
         required
         errorChecker={sequenceErrorChecker}

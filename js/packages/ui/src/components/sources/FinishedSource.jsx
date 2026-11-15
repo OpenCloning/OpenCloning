@@ -10,6 +10,7 @@ import { usePCRDetails } from '../primers/primer_details/usePCRDetails';
 import PCRTable from '../primers/primer_details/PCRTable';
 import RequestStatusWrapper from '../form/RequestStatusWrapper';
 import repositoryMetadata from './repositoryMetadata';
+import ExternalLink from '../common/ExternalLink';
 
 function DatabaseMessage({ source }) {
   const [loadingHistory, setLoadingHistory] = React.useState(false);
@@ -26,7 +27,7 @@ function DatabaseMessage({ source }) {
       <div>
         Imported from
         {' '}
-        <a target="_blank" rel="noopener noreferrer" href={database.getSequenceLink(source.database_id)}>{database.name}</a>
+        <ExternalLink href={database.getSequenceLink(source.database_id)}>{database.name}</ExternalLink>
       </div>
       {/* If the database interface has a LoadHistoryComponent, show a button to load the history */}
       {LoadHistoryComponent && (
@@ -60,9 +61,9 @@ function EuroscarfMessage({ source }) {
       Plasmid
       {' '}
       <strong>
-        <a href={`http://www.euroscarf.de/plasmid_details.php?accno=${repositoryId}`} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={`http://www.euroscarf.de/plasmid_details.php?accno=${repositoryId}`}>
           {repositoryId}
-        </a>
+        </ExternalLink>
       </strong>
       {' '}
       from Euroscarf
@@ -77,9 +78,9 @@ function WeKwikGeneMessage({ source }) {
       Plasmid
       {' '}
       <strong>
-        <a href={`https://wekwikgene.wllsb.edu.cn/plasmids/${repositoryId}`} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={`https://wekwikgene.wllsb.edu.cn/plasmids/${repositoryId}`}>
           {repositoryId}
-        </a>
+        </ExternalLink>
       </strong>
       {' '}
       from WeKwikGene
@@ -94,9 +95,9 @@ function BenchlingMessage({ source }) {
     <>
       Request to Benchling (
       <strong>
-        <a href={editUrl} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={editUrl}>
           link
-        </a>
+        </ExternalLink>
       </strong>
       )
     </>
@@ -111,9 +112,9 @@ function SnapGenePlasmidMessage({ source }) {
       Plasmid
       {' '}
       <strong>
-        <a href={`https://www.snapgene.com/plasmids/${plasmidSet}/${plasmidName}`} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={`https://www.snapgene.com/plasmids/${plasmidSet}/${plasmidName}`}>
           {plasmidName}
-        </a>
+        </ExternalLink>
       </strong>
       {' '}
       from SnapGene
@@ -128,16 +129,16 @@ function OpenDNACollectionsMessage({ source }) {
       Plasmid
       {' '}
 
-      <a href={sequenceFileUrl.replace('https://assets.opencloning.org/open-dna-collections', 'https://github.com/Reclone-org/open-dna-collections/tree/main')} target="_blank" rel="noopener noreferrer">
+      <ExternalLink href={sequenceFileUrl.replace('https://assets.opencloning.org/open-dna-collections', 'https://github.com/Reclone-org/open-dna-collections/tree/main')}>
         {repositoryId.split('/')[1]}
-      </a>
+      </ExternalLink>
       {' '} from collection {' '}
-      <a href={`https://github.com/Reclone-org/open-dna-collections/tree/main/${repositoryId.split('/')[0]}`} target="_blank" rel="noopener noreferrer">
+      <ExternalLink href={`https://github.com/Reclone-org/open-dna-collections/tree/main/${repositoryId.split('/')[0]}`}>
         {repositoryId.split('/')[0]}
-      </a>
+      </ExternalLink>
 
       {' '}
-      from <a href="https://github.com/Reclone-org/open-dna-collections" target="_blank" rel="noopener noreferrer">Open DNA Collections</a>
+      from <ExternalLink href="https://github.com/Reclone-org/open-dna-collections">Open DNA Collections</ExternalLink>
     </>
   );
 }
@@ -154,9 +155,9 @@ function RepositoryIdMessage({ source }) {
     <>
       {`Request to ${repositorySlug || source.type} with ID `}
       <strong>
-        <a href={url} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={url}>
           {source.repository_id}
-        </a>
+        </ExternalLink>
       </strong>
     </>
   );
@@ -189,14 +190,14 @@ function RecombinaseMessage({ source }) {
                     {r.name}
                   </Typography>
                 )}
-                <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', fontSize: '0.9em' }}>
-                  <Box component="span" sx={{ color: 'text.secondary', fontFamily: 'inherit', fontWeight: 500 }}>
+                <Typography variant="body2" component="div" sx={{ typography: 'sequence', fontSize: '0.9em' }}>
+                  <Box component="span" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                     {r.site1_name || 'site1'}:
                   </Box>
                   {' '}{r.site1}
                 </Typography>
-                <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', fontSize: '0.9em', mt: 0.5 }}>
-                  <Box component="span" sx={{ color: 'text.secondary', fontFamily: 'inherit', fontWeight: 500 }}>
+                <Typography variant="body2" component="div" sx={{ typography: 'sequence', fontSize: '0.9em', mt: 0.5 }}>
+                  <Box component="span" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                     {r.site2_name || 'site2'}:
                   </Box>
                   {' '}{r.site2}
@@ -216,7 +217,7 @@ function PlannotateAnnotationMessage({ source }) {
     <>
       <div>
         {'Annotation from '}
-        <a href="https://github.com/mmcguffi/pLannotate" target="_blank" rel="noopener noreferrer">pLannotate</a>
+        <ExternalLink href="https://github.com/mmcguffi/pLannotate">pLannotate</ExternalLink>
       </div>
       <Button onClick={() => setDialogOpen(true)}>
         See report
@@ -234,7 +235,7 @@ function IGEMMessage({ source }) {
     return (
       <>
         {`iGEM plasmid ${source.repository_id} from `}
-        <a href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX" target="_blank" rel="noopener noreferrer">2024 iGEM Distribution</a>
+        <ExternalLink href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX">2024 iGEM Distribution</ExternalLink>
       </>
     );
   }
@@ -245,21 +246,21 @@ function IGEMMessage({ source }) {
     <>
       <div>
         {'iGEM '}
-        <a href={source.sequence_file_url} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={source.sequence_file_url}>
           plasmid
-        </a>
+        </ExternalLink>
         {' containing part '}
-        <a href={`https://parts.igem.org/Part:${partName}`} target="_blank" rel="noopener noreferrer">{partName}</a>
+        <ExternalLink href={`https://parts.igem.org/Part:${partName}`}>{partName}</ExternalLink>
         {` in backbone ${backbone} from `}
-        <a href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX" target="_blank" rel="noopener noreferrer">2024 iGEM Distribution</a>
+        <ExternalLink href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX">2024 iGEM Distribution</ExternalLink>
       </div>
       <div style={{ marginTop: '10px' }}>
         {'Annotated with '}
-        <a href="https://github.com/mmcguffi/pLannotate" target="_blank" rel="noopener noreferrer">
+        <ExternalLink href="https://github.com/mmcguffi/pLannotate">
           pLannotate
-        </a>
+        </ExternalLink>
         {', see report '}
-        <a href={`https://github.com/manulera/annotated-igem-distribution/blob/master/results/reports/${indexInCollection}.csv`} target="_blank" rel="noopener noreferrer">here</a>
+        <ExternalLink href={`https://github.com/manulera/annotated-igem-distribution/blob/master/results/reports/${indexInCollection}.csv`}>here</ExternalLink>
       </div>
     </>
   );
@@ -269,9 +270,9 @@ function SEVAPlasmidMessage({ source }) {
   return (
     <div>
       {'SEVA plasmid '}
-      <a href={source.sequence_file_url} target="_blank" rel="noopener noreferrer">
+      <ExternalLink href={source.sequence_file_url}>
         {source.repository_id}
-      </a>
+      </ExternalLink>
     </div>
   );
 }
@@ -343,13 +344,13 @@ function GenomeCoordinatesMessage({ source }) {
         <div>
           <strong>Assembly:</strong>
           {' '}
-          <a href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${source.assembly_accession}`} target="_blank" rel="noopener noreferrer">{source.assembly_accession}</a>
+          <ExternalLink href={`https://www.ncbi.nlm.nih.gov/datasets/genome/${source.assembly_accession}`}>{source.assembly_accession}</ExternalLink>
         </div>
       )}
       <div>
         <strong>Coords:</strong>
         {' '}
-        <a href={`https://www.ncbi.nlm.nih.gov/nuccore/${source.repository_id}`} target="_blank" rel="noopener noreferrer">{source.repository_id}</a>
+        <ExternalLink href={`https://www.ncbi.nlm.nih.gov/nuccore/${source.repository_id}`}>{source.repository_id}</ExternalLink>
         {` (${coordinateString}, ${strand})`}
       </div>
       {source.locus_tag && (
@@ -363,9 +364,9 @@ function GenomeCoordinatesMessage({ source }) {
         <div>
           <strong>Gene ID:</strong>
           {' '}
-          <a href={`https://www.ncbi.nlm.nih.gov/gene/${source.gene_id}`} target="_blank" rel="noopener noreferrer">
+          <ExternalLink href={`https://www.ncbi.nlm.nih.gov/gene/${source.gene_id}`}>
             {source.gene_id}
-          </a>
+          </ExternalLink>
         </div>
       )}
 

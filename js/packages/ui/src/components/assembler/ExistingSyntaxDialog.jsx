@@ -140,7 +140,7 @@ function ExistingSyntaxDialog({ staticContentPath, onClose, onSyntaxSelect, disp
             ))}
             {displayCreateYourOwnMessage && <ListItem>
               <ListItemText primary="🔎 Can't find your favourite syntax?" secondary="Add it yourself! It's very easy!" />
-              <Button type="a" color="success" href="https://syntax.opencloning.org" target="_blank">Create a syntax</Button>
+              <Button color="success" href="https://syntax.opencloning.org" target="_blank" rel="noopener noreferrer">Create a syntax</Button>
             </ListItem>}
           </List>
         </RequestStatusWrapper>

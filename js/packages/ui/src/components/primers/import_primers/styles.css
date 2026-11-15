@@ -47,10 +47,6 @@
   white-space: nowrap;
 }
 
-.sequence-cell {
-  font-family: monospace;
-}
-
 .primer-add-container {
   display: flex;
   justify-content: center;

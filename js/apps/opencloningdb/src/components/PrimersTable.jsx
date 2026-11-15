@@ -49,7 +49,7 @@ function PrimersTable({ primers, showCreatedBy = false, showCreatedAt = false, w
             <TableCell>
               <TagChipList tags={primer.tags ?? []} />
             </TableCell>
-            <TableCell sx={{ fontFamily: 'monospace' }}>{primer.sequence ?? '—'}</TableCell>
+            <TableCell sx={{ typography: 'sequence' }}>{primer.sequence ?? '—'}</TableCell>
             {showCreatedBy && (
               <TableCell>{primer.created_by?.display_name ?? '—'}</TableCell>
             )}

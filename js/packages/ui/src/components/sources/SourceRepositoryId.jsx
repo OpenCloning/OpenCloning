@@ -5,6 +5,7 @@ import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import RequestStatusWrapper from '../form/RequestStatusWrapper';
 import { getExternalHttpClient } from '@opencloning/utils/httpClients';
 import repositoryMetadata from './repositoryMetadata';
+import ExternalLink from '../common/ExternalLink';
 
 const httpClient = getExternalHttpClient();
 
@@ -49,11 +50,11 @@ function SnapgeneSuccessComponent({ option }) {
     <Alert severity="info" sx={{ mb: 1 }}>
       Plasmid
       {' '}
-      <a href={`https://www.snapgene.com/plasmids/${option.path}`} target="_blank" rel="noopener noreferrer">{option.name}</a>
+      <ExternalLink href={`https://www.snapgene.com/plasmids/${option.path}`}>{option.name}</ExternalLink>
       {' '}
       from set
       {' '}
-      <a href={`https://www.snapgene.com/plasmids/${option.plasmidSet}`} target="_blank" rel="noopener noreferrer">{option.plasmidSetName}</a>
+      <ExternalLink href={`https://www.snapgene.com/plasmids/${option.plasmidSet}`}>{option.plasmidSetName}</ExternalLink>
     </Alert>
   );
 }
@@ -71,11 +72,11 @@ function iGEMSuccessComponent({ option }) {
   return (
     <Alert severity="info" sx={{ mb: 1 }}>
       {'Plasmid '}
-      <a href={option.url} target="_blank" rel="noopener noreferrer">{option.table_name}</a>
+      <ExternalLink href={option.url}>{option.table_name}</ExternalLink>
       {' containing part '}
-      <a href={option.part_url} target="_blank" rel="noopener noreferrer">{option.part_name}</a>
+      <ExternalLink href={option.part_url}>{option.part_name}</ExternalLink>
       {` in backbone ${option.backbone} from `}
-      <a href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX" target="_blank" rel="noopener noreferrer">2024 iGEM Distribution</a>
+      <ExternalLink href="https://airtable.com/appgWgf6EPX5gpnNU/shrb0c8oYTgpZDRgH/tblNqHsHbNNQP2HCX">2024 iGEM Distribution</ExternalLink>
     </Alert>
   );
 }
@@ -119,8 +120,8 @@ const openDNACollectionsGetOptions = (data, inputValue, groupedBy) => data.map((
 function OpenDNACollectionsSuccessComponent({ option }) {
   return (
     <Alert severity="info" sx={{ mb: 1 }}>
-      Plasmid <a href={option.url} target="_blank" rel="noopener noreferrer">{option.name}</a> {' '}
-      from collection <a href={`https://github.com/Reclone-org/open-dna-collections/tree/main/${option.collection}`} target="_blank" rel="noopener noreferrer">{option.collection}</a>
+      Plasmid <ExternalLink href={option.url}>{option.name}</ExternalLink> {' '}
+      from collection <ExternalLink href={`https://github.com/Reclone-org/open-dna-collections/tree/main/${option.collection}`}>{option.collection}</ExternalLink>
     </Alert>
   );
 }
@@ -333,7 +334,7 @@ function SourceRepositoryId({ source, requestStatus, sendSourceRequest }) {
                 <Alert severity="info" sx={{ mb: 1 }}>
                   The sequence must be publicly accessible. Use the URL from a sequence editor page (ending in &quot;/edit&quot;), like
                   {' '}
-                  <a target="_blank" rel="noopener noreferrer" href="https://benchling.com/siverson/f/lib_B94YxDHhQh-cidar-moclo-library/seq_dh1FrJTc-b0015_dh/edit">this example</a>
+                  <ExternalLink href="https://benchling.com/siverson/f/lib_B94YxDHhQh-cidar-moclo-library/seq_dh1FrJTc-b0015_dh/edit">this example</ExternalLink>
                   .
                 </Alert>
               )}

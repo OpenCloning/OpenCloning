@@ -2,6 +2,7 @@ import React from 'react'
 import SectionWrapper from './SectionWrapper'
 import { useFormData } from '../context/FormDataContext';
 import { DataGrid, useGridApiRef } from '@mui/x-data-grid';
+import { SequenceText } from '@opencloning/ui/components/common';
 
 function OverhangNamesForm() {
   const { overhangNames, updateOverhangName } = useFormData();
@@ -23,7 +24,7 @@ function OverhangNamesForm() {
       width: 150,
       editable: false,
       renderCell: (params) => (
-        <span style={{ fontFamily: 'monospace' }}>{params.value}</span>
+        <SequenceText>{params.value}</SequenceText>
       ),
     },
     {

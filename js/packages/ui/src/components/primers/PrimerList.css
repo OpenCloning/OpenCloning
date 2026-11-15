@@ -35,7 +35,3 @@
 div.primer-table-container {
     overflow-x: scroll;
 }
-
-.sequence, #sequence {
-    font-family: monospace;
-}

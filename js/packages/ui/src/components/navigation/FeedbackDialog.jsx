@@ -1,5 +1,6 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Link } from '@mui/material';
 import React from 'react';
+import ExternalLink from '../common/ExternalLink';
 
 function FeedbackDialog({ open, setOpen }) {
   return (
@@ -16,12 +17,12 @@ function FeedbackDialog({ open, setOpen }) {
             <li style={{ marginBottom: 10 }}>
               If you use GitHub,
               {' '}
-              <a href="https://github.com/OpenCloning/OpenCloning/issues/new" target="_blank" rel="noopener noreferrer">create an issue</a>
+              <ExternalLink href="https://github.com/OpenCloning/OpenCloning/issues/new">create an issue</ExternalLink>
             </li>
             <li>
               Otherwise, send an email to
               {' '}
-              <a href="mailto:manuel.lera-ramirez@ucl.ac.uk">manuel.lera-ramirez@ucl.ac.uk</a>
+              <Link href="mailto:manuel.lera-ramirez@ucl.ac.uk">manuel.lera-ramirez@ucl.ac.uk</Link>
             </li>
           </ul>
 
