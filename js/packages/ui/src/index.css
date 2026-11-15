@@ -12,23 +12,6 @@
     color: var(--opencloning-palette-savedToDatabase-main);
 }
 
-.app-container {
-    display: flex;
-    flex-direction: column;
-    /* height: calc(100vh - 114px - 10px); - moved to component to depend on presence of appbar */
-    background-color: var(--opencloning-palette-background-default);
-}
-
-.tab-panels-container {
-    height: 100%;
-    overflow: auto;
-}
-
-.main-sequence-editor {
-    width: 70%;
-    margin: auto;
-}
-
 .node-corner {
     position: absolute;
     right: -1px;
@@ -128,75 +111,3 @@ span.node-text > div:first-child {
     overflow: visible;
 
 } */
-
-div.description-container {
-    margin: auto;
-    margin-bottom: 2em;
-    max-width: 600px;
-}
-
-div.description-container p {
-    /* Show line breaks */
-    white-space: pre-line;
-    text-align: left;
-}
-
-.data-model-displayer {
-    text-align: center;
-}
-
-.data-model-displayer p {
-    font-size: large;
-}
-
-div.dragging-file {
-    text-align: center;
-}
-
-.drag-file-wrapper {
-    border: 5px dashed;
-    border-color: var(--opencloning-palette-grey-500);
-    width: 40%;
-    height: 400px;
-    padding: 10px;
-    margin: auto;
-    text-align: center;
-    border-radius: 40px;
-}
-
-.drag-file-container {
-    padding: 10px;
-}
-
-.drag-file-container .drag-file-close {
-    text-align: right;
-    color: var(--opencloning-palette-error-main);
-    cursor: pointer;
-}
-
-.drag-file-container .drag-file-close svg {
-    font-size: 40px;
-}
-
-.drag-file-container .drag-file-close:hover {
-    /* 70% brightness */
-    filter: brightness(70%);
-}
-
-div#global-error-message-wrapper {
-    position: relative;
-    top: 0;
-    z-index: 999;
-    max-width: 25em;
-}
-
-div#global-error-message-wrapper > div {
-    margin-left: 10px;
-    margin-bottom: 10px;
-    /* Allow line breaks in very long strings only when necessary */
-    word-break: break-word;
-}
-
-.tab-panels-container {
-    text-align: center;
-}

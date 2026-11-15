@@ -47,24 +47,24 @@ export default [
       }
     }
   },
-  // Styling conventions (.claude/skills/mui-styling). Warnings while old code is migrated (styling-plan.md).
+  // Styling conventions (.claude/skills/mui-styling)
   {
     files: ['{apps,packages}/*/src/**/*.jsx'],
     ignores: ['**/*.cy.jsx'],
     rules: {
-      'react/forbid-dom-props': ['warn', { forbid: [
+      'react/forbid-dom-props': ['error', { forbid: [
         { propName: 'style', message: 'Use an MUI component with sx instead (see .claude/skills/mui-styling)' },
       ] }],
-      'react/forbid-component-props': ['warn', { forbid: [
+      'react/forbid-component-props': ['error', { forbid: [
         { propName: 'style', message: 'Use sx instead' },
       ] }],
-      'react/forbid-elements': ['warn', { forbid: [
+      'react/forbid-elements': ['error', { forbid: [
         { element: 'button', message: 'use Button or IconButton' },
         { element: 'a', message: 'use Link' },
         ...['table', 'thead', 'tbody', 'tr', 'th', 'td'].map((element) => ({ element, message: 'use the MUI Table components' })),
         ...['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].map((element) => ({ element, message: 'use Typography' })),
       ] }],
-      'no-restricted-syntax': ['warn', {
+      'no-restricted-syntax': ['error', {
         selector: 'Literal[value=/^(#[0-9a-fA-F]{3,8}|rgba?\\(.*\\))$/]',
         message: 'Use a theme palette token instead of a hard-coded colour',
       }],

@@ -162,11 +162,11 @@ function GlobalPrimerSettingsSection() {
 
 function SettingsTab() {
     return (
-        <div style={{ padding: 16, display: 'flex', justifyContent: 'center' }}>
-            <div style={{ maxWidth: 600, width: '100%' }}>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ maxWidth: 600, width: '100%' }}>
                 <GlobalPrimerSettingsSection />
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 

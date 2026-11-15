@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tabs } from '@mui/material';
+import { Tabs, Box } from '@mui/material';
 import DescriptionEditor from './DescriptionEditor';
 import PrimerList from './primers/PrimerList';
 import SettingsTab from './settings/SettingsTab';
@@ -48,7 +48,16 @@ function OpenCloning({ themeOptions }) {
   // The apps already provide the theme; this is for pages that embed <OpenCloning /> directly
   return (
     <OpenCloningThemeProvider themeOptions={themeOptions}>
-      <div className="app-container" style={{ height: hasAppBar ? 'calc(100vh - 114px - 10px)' : '100vh' }}>
+      <Box
+        className="app-container"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          // The app bar is 114px high (+10px)
+          height: hasAppBar ? 'calc(100vh - 114px - 10px)' : '100vh',
+          bgcolor: 'background.default',
+        }}
+      >
         <Tabs
           variant={smallDevice ? 'scrollable' : 'standard'}
           scrollButtons={smallDevice ? 'auto' : false}
@@ -67,7 +76,7 @@ function OpenCloning({ themeOptions }) {
           <CustomTab label="Settings" index={5} />
           {enableAssembler && <CustomTab label="Assembler" index={6} />}
         </Tabs>
-        <div className="tab-panels-container" ref={tabPanelsRef}>
+        <Box className="tab-panels-container" ref={tabPanelsRef} sx={{ height: '100%', overflow: 'auto', textAlign: 'center' }}>
           <AppAlerts reducerName="cloning" removeAlert={removeAlert} />
           <TabPanel index={1} value={currentTab} className="primer-tab-pannel">
             <div className="primer-list-container">
@@ -81,9 +90,9 @@ function OpenCloning({ themeOptions }) {
           </TabPanel>
           {/* For some reason, putting this here is required for primer.color to work */}
           <TabPanel index={3} value={currentTab} className="main-editor-tab-pannel">
-            <div className="main-sequence-editor">
+            <Box className="main-sequence-editor" sx={{ width: '70%', mx: 'auto' }}>
               <SequenceTab />
-            </div>
+            </Box>
           </TabPanel>
           <TabPanel index={0} value={currentTab} className="cloning-tab-pannel">
             <div className="open-cloning">
@@ -99,8 +108,8 @@ function OpenCloning({ themeOptions }) {
           {enableAssembler && <TabPanel index={6} value={currentTab} className="assembler-tab-pannel">
             <Assembler />
           </TabPanel>}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </OpenCloningThemeProvider>
   );
 }
