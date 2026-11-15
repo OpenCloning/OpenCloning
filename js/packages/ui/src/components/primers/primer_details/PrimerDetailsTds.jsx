@@ -1,4 +1,4 @@
-import { Skeleton } from '@mui/material';
+import { Skeleton, TableCell } from '@mui/material';
 import React from 'react';
 import { formatGcContent, formatMeltingTemperature } from './primerDetailsFormatting';
 
@@ -20,16 +20,16 @@ function PrimerDetailsTds({ primerDetails, pcrDetails }) {
   }
   return (
     <>
-      <td style={{ whiteSpace: 'nowrap' }} className="length">{length}</td>
+      <TableCell sx={{ whiteSpace: 'nowrap' }} className="length">{length}</TableCell>
       {primerDetails.gc_content !== undefined ? (
         <>
-          <td style={{ whiteSpace: 'nowrap' }} className="melting-temperature">{meltingTemperature}</td>
-          <td style={{ whiteSpace: 'nowrap' }} className="gc-content">{gcContent}</td>
+          <TableCell sx={{ whiteSpace: 'nowrap' }} className="melting-temperature">{meltingTemperature}</TableCell>
+          <TableCell sx={{ whiteSpace: 'nowrap' }} className="gc-content">{gcContent}</TableCell>
         </>
       ) : (
         <>
-          <td style={{ whiteSpace: 'nowrap' }} className="melting-temperature">{loadingOrErrorComponent}</td>
-          <td style={{ whiteSpace: 'nowrap' }} className="gc-content">{loadingOrErrorComponent}</td>
+          <TableCell sx={{ whiteSpace: 'nowrap' }} className="melting-temperature">{loadingOrErrorComponent}</TableCell>
+          <TableCell sx={{ whiteSpace: 'nowrap' }} className="gc-content">{loadingOrErrorComponent}</TableCell>
         </>
       )}
     </>

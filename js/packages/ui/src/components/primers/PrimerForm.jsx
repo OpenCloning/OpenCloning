@@ -1,9 +1,9 @@
 import React from 'react';
 import { CheckCircle as CheckCircleIcon, Cancel as CancelIcon } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import ValidatedTextField from '../form/ValidatedTextField';
 
-import './PrimerForm.css';
+import primerRowSx from './primerRowSx';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
 import { sequenceInputSx } from '../common/SequenceText';
 
@@ -55,7 +55,7 @@ function PrimerForm({
   const nameErrorChecker = (s) => (existingNames.includes(s) ? { error: true, helperText: 'Name exists' } : { error: false, helperText: '' });
 
   return (
-    <form className="primer-row" onSubmit={onSubmit} style={{ margin: 'auto' }}>
+    <Box component="form" className="primer-row" onSubmit={onSubmit} sx={[primerRowSx, { m: 'auto' }]}>
       <ValidatedTextField
         id="name"
         label="Name"
@@ -99,7 +99,7 @@ function PrimerForm({
       </IconButton>
       )}
 
-    </form>
+    </Box>
   );
 }
 

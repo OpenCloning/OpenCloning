@@ -1,9 +1,8 @@
 import React from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { Button, ButtonGroup } from '@mui/material';
+import { Box, Button, ButtonGroup, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import PrimerForm from './PrimerForm';
 import PrimerTableRow from './PrimerTableRow';
-import './PrimerList.css';
 import { cloningActions } from '@opencloning/store/cloning';
 import ImportPrimersButton from './import_primers/ImportPrimersButton';
 import PrimerDatabaseImportForm from './import_primers/PrimerDatabaseImportForm';
@@ -13,6 +12,9 @@ import DownloadPrimersButton from './DownloadPrimersButton';
 import useMultiplePrimerDetails from './primer_details/useMultiplePrimerDetails';
 import { usePCRDetails } from './primer_details/usePCRDetails';
 import RequestStatusWrapper from '../form/RequestStatusWrapper';
+
+// The primer table and the forms below it share this width
+const containerSx = { width: '60%', mx: 'auto', mb: 1 };
 
 function PrimerList() {
   const primers = useSelector((state) => state.cloning.primers, shallowEqual);
@@ -45,22 +47,22 @@ function PrimerList() {
   const details = primerDetails.length > 0 ? primerDetails : primers.map((p) => ({ ...p, length: p.sequence.length }));
   return (
     <>
-      <div className="primer-table-container">
+      <Box className="primer-table-container" sx={[containerSx, { overflowX: 'scroll' }]}>
         <RequestStatusWrapper requestStatus={primerDetailsRequestStatus} retry={() => { retryGetPrimerDetails(); retryGetPCRDetails(); }}>
           <RequestStatusWrapper requestStatus={pcrDetailsRequestStatus} retry={retryGetPCRDetails} />
         </RequestStatusWrapper>
-        <table>
-          <thead>
-            <tr style={{ whiteSpace: 'nowrap' }}>
-              <th> </th>
-              <th>Name</th>
-              <th>Length</th>
-              <th>Tm</th>
-              <th>GC%</th>
-              <th>Sequence</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ whiteSpace: 'nowrap' }}>
+              <TableCell sx={{ width: '15%' }} />
+              <TableCell>Name</TableCell>
+              <TableCell>Length</TableCell>
+              <TableCell>Tm</TableCell>
+              <TableCell>GC%</TableCell>
+              <TableCell>Sequence</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {details.filter((primer) => primer.id !== editingPrimerId).map((primer) => (
               <PrimerTableRow
                 key={primer.id}
@@ -71,10 +73,10 @@ function PrimerList() {
                 onEditClick={onEditClick}
               />
             ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="primer-form-container">
+          </TableBody>
+        </Table>
+      </Box>
+      <Box className="primer-form-container" sx={containerSx}>
         {(editingPrimerId && (
           <PrimerForm
             key="primer-edit"
@@ -98,7 +100,7 @@ function PrimerList() {
             existingNames={primers.map((p) => p.name)}
           />
         )) || (
-            <div className="primer-add-container">
+            <Box className="primer-add-container" sx={{ display: 'flex', justifyContent: 'center' }}>
               <ButtonGroup>
               <Button
                 onClick={switchAddingPrimer}
@@ -116,9 +118,9 @@ function PrimerList() {
 
               )}
               </ButtonGroup>
-            </div>
+            </Box>
           )}
-      </div>
+      </Box>
 
     </>
   );

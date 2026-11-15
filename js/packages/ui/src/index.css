@@ -189,11 +189,6 @@ div.dragging-file {
     filter: brightness(70%);
 }
 
-div.primer-designer {
-    margin: auto;
-    width: 60%;
-}
-
 div#global-error-message-wrapper {
     position: relative;
     top: 0;

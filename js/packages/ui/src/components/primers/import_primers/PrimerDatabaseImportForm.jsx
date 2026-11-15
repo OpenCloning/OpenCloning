@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Alert, Button, TextField } from '@mui/material';
+import { Alert, Box, Button, Stack, TextField } from '@mui/material';
 
 import useDatabase from '../../../hooks/useDatabase';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
 import { isEqual } from 'lodash-es';
 import { sequenceInputSx } from '../../common/SequenceText';
+import primerRowSx from '../primerRowSx';
 
 function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
   const existingNames = useSelector((state) => state.cloning.primers.map((p) => p.name), isEqual);
@@ -40,18 +41,18 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
   };
 
   return (
-    <form className="primer-row" onSubmit={onSubmit}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1em', width: '80%', margin: 'auto' }}>
-        <div style={{ display: 'flex', gap: '2em', alignItems: 'center', justifyContent: 'center' }}>
+    <Box component="form" className="primer-row" onSubmit={onSubmit} sx={primerRowSx}>
+      <Stack spacing={2} sx={{ width: '80%', m: 'auto' }}>
+        <Stack direction="row" spacing={4} sx={{ alignItems: 'center', justifyContent: 'center' }}>
           <database.GetPrimerComponent
             primer={primer}
             setPrimer={setPrimer}
             setError={setError}
             existingDatabaseIds={existingDatabaseIds}
           />
-        </div>
+        </Stack>
         {primer && (
-          <div style={{ display: 'flex', gap: '1em', alignItems: 'center' }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <TextField
               label="Name"
               value={primer.name}
@@ -67,7 +68,7 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
               fullWidth
               sx={sequenceInputSx}
             />
-          </div>
+          </Stack>
         )}
         {error && (
         <Alert severity="error" sx={{ mt: 1 }}>
@@ -75,7 +76,7 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
         </Alert>
         )}
 
-        <div style={{ display: 'flex', gap: '1em', justifyContent: 'center' }}>
+        <Stack direction="row" spacing={2} sx={{ justifyContent: 'center' }}>
           <Button
             variant="outlined"
             color="error"
@@ -91,15 +92,9 @@ function PrimerDatabaseImportForm({ submitPrimer, cancelForm }) {
           >
             Import Primer
           </Button>
-        </div>
-
-      </div>
-
-      {primer && (
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: '1em' }} />
-      )}
-
-    </form>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }
 
