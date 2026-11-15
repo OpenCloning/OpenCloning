@@ -111,12 +111,6 @@ div.corner-id {
     font-weight: bold;
 }
 
-button.github-icon svg {
-    padding: 0;
-    color: white;
-    font-size: 30px;
-}
-
 /* Prevents scollbar from showing on small editors,
    that was caused by overflowing numbers at the edges
    of the x axis */

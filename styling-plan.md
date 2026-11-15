@@ -143,7 +143,12 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     `box-shadow: 24` was invalid), and `OrientationPicker` is a grid instead of a layout `<table>` (its
     e2e selector is now `.orientation-picker span`). The primer design e2e tests are viewport-sensitive:
     at the default 1000×660, 4 of them can fail to select a region in the editor, at 1600×1000 they pass.
-  - [ ] `packages/ui/.../navigation/`
+  - [x] `packages/ui/.../navigation/`: no styling warnings left (5 before). `MainAppBar.css` and the
+    unused `github-icon` rule deleted. The Documentation link is a `Button` with an `href` (an `<a>`
+    nested in a `<button>` before), and a `MenuItem component="a"` in the mobile menu. The CSS
+    `position: relative` of the app bar never applied (MUI's styles come after the CSS files), so it
+    stays `position="static"`: a relative app bar draws its shadow over the tabs. Screenshots: only
+    the Feedback dialog changed (paragraph spacing, 4px taller).
   - [ ] `packages/ui/.../assembler/`
   - [ ] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`)
   - [ ] `apps/syntax-builder`
