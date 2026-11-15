@@ -102,8 +102,8 @@ export default function BulkLinkSequencingFilesButton() {
           {readZip.isPending ? <CircularProgress size={24} /> : 'Link sequencing files'}
         </Button>
       </Tooltip>
-      <input style={{ display: 'none' }} type="file" accept=".zip" ref={zipInput} onChange={onFileSelected(readZip.mutate)} data-testid="bulk-link-sequencing-files-zip-input" />
-      <input style={{ display: 'none' }} type="file" accept=".csv,.tsv" ref={tableInput} onChange={onFileSelected(link.mutate)} data-testid="bulk-link-sequencing-files-table-input" />
+      <input hidden type="file" accept=".zip" ref={zipInput} onChange={onFileSelected(readZip.mutate)} data-testid="bulk-link-sequencing-files-zip-input" />
+      <input hidden type="file" accept=".csv,.tsv" ref={tableInput} onChange={onFileSelected(link.mutate)} data-testid="bulk-link-sequencing-files-table-input" />
 
       <BulkUploadModal
         open={run !== null}

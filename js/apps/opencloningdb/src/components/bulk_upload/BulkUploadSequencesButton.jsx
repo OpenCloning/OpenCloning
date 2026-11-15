@@ -98,7 +98,7 @@ export default function BulkUploadSequencesButton() {
       </Tooltip>
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         multiple
         ref={hiddenFileInput}

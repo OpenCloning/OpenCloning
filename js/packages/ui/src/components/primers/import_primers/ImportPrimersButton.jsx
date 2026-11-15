@@ -1,30 +1,22 @@
 import React, { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
-import { Button, Tooltip, Modal, Box } from '@mui/material';
+import { Button, Modal, Box } from '@mui/material';
 import useCloningAlerts from '../../../hooks/useCloningAlerts';
 import './styles.css';
 
 import { primersFromTextFile } from '@opencloning/utils/fileParsers';
 import PrimersImportTable from './ImportPrimersTable';
+import FileUploadButton from '../../common/FileUploadButton';
 
 function ImportPrimersButton({ addPrimer }) {
   const { addAlert } = useCloningAlerts();
   const existingNames = useSelector((state) => state.cloning.primers.map((p) => p.name), shallowEqual);
 
-  // Ref to the hidden file input element
-  const hiddenFileInput = React.useRef(null);
   const [openModal, setOpenModal] = useState(false);
   const [importedPrimers, setImportedPrimers] = useState([]);
   const importButtonDisabled = importedPrimers.every((primer) => primer.error !== '');
 
-  // Function to simulate click on hidden file input
-  const handleUploadClick = () => {
-    hiddenFileInput.current.click();
-  };
-
-  // Function to handle file selection
-  const handleFileUpload = async (event) => {
-    const fileUploaded = event.target.files[0];
+  const handleFileUpload = async ([fileUploaded]) => {
     try {
       const uploadedPrimers = await primersFromTextFile(fileUploaded, existingNames);
       setImportedPrimers(uploadedPrimers);
@@ -35,7 +27,6 @@ function ImportPrimersButton({ addPrimer }) {
         severity: 'error',
       });
     }
-    event.target.value = null;
   };
 
   const handleImportClick = () => {
@@ -49,21 +40,13 @@ function ImportPrimersButton({ addPrimer }) {
 
   return (
     <>
-      <Tooltip title={<span style={{ fontSize: '1.4em' }}>Upload a .csv or .tsv file with headers &apos;name&apos; and &apos;sequence&apos;</span>}>
-        <Button
-          onClick={handleUploadClick}
-        >
-          Import from file
-        </Button>
-      </Tooltip>
-
-      <input
-        style={{ display: 'none' }}
-        type="file"
+      <FileUploadButton
+        onFiles={handleFileUpload}
         accept=".csv,.tsv"
-        ref={hiddenFileInput}
-        onChange={handleFileUpload}
-      />
+        tooltip={<span style={{ fontSize: '1.4em' }}>Upload a .csv or .tsv file with headers &apos;name&apos; and &apos;sequence&apos;</span>}
+      >
+        Import from file
+      </FileUploadButton>
 
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box className="import-primers-modal-content">

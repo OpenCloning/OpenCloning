@@ -106,7 +106,7 @@ export default function BulkUploadTemplateSequencesButton() {
       />
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         accept=".csv,.tsv"
         ref={hiddenFileInput}

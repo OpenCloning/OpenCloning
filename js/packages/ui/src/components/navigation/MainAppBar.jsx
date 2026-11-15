@@ -184,7 +184,7 @@ function MainAppBar() {
           {/* Desktop buttons - hidden on mobile */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
             <ButtonWithMenu menuItems={fileMenu}>File</ButtonWithMenu>
-            <input type="file" ref={setFileInput} style={{ display: 'none' }} onChange={onFileChange} accept=".json,.zip" />
+            <input type="file" ref={setFileInput} hidden onChange={onFileChange} accept=".json,.zip" />
             {fileList && <LoadCloningHistoryWrapper fileList={fileList} clearFiles={() => setFileList([])} />}
             <ButtonWithMenu menuItems={helpMenu}>About</ButtonWithMenu>
             <Button><ExternalLink color="inherit" underline="none" href="https://docs.opencloning.org">Documentation</ExternalLink></Button>

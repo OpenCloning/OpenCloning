@@ -59,6 +59,17 @@ Replace native controls and text with MUI components:
 Keep plain structural elements (`div`, `span`, `ul`, `li`, `form`). Turning a bare `<div>` into a
 `<Box>` adds an import and makes nothing clearer. Use `Box` when the element needs `sx`.
 
+## Shared primitives
+
+In `js/packages/ui/src/components/common/` (apps import them from `@opencloning/ui/components/common`):
+
+- `ExternalLink`: any link that opens in a new tab (sets `target` and `rel`).
+- `SequenceText`: a DNA sequence in text. For a table cell use `sx={{ typography: 'sequence' }}`, and for
+  a text field `sx={sequenceInputSx}`. Never write `fontFamily: 'monospace'` for a sequence.
+- `FileUploadButton`: a button that opens the file picker (`onFiles` gets an array of files). For a file
+  picker opened from a menu, use `<input type="file" hidden ref={…}>`, not `style={{ display: 'none' }}`.
+- `CodeBlock`: code or other preformatted text.
+
 ## Spacing between siblings
 
 Put the spacing on the parent with `Stack` (`<Stack spacing={2}>`), rather than giving every child its

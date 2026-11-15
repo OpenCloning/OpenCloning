@@ -97,7 +97,7 @@ export default function BulkUploadPrimersButton() {
       />
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         accept=".csv,.tsv"
         ref={hiddenFileInput}
