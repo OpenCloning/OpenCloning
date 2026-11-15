@@ -10,6 +10,8 @@ const themeOptions = {
   palette: {
     // Sequences and sources that are saved in the database
     savedToDatabase: { main: '#008000' },
+    // Dashed outline of the overhangs in the assembler's part diagrams
+    overhang: { main: '#EE220C' },
   },
   typography: {
     // DNA sequences (see SequenceText): monospace, at the size of the surrounding text

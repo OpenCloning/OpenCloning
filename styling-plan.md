@@ -149,7 +149,11 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     `position: relative` of the app bar never applied (MUI's styles come after the CSS files), so it
     stays `position="static"`: a relative app bar draws its shadow over the tabs. Screenshots: only
     the Feedback dialog changed (paragraph spacing, 4px taller).
-  - [ ] `packages/ui/.../assembler/`
+  - [x] `packages/ui/.../assembler/`: no styling warnings left (3 before). `assembly_component.module.css`
+    deleted: its `:root` variables leaked into the host page, and `--border-color` is now the `overhang`
+    palette token. `AssemblerPart` keeps the same DOM (tests read the lines of a sequence by position),
+    and its container has the class `assembler-part-container` (tests select `[class*="container"]`).
+    Screenshots of the MoClo YTK syntax and 8 parts of its overview: all pixel-identical.
   - [ ] `apps/opencloningdb` pages and bulk upload (`PreviewTable`, `DetailTable`)
   - [ ] `apps/syntax-builder`
 - [ ] **7. Clean up.** Delete emptied CSS files (and their entries in the pre-commit allowlist). Make the
