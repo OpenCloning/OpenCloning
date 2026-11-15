@@ -143,7 +143,6 @@ repos:
           (?x)^js/(
             apps/opencloningdb/src/index\.css|
             apps/standalone-app/src/index\.css|
-            apps/syntax-builder/src/index\.css|
             packages/ui/src/index\.css|
             packages/ui/src/components/NetworkTree\.css
           )$

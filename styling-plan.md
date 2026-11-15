@@ -164,7 +164,11 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     - [ ] Not done: the dialog scaffold and `Stack` rows from the table above. Filter field width:
       `MIN_WIDTH` is 200 in the sequences and primers pages but 150 (and 1.5×) in the lines page, so a
       single width would change the lines filters. Decide the width first.
-  - [ ] `apps/syntax-builder`
+  - [x] `apps/syntax-builder`: no styling warnings left (3 before), and `index.css` deleted: the page
+    styles were already in `GlobalStyles` (step 4), the rest moved to `sx` (sticky header in
+    `HeaderActions`, background in `App`, overhang columns in the `sequence` typography). Colour
+    literals in the colour column replaced with palette tokens. Screenshots: identical except the
+    border of the colour swatches (`#ccc` → `grey.400`).
 - [ ] **7. Clean up.** Delete emptied CSS files (and their entries in the pre-commit allowlist). Make the
   ESLint rules errors. `github-icon`, `import-primers-container` and `primer-designer` already look
   unused.
