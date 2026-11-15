@@ -8,7 +8,7 @@ import SampleUidBadge from './SampleUidBadge';
 
 function SequenceTableRow({ seq, withCheckbox, showSampleUids, showType, showCreatedBy, showCreatedAt, selectedIds, toggleRow }) {
   return (
-    <TableRow key={seq.id} hover>
+    <TableRow key={seq.id}>
       {withCheckbox && (
         <TableCell padding="checkbox">
           <Checkbox

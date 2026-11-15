@@ -1,6 +1,7 @@
 import { isEqual } from 'lodash-es';
 import React from 'react';
 import { useSelector } from 'react-redux';
+import CodeBlock from './common/CodeBlock';
 
 function DataModelDisplayer() {
   const { sources,  sequences, primers } = useSelector((state) => state.cloning, isEqual);
@@ -20,9 +21,9 @@ function DataModelDisplayer() {
         .
       </p>
 
-      <code>
+      <CodeBlock sx={{ display: 'inline-block', minWidth: '40%', maxWidth: '50%', mb: 4, whiteSpace: 'pre-wrap' }}>
         {JSON.stringify({ sources, sequences: trimmedSequences, primers }, null, 4)}
-      </code>
+      </CodeBlock>
     </div>
   );
 }

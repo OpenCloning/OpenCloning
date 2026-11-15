@@ -18,6 +18,15 @@ const themeOptions = {
         root: { alignItems: 'center' },
       },
     },
+    // Tables have a grey header row, and highlight the row under the pointer
+    MuiTableCell: {
+      styleOverrides: {
+        head: ({ theme }) => ({ backgroundColor: theme.vars.palette.grey[100] }),
+      },
+    },
+    MuiTableRow: {
+      defaultProps: { hover: true },
+    },
     MuiTooltip: {
       defaultProps: { arrow: true },
       styleOverrides: {

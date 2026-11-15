@@ -47,7 +47,7 @@ function LinesTable({ lines = [], showCreatedBy = false, showCreatedAt = false, 
       <TableBody>
         {lines.map((line) => {
           return (
-            <TableRow key={line.id} hover>
+            <TableRow key={line.id}>
               {withCheckbox &&
               (<TableCell padding="checkbox">
                 <Checkbox

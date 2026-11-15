@@ -1,9 +1,3 @@
-table {
-    width: auto;
-    border-collapse: collapse;
-    width: 100%;
-}
-
 .primer-table-container {
     width: 60%;
     margin: auto;
@@ -16,25 +10,26 @@ table {
     margin-bottom: 10px;
 }
 
-table th:first-child, td.icons {
+/* The primer table (a native table, until it is converted to MUI) */
+.primer-table-container table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.primer-table-container th:first-child, .primer-table-container td.icons {
     width: 15%;
     /* Prevent icons from appear as column is sequence is very long */
     white-space: nowrap;
 }
 
-th, td {
-    border-bottom: 1px solid #ddd;
+.primer-table-container th, .primer-table-container td {
+    border-bottom: 1px solid var(--opencloning-palette-divider);
     padding: 8px;
     text-align: left;
 }
 
-th {
-    background-color: #f0f0f0;
-}
-
-
-tr:hover {
-    background-color: #f0f0f0;
+.primer-table-container th, .primer-table-container tr:hover {
+    background-color: var(--opencloning-palette-grey-100);
 }
 
 div.primer-table-container {

@@ -48,7 +48,8 @@ Contents:
 - [x] **Palette:** `savedToDatabase`, for nodes of the cloning history saved in the database.
 - [ ] **Typography:** a `sequence` variant for monospace sequences (written inline 20 times), added with
   `SequenceText` in step 5.
-- [x] **Component overrides:** alerts vertically centred, tooltips with an arrow and `1rem` text.
+- [x] **Component overrides:** alerts vertically centred, tooltips with an arrow and `1rem` text,
+  tables with a grey header row and rows highlighted on hover.
 - [x] **CSS variables**, for the CSS that is left.
 - **Deliberately not defaulted:** `fullWidth` (131 uses) and `size="small"` (64 uses). Their use is
   mixed, and a hidden default makes a call site harder to read.
@@ -58,6 +59,7 @@ Contents:
 | Component | Evidence | Replaces |
 |---|---|---|
 | `ExternalLink` | 41 `target="_blank" rel=…` in 11 files; MUI `Link` used 5 times | the ~12 `…Message` functions in `FinishedSource.jsx` |
+| `CodeBlock` ✅ | the global `code` rule, used by 2 components | added in step 4 |
 | `SequenceText` | 20 inline `monospace` | `.sequence`, `.sequence-cell`, inline `fontFamily` |
 | `FileUploadButton` | 16 `type="file"` inputs, 15 `display: 'none'` | hidden-input boilerplate in 15 files |
 | `PreviewTable` (`columns` prop) | 5 bulk-upload tables with the same shell and hand-written `<col>` widths | ~30 lines per file |
@@ -88,10 +90,16 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
   - `github-icon` rule: unused, step 7.
   - `standalone-app` toggle button: stays. It is plain HTML outside React, so it can't rely on the
     theme's CSS variables (they are removed when OpenCloning unmounts).
-- [ ] **4. Stop the leaks.** Scope the bare `table`/`code`/`button` rules. Move `html`/`body` styles out
-  of the library into the apps (no embedder relies on them).
+- [x] **4. Stop the leaks.** The library CSS no longer styles elements outside OpenCloning:
+  - `html`/`body`: moved to the `opencloning` app (`GlobalStyles` in `index.jsx`), the only app that needs
+    the page not to scroll. Checked before/after in all four apps that load the library CSS.
+  - `button`: the cursor moved to the one native button (`SourceBox`).
+  - `code`: replaced by the `CodeBlock` component (`components/common/`).
+  - Bare table rules: scoped to the native primer table. MUI tables were also getting them, so their grey
+    header and row hover are now in the theme.
   - [ ] Separate PR with screenshots: `CssBaseline` in each app root, replacing the hand-written resets in
-    `test-app` and `standalone-app`.
+    `test-app` and `standalone-app`. Until then `test-app` shows the browser's default 8px body margin
+    (it never loaded its own `index.css`, and relied on the library's).
 - [ ] **5. Shared primitives.** Add `ExternalLink`, `SequenceText` and `FileUploadButton`, and adopt them.
 - [ ] **6. Area sweeps**, one PR each:
   - [ ] `packages/ui/.../sources/`
