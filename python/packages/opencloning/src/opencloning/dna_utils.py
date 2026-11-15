@@ -9,11 +9,13 @@ import subprocess
 import os
 import shutil
 from pydna.parsers import parse
-from Bio.Align import PairwiseAligner, Alignment
+from Bio.Align import PairwiseAligner
 from Bio.Data.IUPACData import ambiguous_dna_values as _ambiguous_dna_values
 from pairwise_alignments_to_msa.alignment import aligned_tuples_to_MSA
-from copy import deepcopy
-import numpy as np
+import edlib
+import logging
+import re
+from itertools import combinations
 from pydna.utils import location_boundaries, shift_location
 from Bio.SeqFeature import SimpleLocation, CompoundLocation
 
@@ -23,38 +25,15 @@ ambiguous_only_dna_values = {**_ambiguous_dna_values}
 for normal_base in 'ACGT':
     del ambiguous_only_dna_values[normal_base]
 
+IUPAC_BASES = set(_ambiguous_dna_values)
+# Pairs of IUPAC codes that can represent the same base, so edlib counts them as matches
+IUPAC_EQUALITIES = [
+    (a, b)
+    for a, b in combinations(sorted(_ambiguous_dna_values), 2)
+    if set(_ambiguous_dna_values[a]) & set(_ambiguous_dna_values[b])
+]
 
-def get_sequence_shift(sequence: str, reference: str) -> int:
-    """Given two identical but shifted sequences, return the shift."""
-    if sequence == reference:
-        return 0
-    else:
-        result = (sequence.upper() * 2).find(reference.upper())
-        if result == -1:
-            raise ValueError('Sequence not found in reference')
-        return result % len(sequence)
-
-
-def remove_padding(alignment: Alignment, reference: str) -> (str, str):
-    """Remove the padding from the permutated sequence."""
-    new_alignment = deepcopy(alignment)
-    permutated_sequence = new_alignment.sequences[1]
-    sequence_shift = get_sequence_shift(permutated_sequence, reference)
-    padding = len(permutated_sequence) - len(reference)
-    if padding == 0:
-        return tuple(new_alignment)
-    unshifted = permutated_sequence[sequence_shift:] + permutated_sequence[:sequence_shift]
-    replaced = unshifted[:-padding] + '-' * padding
-    new_alignment.sequences[1] = replaced[-sequence_shift:] + replaced[:-sequence_shift]
-
-    # Remove positions in the alignment where both positions contain a dash
-    # this happens because of - matching Ns in the permutated sequence.
-    # It's not the best way to do this, but it works for now.
-    out_seqs = tuple(new_alignment)
-    seqs_array = np.array([list(s) for s in out_seqs])
-    # Drop positions where both sequences are dashes
-    seqs_array = seqs_array[:, ~np.all(seqs_array == '-', axis=0)]
-    return tuple(''.join(s) for s in seqs_array)
+logger = logging.getLogger(__name__)
 
 
 def sum_is_sticky(three_prime_end: tuple[str, str], five_prime_end: tuple[str, str], partial: bool = False) -> int:
@@ -105,31 +84,78 @@ def align_with_mafft(inputs: list[str], orientation_known: bool) -> list[str]:
     return [str(s.seq) for s in parse(result.stdout)]
 
 
-def permutate_trace(reference: str, sanger_trace: str) -> str:
-    """Permutate a trace with respect to the reference using MARS"""
-    # As an input for MARS, we need the reference + all traces
-    # We include traces in both directions, since MARS does not handle
-    # reverse complements - see https://github.com/lorrainea/MARS/issues/17#issuecomment-2598314356
-    len_diff = len(reference) - len(sanger_trace)
-    padded_trace = sanger_trace
-    # TODO: Better way of discriminating between Sanger / full sequence sequencing
-    if len_diff > 0 and (len(sanger_trace) / len(reference) < 0.8):
-        padded_trace = sanger_trace + len_diff * 'N'
+def _edlib_infix(query: str, target: str) -> dict:
+    """Align query as an infix of target (edlib HW mode), counting IUPAC-compatible bases as matches."""
+    return edlib.align(query, target, mode='HW', task='path', additionalEqualities=IUPAC_EQUALITIES)
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_path = os.path.join(tmpdir, 'input.fa')
-        with open(input_path, 'w') as f:
-            f.write(f">ref\n{reference}\n")
-            f.write(f">trace\n{padded_trace}\n")
 
-        output_path = os.path.join(tmpdir, 'output.fa')
-        result = subprocess.run(['mars', '-a', 'DNA', '-m', '0', '-i', input_path, '-o', output_path, '-q', '5', '-l', '20', '-P', '1'], capture_output=True, text=True)  # fmt: skip
+def _longest_exact_run(cigar: str, q_start: int, t_start: int) -> tuple[int, int]:
+    """Walk an extended CIGAR (=, X, I, D) and return the midpoint of the longest run of matches
+    as (position in query, position in target). If there are no matches, return the start positions."""
+    q, t = q_start, t_start
+    best_len, best = 0, (q_start, t_start)
+    for length, op in re.findall(r'(\d+)([=XID])', cigar):
+        length = int(length)
+        if op == '=' and length > best_len:
+            best_len, best = length, (q + length // 2, t + length // 2)
+        if op in '=XI':
+            q += length
+        if op in '=XD':
+            t += length
+    return best
 
-        if result.returncode != 0:
-            raise RuntimeError(f'MARS failed:\n{result.stderr}')
 
-        # read permutated trace
-        return str(parse(output_path, 'fasta')[1].seq)
+def _rotate_alignment_to_reference_origin(ref_aln: str, trace_aln: str, ref_shift: int) -> tuple[str, str]:
+    """Rotate the columns of an alignment of a reference rotated by ref_shift, so that the reference
+    row starts at the original index 0 again."""
+    ref_len = len(ref_aln) - ref_aln.count('-')
+    origin = (ref_len - ref_shift) % ref_len
+    base_columns = [i for i, base in enumerate(ref_aln) if base != '-']
+    column = base_columns[origin]
+    return ref_aln[column:] + ref_aln[:column], trace_aln[column:] + trace_aln[:column]
+
+
+def _align_to_circular_reference(reference: str, trace: str) -> tuple[str, str]:
+    """Align a trace to a circular reference. Edlib fixes the strand of the trace and a rotation
+    of both sequences in which the trace does not cross the origin, then the alignment is done with
+    the pairwise aligner, and rotated back so the reference is in its original coordinates."""
+    trace_is_shorter = len(trace) <= len(reference)
+    short, long = (trace, reference) if trace_is_shorter else (reference, trace)
+    long_twice = long + long
+
+    fwd = _edlib_infix(short, long_twice)
+    rvs = _edlib_infix(reverse_complement(short), long_twice)
+    is_reverse = rvs['editDistance'] < fwd['editDistance']
+    rough = rvs if is_reverse else fwd
+    t_start, t_end = rough['locations'][0]
+
+    if t_end - t_start + 1 > len(long):
+        logger.warning(
+            'Sanger trace aligns to more than one full turn of the sequence, '
+            'the sequences may contain repeats or be too different, the alignment may be wrong'
+        )
+
+    if is_reverse:
+        trace = reverse_complement(trace)
+
+    if len(trace) / len(reference) >= 0.8:
+        # Plasmid vs plasmid: rotate both to start at the middle of the longest exact match
+        i, t = _longest_exact_run(rough['cigar'], 0, t_start)
+        if is_reverse and not trace_is_shorter:
+            # The alignment is rc(reference) vs trace + trace, map it to reference vs rc(trace) + rc(trace)
+            i, t = len(short) - 1 - i, 2 * len(long) - 1 - t
+        j = t % len(long)
+        ref_shift, trace_shift = (j, i) if trace_is_shorter else (i, j)
+        trace = trace[trace_shift:] + trace[:trace_shift]
+    else:
+        # Short read (always shorter than the reference): rotate the reference to the middle of the
+        # region the read does not cover, so that the read lies inside it without crossing the origin
+        span = t_end - t_start + 1
+        ref_shift = (t_end + 1 + max(len(reference) - span, 0) // 2) % len(reference)
+
+    rotated_reference = reference[ref_shift:] + reference[:ref_shift]
+    ref_aln, trace_aln = next(aligner.align(rotated_reference, trace))
+    return _rotate_alignment_to_reference_origin(ref_aln, trace_aln, ref_shift)
 
 
 def align_sanger_traces(dseqr: Dseqrecord, sanger_traces: list[str]) -> list[str]:
@@ -140,34 +166,24 @@ def align_sanger_traces(dseqr: Dseqrecord, sanger_traces: list[str]) -> list[str
     sanger_traces = [trace.upper() for trace in sanger_traces]
 
     # Check that required executables exist in PATH
-    if not shutil.which('mars'):
-        raise RuntimeError("'mars' executable not found in PATH")
     if not shutil.which('mafft'):
         raise RuntimeError("'mafft' executable not found in PATH")
 
+    for trace in sanger_traces:
+        if not set(trace) <= IUPAC_BASES:
+            raise ValueError('Sanger trace contains characters that are not IUPAC nucleotides')
+
     aligned_pairs = []
     for trace in sanger_traces:
-        # If the sequence is circular, permutate both fwd and reverse complement
-        rc_trace = reverse_complement(trace)
         if dseqr.circular:
-            fwd = permutate_trace(query_str, trace)
-            rvs = permutate_trace(query_str, rc_trace)
-        else:
-            fwd = trace
-            rvs = rc_trace
+            aligned_pairs.append(_align_to_circular_reference(query_str, trace))
+            continue
 
-        # Pairwise-align and keep the best alignment
-        fwd_alignment = next(aligner.align(query_str, fwd))
-        rvs_alignment = next(aligner.align(query_str, rvs))
-
+        # Pairwise-align both orientations and keep the best alignment
+        fwd_alignment = next(aligner.align(query_str, trace))
+        rvs_alignment = next(aligner.align(query_str, reverse_complement(trace)))
         best_alignment = fwd_alignment if fwd_alignment.score > rvs_alignment.score else rvs_alignment
-
-        if dseqr.circular:
-            trace4padding = trace if best_alignment is fwd_alignment else rc_trace
-            formatted_alignment = remove_padding(best_alignment, trace4padding)
-        else:
-            formatted_alignment = tuple(best_alignment)
-        aligned_pairs.append(formatted_alignment)
+        aligned_pairs.append(tuple(best_alignment))
 
     return aligned_tuples_to_MSA(aligned_pairs)
 

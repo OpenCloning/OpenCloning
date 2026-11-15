@@ -10,9 +10,9 @@
 ARG APP_TARGET="cloning"
 
 # BUILDER — shared setup
-FROM manulera/opencloningbackend-base:python_3.12-alpine3.21 AS base-setup
+FROM python:3.12-slim-bookworm AS base-setup
 
-RUN adduser -s /bin/bash -D backend
+RUN useradd -m -s /bin/bash backend
 USER backend
 WORKDIR /home/backend
 
@@ -52,9 +52,11 @@ COPY packages/opencloning-mcp/src packages/opencloning-mcp/src
 
 FROM workspace-full AS builder-test
 
-RUN uv sync --frozen --no-default-groups --no-editable --group test
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends mafft && rm -rf /var/lib/apt/lists/*
+USER backend
 
-ENV PATH="/usr/local/bin/mafft/bin:$VIRTUAL_ENV/bin:$PATH"
+RUN uv sync --frozen --no-default-groups --no-editable --group test
 
 COPY conftest.py conftest.py
 COPY packages/opencloning-db/tests packages/opencloning-db/tests
@@ -76,13 +78,13 @@ RUN uv sync --frozen --package opencloning-mcp --no-default-groups --no-editable
 FROM builder-prod-${APP_TARGET} AS builder-selected
 
 # FINAL IMAGE (default build target)
-FROM python:3.12-alpine3.21 AS production
+FROM python:3.12-slim-bookworm AS production
 
-# You need bash to run mafft and runtime libraries for MARS
-RUN apk update --no-cache && apk add --no-cache bash libstdc++ libgomp libgcc
+# mafft is used for multiple sequence alignment of sanger traces
+RUN apt-get update && apt-get install -y --no-install-recommends mafft && rm -rf /var/lib/apt/lists/*
 
 # create a user to run the app
-RUN adduser -s /bin/bash -D backend
+RUN useradd -m -s /bin/bash backend
 USER backend
 WORKDIR /home/backend
 ARG APP_TARGET="cloning"
@@ -90,10 +92,8 @@ ENV APP_TARGET="${APP_TARGET}"
 
 ENV VIRTUAL_ENV="/home/backend/venv"
 COPY --from=builder-selected $VIRTUAL_ENV $VIRTUAL_ENV
-COPY --from=builder-selected /usr/local/bin/mars /usr/local/bin/mars
-COPY --from=builder-selected /usr/local/bin/mafft /usr/local/bin/mafft
 
-ENV PATH="/usr/local/bin/mafft/bin:$VIRTUAL_ENV/bin:$PATH"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV USE_HTTPS=false
 
 # Worker processes per container

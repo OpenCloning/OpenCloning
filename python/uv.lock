@@ -563,6 +563,29 @@ wheels = [
 ]
 
 [[package]]
+name = "edlib"
+version = "1.3.9.post1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/dd/caa71ef15b46375e01581812e52ec8e3f4da0686f370e8b9179eb5f748fb/edlib-1.3.9.post1.tar.gz", hash = "sha256:b0fb6e85882cab02208ccd6daa46f80cb9ff1d05764e91bf22920a01d7a6fbfa", size = 120216, upload-time = "2024-09-04T22:29:55.414Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/a8/bee9a0e6133ede12505b07339e4d125c2a5b8c4dfad5fe9a7304f9fc6e6e/edlib-1.3.9.post1-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:6249493e72f324f731ab23433d04a06888f45319d8f7a765b6d1f135f102fa38", size = 132161, upload-time = "2024-09-04T22:32:39.953Z" },
+    { url = "https://files.pythonhosted.org/packages/14/66/6d3973667832706a86754db98293393df8f87906105101479c75d6e02548/edlib-1.3.9.post1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:fdf895ce15a81097b191ded0f829a426d1d76b12147cfe01ad75ba5aa70af00d", size = 70496, upload-time = "2024-09-04T22:32:41.47Z" },
+    { url = "https://files.pythonhosted.org/packages/41/b3/267cf3b9f6ba13bede5c2f29957102f4988fead04ad7fed89e4bdf89562a/edlib-1.3.9.post1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ea4714c98756954d19325dee61093e7b8d0ec204dae522c27d57998c32a4a796", size = 397043, upload-time = "2024-09-04T21:44:26.463Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/df/70cacedb6b238b5258942bd8fdb890aa6a65b19517f9cfdc241928a0b549/edlib-1.3.9.post1-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:82e95bcc4a025d919db53b3b48e98e967afc4c6d741d39e906cdeca6bc74deda", size = 1477867, upload-time = "2024-09-04T21:44:27.935Z" },
+    { url = "https://files.pythonhosted.org/packages/65/ff/8fc79ffde2f54b015bd698dc69c516913f4103126ff5c467c8c8bcd81817/edlib-1.3.9.post1-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:2aba2e45677b19a26a7d9acd74bd0869a6b138b7626dbeafcd5a15aea00b36f2", size = 1399372, upload-time = "2024-09-04T21:44:29.922Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/de/8fd435bb5d76b86147ff16b86de269ac51f2515c027fa6b16d602e53b83d/edlib-1.3.9.post1-cp312-cp312-macosx_10_9_universal2.whl", hash = "sha256:9bc0d778527d2a1ff60379d6620c2fa057bc7a94a8a31ec525e550b7afcfd83c", size = 132817, upload-time = "2024-09-04T22:32:42.576Z" },
+    { url = "https://files.pythonhosted.org/packages/00/62/57d8b700aa5d2f9912b6689e7b309fbf0555d115c7881068ded3d705a679/edlib-1.3.9.post1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:947080004c9fa82dfae9330ecc8ac9f5506503ea3fd379e0cd20b24c4dd51bb7", size = 71450, upload-time = "2024-09-04T22:32:44.081Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/98/6d75b060dd4c5f8a91b5c7031faf41cccb58448ffc14d0ef03e02ecb6c67/edlib-1.3.9.post1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b8539562cfb7b387decae9492e86fbc35094ded4769ea8242273015c073ad366", size = 397510, upload-time = "2024-09-04T21:44:31.511Z" },
+    { url = "https://files.pythonhosted.org/packages/da/cd/1acfddd17aa804ba8dcb9900c4a5c7a959310a57b351696d940617b878a9/edlib-1.3.9.post1-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:508687d0a16ff1f3f63d31511f469b43028a865faf1fb68fbf5499aa78b4e7ec", size = 1476286, upload-time = "2024-09-04T21:44:33.029Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/97/98c62f1c6dead23373aa968a3e5928908fb93cdc826d712e6136e0736022/edlib-1.3.9.post1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:2d6f40a19d0dc784c5f3b27c2989e431614797bcb77f15b55781491cdab1666f", size = 1396526, upload-time = "2024-09-04T21:44:34.403Z" },
+    { url = "https://files.pythonhosted.org/packages/14/a7/7d7d4f7ff473127fbcc1ae65e6fc17ed6f024b4bc55c41e79a11298cc4ab/edlib-1.3.9.post1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:d87ea04825968350bc5dabe1e95f7d0fe357183c26a039592d4ff12d53ae6c7a", size = 130496, upload-time = "2024-09-04T22:32:45.503Z" },
+    { url = "https://files.pythonhosted.org/packages/3c/fb/e1ac4e8088f15fad0dab1cf95b23ca0855ada8b0a14451492f3320b2e1a0/edlib-1.3.9.post1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:c328b481eb9bb4fde7b5a79c5f251413e2486033d5bc92d6788f6ce301e398cc", size = 70170, upload-time = "2024-09-04T22:32:46.624Z" },
+    { url = "https://files.pythonhosted.org/packages/f9/f3/f12157bbace8c9149133fc7eb5bd03894ae52301d372e010a967dae1fe3b/edlib-1.3.9.post1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6e6457ff3e80d29eb42436eea7235babd3f1db78a526565e1fdce102aa3f6fa0", size = 396268, upload-time = "2024-09-04T21:44:35.898Z" },
+    { url = "https://files.pythonhosted.org/packages/18/e2/bfa5ec07a7ce0835598b00f4935c510057945580c25dc0e725fa696ee464/edlib-1.3.9.post1-cp313-cp313-musllinux_1_2_i686.whl", hash = "sha256:a8ebdc95d9f5233b4ebd0b7061eb05d9786ccac05a2065faebf2dd61cf1ac945", size = 1473440, upload-time = "2024-09-04T21:44:37.023Z" },
+    { url = "https://files.pythonhosted.org/packages/27/6a/569bf9584318fe13bf7e5e9ac580043f8e0ca54c97354e971f9cd831241b/edlib-1.3.9.post1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:a8dc08d4e162bd9f0c0f4a2511a2769c2953e3315915f5631e33096c85b27ac5", size = 1396601, upload-time = "2024-09-04T21:44:38.475Z" },
+]
+
+[[package]]
 name = "email-validator"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1223,11 +1246,11 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "biopython" },
     { name = "certifi" },
+    { name = "edlib" },
     { name = "fastapi" },
     { name = "gunicorn" },
     { name = "httpx2" },
     { name = "networkx" },
-    { name = "numpy" },
     { name = "opencloning-linkml" },
     { name = "openpyxl" },
     { name = "pairwise-alignments-to-msa" },
@@ -1249,11 +1272,11 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0,<5" },
     { name = "biopython", specifier = ">=1.87" },
     { name = "certifi", specifier = ">=2026.10.18" },
+    { name = "edlib", specifier = ">=1.3.9" },
     { name = "fastapi", specifier = ">=0.135.3" },
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "httpx2", specifier = ">=2.16.0" },
     { name = "networkx", specifier = ">=3.6.1" },
-    { name = "numpy", specifier = ">=2.4.4" },
     { name = "opencloning-linkml", specifier = ">=1.0.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pairwise-alignments-to-msa", specifier = ">=0.1.1" },

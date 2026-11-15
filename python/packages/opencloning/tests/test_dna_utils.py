@@ -5,15 +5,14 @@ from Bio.SeqFeature import SeqFeature
 from opencloning.dna_utils import (
     sum_is_sticky,
     align_sanger_traces,
-    permutate_trace,
-    remove_padding,
     compound_location_to_capitalized_str,
+    _longest_exact_run,
+    _rotate_alignment_to_reference_origin,
 )
 from pydna.dseq import Dseq
 from pydna.parsers import parse
 from pydna.dseqrecord import Dseqrecord
 from Bio.Seq import reverse_complement
-from Bio.Align import Alignment
 from Bio.SeqFeature import Location
 
 test_files = os.path.join(os.path.dirname(__file__), 'test_files')
@@ -149,61 +148,90 @@ class AlignSangerTrackTest(unittest.TestCase):
         # TODO: this has to do with https://github.com/OpenCloning/OpenCloning_frontend/issues/336
         self.assertEqual(alignments[1], alignments[3])
 
-    def test_permutate_trace_error(self):
-        with self.assertRaises(RuntimeError):
-            permutate_trace('hello', 'world')
+    def test_align_sanger_traces_plasmid(self):
+        seq = parse(os.path.join(test_files, 'GIN11M86.gb'))[0].looped()
+        ref = str(seq.seq)
 
-        with self.assertRaises(RuntimeError):
-            permutate_trace('a', 'aa')
+        # Full plasmid sequencing: a few SNPs, a deletion and an insertion
+        trace = list(ref)
+        for pos in (100, 500, 800):
+            trace[pos] = 'A' if trace[pos] != 'A' else 'C'
+        trace = ''.join(trace)
+        trace = trace[:300] + trace[305:]
+        trace = trace[:700] + 'GATTACA' + trace[700:]
 
-    def test_remove_padding(self):
-        full_seq = 'gatcaataacagtgtttgtggagctgtgtgtattatttacgatc'.upper()
-        trace = full_seq[:-15]
+        expected = align_sanger_traces(seq, [trace])
+        self.assertEqual(expected[0], ref[:705] + '-' * 7 + ref[705:])
+        self.assertEqual(expected[1].replace('-', ''), trace)
 
-        for rotation in range(len(full_seq)):
+        # The result does not depend on the rotation or strand of the trace
+        for shift in [1, 50, 299, 302, 650, len(trace) - 1]:
+            for rev_comp in [False, True]:
+                rotated = trace[shift:] + trace[:shift]
+                if rev_comp:
+                    rotated = reverse_complement(rotated)
+                self.assertEqual(align_sanger_traces(seq, [rotated]), expected)
 
-            # This is the equivalent of permutate_trace(full_seq, trace), but a real example can return
-            # the same result for subsequent rotations, so we just mock it like this
-            ref = full_seq[rotation:] + full_seq[:rotation]
-            permutated_trace = trace[rotation:] + 'N' * 15 + trace[:rotation]
-            seq, coords = Alignment.parse_printed_alignment([bytes(ref, 'utf-8'), bytes(permutated_trace, 'utf-8')])
+        # Nor on the rotation or strand of the reference
+        for shifted_seq in [seq.shifted(400), seq.reverse_complement().shifted(123)]:
+            alignment = align_sanger_traces(shifted_seq, [trace])
+            self.assertEqual(alignment[0].replace('-', ''), str(shifted_seq.seq))
+            aligned_trace = alignment[1].replace('-', '')
+            self.assertEqual(len(aligned_trace), len(trace))
+            self.assertTrue(aligned_trace in trace * 2 or reverse_complement(aligned_trace) in trace * 2)
+            self.assertEqual(alignment[0].count('-'), 7)
 
-            alignment = Alignment([s.decode() for s in seq], coords)
-            assert remove_padding(alignment, trace)[1] == trace[rotation:] + '-' * 15 + trace[:rotation]
+    def test_align_sanger_traces_longer_than_reference(self):
+        seq = parse(os.path.join(test_files, 'GIN11M86.gb'))[0].looped()
+        ref = str(seq.seq)
+        insertion = 'ACGTACGTAC' * 5
+        trace = ref[:200] + insertion + ref[200:]
+        expected = [ref[:200] + '-' * len(insertion) + ref[200:], trace]
+        for shift in [0, 10, 220, 600]:
+            for rev_comp in [False, True]:
+                rotated = trace[shift:] + trace[:shift]
+                if rev_comp:
+                    rotated = reverse_complement(rotated)
+                self.assertEqual(align_sanger_traces(seq, [rotated]), expected)
 
-        # Works without padding
-        seq, coords = Alignment.parse_printed_alignment([bytes(full_seq, 'utf-8'), bytes(full_seq, 'utf-8')])
-        alignment = Alignment([s.decode() for s in seq], coords)
-        s1, s2 = remove_padding(alignment, full_seq)
-        assert s1 == full_seq
-        assert s2 == full_seq
+    def test_align_sanger_traces_warning(self):
+        # Unrelated sequences, where the rough alignment spans more than a full turn of the reference
+        seq = Dseqrecord('TTAGTTGTGCCGCAGCGAAGTAGTGCTTGAAATATGCGAC', circular=True)
+        trace = 'CCCTAAGTAGGAGCGTATGCGCCCAGTAACCAATGCCTGT'
+        with self.assertLogs('opencloning.dna_utils', level='WARNING'):
+            alignment = align_sanger_traces(seq, [trace])
+        # The alignment is still returned
+        self.assertEqual(alignment[0].replace('-', ''), str(seq.seq))
 
-        trace = 'GGTGGTGGGATTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCAAAACAGTGTTTGTGGAGCA'
-        # Removes double -/- resulting from -/N
-        seq, coords = Alignment.parse_printed_alignment(
-            [
-                bytes(
-                    'GATCAATAACAGTGTTTGTGGAGCA-----GAGTAGATTACTTAAAGTATGACAATTGCTTCAACGAAGGGAAAAGCGGCGTTCCCTTGATGGTGGTGGGATTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATC',
-                    'utf-8',
-                ),
-                bytes(
-                    '-----AAAACAGTGTTTGTGGAGCANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNGGTGGTGGGATTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATC',
-                    'utf-8',
-                ),
-            ]
+    def test_longest_exact_run(self):
+        # 3 matches, mismatch, 6 matches, insertion, deletion, 2 matches
+        self.assertEqual(_longest_exact_run('3=1X6=2I1D2=', 0, 0), (7, 7))
+        self.assertEqual(_longest_exact_run('3=1X6=2I1D2=', 5, 10), (12, 17))
+        # Positions after insertions and deletions
+        self.assertEqual(_longest_exact_run('2=3I4=', 0, 0), (7, 4))
+        self.assertEqual(_longest_exact_run('2=3D4=', 0, 0), (4, 7))
+        # No matches
+        self.assertEqual(_longest_exact_run('4X', 3, 8), (3, 8))
+
+    def test_rotate_alignment_to_reference_origin(self):
+        ref = 'ACGTTGCA'
+        for shift in range(len(ref)):
+            rotated = ref[shift:] + ref[:shift]
+            self.assertEqual(
+                _rotate_alignment_to_reference_origin(rotated, rotated.lower(), shift), (ref, ref.lower())
+            )
+
+        # Gaps in the reference stay attached to the base before them
+        ref_aln = 'GC--AAC-GT'
+        trace_aln = 'GCTTAACCG-'
+        # The original reference is AACGTGC (rotated by 5)
+        self.assertEqual(
+            _rotate_alignment_to_reference_origin(ref_aln, trace_aln, 5),
+            ('AAC-GTGC--', 'AACCG-GCTT'),
         )
-        alignment = Alignment([s.decode() for s in seq], coords)
-        s1, s2 = remove_padding(alignment, trace)
-        self.assertNotIn('-', s1)
 
     def test_binaries_missing(self):
         seq = Dseqrecord('ACGT')
-
-        # Test mars missing
-        with patch('shutil.which', lambda x: None if x == 'mars' else True):
-            with self.assertRaises(RuntimeError) as cm:
-                align_sanger_traces(seq, ['ACGT'])
-            self.assertEqual(str(cm.exception), "'mars' executable not found in PATH")
 
         # Test mafft missing
         with patch('shutil.which', lambda x: None if x == 'mafft' else True):
