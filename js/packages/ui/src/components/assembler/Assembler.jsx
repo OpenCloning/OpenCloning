@@ -265,9 +265,9 @@ export function AssemblerComponent({ plasmids, categories, assemblyEnzymes, addA
       }
     } catch (e) {
       if (e.assembly) {
-        errorMessage = (<><div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</div><div>Error assembling {e.assembly.map((p) => formatItemName(p.plasmid)).join(', ')}</div></>)
+        errorMessage = (<><Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</Box><div>Error assembling {e.assembly.map((p) => formatItemName(p.plasmid)).join(', ')}</div></>)
       } else if (e.plasmid) {
-        errorMessage = (<><div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</div><div>Error fetching sequence for {formatItemName(e.plasmid)}</div></>)
+        errorMessage = (<><Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</Box><div>Error fetching sequence for {formatItemName(e.plasmid)}</div></>)
       }
       setErrorMessage(errorMessage)
     } finally {
