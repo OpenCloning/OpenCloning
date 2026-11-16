@@ -67,10 +67,10 @@ function DownloadSequenceFileDialog({ id, dialogOpen, setDialogOpen, downloadCal
             variant="standard"
             onChange={(e) => setExtension(e.target.value)}
           >
-            <FormControlLabel value=".gb" control={<Radio />} label="genbank" />
-            <FormControlLabel value=".fasta" control={<Radio />} label="fasta" />
-            <FormControlLabel value=".json" control={<Radio />} label="json (sequence + history)" />
-            {hasFiles && <FormControlLabel value=".zip" control={<Radio />} label="zip (sequence + history + verification files)" />}
+            <FormControlLabel value=".gb" control={<Radio />} label="genbank (sequence + features)" />
+            <FormControlLabel value=".fasta" control={<Radio />} label="fasta (sequence only)" />
+            <FormControlLabel value=".json" control={<Radio />} label="json (sequence + features + history)" />
+            {hasFiles && <FormControlLabel value=".zip" control={<Radio />} label="zip (sequence + features + history + verification files)" />}
           </RadioGroup>
         </FormControl>
 
