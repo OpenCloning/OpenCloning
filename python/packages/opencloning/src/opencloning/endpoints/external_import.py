@@ -94,6 +94,7 @@ def read_from_file(
     output_name: str | None = Query(
         None,
         description='Name of the output sequence',
+        pattern=r'^[^\s]+$',
     ),
     start: int | None = Query(None, description='Start position of the sequence to read (0-based)', ge=0),
     end: int | None = Query(

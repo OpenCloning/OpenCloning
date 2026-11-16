@@ -101,6 +101,11 @@ class ReadFileTest(unittest.TestCase):
         dseqr = read_dsrecord_from_json(TextFileSequence.model_validate(payload['sequences'][0]))
         self.assertEqual(dseqr.name, 'hello')
 
+        # Names with whitespace are rejected
+        with open(example['file'], 'rb') as f:
+            response = client.post('/read_from_file', params={'output_name': 'hello world'}, files={'file': f})
+        self.assertEqual(response.status_code, 422)
+
     def test_errors_read_files(self):
         # Create a temp empty file
         with tempfile.NamedTemporaryFile() as temp_empty_file:

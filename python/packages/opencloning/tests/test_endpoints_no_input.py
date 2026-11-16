@@ -165,6 +165,21 @@ class ManuallyTypedTest(unittest.TestCase):
         response = client.post('/manually_typed', json={'source': {'id': 0}, 'sequence': {'id': 0, 'sequence': ''}})
         self.assertEqual(response.status_code, 422)
 
+    def test_manually_typed_invalid_output_name(self):
+        for name in ['my seq', 'my\tseq', ' ', '']:
+            response = client.post(
+                '/manually_typed',
+                json={'source': {'id': 0, 'output_name': name}, 'sequence': {'id': 0, 'sequence': 'ATGC'}},
+            )
+            self.assertEqual(response.status_code, 422, name)
+            self.assertIn('no spaces', response.json()['detail'])
+
+        response = client.post(
+            '/manually_typed',
+            json={'source': {'id': 0, 'output_name': 'my_seq'}, 'sequence': {'id': 0, 'sequence': 'ATGC'}},
+        )
+        self.assertEqual(response.status_code, 200)
+
 
 def test_primer_too_long_rejected():
     from opencloning.pydantic_models import PrimerModel
