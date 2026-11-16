@@ -53,10 +53,12 @@ def downgrade_to(engine: Engine, revision: str) -> None:
 
 def recreate_public_schema(engine: Engine) -> None:
     """Drop and recreate the public schema (destructive)."""
-    Base.metadata.drop_all(engine)
-    # Drop also alembic_version table
+    # Drop the whole schema rather than Base.metadata.drop_all: the database may contain
+    # tables/types from migrations newer than the checked-out models, whose foreign keys
+    # would block dropping only the known tables. Also removes alembic_version.
     with engine.begin() as conn:
-        conn.execute(text('DROP TABLE alembic_version'))
+        conn.execute(text('DROP SCHEMA public CASCADE'))
+        conn.execute(text('CREATE SCHEMA public'))
     upgrade_head(engine.url.render_as_string(hide_password=False))
 
 
