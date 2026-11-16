@@ -24,7 +24,7 @@ const READS = {
 function interceptSequencesWithFiles(stub, fileIdsBySequenceId, files) {
   const body = stub.response.body.map((item) => ({
     ...item,
-    sequencing_files: (fileIdsBySequenceId[item.sequence_ref.id] ?? []).map((id) => ({ id, original_name: files[id].name })),
+    sequencing_files: (fileIdsBySequenceId[item.sequence_ref.id] ?? []).map((id) => ({ id, original_name: files[id].name, sample_uid: `sample-${id}` })),
   }));
   cy.interceptOpenCloningDBStub({ ...stub, response: { ...stub.response, body } }, { alias: 'getSequences' });
 }
@@ -151,6 +151,8 @@ describe('<SequencingCheckModal />', () => {
         ]);
         expect(actual).to.deep.equal(expectedFiles);
       });
+      // Each file shows the sample it belongs to
+      cy.get('[data-testid="sequencing-check-file-sample"]').should('have.length', expectedFiles.length).first().should('contain', 'sample sample-');
       cy.get('[data-testid="sequencing-check-file-row"]').first().should('contain', 'Alignment failed');
       cy.get('[data-testid="sequencing-check-file-row"]').eq(1).should('contain', 'Identity below 100%');
 

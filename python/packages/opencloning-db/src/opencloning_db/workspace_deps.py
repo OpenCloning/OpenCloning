@@ -17,6 +17,7 @@ from opencloning_db.models import (
     Sequence,
     SequenceSample,
     SequenceType,
+    SequencingFile,
     Tag,
     User,
     WorkspaceRole,
@@ -156,3 +157,16 @@ def get_sequence_sample_in_workspace_for_user(
 
     assert_workspace_access(session, user.id, sample.uid_workspace_id, min_role)
     return sample
+
+
+def get_sequencing_file_in_workspace_for_user(
+    session: Session, user: User, workspace_id: int, file_id: int, min_role: WorkspaceRole
+) -> SequencingFile:
+    """A sequencing file of an instance (e.g. a sample) of a sequence of the selected workspace."""
+    sequencing_file = session.get(SequencingFile, file_id)
+    if sequencing_file is None:
+        raise HTTPException(status_code=404, detail='Sequencing file not found')
+    sequence_workspace_id = sequencing_file.instance.sequence.workspace_id
+    assert_workspace_access(session, user.id, sequence_workspace_id, min_role)
+    _require_selected_workspace(sequence_workspace_id, workspace_id, 'Sequencing file not found')
+    return sequencing_file

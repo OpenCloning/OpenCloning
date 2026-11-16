@@ -245,6 +245,11 @@ class BaseSequence(InputEntity):
     def sample_uids(self) -> List[str]:
         return [s.uid for s in self.instances if isinstance(s, SequenceSample)]
 
+    @property
+    def sequencing_files(self) -> List['SequencingFile']:
+        """Sequencing files of all the instances that point to the sequence, sorted by id."""
+        return sorted((f for instance in self.instances for f in instance.sequencing_files), key=lambda f: f.id)
+
     def to_pydantic_sequence(self) -> opencloning_models.Sequence:
         raise NotImplementedError('to_pydantic_sequence is not implemented for BaseSequence')
 
@@ -261,9 +266,6 @@ class Sequence(BaseSequence):
     seguid: Mapped[str] = mapped_column(nullable=False)
 
     file_content: Mapped[str] = mapped_column(Text, nullable=False, deferred=True)
-    sequencing_files: Mapped[List['SequencingFile']] = relationship(
-        back_populates='sequence', cascade='all, delete-orphan'
-    )
 
     __mapper_args__ = {
         'polymorphic_identity': 'sequence',
@@ -608,18 +610,28 @@ def _to_db_input(
 
 
 class SequencingFile(Base):
+    """
+    Sequencing data of a concrete instance of a sequence (a sample, or a sequence in a line), not of the
+    theoretical sequence: the files follow the instance when it is re-pointed to another sequence.
+    """
+
     __tablename__ = 'sequencing_file'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    sequence_id: Mapped[int] = mapped_column(ForeignKey('sequence.id'), nullable=False)
+    sequence_instance_id: Mapped[int] = mapped_column(ForeignKey('sequence_instance.id'), nullable=False)
     original_name: Mapped[str] = mapped_column()
     file_content: Mapped[bytes] = mapped_column(LargeBinary, nullable=False, deferred=True)
 
-    sequence: Mapped['Sequence'] = relationship(back_populates='sequencing_files')
+    instance: Mapped['SequenceInstance'] = relationship(back_populates='sequencing_files')
 
     __table_args__ = (
-        UniqueConstraint('sequence_id', 'original_name', name='uq_sequencefile_sequenceid_originalname'),
+        UniqueConstraint('sequence_instance_id', 'original_name', name='uq_sequencingfile_instanceid_originalname'),
     )
+
+    @property
+    def sample_uid(self) -> Optional[str]:
+        """UID of the sample the file belongs to, None if the instance is not a sample."""
+        return self.instance.uid if isinstance(self.instance, SequenceSample) else None
 
 
 class SequenceInstance(Base):
@@ -637,19 +649,62 @@ class SequenceInstance(Base):
     type: Mapped[str] = mapped_column()
 
     sequence: Mapped['BaseSequence'] = relationship(back_populates='instances')
+    sequencing_files: Mapped[List['SequencingFile']] = relationship(
+        back_populates='instance', cascade='all, delete-orphan', order_by='SequencingFile.id'
+    )
+    reassignments: Mapped[List['SequenceInstanceReassignment']] = relationship(
+        back_populates='instance', cascade='all, delete-orphan', order_by='SequenceInstanceReassignment.id'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'sequence_instance',
     }
 
+    def reassign(self, sequence: 'BaseSequence', *, user_id: int, note: Optional[str] = None) -> None:
+        """Point the instance to another sequence, keeping a record of the sequence it pointed to before."""
+        self.reassignments.append(
+            SequenceInstanceReassignment(
+                from_sequence_id=self.sequence_id,
+                to_sequence=sequence,
+                created_by_id=user_id,
+                note=note,
+            )
+        )
+        self.sequence = sequence
+
+
+class SequenceInstanceReassignment(Base):
+    """
+    Record of an instance being re-pointed from one sequence to another, e.g. a sample that was planned
+    as one sequence and turned out to be another one when sequenced. Rows are never updated.
+    """
+
+    __tablename__ = 'sequence_instance_reassignment'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    sequence_instance_id: Mapped[int] = mapped_column(ForeignKey('sequence_instance.id'), nullable=False)
+    from_sequence_id: Mapped[int] = mapped_column(ForeignKey('base_sequence.id'), nullable=False)
+    to_sequence_id: Mapped[int] = mapped_column(ForeignKey('base_sequence.id'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    instance: Mapped['SequenceInstance'] = relationship(back_populates='reassignments')
+    from_sequence: Mapped['BaseSequence'] = relationship(foreign_keys=[from_sequence_id])
+    to_sequence: Mapped['BaseSequence'] = relationship(foreign_keys=[to_sequence_id])
+    created_by: Mapped['User'] = relationship(foreign_keys=[created_by_id])
+
 
 class SequenceSample(SequenceInstance):
     """
     A physical lab sample with a user-defined UID pointing to the sequence the
     user considers correct. UID is assigned before sequencing; after sequencing
-    it can be re-pointed to a corrected sequence by updating sequence_id on the
-    parent SequenceInstance row.
+    it can be re-pointed to a corrected sequence with SequenceInstance.reassign.
     """
 
     __tablename__ = 'sequence_sample'
@@ -659,10 +714,38 @@ class SequenceSample(SequenceInstance):
     # Duplicates the owning sequence workspace to support workspace-scoped UID uniqueness.
     uid_workspace_id: Mapped[int] = mapped_column('workspace_id', ForeignKey('workspace.id'), nullable=False)
     uid: Mapped[str] = mapped_column()
+    # Free text, where the sample is stored
+    location: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+
+    created_by: Mapped['User'] = relationship(foreign_keys=[created_by_id])
 
     __mapper_args__ = {
         'polymorphic_identity': 'sequence_sample',
     }
+
+    @classmethod
+    def from_create(
+        cls,
+        *,
+        uid: str,
+        sequence: 'BaseSequence',
+        ctx: WriteContext,
+        location: Optional[str] = None,
+    ) -> Self:
+        """Build a SequenceSample of *sequence* from request-body fields and a write context."""
+        return cls(
+            uid=uid,
+            sequence=sequence,
+            location=location,
+            uid_workspace_id=ctx.workspace_id,
+            created_by_id=ctx.user.id,
+        )
 
 
 class SequenceInLine(SequenceInstance):

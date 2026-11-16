@@ -173,6 +173,7 @@ class TestSequence(_MemoryDbTestCase):
                 sequence_id=seq.id,
                 uid_workspace_id=ws.id,
                 uid='S-1',
+                created_by_id=1,
             )
             sil = SequenceInLine(sequence_id=seq.id, line_id=line.id)
             session.add_all([samp, sil])
@@ -608,6 +609,7 @@ class TestSequenceSample(_MemoryDbTestCase):
                 sequence_id=seq_w1.id,
                 uid_workspace_id=w1.id,
                 uid='U',
+                created_by_id=1,
             )
             session.add(samp)
             session.flush()
@@ -630,6 +632,7 @@ class TestSequenceSample(_MemoryDbTestCase):
                 sequence_id=seq.id,
                 uid_workspace_id=w1.id,
                 uid='U',
+                created_by_id=1,
             )
             session.add(samp)
             session.flush()
@@ -642,6 +645,7 @@ class TestSequenceSample(_MemoryDbTestCase):
                     sequence_id=seq.id,
                     uid_workspace_id=w2.id,
                     uid='U',
+                    created_by_id=1,
                 )
             )
             with self.assertRaisesRegex(ValueError, 'uid_workspace_id must match'):

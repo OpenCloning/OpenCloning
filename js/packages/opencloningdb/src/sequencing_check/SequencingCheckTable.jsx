@@ -94,7 +94,14 @@ export default function SequencingCheckTable({ rows, renderSequenceName = defaul
               <TableRow key={file.id} selected={selected} data-testid="sequencing-check-file-row">
                 {i === 0 && sequenceCell}
                 <TableCell align="center" padding="checkbox"><StatusIcon status={status} /></TableCell>
-                <TableCell sx={{ fontFamily: 'monospace', overflowWrap: 'anywhere' }} data-testid="sequencing-check-file-name">{file.name}</TableCell>
+                <TableCell sx={{ fontFamily: 'monospace', overflowWrap: 'anywhere' }}>
+                  <span data-testid="sequencing-check-file-name">{file.name}</span>
+                  {file.sampleUid && (
+                    <Box sx={{ color: 'text.secondary', fontSize: '0.8em' }} data-testid="sequencing-check-file-sample">
+                      sample {file.sampleUid}
+                    </Box>
+                  )}
+                </TableCell>
                 <TableCell data-testid="sequencing-check-identity">{identityText(result)}</TableCell>
                 <TableCell padding="none" align="center">
                   {onViewAlignment && (

@@ -217,9 +217,16 @@ def stubs(dirname: str) -> Generator[StubRequest, None, None]:
         method='POST',
         body=get_stub(dirname, 'get_text_file_sequence').response.body,
     )
+    selected_sample_uid = 'stub-sample'
     yield StubRequest(
-        name='post_sequence_sequencing_files',
-        endpoint=f'/db/sequences/{selected_sequence_id}/sequencing_files',
+        name='post_sequence_sample',
+        endpoint='/db/sequence_samples',
+        method='POST',
+        body={'uid': selected_sample_uid, 'sequence_id': selected_sequence_id, 'location': 'box 1'},
+    )
+    yield StubRequest(
+        name='post_sample_sequencing_files',
+        endpoint=f'/db/sequence_samples/{selected_sample_uid}/sequencing_files',
         method='POST',
         multipart_files=[
             {
@@ -233,6 +240,12 @@ def stubs(dirname: str) -> Generator[StubRequest, None, None]:
         name='get_sequence_sequencing_files',
         endpoint=f'/db/sequences/{selected_sequence_id}/sequencing_files',
         method='GET',
+    )
+    yield StubRequest(
+        name='get_sequence_samples',
+        endpoint='/db/sequence_samples',
+        method='GET',
+        params={'sequence_id': str(selected_sequence_id)},
     )
     last_file_id = get_stub(dirname, 'get_sequence_sequencing_files').response.body[-1]['id']
     yield StubRequest(

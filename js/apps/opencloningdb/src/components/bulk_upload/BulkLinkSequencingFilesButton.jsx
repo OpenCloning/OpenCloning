@@ -20,10 +20,21 @@ const onFileSelected = (mutate) => (event) => {
 };
 
 /**
- * Name of the first sequence of the workspace with the seguid of the read circularised (sequencing runs of
- * whole plasmids), null if there is none or the file could not be read.
+ * Name of the sequence of the sample whose UID is the sample name of the file, if it exists. Otherwise, name of the
+ * first sequence of the workspace with the seguid of the read circularised (sequencing runs of whole plasmids),
+ * null if there is none or the file could not be read.
  */
 async function matchingSequenceName(backendHttpClient, file) {
+  const sampleName = fastqSampleName(file);
+  try {
+    const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, { params: { uid: sampleName } });
+    const existing = data.items.find(({ uid }) => uid.toLowerCase() === sampleName.toLowerCase());
+    if (existing) {
+      return existing.sequence.name;
+    }
+  } catch {
+    // Fall back to the seguid match
+  }
   try {
     const { teselaJson } = await readSequencingFile(file);
     const { data: seguid } = await backendHttpClient.post('seguid', { sequence: teselaJson.sequence, circular: true });
@@ -34,16 +45,17 @@ async function matchingSequenceName(backendHttpClient, file) {
   }
 }
 
-/** { sampleName: sequenceName } of the samples that match a sequence of the workspace. */
+/** { sampleName: sequenceName } of the samples that exist or match a sequence of the workspace. */
 async function matchingSequenceNames(backendHttpClient, files) {
   const names = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, (file) => matchingSequenceName(backendHttpClient, file));
   return Object.fromEntries(files.map((file, i) => [fastqSampleName(file), names[i]]).filter(([, name]) => name));
 }
 
 /**
- * Link the .final.fastq files of a zipped sequencing run (one folder per sample) to existing sequences:
- * the user downloads a table with the sample names, fills in the sequence names by hand and uploads it.
- * The samples that match a sequence of the workspace exactly are already filled in the table.
+ * Link the .final.fastq files of a zipped sequencing run (one folder per sample) to samples: the user downloads a
+ * table with the sample names, fills in the sample UIDs (by default the sample name) and the sequence names by hand,
+ * and uploads it. Samples that do not exist are created for that sequence. The sequence names of the samples that
+ * already exist, or that match a sequence of the workspace exactly, are already filled in the table.
  */
 export default function BulkLinkSequencingFilesButton() {
   const isViewer = useSelector((state) => state.auth.workspace?.role) === 'viewer';
@@ -68,9 +80,11 @@ export default function BulkLinkSequencingFilesButton() {
 
   const link = useMutation({
     mutationFn: async (tableFile) => {
+      // sample_uid is optional, by default the sample name
       const rows = await delimitedFileToJson(tableFile, ['sample_name', 'sequence_name'], true);
       const formData = new FormData();
-      pairFastqFilesWithSequences(run.files, rows).forEach(({ sequenceName, file }) => {
+      pairFastqFilesWithSequences(run.files, rows).forEach(({ sampleUid, sequenceName, file }) => {
+        formData.append('sample_uids', sampleUid);
         formData.append('sequence_names', sequenceName);
         formData.append('files', file);
       });
@@ -79,9 +93,12 @@ export default function BulkLinkSequencingFilesButton() {
       });
       return data;
     },
-    onSuccess: ({ created }) => {
-      addAlert({ message: `Linked ${created} sequencing file${created === 1 ? '' : 's'} successfully`, severity: 'success' });
+    onSuccess: ({ created, created_samples: createdSamples }) => {
+      const newSamples = createdSamples > 0 ? `, ${createdSamples} new sample${createdSamples === 1 ? '' : 's'}` : '';
+      addAlert({ message: `Linked ${created} sequencing file${created === 1 ? '' : 's'} successfully${newSamples}`, severity: 'success' });
       queryClient.invalidateQueries({ queryKey: ['sequence'] });
+      queryClient.invalidateQueries({ queryKey: ['sequences'] });
+      queryClient.invalidateQueries({ queryKey: ['sequence_samples'] });
       closeModal();
     },
   });
@@ -97,7 +114,7 @@ export default function BulkLinkSequencingFilesButton() {
 
   return (
     <>
-      <Tooltip title="Link the .final.fastq files of a zipped sequencing run to sequences">
+      <Tooltip title="Link the .final.fastq files of a zipped sequencing run to samples">
         <Button onClick={() => zipInput.current?.click()} disabled={readZip.isPending} data-testid="bulk-link-sequencing-files-button">
           {readZip.isPending ? <CircularProgress size={24} /> : 'Link sequencing files'}
         </Button>
@@ -115,12 +132,12 @@ export default function BulkLinkSequencingFilesButton() {
           <Stack spacing={2}>
             <Typography data-testid="bulk-link-sequencing-files-count">
               Found {run.files.length} .final.fastq file{run.files.length === 1 ? '' : 's'} in {run.zipName}
-              {' '}({Object.keys(run.sequenceNames).length} match an existing sequence exactly).
+              {' '}({Object.keys(run.sequenceNames).length} already known: an existing sample or an exact sequence match).
             </Typography>
             <Typography variant="body2">
-              Download the sample table, fill in the sequence_name column with the sequence each sample should be
-              linked to (leave it empty to skip a sample), and upload it. The samples that match an existing
-              sequence are already filled in.
+              Download the sample table, fill in the sample_uid column with the UID of each sample (by default the
+              sample name) and the sequence_name column with its sequence (leave it empty to skip a sample), and upload
+              it. Samples that do not exist yet are created. The known sequences are already filled in.
             </Typography>
             {link.error && <Alert severity="error">{error2String(link.error)}</Alert>}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

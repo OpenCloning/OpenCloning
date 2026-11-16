@@ -1,109 +1,82 @@
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControl } from '@mui/material';
-import { QuerySelect, useDebouncedSearchQuery } from '@opencloning/ui';
-import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
-import useAppAlerts from '../hooks/useAppAlerts';
-import error2String from '@opencloning/utils/error2String';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControl, TextField } from '@mui/material';
+import { openCloningDBHttpClient, endpoints, SequenceSelect } from '@opencloning/opencloningdb';
+import SampleSelect from './SampleSelect';
+import useSampleMutation from '../hooks/useSampleMutation';
 
-const getSearchQuery = (sequenceId) => (uid) => ({
-  queryKey: ['sequence_samples', { uid }],
-  queryFn: async () => {
-    const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, { params: { uid } });
-    return data.filter((sample) => sample.sequence_id !== sequenceId);
-  },
-});
-
-function TransferSampleDialog({ sequenceId, open, onClose }) {
-  const { addAlert } = useAppAlerts();
-  const queryClient = useQueryClient();
+/**
+ * Move a sample (and its sequencing files) to another sequence, e.g. a sample planned as one sequence that turned
+ * out to be another one when sequenced. The move is kept in the sample history of both sequences.
+ * With sample, the sample is fixed and the user picks the target sequence; without it, the user picks a sample
+ * of another sequence to move it to sequenceId.
+ */
+function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
   const [selectedSample, setSelectedSample] = React.useState(null);
-  const [confirming, setConfirming] = React.useState(false);
+  const [targetSequence, setTargetSequence] = React.useState(null);
+  const [note, setNote] = React.useState('');
 
-  const getQuery = React.useMemo(() => getSearchQuery(sequenceId), [sequenceId]);
-  const { query, autocompleteProps, clearInput } = useDebouncedSearchQuery(getQuery);
-
-  const transferMutation = useMutation({
-    mutationFn: async (uid) => {
-      const body = { sequence_id: sequenceId };
-      const { data } = await openCloningDBHttpClient.patch(endpoints.sequenceSample(uid), body);
-      return data;
-    },
-    onSuccess: () => {
-      addAlert({ message: 'UID transferred successfully', severity: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'cloning_strategy'] });
-      handleClose();
-    },
-    onError: (error) => {
-      addAlert({
-        message: error2String(error),
-        severity: 'error',
-      });
-    },
-  });
-
-  const handleSelect = (value) => {
-    setSelectedSample(value);
-    if (value) {
-      setConfirming(true);
-    } else {
-      setConfirming(false);
-    }
-  };
-
-  const handleConfirm = () => {
-    if (!selectedSample) return;
-    transferMutation.mutate(selectedSample.uid);
-  };
+  const movedSample = sample ?? selectedSample;
+  const target = sample ? targetSequence : { id: sequenceId };
 
   const handleClose = () => {
     setSelectedSample(null);
-    setConfirming(false);
-    clearInput();
+    setTargetSequence(null);
+    setNote('');
     onClose();
   };
 
+  const transferMutation = useSampleMutation({
+    mutationFn: async () => {
+      const body = { sequence_id: target.id, note: note.trim() || null };
+      const { data } = await openCloningDBHttpClient.post(endpoints.sequenceSampleReassign(movedSample.uid), body);
+      return data;
+    },
+    successMessage: 'UID transferred successfully',
+    onSuccess: handleClose,
+  });
+
+  const excludeOwnSamples = React.useCallback((s) => s.sequence_id !== sequenceId, [sequenceId]);
+
   return (
-    <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose}>
-      <DialogTitle>Transfer UID from another sequence to this sequence</DialogTitle>
+    <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} data-testid="transfer-sample-dialog">
+      <DialogTitle>
+        {sample ? `Move sample ${sample.uid} to another sequence` : 'Transfer UID from another sequence to this sequence'}
+      </DialogTitle>
       <DialogContent>
-        {!confirming ? (
-          <FormControl fullWidth sx={{ mt: 1 }}>
-            <QuerySelect
-              query={query}
-              label="Search UIDs"
-              multiple={false}
-              getOptionLabel={(sample) => `${sample.uid} (${sample.sequence?.name ?? sample.sequence_id})`}
-              getOptionKey={(sample) => sample.uid}
-              value={selectedSample}
-              onChange={handleSelect}
-              autoComplete
-              autocompleteProps={autocompleteProps}
-              onClear={clearInput}
+        <FormControl fullWidth sx={{ mt: 1 }}>
+          {sample
+            ? <SequenceSelect multiple={false} label="Sequence" value={targetSequence} onChange={setTargetSequence} />
+            : <SampleSelect value={selectedSample} onChange={setSelectedSample} filter={excludeOwnSamples} />}
+        </FormControl>
+        {movedSample && target && (
+          <>
+            <Typography sx={{ mt: 2 }}>
+              Are you sure you want to transfer UID <strong>{movedSample.uid}</strong>
+              {!sample && <> from sequence <strong>{movedSample.sequence?.name ?? movedSample.sequence_id}</strong></>}
+              {sample ? <> to sequence <strong>{target.name}</strong>?</> : ' to this one?'}
+              {' '}Its sequencing files are moved with it.
+            </Typography>
+            <TextField
+              fullWidth
+              sx={{ mt: 2 }}
+              label="Note (optional)"
+              placeholder="e.g. point mutation found by sequencing"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
             />
-          </FormControl>
-        ) : (
-          <Typography sx={{ mt: 1 }}>
-            Are you sure you want to transfer UID <strong>{selectedSample.uid}</strong> from
-            sequence <strong>{selectedSample.sequence?.name ?? selectedSample.sequence_id}</strong> to
-            this one?
-          </Typography>
+          </>
         )}
       </DialogContent>
-      {confirming && (
-        <DialogActions>
-          <Button onClick={() => { setConfirming(false); setSelectedSample(null); }}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirm}
-            disabled={transferMutation.isPending}
-          >
-            {transferMutation.isPending ? 'Transferring…' : 'Confirm'}
-          </Button>
-        </DialogActions>
-      )}
+      <DialogActions>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button
+          variant="contained"
+          onClick={() => transferMutation.mutate()}
+          disabled={!movedSample || !target || transferMutation.isPending}
+        >
+          {transferMutation.isPending ? 'Transferring…' : 'Confirm'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

@@ -115,17 +115,20 @@ describe('sequencing run zip files', () => {
   it('builds the sample table and pairs the filled rows with the files', async () => {
     const files = await finalFastqFilesFromZip(await runZip(runPaths));
     // Sorted by sample name, whatever the order in the zip
-    expect(sampleTableTsv([...files].reverse())).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
-    expect(sampleTableTsv(files)).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
-    expect(sampleTableTsv(files, { 'A1-P1-2': 'pREX0008' })).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\tpREX0008\n');
+    const header = 'sample_name\tsample_uid\tsequence_name';
+    expect(sampleTableTsv([...files].reverse())).toBe(`${header}\nA1-P1\tA1-P1\t\nA1-P1-2\tA1-P1-2\t\n`);
+    expect(sampleTableTsv(files)).toBe(`${header}\nA1-P1\tA1-P1\t\nA1-P1-2\tA1-P1-2\t\n`);
+    expect(sampleTableTsv(files, { 'A1-P1-2': 'pREX0008' })).toBe(`${header}\nA1-P1\tA1-P1\t\nA1-P1-2\tA1-P1-2\tpREX0008\n`);
 
     const pairs = pairFastqFilesWithSequences(files, [
-      { sample_name: 'A1-P1', sequence_name: ' pREX0008 ' },
-      { sample_name: 'A1-P1-2', sequence_name: '' },
+      { sample_name: 'A1-P1', sample_uid: ' clone-1 ', sequence_name: ' pREX0008 ' },
+      { sample_name: 'A1-P1-2', sample_uid: 'clone-2', sequence_name: '' },
     ]);
-    expect(pairs.map(({ sequenceName, file }) => [sequenceName, file.name])).toEqual([['pREX0008', 'A1-P1.final.fastq']]);
+    expect(pairs.map(({ sampleUid, sequenceName, file }) => [sampleUid, sequenceName, file.name])).toEqual([['clone-1', 'pREX0008', 'A1-P1.final.fastq']]);
+    // An empty sample UID means the sample name
+    expect(pairFastqFilesWithSequences(files, [{ sample_name: 'A1-P1', sample_uid: '', sequence_name: 'pREX0008' }])[0].sampleUid).toBe('A1-P1');
 
-    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'A1-P1', sequence_name: '' }]))
+    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'A1-P1', sample_uid: 'A1-P1', sequence_name: '' }]))
       .toThrow('No sequence names were filled in the table');
     expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'B7', sequence_name: 'pREX0008' }]))
       .toThrow('Samples not found in the zip file: B7');

@@ -260,22 +260,32 @@ export async function finalFastqFilesFromZip(zipFile) {
 }
 
 /**
- * Table to fill by hand with the sequence each sample should be linked to, sorted by sample name.
- * sequenceNames ({ sampleName: sequenceName }) pre-fills the sequence names that are already known.
+ * Table to fill by hand with the sample UID and the sequence of each sample of the run, sorted by sample name.
+ * The sample UID is pre-filled with the sample name. known ({ sampleName: sequenceName }) pre-fills the sequence
+ * names that are already known (the sequence of an existing sample with that UID, or a sequence that matches).
  */
-export function sampleTableTsv(files, sequenceNames = {}) {
+export function sampleTableTsv(files, known = {}) {
   const sampleNames = files.map(fastqSampleName).sort((a, b) => a.localeCompare(b));
-  return `${['sample_name\tsequence_name', ...sampleNames.map((name) => `${name}\t${sequenceNames[name] ?? ''}`)].join('\n')}\n`;
+  const rows = sampleNames.map((name) => `${name}\t${name}\t${known[name] ?? ''}`);
+  return `${['sample_name\tsample_uid\tsequence_name', ...rows].join('\n')}\n`;
 }
 
 /**
- * Pair the fastq files with the sequence names of the filled sample table (rows of delimitedFileToJson).
- * Rows without sequence name are skipped. Returns [{ sequenceName, file }].
+ * Pair the fastq files with the filled sample table (rows of delimitedFileToJson). Rows without sequence name are
+ * skipped, an empty sample UID means the sample name. Returns [{ sampleUid, sequenceName, file }]: the file goes to
+ * the sample with that UID, which is created for the sequence if it does not exist.
  */
 export function pairFastqFilesWithSequences(files, rows) {
   const filesBySample = Object.fromEntries(files.map((file) => [fastqSampleName(file), file]));
   const filledRows = rows
-    .map((row) => ({ sampleName: String(row.sample_name ?? '').trim(), sequenceName: String(row.sequence_name ?? '').trim() }))
+    .map((row) => {
+      const sampleName = String(row.sample_name ?? '').trim();
+      return {
+        sampleName,
+        sampleUid: String(row.sample_uid ?? '').trim() || sampleName,
+        sequenceName: String(row.sequence_name ?? '').trim(),
+      };
+    })
     .filter(({ sequenceName }) => sequenceName);
   if (filledRows.length === 0) {
     throw new Error('No sequence names were filled in the table');
@@ -284,5 +294,5 @@ export function pairFastqFilesWithSequences(files, rows) {
   if (unknownSamples.length > 0) {
     throw new Error(`Samples not found in the zip file: ${unknownSamples.join(', ')}`);
   }
-  return filledRows.map(({ sampleName, sequenceName }) => ({ sequenceName, file: filesBySample[sampleName] }));
+  return filledRows.map(({ sampleName, sampleUid, sequenceName }) => ({ sampleUid, sequenceName, file: filesBySample[sampleName] }));
 }

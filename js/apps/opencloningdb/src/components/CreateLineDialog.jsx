@@ -10,14 +10,17 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   TextField,
 } from '@mui/material';
+import { AddCircle as AddCircleIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { formatSequenceName, SequenceSelect } from '@opencloning/opencloningdb';
 import NewLineUID from './NewLineUID';
 import LineSelect from './LineSelect';
 import { getPlasmidSequencesInLine, getAlleleSequencesInLine } from '../utils/models_utils';
 import useCreateLineMutation from '../hooks/useCreateLineMutation';
 import error2String from '@opencloning/utils/error2String';
+import useAppAlerts from '../hooks/useAppAlerts';
 
 const MAX_PARENTS = 2;
 
@@ -104,16 +107,23 @@ function InfoAlert({ parents }) {
 function CreateLineDialog({ open, onClose, fixedParents = null }) {
   const navigate = useNavigate();
   const createLineMutation = useCreateLineMutation();
+  const { addAlert } = useAppAlerts();
 
-  const [lineUID, setLineUID] = React.useState('');
-  const [lineUidChecking, setLineUidChecking] = React.useState(false);
+  // Several UIDs create sibling lines (e.g. isolates of the same transformation), with the same parents and sequences
+  const nextRowIdRef = React.useRef(1);
+  const [uidRows, setUidRows] = React.useState([{ id: 0, uid: '', checking: false }]);
+  const updateUidRow = (rowId, changes) => setUidRows((prev) => prev.map((r) => (r.id === rowId ? { ...r, ...changes } : r)));
+  const lineUIDs = uidRows.map((r) => r.uid);
+  const duplicatedUIDs = [...new Set(lineUIDs.filter((uid, i) => uid && lineUIDs.findIndex((u) => u.toLowerCase() === uid.toLowerCase()) !== i))];
+  const uidsReady = lineUIDs.every((uid) => uid) && duplicatedUIDs.length === 0 && !uidRows.some((r) => r.checking);
   const [selectedParents, setSelectedParents] = React.useState([]);
   const [alleles, setAlleles] = React.useState([]);
   const [plasmids, setPlasmids] = React.useState([]);
 
   React.useEffect(() => {
     if (!open) return;
-    setLineUID('');
+    nextRowIdRef.current = 1;
+    setUidRows([{ id: 0, uid: '', checking: false }]);
     const initialParents = fixedParents ?? [];
     setSelectedParents(initialParents);
     const { alleles: initialAlleles, plasmids: initialPlasmids } = getSequencesFromParents(initialParents);
@@ -144,14 +154,23 @@ function CreateLineDialog({ open, onClose, fixedParents = null }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!lineUID || !canSubmit) return;
-    const resp = await createLineMutation.mutateAsync({
-      uid: lineUID,
-      allele_ids: alleles.map((a) => a.id),
-      plasmid_ids: plasmids.map((p) => p.id),
-      parent_ids: selectedParents.map((p) => p.id),
-    });
-    navigate(`/lines/${resp.id}`);
+    if (!uidsReady || !canSubmit) return;
+    const created = [];
+    for (const uid of lineUIDs) {
+      created.push(await createLineMutation.mutateAsync({
+        uid,
+        allele_ids: alleles.map((a) => a.id),
+        plasmid_ids: plasmids.map((p) => p.id),
+        parent_ids: selectedParents.map((p) => p.id),
+      }));
+    }
+    onClose();
+    if (created.length === 1) {
+      navigate(`/lines/${created[0].id}`);
+    } else {
+      addAlert({ message: `${created.length} lines created: ${lineUIDs.join(', ')}`, severity: 'success' });
+      navigate('/lines');
+    }
   };
 
   return (
@@ -159,12 +178,35 @@ function CreateLineDialog({ open, onClose, fixedParents = null }) {
       <DialogTitle>{dialogTitle}</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit}>
-          <FormControl fullWidth sx={{ mt: 1 }}>
-            <NewLineUID
-              onChange={setLineUID}
-              onValidationStateChange={({ isChecking }) => setLineUidChecking(isChecking)}
-            />
-          </FormControl>
+          {uidRows.map((row, index) => (
+            <Box key={row.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+              <FormControl fullWidth>
+                <NewLineUID
+                  label={index === 0 ? 'Line UID' : `Line UID ${index + 1}`}
+                  onChange={(uid) => updateUidRow(row.id, { uid })}
+                  onValidationStateChange={({ isChecking }) => updateUidRow(row.id, { checking: isChecking })}
+                />
+              </FormControl>
+              {uidRows.length > 1 && (
+                <IconButton onClick={() => setUidRows((prev) => prev.filter((r) => r.id !== row.id))} size="small" sx={{ mb: 3 }} aria-label="Remove line UID">
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Box>
+          ))}
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+              onClick={() => setUidRows((prev) => [...prev, { id: nextRowIdRef.current++, uid: '', checking: false }])}
+              color="success"
+              size="small"
+              startIcon={<AddCircleIcon />}
+            >
+              Add a sibling line (another isolate)
+            </Button>
+          </Box>
+          {duplicatedUIDs.length > 0 && (
+            <Alert severity="error" sx={{ mt: 1 }}>Duplicate UIDs: {duplicatedUIDs.join(', ')}</Alert>
+          )}
           <FormControl fullWidth sx={{ mt: 1 }}>
             <LineSelect
               multiple
@@ -208,12 +250,12 @@ function CreateLineDialog({ open, onClose, fixedParents = null }) {
           )}
           <FormControl fullWidth sx={{ mt: 2 }}>
             <Button
-              disabled={!lineUID || !canSubmit || lineUidChecking || createLineMutation.isPending}
+              disabled={!uidsReady || !canSubmit || createLineMutation.isPending}
               type="submit"
               variant="contained"
               color="primary"
             >
-              {createLineMutation.isPending ? 'Creating…' : 'Submit'}
+              {createLineMutation.isPending ? 'Creating…' : (uidRows.length > 1 ? `Create ${uidRows.length} lines` : 'Submit')}
             </Button>
           </FormControl>
         </form>

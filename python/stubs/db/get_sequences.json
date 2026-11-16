@@ -19,7 +19,9 @@
           },
           "id": 86,
           "name": "seqcheck_linear_3",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_linear_3-sample"
+          ],
           "seguid": "ldseguid=_XemvgSI5rviFQb7d_2kp7JouwQ",
           "sequence_type": "linear_dna",
           "tags": [
@@ -38,7 +40,9 @@
           },
           "id": 85,
           "name": "seqcheck_linear_2",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_linear_2-sample"
+          ],
           "seguid": "ldseguid=eG3ATEdW44h7aDMfcAlZnN2j65o",
           "sequence_type": "linear_dna",
           "tags": [
@@ -57,7 +61,9 @@
           },
           "id": 84,
           "name": "seqcheck_linear_1",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_linear_1-sample"
+          ],
           "seguid": "ldseguid=IlAdBBErYDJWgZyRKjYCE5PYwmo",
           "sequence_type": "linear_dna",
           "tags": [
@@ -76,7 +82,9 @@
           },
           "id": 83,
           "name": "seqcheck_circular_3",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_circular_3-sample"
+          ],
           "seguid": "cdseguid=zFx5hMYHKdTysVxHIFaDD5ZWxOs",
           "sequence_type": "plasmid",
           "tags": [
@@ -95,7 +103,9 @@
           },
           "id": 82,
           "name": "seqcheck_circular_2",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_circular_2-sample"
+          ],
           "seguid": "cdseguid=agbObHtt5qQjxxCEInm0gWYjz_w",
           "sequence_type": "plasmid",
           "tags": [
@@ -114,7 +124,9 @@
           },
           "id": 81,
           "name": "seqcheck_circular_1",
-          "sample_uids": [],
+          "sample_uids": [
+            "seqcheck_circular_1-sample"
+          ],
           "seguid": "cdseguid=t87sd9-LRtENEta2-yadhxRDAh8",
           "sequence_type": "plasmid",
           "tags": [

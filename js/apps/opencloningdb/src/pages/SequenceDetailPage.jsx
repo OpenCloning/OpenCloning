@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Typography, CircularProgress, Alert, Box, IconButton, Tooltip } from '@mui/material';
+import { Typography, CircularProgress, Alert, Box } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
-import { convertToTeselaJson, downloadBlob, readSequencingFile } from '@opencloning/utils/readNwrite';
+import { convertToTeselaJson, readSequencingFile } from '@opencloning/utils/readNwrite';
 import SequenceViewer from '@opencloning/ui/components/SequenceViewer';
 import ResourceDetailHeader from '../components/ResourceDetailHeader';
 import SequenceTypeChip from '../components/SequenceTypeChip';
@@ -17,119 +17,17 @@ import TopButtonSection from '../components/TopButtonSection';
 import AddToCloningButton from '../components/AddToCloningButton';
 import ChangeSequenceCircularityButton from '../components/ChangeSequenceCircularityButton';
 import DeleteResourceButton from '../components/DeleteResourceButton';
-import { List, ListItem, ListItemIcon } from '@mui/material';
 import { OpenCloningDBInterface } from '@opencloning/opencloningdb';
-import { Download as DownloadIcon, Visibility as VisibilityIcon, AddCircle as AddCircleIcon, Delete as DeleteIcon, InsertDriveFile as InsertDriveFileIcon } from '@mui/icons-material';
-import DetailPageSectionAction from '../components/DetailPageSectionAction';
-import { ImportSequencingFilesInput } from '@opencloning/ui/components/verification';
 import useAppAlerts from '../hooks/useAppAlerts';
 import useSequencingAlignment from '@opencloning/ui/hooks/useSequencingAlignment';
 import { QueryStatusWrapper } from '@opencloning/ui';
 import SequenceSamplesSection from '../components/SequenceSamplesSection';
+import SampleHistorySection from '../components/SampleHistorySection';
 import useUpdateAnnotationMutation from '../hooks/useUpdateAnnotationMutation';
 import DetailTable from '../components/DetailTable';
 import error2String from '@opencloning/utils/error2String';
 
-const { getSequencingFiles, submitSequencingFileToDatabase } = OpenCloningDBInterface;
-
-function SequencingFileRow({ file, sequenceId, onGetFile }) {
-  return (
-    <ListItem disableGutters dense sx={{ pl: 1, mb: 0.5, borderLeft: '3px solid', borderColor: 'primary.light', display: 'flex', alignItems: 'center', '&:hover .file-actions': { opacity: 1 }, '& .file-actions': { opacity: 0, transition: 'opacity 0.15s' } }} data-testid="sequencing-file-row">
-      <ListItemIcon sx={{ minWidth: 32, flexShrink: 0 }}>
-        <InsertDriveFileIcon fontSize="small" color="action" />
-      </ListItemIcon>
-      <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.875rem', flexShrink: 0 }}>{file.name}</Box>
-      <Box className="file-actions" sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
-        <Tooltip title="Download" placement="top">
-          <IconButton size="small" onClick={() => onGetFile(file.getFile)}>
-            <DownloadIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete" placement="top">
-          <span>
-            <DeleteSequencingFileButton sequenceId={sequenceId} fileId={file.id} />
-          </span>
-        </Tooltip>
-      </Box>
-    </ListItem>
-  );
-}
-
-function DeleteSequencingFileButton({ sequenceId, fileId }) {
-  const { addAlert } = useAppAlerts();
-  const queryClient = useQueryClient();
-
-  const deleteSequencingFileMutation = useMutation({
-    mutationFn: () => openCloningDBHttpClient.delete(endpoints.sequenceSequencingFileDelete(sequenceId, fileId)),
-    onSuccess: () => {
-      addAlert({ message: 'Sequencing file deleted successfully', severity: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'cloning_strategy'] });
-      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'sequencing_files'] });
-    },
-    onError: (error) => {
-      addAlert({
-        message: error2String(error),
-        severity: 'error',
-      });
-    },
-  });
-
-  return (
-    <IconButton
-      size="small"
-      onClick={() => deleteSequencingFileMutation.mutate()}
-      disabled={deleteSequencingFileMutation.isLoading}
-    >
-      <DeleteIcon fontSize="small" />
-    </IconButton>
-  );
-}
-
-function SequencingFileSectionActions({ sequencingFiles, databaseId, onSeeAlignments, alignmentLoading }) {
-  const fileInputRef = React.useRef(null);
-  const { addAlert } = useAppAlerts();
-  const queryClient = useQueryClient();
-  const sequencingFileNames = React.useMemo(() => sequencingFiles.map((file) => file.name), [sequencingFiles]);
-
-  const mutation = useMutation({
-    mutationFn: (files) => submitSequencingFileToDatabase({ databaseId, sequencingFiles: files }),
-    onSuccess: () => {
-      addAlert({ message: 'Sequencing files submitted successfully', severity: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['sequence', databaseId, 'cloning_strategy'] });
-      queryClient.invalidateQueries({ queryKey: ['sequence', databaseId, 'sequencing_files'] });
-    },
-    onError: (error) => {
-      addAlert({
-        message: error2String(error),
-        severity: 'error',
-      });
-    },
-  });
-
-  const handleFileChange = (files) => {
-    for (const file of files) {
-      if (sequencingFileNames.includes(file.name)) {
-        addAlert({ message: `File ${file.name} already exists`, severity: 'error' });
-        return;
-      }
-    }
-    mutation.mutate(files);
-  };
-  return (
-    <>
-      <ImportSequencingFilesInput onFileChange={handleFileChange} fileInputRef={fileInputRef} />
-      <DetailPageSectionAction icon={<AddCircleIcon />} onClick={ () => fileInputRef.current?.click()} title="Add sequencing files" />
-      {sequencingFiles?.length > 0 && (
-        <DetailPageSectionAction
-          icon={alignmentLoading ? <CircularProgress size={24} /> : <VisibilityIcon />}
-          onClick={onSeeAlignments}
-          title="See alignments"
-          disabled={alignmentLoading}
-        />
-      )}
-    </>
-  )
-}
+const { getSequencingFiles } = OpenCloningDBInterface;
 
 function SequenceDetailPage() {
   const { id: idString } = useParams();
@@ -137,10 +35,6 @@ function SequenceDetailPage() {
   const navigate = useNavigate();
   const { addAlert } = useAppAlerts();
   const alignmentMutation = useSequencingAlignment({ onError: (e) => addAlert({ message: e?.message || 'Alignment failed', severity: 'error' }) });
-  const onGetFile = async (fileGetter) => {
-    const file = await fileGetter();
-    downloadBlob(file, file.name);
-  }
 
   const { data: data, isLoading: isLoading, error: error} = useQuery({
     retry: false,
@@ -173,11 +67,12 @@ function SequenceDetailPage() {
     },
     enabled: Boolean(id),
   });
+  // Sequencing files of all the samples, to align them to the sequence
   const sequencingFilesQuery = useQuery({
     retry: false,
     queryKey: ['sequence', id, 'sequencing_files'],
     queryFn: () => getSequencingFiles(id),
-    enabled: Boolean(id),
+    enabled: Boolean(id) && data?.isTemplateSequence === false,
   });
   const primersQuery = useQuery({
     retry: false,
@@ -292,7 +187,13 @@ function SequenceDetailPage() {
       {isTemplateSequence && (
         <Alert severity="info" sx={{ maxWidth: 500 }}>This is a sequence template.</Alert>
       )}
-      <SequenceSamplesSection sequenceId={id} sampleUids={sequenceInDb?.sample_uids ?? []} />
+      <SequenceSamplesSection
+        sequenceId={id}
+        isTemplateSequence={isTemplateSequence}
+        onSeeAlignments={isTemplateSequence ? null : () => handleSeeAlignmentsMutation.mutate()}
+        alignmentLoading={handleSeeAlignmentsMutation.isPending || alignmentMutation.isPending || sequencingFilesQuery.isFetching}
+      />
+      <SampleHistorySection sequenceId={id} />
       {sequenceInDb.type !== 'template_sequence' && (
         <DetailPageSection title="Provenance" data-testid="sequence-provenance">
           <Typography color="text.secondary" sx={{ mb: 1 }}>
@@ -334,26 +235,6 @@ function SequenceDetailPage() {
 
       {sequenceInDb.type !== 'template_sequence' && (
         <>
-          <DetailPageSection title="Sequencing files" actions={
-            <SequencingFileSectionActions
-              sequencingFiles={sequencingFiles}
-              databaseId={id}
-              onSeeAlignments={() => handleSeeAlignmentsMutation.mutate()}
-              alignmentLoading={handleSeeAlignmentsMutation.isPending || alignmentMutation.isPending}
-            />
-          }>
-            <QueryStatusWrapper queryResult={sequencingFilesQuery}>
-              <List disablePadding>
-                {sequencingFiles.map((file) => (
-                  <SequencingFileRow key={file.name} file={file} sequenceId={id} onGetFile={onGetFile} />
-                ))}
-              </List>
-              {sequencingFiles.length === 0 && (
-                <Typography color="text.secondary">No sequencing files linked</Typography>
-              )}
-            </QueryStatusWrapper>
-          </DetailPageSection>
-
           <Box sx={{ mt: 2 }}>
             {sequenceData ? (
               <SequenceViewer sequenceData={sequenceData} alignmentData={alignmentMutation.data ?? null} onUpdateAnnotation={updateAnnotationMutation.mutateAsync} />

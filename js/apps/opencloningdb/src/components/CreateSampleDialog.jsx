@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dialog, DialogTitle, DialogContent, Button, FormControl, Alert, Box, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, FormControl, Alert, Box, IconButton, TextField } from '@mui/material';
 import { AddCircle as AddCircleIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewSampleUID from './NewSampleUID';
@@ -11,7 +11,7 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
   const { addAlert } = useAppAlerts();
   const queryClient = useQueryClient();
   const nextIdRef = React.useRef(1);
-  const [rows, setRows] = React.useState([{ id: 0, validatedUid: '', isChecking: false }]);
+  const [rows, setRows] = React.useState([{ id: 0, validatedUid: '', isChecking: false, location: '' }]);
 
   const handleValidatedChange = React.useCallback((rowId, value) => {
     setRows((prev) => prev.map((r) => (r.id === rowId ? { ...r, validatedUid: value } : r)));
@@ -21,8 +21,12 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
     setRows((prev) => prev.map((r) => (r.id === rowId ? { ...r, isChecking } : r)));
   }, []);
 
+  const handleLocationChange = (rowId, location) => {
+    setRows((prev) => prev.map((r) => (r.id === rowId ? { ...r, location } : r)));
+  };
+
   const addRow = () => {
-    setRows((prev) => [...prev, { id: nextIdRef.current++, validatedUid: '', isChecking: false }]);
+    setRows((prev) => [...prev, { id: nextIdRef.current++, validatedUid: '', isChecking: false, location: '' }]);
   };
 
   const removeRow = (rowId) => {
@@ -35,10 +39,10 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
   const hasDuplicates = duplicateUids.length > 0;
 
   const createMutation = useMutation({
-    mutationFn: async (uidsToCreate) => {
+    mutationFn: async (rowsToCreate) => {
       const results = await Promise.all(
-        uidsToCreate.map((uid) => {
-          const body = { uid, sequence_id: sequenceId };
+        rowsToCreate.map(({ validatedUid: uid, location }) => {
+          const body = { uid, sequence_id: sequenceId, location: location.trim() || null };
           return openCloningDBHttpClient.post(endpoints.postSequenceSample, body);
         }),
       );
@@ -46,7 +50,8 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
     },
     onSuccess: (results) => {
       addAlert({ message: `${results.length} sample UID(s) created successfully`, severity: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'cloning_strategy'] });
+      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId] });
+      queryClient.invalidateQueries({ queryKey: ['sequence_samples'] });
       resetAndClose();
     },
     onError: (error) => {
@@ -63,11 +68,11 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!canSubmit) return;
-    createMutation.mutate(validUids);
+    createMutation.mutate(rows);
   };
 
   const resetAndClose = () => {
-    setRows([{ id: 0, validatedUid: '', isChecking: false }]);
+    setRows([{ id: 0, validatedUid: '', isChecking: false, location: '' }]);
     nextIdRef.current = 1;
     onClose();
   };
@@ -86,6 +91,13 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
                   label={`Sample UID ${index + 1}`}
                 />
               </FormControl>
+              <TextField
+                label="Location (optional)"
+                value={row.location}
+                onChange={(e) => handleLocationChange(row.id, e.target.value)}
+                sx={{ mb: 3, minWidth: 180 }}
+                slotProps={{ htmlInput: { 'data-testid': 'create-sample-location' } }}
+              />
               {rows.length > 1 && (
                 <IconButton onClick={() => removeRow(row.id)} size="small" sx={{ mb: 3 }}>
                   <DeleteIcon />

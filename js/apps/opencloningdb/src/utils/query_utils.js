@@ -91,7 +91,18 @@ export function parseSequenceParams(searchParams) {
     instantiated: parseBoolean(searchParams.get('instantiated')),
     has_uid: parseBoolean(searchParams.get('has_uid')),
     created_by: parseString(searchParams.get('created_by')),
+    location: parseString(searchParams.get('location')),
   };
+}
+
+/** The view of the sequences page: one row per sequence ('sequences') or one row per sample ('samples'). */
+export function parseSequencesView(searchParams) {
+  return searchParams.get('view') === 'samples' ? 'samples' : 'sequences';
+}
+
+/** Filters of the sequences page that apply to the samples view (GET /sequence_samples). */
+export function sampleFiltersFromSequenceParams({ uid, name, tags, sequence_types: sequenceTypes, created_by: createdBy, location }) {
+  return { uid, name, tags, sequence_types: sequenceTypes, created_by: createdBy, location };
 }
 
 /**
@@ -101,7 +112,7 @@ export function parseSequenceParams(searchParams) {
 export function applySequenceParamsToSearchParams(params, nextParams) {
   nextParams.delete('page');
 
-  const keys = ['name', 'uid', 'tags', 'sequence_types', 'instantiated', 'has_uid', 'created_by'];
+  const keys = ['name', 'uid', 'tags', 'sequence_types', 'instantiated', 'has_uid', 'created_by', 'location'];
   keys.forEach((key) => nextParams.delete(key));
 
   if (params.name) {
@@ -124,6 +135,9 @@ export function applySequenceParamsToSearchParams(params, nextParams) {
   }
   if (params.created_by) {
     nextParams.set('created_by', params.created_by);
+  }
+  if (params.location) {
+    nextParams.set('location', params.location);
   }
 }
 

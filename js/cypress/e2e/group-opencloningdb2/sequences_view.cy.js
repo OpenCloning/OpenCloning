@@ -144,10 +144,10 @@ describe('SequencesPage', () => {
 
           if (sequenceDetail.sample_uids.length > 0) {
             sequenceDetail.sample_uids.forEach((uid) => {
-              cy.contains('h6', 'Sequence sample UIDs').parent().parent().contains(uid).should('exist');
+              cy.get('[data-testid="sequence-samples-section"] [data-testid="sample-block-uid"]').contains(uid).should('exist');
             });
           } else {
-            cy.contains('h6', 'Sequence sample UIDs').parent().parent().contains('No UIDs linked').should('exist');
+            cy.get('[data-testid="sequence-samples-section"]').contains('No samples').should('exist');
           }
           cy.get('[data-testid="sequence-seguid"]').contains(sequenceDetail.seguid).should('exist');
         });
@@ -171,7 +171,7 @@ describe('SequencesPage', () => {
               cy.get('[data-testid="sequencing-file-row"]').contains(file.original_name).should('exist');
             });
           } else {
-            cy.contains('h6', 'Sequencing files').parent().parent().contains('No sequencing files linked').should('exist');
+            cy.get('[data-testid="sequencing-file-row"]').should('not.exist');
           }
         });
 
@@ -224,6 +224,36 @@ describe('SequencesPage', () => {
     // Empty source should have been removed
     cy.get('li.source-node').should('have.length', 1);
     cy.get('.open-cloning', { timeout: 20000 }).contains('pREX0008').should('exist');
+  });
+
+  it('can switch to the samples view, with one row per sample', () => {
+    cy.intercept('GET', Cypress.getDbURL(endpoints.sequenceSamples, '*')).as('getSamples');
+    cy.e2eLogin('/sequences?name=pREX0008', 'view-only-user@example.com', 'password');
+    cy.get('[data-testid="sequence-table"]').should('exist');
+    cy.get('[data-testid="sequences-view-toggle"]').contains('button', 'Samples').click();
+    cy.url().should('include', 'view=samples');
+    cy.wait('@getSamples').then(({ request, response }) => {
+      // The sequence filters apply to the samples
+      expect(request.query).to.deep.equal({ page: '1', size: '25', name: 'pREX0008' });
+      const sample = response.body.items.find((item) => item.uid === 'example_sequencing-sample');
+      cy.get('[data-testid="samples-table-row"]').filter(':contains(example_sequencing-sample)').within(() => {
+        cy.get('td').eq(2).should('contain', 'pREX0008');
+        cy.get('td').eq(3).should('contain', 'Plasmid');
+        cy.get('td').eq(4).should('contain', '—');
+        cy.get('td').eq(5).should('contain', String(sample.sequencing_files.length));
+      });
+    });
+    // The location filter is only in the samples view, the "With UID" switch only in the sequences view
+    cy.get('[data-testid="url-params-form"]').contains('label', 'With UID').should('not.exist');
+    cy.get('[data-testid="url-params-form"]').contains('label', 'Location').siblings('div').find('input').type('nowhere');
+    cy.get('[data-testid="url-params-form"]').contains('button', 'Search').click();
+    cy.wait('@getSamples').its('request.query.location').should('equal', 'nowhere');
+    cy.get('[data-testid="samples-table-row"]').should('not.exist');
+
+    cy.get('[data-testid="sequences-view-toggle"]').contains('button', 'Sequences').click();
+    cy.url().should('not.include', 'view=samples');
+    cy.get('[data-testid="sequence-table"]').contains('pREX0008').should('exist');
+    cy.get('[data-testid="url-params-form"]').contains('label', 'With UID').should('exist');
   });
 
   it('can download and align sequencing files', () => {

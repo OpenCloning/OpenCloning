@@ -64,15 +64,15 @@ def workspace_headers(
 
 def post_sequencing_file_upload(
     client,
-    seq_id: int,
+    sample_uid: str,
     token: str,
     workspace_id: int | str,
     filename: str,
     body: bytes,
 ):
-    """POST multipart upload to ``/sequences/{id}/sequencing_files``."""
+    """POST multipart upload to ``/sequence_samples/{uid}/sequencing_files``."""
     return client.post(
-        f"/sequences/{seq_id}/sequencing_files",
+        f"/sequence_samples/{sample_uid}/sequencing_files",
         headers=workspace_headers(token, workspace_id),
         files={'files': (filename, body, 'application/octet-stream')},
     )

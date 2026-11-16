@@ -2,9 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { getStub } from './testUtils.test';
 import endpoints from './endpoints';
 
-const multipartStub = getStub('post_sequence_sequencing_files');
+const multipartStub = getStub('post_sample_sequencing_files');
 const sequenceFileStub = multipartStub.body.multipart_files[0];
-const databaseId = Number(multipartStub.endpoint.match(/\/sequences\/(\d+)\//)?.[1]);
+const sampleUid = decodeURIComponent(multipartStub.endpoint.match(/\/sequence_samples\/([^/]+)\//)?.[1]);
 const postMock = vi.fn().mockResolvedValue({
   data: 'direct-response',
 });
@@ -47,12 +47,12 @@ describe('submitSequencingFileToDatabase multipart payload', () => {
     });
 
     const result = await OpenCloningDBInterface.submitSequencingFileToDatabase({
-      databaseId,
+      sampleUid,
       sequencingFiles: [sequenceFile],
     });
 
     const [url, formData] = postMock.mock.calls[0];
-    expect(url).toBe(endpoints.sequenceSequencingFiles(databaseId));
+    expect(url).toBe(endpoints.sequenceSampleSequencingFiles(sampleUid));
     expect(formData).toBeInstanceOf(FormData);
 
     const files = formData.getAll('files');
