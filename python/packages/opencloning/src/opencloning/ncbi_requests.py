@@ -5,7 +5,7 @@ from pydna.opencloning_models import GenomeCoordinatesSource, NCBISequenceSource
 from Bio.SeqFeature import Location
 
 from .app_settings import settings
-from .http_client import get_http_client, Response, TimeoutException, ConnectError
+from .http_client import get_http_client, Response
 
 
 # The API key is never put in URLs (which end up in logs and exception messages):
@@ -31,24 +31,17 @@ def _check_ncbi_response(resp: Response) -> Response:
     return resp
 
 
-async def _ncbi_request(method: str, url: str, **kwargs) -> Response:
-    try:
-        async with get_http_client() as client:
-            resp = await client.request(method, url, timeout=20.0, **kwargs)
-    except TimeoutException as e:
-        raise HTTPException(504, 'NCBI took too long to respond, try again later') from e
-    except ConnectError as e:
-        raise HTTPException(503, 'Cannot connect to NCBI, try again later') from e
-    return _check_ncbi_response(resp)
-
-
 async def async_get(url, headers, params=None) -> Response:
-    return await _ncbi_request('GET', url, headers=headers, params=params)
+    async with get_http_client() as client:
+        resp = await client.get(url, headers=headers, params=params)
+        return _check_ncbi_response(resp)
 
 
 async def async_post_form(url, headers=None, params=None) -> Response:
     """POST ``params`` as a form body (E-utilities accept POST, keeping ``api_key`` out of the URL)."""
-    return await _ncbi_request('POST', url, headers=headers, data=params)
+    async with get_http_client() as client:
+        resp = await client.post(url, headers=headers, data=params)
+        return _check_ncbi_response(resp)
 
 
 # TODO: this does not return old assembly accessions, see https://github.com/ncbi/datasets/issues/380#issuecomment-2231142816

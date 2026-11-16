@@ -57,6 +57,15 @@ File uploads are size-limited; requests above the limit are rejected with HTTP 4
 | `MAX_SEQUENCING_FILE_SIZE_MB` | `20` | Maximum size (MB) of each uploaded sequencing file (database API only) |
 | `MAX_REQUEST_BODY_SIZE_MB` | `100` | Maximum size (MB) of any request body, enforced while it is received, so oversized uploads are rejected before they are written to temporary files |
 
+## External services
+
+Requests to external services (NCBI, Addgene, SEVA, etc.) that time out answer with HTTP 504, and those that cannot connect answer with HTTP 503.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `EXTERNAL_REQUEST_TIMEOUT` | `20` | Timeout (seconds) of requests to external services |
+| `PLANNOTATE_TIMEOUT` | `20` | Timeout (seconds) of requests to the pLannotate server, which can take longer |
+
 ## Database connections
 
 Each process (each gunicorn worker) has its own connection pool, and can open up to `DB_POOL_SIZE + DB_MAX_OVERFLOW` connections to Postgres. Keep `GUNICORN_WORKERS * (DB_POOL_SIZE + DB_MAX_OVERFLOW)`, plus any other clients of the database, below the connection limit of the Postgres server. When all the connections of a worker are in use, requests wait for a free one (up to 30 s) instead of failing.
