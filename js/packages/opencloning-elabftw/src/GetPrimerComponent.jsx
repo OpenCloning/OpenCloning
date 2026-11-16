@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import ELabFTWCategorySelect from './ELabFTWCategorySelect';
 import ELabFTWResourceSelect from './ELabFTWResourceSelect';
+import { getPrimerSequenceFromExtraFields } from './utils';
 
 function GetPrimerComponent({ primer, setPrimer, setError }) {
   const [category, setCategory] = React.useState(null);
@@ -19,7 +20,7 @@ function GetPrimerComponent({ primer, setPrimer, setError }) {
     }
     let sequence;
     try {
-      sequence = JSON.parse(resource.metadata).extra_fields?.sequence?.value;
+      sequence = getPrimerSequenceFromExtraFields(JSON.parse(resource.metadata).extra_fields);
       if (!sequence) {
         setError('No sequence found in metadata');
         setPrimer(null);

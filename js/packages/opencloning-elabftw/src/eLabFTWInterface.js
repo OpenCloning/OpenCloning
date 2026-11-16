@@ -4,7 +4,7 @@ import SubmitToDatabaseComponent from './SubmitToDatabaseComponent';
 import PrimersNotInDatabaseComponent from './PrimersNotInDatabaseComponent';
 import GetPrimerComponent from './GetPrimerComponent';
 import { eLabFTWHttpClient, writeHeaders, readHeaders, baseUrl, getELabFTWVersion } from './common';
-import { getFileFromELabFTW, error2String } from './utils';
+import { getFileFromELabFTW, error2String, getPrimerSequenceFromExtraFields } from './utils';
 import LoadHistoryComponent from './LoadHistoryComponent';
 import { encodePathSegment } from '@opencloning/utils/urlUtils';
 
@@ -214,7 +214,7 @@ async function getPrimer(databaseId) {
   try {
     const resp = await eLabFTWHttpClient.get(url, { headers: readHeaders });
     resp.data.metadata = JSON.parse(resp.data.metadata);
-    return { name: resp.data.title, database_id: databaseId, sequence: resp.data.metadata.extra_fields.sequence?.value };
+    return { name: resp.data.title, database_id: databaseId, sequence: getPrimerSequenceFromExtraFields(resp.data.metadata.extra_fields) };
   } catch (e) {
     console.error(e);
     if (e.code === 'ERR_NETWORK') {

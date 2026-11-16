@@ -4,6 +4,12 @@
 import { eLabFTWHttpClient, readHeaders } from './common';
 import { encodePathSegment } from '@opencloning/utils/urlUtils';
 
+// Primer sequence stored in an extra field called "sequence" (any capitalization)
+export function getPrimerSequenceFromExtraFields(extraFields) {
+  const key = Object.keys(extraFields || {}).find((k) => k.toLowerCase() === 'sequence');
+  return key ? extraFields[key]?.value : undefined;
+}
+
 export function error2String(error) {
   if (error.code === 'ERR_NETWORK') { return 'Network error: Cannot connect to eLabFTW'; }
   if (!error.code) {
