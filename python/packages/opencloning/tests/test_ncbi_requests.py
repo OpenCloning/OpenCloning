@@ -6,6 +6,7 @@ import opencloning.ncbi_requests as ncbi_requests
 import pytest
 import respx
 from fastapi import HTTPException
+from opencloning.http_client import TimeoutException, ConnectError
 import unittest
 
 from Bio.SeqFeature import SimpleLocation
@@ -32,6 +33,22 @@ class NcbiAsyncRequestsTest(unittest.IsolatedAsyncioTestCase):
             await ncbi_requests.get_genbank_sequence('blah', 1, 10, 1)
         assert e.value.status_code == 503
         assert e.value.detail == 'NCBI returned an unexpected error'
+
+    @respx.mock
+    async def test_ncbi_timeout_and_connection_errors(self):
+        efetch_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+        respx.post(efetch_url).mock(side_effect=TimeoutException('timeout'))
+        with pytest.raises(HTTPException) as e:
+            await ncbi_requests.get_genbank_sequence('blah', 1, 10, 1)
+        assert e.value.status_code == 504
+        assert e.value.detail == 'NCBI took too long to respond, try again later'
+
+        datasets_url = 'https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/blah/annotation_report'
+        respx.get(datasets_url).mock(side_effect=ConnectError('cannot connect'))
+        with pytest.raises(HTTPException) as e:
+            await ncbi_requests.get_annotations_from_query('bluh', 'blah')
+        assert e.value.status_code == 503
+        assert e.value.detail == 'Cannot connect to NCBI, try again later'
 
     async def test_get_annotations_from_query(self):
         result = await ncbi_requests.get_annotations_from_query('SPAPB1A10.09', 'GCF_000002945.2')
