@@ -38,6 +38,11 @@ from typing import Callable
 def format_sequence_genbank(seq: Dseqrecord, seq_name: str = None) -> TextFileSequence:
 
     if seq_name is not None:
+        # GenBank LOCUS names cannot contain whitespace, BioPython would raise a ValueError
+        if seq_name == '' or any(c.isspace() for c in seq_name):
+            raise HTTPException(
+                422, f'Invalid sequence name "{seq_name}": it must be non-empty and contain no spaces.'
+            )
         seq.name = seq_name
     elif seq.name.lower() == 'exported':
         correct_name(seq)
