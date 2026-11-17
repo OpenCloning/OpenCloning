@@ -17,7 +17,7 @@
         "@mui/material": "^9.5.0",
         "@opencloning/ui": "workspace:*",
         "@opencloning/utils": "workspace:*",
-        "axios": "^1.21.0"
+        "axios": "^1.21.1"
     },
     "peerDependencies": {
         "react": "^18.3.1",
