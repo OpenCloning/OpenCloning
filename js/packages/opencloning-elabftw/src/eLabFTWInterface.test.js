@@ -301,7 +301,7 @@ describe('test submitPrimerToDatabase', () => {
     mockedScenarios.push(mockDeleteResource);
 
     const result = submitPrimerToDatabase(primerSubmissionPayloadWithLinkedSequence);
-    expect(result).rejects.toThrow('Error linking to sequence: Not found');
+    await expect(result).rejects.toThrow('Error linking to sequence: Not found');
   });
   it('fail linking network error', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -309,26 +309,26 @@ describe('test submitPrimerToDatabase', () => {
     mockedScenarios.push(mockNetworkError(mockPrimerLink));
     mockedScenarios.push(mockDeleteResource);
     const result = submitPrimerToDatabase(primerSubmissionPayloadWithLinkedSequence);
-    expect(result).rejects.toThrow('Error linking to sequence: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error linking to sequence: Network error: Cannot connect to eLabFTW');
   });
   it('fail naming network error', async () => {
     mockedScenarios.push(mockCreateResource);
     mockedScenarios.push(mockNetworkError(mockPrimerUpdate));
     mockedScenarios.push(mockDeleteResource);
     const result = submitPrimerToDatabase(primerSubmissionPayload);
-    expect(result).rejects.toThrow('Error naming primer: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error naming primer: Network error: Cannot connect to eLabFTW');
   });
   it('fail creating primer', async () => {
     mockedScenarios.push(mockNetworkError(mockCreateResource));
     const result = submitPrimerToDatabase(primerSubmissionPayload);
-    expect(result).rejects.toThrow('Error creating primer: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error creating primer: Network error: Cannot connect to eLabFTW');
   });
   it('fail removing primer if error occurs', async () => {
     mockedScenarios.push(mockCreateResource);
     mockedScenarios.push(mockNetworkError(mockPrimerUpdate));
     mockedScenarios.push(mockNetworkError(mockDeleteResource));
     const result = submitPrimerToDatabase(primerSubmissionPayload);
-    expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete primer with id ${MAIN_RESOURCE_DATABASE_ID} after an error naming primer.`);
+    await expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete primer with id ${MAIN_RESOURCE_DATABASE_ID} after an error naming primer.`);
   });
 });
 
@@ -387,12 +387,12 @@ describe('test getPrimer', () => {
   it('fail getting primer - network error', async () => {
     mockedScenarios.push(mockNetworkError(mockPrimerGet));
     const result = getPrimer(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow('Error getting primer: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error getting primer: Network error: Cannot connect to eLabFTW');
   });
   it('fail getting primer - not found', async () => {
     mockedScenarios.push(mockNotFound(mockPrimerGet));
     const result = getPrimer(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow(`Error getting primer with id ${MAIN_RESOURCE_DATABASE_ID}, it might have been deleted or you can no longer access it`);
+    await expect(result).rejects.toThrow(`Error getting primer with id ${MAIN_RESOURCE_DATABASE_ID}, it might have been deleted or you can no longer access it`);
   });
 });
 
@@ -412,12 +412,12 @@ describe('test getSequenceName', () => {
   it('fail getting sequence name - network error', async () => {
     mockedScenarios.push(mockNetworkError(mockSequenceName));
     const result = getSequenceName(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow('Error getting sequence name: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error getting sequence name: Network error: Cannot connect to eLabFTW');
   });
   it('fail getting sequence name - not found', async () => {
     mockedScenarios.push(mockNotFound(mockSequenceName));
     const result = getSequenceName(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow(`Error getting name of sequence with id ${MAIN_RESOURCE_DATABASE_ID}, it might have been deleted or you can no longer access it`);
+    await expect(result).rejects.toThrow(`Error getting name of sequence with id ${MAIN_RESOURCE_DATABASE_ID}, it might have been deleted or you can no longer access it`);
   });
 });
 
@@ -473,18 +473,18 @@ describe('test getSequencingFiles', () => {
   it('get sequencing files - network error', async () => {
     mockedScenarios.push(mockNetworkError(mockSequencingFilesFirstRequest));
     const result = getSequencingFiles(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
   });
   it('get sequencing files - not found', async () => {
     mockedScenarios.push(mockNotFound(mockSequencingFilesFirstRequest));
     const result = getSequencingFiles(MAIN_RESOURCE_DATABASE_ID);
-    expect(result).rejects.toThrow('Not found');
+    await expect(result).rejects.toThrow('Not found');
   });
   it('get sequencing files - getFile() - network error', async () => {
     mockedScenarios.push(mockSequencingFilesFirstRequest);
     mockedScenarios.push(mockNetworkError(mockSequencingFilesFirstFile));
     const result = await getSequencingFiles(MAIN_RESOURCE_DATABASE_ID);
-    expect(result[0].getFile()).rejects.toThrow('Network error: Cannot connect to eLabFTW');
+    await expect(result[0].getFile()).rejects.toThrow('Network error: Cannot connect to eLabFTW');
   });
 });
 
@@ -527,24 +527,24 @@ describe('test loadSequenceFromUrlParams', () => {
   it('load sequence from url params - fileInfo network error', async () => {
     mockedScenarios.push(mockNetworkError(mockFileInfo));
     const result = loadSequenceFromUrlParams({ item_id: MAIN_RESOURCE_DATABASE_ID, file_id: MAIN_RESOURCE_SEQUENCE_FILE_DATABASE_ID });
-    expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
   });
   it('load sequence from url params - fileInfo not found', async () => {
     mockedScenarios.push(mockNotFound(mockFileInfo));
     const result = loadSequenceFromUrlParams({ item_id: MAIN_RESOURCE_DATABASE_ID, file_id: MAIN_RESOURCE_SEQUENCE_FILE_DATABASE_ID });
-    expect(result).rejects.toThrow('Not found');
+    await expect(result).rejects.toThrow('Not found');
   });
   it('load sequence from url params - fileContent network error', async () => {
     mockedScenarios.push(mockFileInfo);
     mockedScenarios.push(mockNetworkError(mockFileContent));
     const result = loadSequenceFromUrlParams({ item_id: MAIN_RESOURCE_DATABASE_ID, file_id: MAIN_RESOURCE_SEQUENCE_FILE_DATABASE_ID });
-    expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Network error: Cannot connect to eLabFTW');
   });
   it('load sequence from url params - fileContent not found', async () => {
     mockedScenarios.push(mockFileInfo);
     mockedScenarios.push(mockNotFound(mockFileContent));
     const result = loadSequenceFromUrlParams({ item_id: MAIN_RESOURCE_DATABASE_ID, file_id: MAIN_RESOURCE_SEQUENCE_FILE_DATABASE_ID });
-    expect(result).rejects.toThrow('Not found');
+    await expect(result).rejects.toThrow('Not found');
   });
 });
 
@@ -743,14 +743,14 @@ describe('test submitSequenceToDatabase', () => {
   it('submitSequenceToDatabase - create resource network error', async () => {
     mockedScenarios.push(mockNetworkError(mockCreateResource));
     const result = submitSequenceToDatabase(submissionPayload);
-    expect(result).rejects.toThrow('Error creating resource: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error creating resource: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - rename resource network error', async () => {
     mockedScenarios.push(mockCreateResource);
     mockedScenarios.push(mockNetworkError(mockUpdateResource));
     mockedScenarios.push(mockDeleteResource);
     const result = submitSequenceToDatabase(submissionPayload);
-    expect(result).rejects.toThrow('Error setting resource title: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error setting resource title: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - submit sequence file network error', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -758,7 +758,7 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockNetworkError(mockUploadSequenceFile));
     mockedScenarios.push(mockDeleteResource);
     const result = submitSequenceToDatabase(submissionPayload);
-    expect(result).rejects.toThrow('Error uploading sequence file: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error uploading sequence file: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - submit history file network error', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -767,7 +767,7 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockNetworkError(mockUploadHistoryFile));
     mockedScenarios.push(mockDeleteResource);
     const result = submitSequenceToDatabase(submissionPayload);
-    expect(result).rejects.toThrow('Error uploading history file: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error uploading history file: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - submit sequence with primers', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -798,7 +798,7 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockDeleteResource);
 
     const result = submitSequenceToDatabase(submissionPayloadWithPrimers);
-    expect(result).rejects.toThrow('Error submitting new primers: Error linking to sequence: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error submitting new primers: Error linking to sequence: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - submit sequence with primers network error after linking primer - deletes both resource and primers', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -812,7 +812,7 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockDeleteResource);
 
     const result = submitSequenceToDatabase(submissionPayloadWithPrimers);
-    expect(result).rejects.toThrow('Error uploading sequence file: Network error: Cannot connect to eLabFTW');
+    await expect(result).rejects.toThrow('Error uploading sequence file: Network error: Cannot connect to eLabFTW');
   });
   it('submitSequenceToDatabase - submit sequence with ancestors', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -830,7 +830,7 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockNetworkError(mockUploadSequenceFile));
     mockedScenarios.push(mockNetworkError(mockDeleteResource));
     const result = submitSequenceToDatabase(submissionPayload);
-    expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete the sequence with id ${MAIN_RESOURCE_DATABASE_ID} after an error uploading sequence file.`);
+    await expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete the sequence with id ${MAIN_RESOURCE_DATABASE_ID} after an error uploading sequence file.`);
   });
   it('submitSequenceToDatabase - error deleting primer after error', async () => {
     mockedScenarios.push(mockCreateResource);
@@ -843,12 +843,12 @@ describe('test submitSequenceToDatabase', () => {
     mockedScenarios.push(mockNetworkError(mockDeleteNewPrimer));
 
     const result = submitSequenceToDatabase(submissionPayloadWithPrimers);
-    expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete newly created primers linked to sequence with id ${MAIN_RESOURCE_DATABASE_ID} after an error uploading sequence file.`);
+    await expect(result).rejects.toThrow(`There was an error (Network error: Cannot connect to eLabFTW) while trying to delete newly created primers linked to sequence with id ${MAIN_RESOURCE_DATABASE_ID} after an error uploading sequence file.`);
   });
-  it('throws error if sequence already has a database_id', () => {
+  it('throws error if sequence already has a database_id', async () => {
     const submissionPayloadWithDatabaseId = JSON.parse(JSON.stringify(submissionPayload));
     submissionPayloadWithDatabaseId.substate.sources[0].database_id = '123';
     const result = submitSequenceToDatabase(submissionPayloadWithDatabaseId);
-    expect(result).rejects.toThrow('Sequence already has a database_id');
+    await expect(result).rejects.toThrow('Sequence already has a database_id');
   });
 });
