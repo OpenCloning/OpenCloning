@@ -24,3 +24,5 @@ ignore:
   - "js/packages/*/src/**/index.js"
   - "js/packages/*/src/index.js"
   - "js/packages/ui/scripts/**"
+  - "js/**/*.cy.js"
+  - "js/**/*.cy.jsx"
