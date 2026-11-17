@@ -10,12 +10,12 @@
     "preview": "yarn run -T vite preview"
   },
   "dependencies": {
+    "@mui/icons-material": "^9.5.0",
     "@mui/x-data-grid": "^9.18.0",
     "@opencloning/ui": "workspace:*",
     "@opencloning/utils": "workspace:*",
-    "graphology": "^0.26.0",
-    "graphology-dag": "^0.4.1",
-    "graphology-simple-path": "^0.2.0",
+    "@teselagen/sequence-utils": "^0.3.42",
+    "axios": "^1.21.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   }
