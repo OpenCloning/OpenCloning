@@ -595,33 +595,34 @@ wheels = [
 
 [[package]]
 name = "fastapi"
-version = "0.162.2"
+version = "0.162.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
+    { name = "anyio" },
     { name = "opentelemetry-api" },
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c9/53/f6fed628a0c3d6a284125a93f9145b02ecc2c394735a878b5ad9938c8e17/fastapi-0.162.2.tar.gz", hash = "sha256:9ebd2a69b579141315b2447d8e3f518e6fd909abd6c01cac5cc6b06d5c8841f4", size = 530366, upload-time = "2026-11-07T15:41:39.838Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/82/6b9764e52f89a8aaf68a5005093bcb8fdcadcb6ba30571def786c0d3bfc0/fastapi-0.162.7.tar.gz", hash = "sha256:b7503029c8ef2d2d5fea9049294cf8d0f2805c6621f4677ede269fce19f01efb", size = 535511, upload-time = "2026-11-13T17:47:18.517Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/fb/0dc0f819163bc6b7f9e6802d7d0b1ac180fbbe4e75dbd10655c6a4d77796/fastapi-0.162.2-py3-none-any.whl", hash = "sha256:d0584f9662317e01140df94c64f4bed1d8b059fe35496e30c9c92f70e6e5ff15", size = 151671, upload-time = "2026-11-07T15:41:38.509Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/49/2d76050f652082f1435f34a8ac9af6207b9aed8b81cde42e0bb121fa7c5a/fastapi-0.162.7-py3-none-any.whl", hash = "sha256:fa3be857122ec8d91d4d234e86ac19acf4ef23f5c6c3dfcce78ec0c27c0c5ab4", size = 152411, upload-time = "2026-11-13T17:47:16.598Z" },
 ]
 
 [[package]]
 name = "fastapi-pagination"
-version = "0.16.2"
+version = "0.16.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/a1/73165d7932f1f87bac9f5e12e65864cbce1bd86882ed37c7603888d31299/fastapi_pagination-0.16.2.tar.gz", hash = "sha256:f9b0bec39f2156e66b3ef73c35cc6eb7345faa86a7c3149d4f63b60b0e9e5e58", size = 662215, upload-time = "2026-11-03T23:22:37.135Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/50/8938abf7faee7e93e6aeede7c737ca2b5537bb3b6405467b344562f03db2/fastapi_pagination-0.16.3.tar.gz", hash = "sha256:881bc0c2f389346afbff8ea6359f511cda6afbc71ad07baff1c60617fa54dd8b", size = 670086, upload-time = "2026-11-12T18:26:03.438Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ec/01/609ad358f28bef0d1f42694e2e1894f1791c443fd8bacc426a518a10ef88/fastapi_pagination-0.16.2-py3-none-any.whl", hash = "sha256:6d154e37a1e9fefdd8c3730786863aa9502a90c08b6c59326ae3a5e07ae0a19d", size = 53227, upload-time = "2026-11-03T23:22:35.536Z" },
+    { url = "https://files.pythonhosted.org/packages/95/d8/720bb00256b1e3c26bd365ed3a2b2ce37dbc65d67c297ad2caded18e4947/fastapi_pagination-0.16.3-py3-none-any.whl", hash = "sha256:4db172f797a4adca1e662612a02c11409418bea18d86dc62fe595f8b0e5a599f", size = 56086, upload-time = "2026-11-12T18:26:02.207Z" },
 ]
 
 [[package]]
@@ -1249,7 +1250,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0,<5" },
     { name = "biopython", specifier = ">=1.87" },
     { name = "certifi", specifier = ">=2026.10.18" },
-    { name = "fastapi", specifier = ">=0.135.3" },
+    { name = "fastapi", specifier = ">=0.162.7" },
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "httpx2", specifier = ">=2.16.0" },
     { name = "networkx", specifier = ">=3.6.1" },
@@ -1282,7 +1283,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "opencloning-db", editable = "packages/opencloning-db" },
-    { name = "typer", specifier = ">=0.28.0" },
+    { name = "typer", specifier = ">=0.29.1" },
 ]
 
 [[package]]
@@ -1307,7 +1308,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.18.4" },
-    { name = "fastapi", specifier = ">=0.162.2" },
+    { name = "fastapi", specifier = ">=0.162.7" },
     { name = "fastapi-pagination", specifier = ">=0.16.2,<0.17" },
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "opencloning", editable = "packages/opencloning" },
@@ -1353,7 +1354,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "biopython", specifier = ">=1.88" },
-    { name = "fastapi", specifier = ">=0.135.3" },
+    { name = "fastapi", specifier = ">=0.162.7" },
     { name = "mcp", specifier = ">=2.3,<3" },
     { name = "opencloning", editable = "packages/opencloning" },
     { name = "opencloning-linkml", specifier = ">=1.0.0" },
@@ -2932,17 +2933,18 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.28.0"
+version = "0.29.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
     { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "pydantic" },
     { name = "rich" },
     { name = "shellingham" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/8f/21021859316f44289101638dc74d82e13d722d8533e4b8708a3ab7c8461a/typer-0.28.0.tar.gz", hash = "sha256:69ab84ef79fd601cff071bbd2566d855ecadfd93adbc4b3360b9924359bdd857", size = 205415, upload-time = "2026-11-06T08:37:19.779Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/aa/0de7986aa1fa856adb961c67345189b97d13f6e250b34ba68884df865f07/typer-0.29.1.tar.gz", hash = "sha256:ab6eb3880bf67ce96147734717f9ec333c06f66e361f3ea947d0be43da39f242", size = 205843, upload-time = "2026-11-11T09:18:39.782Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/98/8ef60c7cd773dbab9d276a4c7bff505913a25b61acd8a9ef01ceeb70f554/typer-0.28.0-py3-none-any.whl", hash = "sha256:afd18929180b706c5e9a239f53c3c8136903553c0c2d460598bbaa924191d4ab", size = 123253, upload-time = "2026-11-06T08:37:18.611Z" },
+    { url = "https://files.pythonhosted.org/packages/05/ff/51969745f31cea6bcd12151e668febcf979656316e67a7755942267c1273/typer-0.29.1-py3-none-any.whl", hash = "sha256:00dbc549c13428bec1be55fe1f4d0fb8c6637a310e4f178ef14abe9534ee7b58", size = 121064, upload-time = "2026-11-11T09:18:38.671Z" },
 ]
 
 [[package]]
