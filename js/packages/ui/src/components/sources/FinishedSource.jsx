@@ -376,7 +376,7 @@ function GenomeCoordinatesMessage({ source }) {
 function FinishedSource({ sourceId }) {
   const source = useSelector((state) => state.cloning.sources.find((s) => s.id === sourceId), isEqual);
   const primers = useSelector((state) => state.cloning.primers, isEqual);
-  let message = '';
+  let message;
   switch (source.type) {
     case 'UploadedFileSource': message = <FileMessage source={source} />; break;
     case 'ManuallyTypedSource': message = 'Manually typed sequence'; break;

@@ -32,6 +32,6 @@ export const getFileFromELabFTW = async (itemId, fileInfo) => {
     return new File([resp.data], fileInfo.real_name);
   } catch (e) {
     console.error(e);
-    throw new Error(`${error2String(e)}`);
+    throw new Error(`${error2String(e)}`, { cause: e });
   }
 };

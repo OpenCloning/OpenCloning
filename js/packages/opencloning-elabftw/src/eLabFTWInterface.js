@@ -48,7 +48,7 @@ async function submitPrimerToDatabase({ submissionData: { title, categoryId }, p
     resourceId = await createResource(categoryId);
   } catch (e) {
     console.error(e);
-    throw new Error(`Error creating primer: ${error2String(e)}`);
+    throw new Error(`Error creating primer: ${error2String(e)}`, { cause: e });
   }
   const metadata = JSON.stringify({ extra_fields: { sequence: { type: 'text', value: primer.sequence, group_id: null } } });
   let stage;
@@ -65,9 +65,9 @@ async function submitPrimerToDatabase({ submissionData: { title, categoryId }, p
       await deleteResource(resourceId);
     } catch (e2) {
       console.error(e2);
-      throw new Error(`There was an error (${error2String(e2)}) while trying to delete primer with id ${resourceId} after an error ${stage}.`);
+      throw new Error(`There was an error (${error2String(e2)}) while trying to delete primer with id ${resourceId} after an error ${stage}.`, { cause: e2 });
     }
-    throw new Error(`Error ${stage}: ${error2String(e)}`);
+    throw new Error(`Error ${stage}: ${error2String(e)}`, { cause: e });
   }
   return resourceId;
 }
@@ -122,7 +122,7 @@ async function submitSequenceToDatabase({ submissionData: { title, categoryId, p
     resourceId = await createResource(categoryId);
   } catch (e) {
     console.error(e);
-    throw new Error(`Error creating resource: ${error2String(e)}`);
+    throw new Error(`Error creating resource: ${error2String(e)}`, { cause: e });
   }
   let stage;
   let newPrimerDatabaseIds = [];
@@ -176,11 +176,11 @@ async function submitSequenceToDatabase({ submissionData: { title, categoryId, p
     } catch (e2) {
       console.error(e2);
       if (primersDeleted) {
-        throw new Error(`There was an error (${error2String(e2)}) while trying to delete the sequence with id ${resourceId} after an error ${stage}.`);
+        throw new Error(`There was an error (${error2String(e2)}) while trying to delete the sequence with id ${resourceId} after an error ${stage}.`, { cause: e2 });
       }
-      throw new Error(`There was an error (${error2String(e2)}) while trying to delete newly created primers linked to sequence with id ${resourceId} after an error ${stage}.`);
+      throw new Error(`There was an error (${error2String(e2)}) while trying to delete newly created primers linked to sequence with id ${resourceId} after an error ${stage}.`, { cause: e2 });
     }
-    throw new Error(`Error ${stage}: ${error2String(e)}`);
+    throw new Error(`Error ${stage}: ${error2String(e)}`, { cause: e });
   }
 }
 
@@ -199,7 +199,7 @@ async function loadSequenceFromUrlParams(urlParams) {
       const resp = await eLabFTWHttpClient.get(url, { headers: readHeaders });
       fileInfo = resp.data;
     } catch (e) {
-      throw new Error(`${error2String(e)}`);
+      throw new Error(`${error2String(e)}`, { cause: e });
     }
 
     // getFileFromELabFTW already handles errors
@@ -218,9 +218,9 @@ async function getPrimer(databaseId) {
   } catch (e) {
     console.error(e);
     if (e.code === 'ERR_NETWORK') {
-      throw new Error(`Error getting primer: ${error2String(e)}`);
+      throw new Error(`Error getting primer: ${error2String(e)}`, { cause: e });
     }
-    throw new Error(`Error getting primer with id ${databaseId}, it might have been deleted or you can no longer access it`);
+    throw new Error(`Error getting primer with id ${databaseId}, it might have been deleted or you can no longer access it`, { cause: e });
   }
 }
 
@@ -232,9 +232,9 @@ async function getSequenceName(databaseId) {
   } catch (e) {
     console.error(e);
     if (e.code === 'ERR_NETWORK') {
-      throw new Error(`Error getting sequence name: ${error2String(e)}`);
+      throw new Error(`Error getting sequence name: ${error2String(e)}`, { cause: e });
     }
-    throw new Error(`Error getting name of sequence with id ${databaseId}, it might have been deleted or you can no longer access it`);
+    throw new Error(`Error getting name of sequence with id ${databaseId}, it might have been deleted or you can no longer access it`, { cause: e });
   }
 }
 
@@ -251,7 +251,7 @@ async function getSequencingFiles(databaseId) {
     }));
   } catch (e) {
     console.error(e);
-    throw new Error(`${error2String(e)}`);
+    throw new Error(`${error2String(e)}`, { cause: e });
   }
 }
 

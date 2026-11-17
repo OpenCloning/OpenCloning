@@ -206,7 +206,7 @@ function IndexJsonSelector({
             label={groupField.charAt(0).toUpperCase() + groupField.slice(1).replace(/([A-Z])/g, ' $1')}
           >
             {groups.map((group) => (
-              <MenuItem value={group}>{group}</MenuItem>
+              <MenuItem key={group} value={group}>{group}</MenuItem>
             ))}
           </Select>
         </FormControl>

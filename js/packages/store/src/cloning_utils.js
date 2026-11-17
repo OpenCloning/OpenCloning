@@ -103,7 +103,7 @@ export function getPrimerDesignObject({ sources, sequences }) {
   const otherInputIds = finalSource.input.map((i) => i.sequence).filter((i) => !mockSequenceIds.includes(i));
   const otherInputs = sequences.filter((e) => otherInputIds.includes(e.id));
   // There should be no TemplateSequence as an input that does not have primer_design set
-  if (otherInputs.some((i) => i.type === 'TemplateSequence' && !Boolean(i.primer_design))) {
+  if (otherInputs.some((i) => i.type === 'TemplateSequence' && !i.primer_design)) {
     // return 'TemplateSequence input to final source does not have primer_design set';
     return { finalSource: null, otherInputIds: [], pcrSources: [], outputSequences: [], assemblyInputsInOrder: [] };
   }

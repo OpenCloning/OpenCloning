@@ -327,11 +327,13 @@ describe('<AssemblerComponent />', () => {
     cy.get('[data-testid="assembler-download-assemblies-button"]').should('not.be.disabled');
 
     cy.get('[data-testid="assembler-product-table-edit-button"]').first().click();
-    cy.get('[role="dialog"]').find('input').clear().type('duplicate_name');
+    cy.get('[role="dialog"]').find('input').clear();
+    cy.get('[role="dialog"]').find('input').type('duplicate_name');
     cy.get('[role="dialog"]').contains('Save').click();
 
     cy.get('[data-testid="assembler-product-table-edit-button"]').last().click();
-    cy.get('[role="dialog"]').find('input').clear().type('duplicate_name');
+    cy.get('[role="dialog"]').find('input').clear();
+    cy.get('[role="dialog"]').find('input').type('duplicate_name');
     cy.get('[role="dialog"]').contains('Save').click();
 
     cy.get('[data-testid="assembler-download-assemblies-button"]').should('be.disabled');

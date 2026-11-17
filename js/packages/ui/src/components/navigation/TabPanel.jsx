@@ -1,6 +1,7 @@
 import React from 'react';
 
-const TabPanel = React.forwardRef(({ children, value, index, ...other }, ref) => {
+// Inactive panels are hidden instead of unmounted, so their content keeps its state when switching tabs
+function TabPanel({ children, value, index, ...other }) {
   const style = value === index ? {
     visibility: 'visible',
 
@@ -23,6 +24,6 @@ const TabPanel = React.forwardRef(({ children, value, index, ...other }, ref) =>
       {children}
     </div>
   );
-});
+}
 
 export default TabPanel;

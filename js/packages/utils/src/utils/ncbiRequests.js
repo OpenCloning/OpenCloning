@@ -48,9 +48,9 @@ export async function getInfoFromAssemblyId(assemblyId) {
 
   const species = reports[0].organism;
   const exactAssemblyMatch = reports.find((report) => report.accession === assemblyId);
-  let exactMatch = null;
-  let newerAssembly = null;
-  let pairedAccession = null;
+  let exactMatch;
+  let newerAssembly;
+  let pairedAccession;
   if (!exactAssemblyMatch) {
     // The assembly ID is valid, but it's not an exact match to a particular version.
     // For example, passing GCA_000007565 will return entries, but the actual assembly versions

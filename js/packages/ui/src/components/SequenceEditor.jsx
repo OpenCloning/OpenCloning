@@ -35,15 +35,17 @@ function SequenceEditor({ sequenceId }) {
   const unmutableSeq = useSelector((state) => state.cloning.teselaJsonCache[sequenceId], isEqual);
   const seq = { ...unmutableSeq };
 
-  // Make a copy
-  const seqCopy = React.useMemo(() => structuredClone(seq), [seq]);
-  // Filter out features of type "source"
-  seqCopy.features = seqCopy.features.filter((f) => f.type !== 'source');
-  // If the primer has been already added to the template, we don't add it again
-  const pcrPrimers2Include = pcrPrimers.filter((p) => !seqCopy.primers.some(
-    (p2) => p2.name === p.name && p2.start === p.start && p2.end === p.end,
-  ));
-  seqCopy.primers = [...seqCopy.primers, ...pcrPrimers2Include];
+  const seqCopy = React.useMemo(() => {
+    const copy = structuredClone(unmutableSeq);
+    // Filter out features of type "source"
+    copy.features = copy.features.filter((f) => f.type !== 'source');
+    // If the primer has been already added to the template, we don't add it again
+    const pcrPrimers2Include = pcrPrimers.filter((p) => !copy.primers.some(
+      (p2) => p2.name === p.name && p2.start === p.start && p2.end === p.end,
+    ));
+    copy.primers = [...copy.primers, ...pcrPrimers2Include];
+    return copy;
+  }, [unmutableSeq, pcrPrimers]);
   const parentSource = useSelector((state) => state.cloning.sources.find((source) => source.id === sequenceId), isEqual);
   const stateSelectedRegion = useSelector((state) => state.cloning.selectedRegions.find((r) => r.id === sequenceId)?.selectedRegion, isEqual);
   const parentSequenceData = useSelector((state) => parentSource.input.map(({sequence}) => state.cloning.teselaJsonCache[sequence]), isEqual);

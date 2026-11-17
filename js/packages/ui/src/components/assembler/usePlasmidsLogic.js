@@ -76,7 +76,7 @@ export function usePlasmidsLogic({ parts, assemblyEnzymes, overhangNames }) {
         sequenceData.circular = true;
         return {...sequenceData, appData: { fileName: file.name, correspondingParts: [], partInfo: [], correspondingPartsNames: [] } };
       } catch (e) {
-        throw new Error(`Error uploading plasmid from file ${file.name}: ${e.message}`);
+        throw new Error(`Error uploading plasmid from file ${file.name}: ${e.message}`, { cause: e });
       }
     }));
     setLinkedPlasmids(plasmids);
@@ -94,7 +94,7 @@ export function usePlasmidsLogic({ parts, assemblyEnzymes, overhangNames }) {
         const sequenceData = data[0].parsedSequence;
         return { ...sequenceData, appData: { fileName: name, databaseId, textFileSequence, correspondingParts: [], partInfo: [], correspondingPartsNames: [] } };
       } catch (e) {
-        throw new Error(`Error loading plasmid ${name} from database: ${e.message}`);
+        throw new Error(`Error loading plasmid ${name} from database: ${e.message}`, { cause: e });
       }
     }));
     setLinkedPlasmids(plasmids);
