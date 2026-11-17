@@ -85,13 +85,13 @@ const primerProblematicValues = (primerDetails, pcrDetails) => {
     problematicValues.meltingTemperature = 'Melting temperature is outside the optimal range';
   }
 
-  return problematicValues;
-  if (primerDetails.homodimer && primerDetails.homodimer.deltaG < -8000) {
-    problematicValues.homodimer = 'May form homodimers';
-  }
-  if (primerDetails.hairpin && primerDetails.hairpin.deltaG < -8000) {
-    problematicValues.hairpin = 'May form hairpins';
-  }
+  // Homodimer and hairpin warnings are disabled for now:
+  // if (primerDetails.homodimer && primerDetails.homodimer.deltaG < -8000) {
+  //   problematicValues.homodimer = 'May form homodimers';
+  // }
+  // if (primerDetails.hairpin && primerDetails.hairpin.deltaG < -8000) {
+  //   problematicValues.hairpin = 'May form hairpins';
+  // }
 
   return problematicValues;
 };

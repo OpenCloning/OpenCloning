@@ -21,6 +21,10 @@ function SubSequenceDisplayer({
   if (!['PCRSource', 'RestrictionEnzymeDigestionSource'].includes(source.type)) {
     return null;
   }
+  return <SubSequenceView source={source} sourceId={sourceId} />;
+}
+
+function SubSequenceView({ source, sourceId }) {
   const inputSequenceIds = useSelector((state) => getInputSequencesFromSourceId(state, sourceId).map(({ id }) => id), isEqual);
   const seq = useSelector((state) => state.cloning.teselaJsonCache[inputSequenceIds[0]], isEqual);
 

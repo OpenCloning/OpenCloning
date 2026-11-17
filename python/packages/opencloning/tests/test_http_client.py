@@ -1,62 +1,48 @@
 import unittest
-from importlib import reload
-from opencloning import http_client
-from fastapi import HTTPException
-from opencloning import app_settings
-from pytest import MonkeyPatch
-from unittest.mock import patch, AsyncMock
-import os
 
-mock_cert_file = os.path.join(os.path.dirname(__file__), 'test_files/dummy_certificate.crt')
+import httpx2
+import pytest
+import respx
+
+from opencloning.app_settings import settings
+from opencloning.external_service_errors import (
+    ExternalServiceNotAllowed,
+    ExternalServiceTimeout,
+    ExternalServiceUnavailable,
+)
+from opencloning.http_client import get_http_client
+
+URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/dummy'
 
 
-class TestHttpClientProxy(unittest.IsolatedAsyncioTestCase):
+class HttpClientErrorsTest(unittest.IsolatedAsyncioTestCase):
 
-    def tearDown(self):
-        MonkeyPatch().delenv('PROXY_URL', raising=False)
-        MonkeyPatch().delenv('PROXY_CERT_FILE', raising=False)
-        MonkeyPatch().delenv('ALLOWED_EXTERNAL_URLS', raising=False)
-        reload(app_settings)
-        reload(http_client)
+    @respx.mock
+    async def test_timeout(self):
+        respx.get(URL).mock(side_effect=httpx2.ReadTimeout('timeout'))
+        async with get_http_client() as client:
+            with pytest.raises(ExternalServiceTimeout) as e:
+                await client.get(URL)
+        assert e.value.status_code == 504
+        assert str(e.value) == 'eutils.ncbi.nlm.nih.gov took too long to respond, try again later'
 
-    async def test_proxy(self):
-        MonkeyPatch().setenv('PROXY_URL', 'https://dummy.com')
-        MonkeyPatch().setenv('PROXY_CERT_FILE', mock_cert_file)
-        reload(app_settings)
-        reload(http_client)
-        mock_client = AsyncMock()
-        with patch('opencloning.http_client.AsyncClient', return_value=mock_client) as mock_client_class:
-            async with http_client.get_http_client():
-                pass
+    @respx.mock
+    async def test_connection_error(self):
+        respx.get(URL).mock(side_effect=httpx2.ConnectError('cannot connect'))
+        async with get_http_client() as client:
+            with pytest.raises(ExternalServiceUnavailable) as e:
+                await client.get(URL)
+        assert e.value.status_code == 503
+        assert str(e.value) == 'Cannot connect to eutils.ncbi.nlm.nih.gov, try again later'
 
-            # Verify the client was initialized with correct proxy settings
-            mock_client_class.assert_called_once()
-            called_kwargs = mock_client_class.call_args.kwargs
-            self.assertIn('proxy', called_kwargs)
-            self.assertIn('verify', called_kwargs)
-            self.assertEqual(called_kwargs['proxy'], 'https://dummy.com')
+    async def test_url_not_allowed(self):
+        async with get_http_client() as client:
+            with pytest.raises(ExternalServiceNotAllowed) as e:
+                await client.get('https://not-allowed.example.com/')
+        assert e.value.status_code == 403
+        assert str(e.value) == 'Request to https://not-allowed.example.com/ is not allowed'
 
-        # To ensure that the certificate is actually being loaded,
-        # provide invalid path and test the error
-        MonkeyPatch().setenv('PROXY_CERT_FILE', 'invalid_path')
-        reload(app_settings)
-        reload(http_client)
-        with self.assertRaises(FileNotFoundError):
-            async with http_client.get_http_client():
-                pass
 
-    async def test_allowed_external_urls(self):
-        MonkeyPatch().setenv('ALLOWED_EXTERNAL_URLS', 'https://dummy.com,https://google.com')
-        reload(app_settings)
-        reload(http_client)
-
-        # Does not raise an error
-        async with http_client.get_http_client() as client:
-            await client.get('https://google.com')
-
-        # Raises an error
-        with self.assertRaises(HTTPException) as e:
-            async with http_client.get_http_client() as client:
-                await client.get('https://dummy2.com')
-        self.assertEqual(e.exception.status_code, 403)
-        self.assertIn('not allowed', str(e.exception.detail))
+def test_timeout_setting():
+    assert get_http_client().timeout.read == settings.EXTERNAL_REQUEST_TIMEOUT
+    assert get_http_client(3).timeout.read == 3

@@ -38,6 +38,8 @@ MAX_REQUEST_BODY_SIZE_MB = (
 )
 PLANNOTATE_URL = os.environ['PLANNOTATE_URL'] if 'PLANNOTATE_URL' in os.environ else None
 PLANNOTATE_TIMEOUT = int(os.environ['PLANNOTATE_TIMEOUT']) if 'PLANNOTATE_TIMEOUT' in os.environ else 20
+# Default timeout (in seconds) of requests to external services (NCBI, Addgene, etc.)
+EXTERNAL_REQUEST_TIMEOUT = float(os.environ.get('EXTERNAL_REQUEST_TIMEOUT', 20))
 # Handle trailing slash:
 if PLANNOTATE_URL is not None and not PLANNOTATE_URL.endswith('/'):
     PLANNOTATE_URL += '/'
@@ -82,6 +84,7 @@ class Settings(BaseModel):
     ALLOWED_ORIGINS: list[str]
     PLANNOTATE_URL: str | None
     PLANNOTATE_TIMEOUT: int
+    EXTERNAL_REQUEST_TIMEOUT: float = Field(gt=0)
     PROXY_URL: str | None
     # Must be a full path to the proxy certificate file
     PROXY_CERT_FILE: str | None
@@ -100,6 +103,7 @@ settings = Settings(
     ALLOWED_ORIGINS=ALLOWED_ORIGINS,
     PLANNOTATE_URL=PLANNOTATE_URL,
     PLANNOTATE_TIMEOUT=PLANNOTATE_TIMEOUT,
+    EXTERNAL_REQUEST_TIMEOUT=EXTERNAL_REQUEST_TIMEOUT,
     PROXY_URL=PROXY_URL,
     PROXY_CERT_FILE=PROXY_CERT_FILE,
     ADDGENE_TOKEN=ADDGENE_TOKEN,

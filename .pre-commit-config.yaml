@@ -115,3 +115,10 @@ repos:
         language: pygrep
         entry: "from '@mui/(material/[A-Z]|icons-material/)"
         files: ^js/(apps|packages)/.*/src/.*\.jsx?$
+      # Only errors fail the hook (--quiet); warnings are not enforced. Runs from js/ (where
+      # eslint.config.js is), so the js/ prefix is stripped from the paths. Needs the js/ dependencies (yarn install).
+      - id: eslint
+        name: eslint (errors only)
+        entry: bash -c 'cd js && exec node_modules/.bin/eslint --quiet --no-warn-ignored "${@#js/}"' --
+        language: system
+        files: ^js/.*\.(js|jsx|mjs|cjs)$

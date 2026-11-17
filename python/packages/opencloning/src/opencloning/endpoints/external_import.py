@@ -47,7 +47,6 @@ from ..dna_functions import (
 )
 from .. import request_examples
 from .. import ncbi_requests
-from ..http_client import ConnectError
 
 router = get_router()
 
@@ -241,17 +240,6 @@ def read_snapgene_history(response: Response, file: UploadFile = File(...)):
         ) from e
 
 
-def handle_repository_errors(exception: Exception, repository_name: str) -> None:
-    """
-    Centralized error handler for repository requests, to be called from an ``except`` block.
-    Converts ConnectError to HTTPException with 504 status. Anything else is re-raised: HTTPExceptions
-    are returned as-is, and unexpected errors end up as a generic 500 (logged once, with their stack).
-    """
-    if isinstance(exception, ConnectError):
-        raise HTTPException(504, f'Unable to connect to {repository_name}: {exception}')
-    raise
-
-
 # TODO: a bit inconsistent that here you don't put {source: {...}} in the request, but
 # directly the object.
 
@@ -306,14 +294,11 @@ async def get_from_repository_id(
     ),
 )
 async def get_from_repository_id_genbank(source: NCBISequenceSource):
-    try:
-        # This request already fails if the sequence does not exist
-        seq_length = await ncbi_requests.get_sequence_length_from_sequence_accession(source.repository_id)
-        if seq_length > settings.NCBI_MAX_SEQUENCE_LENGTH:
-            raise HTTPException(400, f'sequence is too long (max {settings.NCBI_MAX_SEQUENCE_LENGTH} bp)')
-        seq = await ncbi_requests.get_genbank_sequence(source.repository_id)
-    except Exception as exception:
-        handle_repository_errors(exception, 'NCBI')
+    # This request already fails if the sequence does not exist
+    seq_length = await ncbi_requests.get_sequence_length_from_sequence_accession(source.repository_id)
+    if seq_length > settings.NCBI_MAX_SEQUENCE_LENGTH:
+        raise HTTPException(400, f'sequence is too long (max {settings.NCBI_MAX_SEQUENCE_LENGTH} bp)')
+    seq = await ncbi_requests.get_genbank_sequence(source.repository_id)
 
     return format_products(source.id, [seq], None, source.output_name)
 
@@ -325,10 +310,7 @@ async def get_from_repository_id_genbank(source: NCBISequenceSource):
     ),
 )
 async def get_from_repository_id_addgene(source: AddgeneIdSource):
-    try:
-        dseq = await request_from_addgene(source.repository_id)
-    except Exception as exception:
-        handle_repository_errors(exception, 'Addgene')
+    dseq = await request_from_addgene(source.repository_id)
 
     # sequence_file_url and addgene_sequence_type in the request are not validated (the urls served by
     # Addgene have changed over time), the returned source always contains the current values.
@@ -342,10 +324,7 @@ async def get_from_repository_id_addgene(source: AddgeneIdSource):
     ),
 )
 async def get_from_repository_id_wekwikgene(source: WekWikGeneIdSource):
-    try:
-        dseq = await request_from_wekwikgene(source.repository_id)
-    except Exception as exception:
-        handle_repository_errors(exception, 'WeKwikGene')
+    dseq = await request_from_wekwikgene(source.repository_id)
     return format_products(
         source.id,
         [dseq],
@@ -369,11 +348,8 @@ async def get_from_repository_id_wekwikgene(source: WekWikGeneIdSource):
 async def get_from_benchling_url(
     source: Annotated[BenchlingUrlSource, Body(openapi_examples=request_examples.benchling_url_examples)],
 ):
-    try:
-        dseq = await get_sequence_from_benchling_url(source.repository_id)
-        return format_products(source.id, [dseq], None, source.output_name)
-    except Exception as exception:
-        handle_repository_errors(exception, 'Benchling')
+    dseq = await get_sequence_from_benchling_url(source.repository_id)
+    return format_products(source.id, [dseq], None, source.output_name)
 
 
 @router.post(
@@ -385,12 +361,9 @@ async def get_from_benchling_url(
 async def get_from_repository_id_snapgene(
     source: Annotated[SnapGenePlasmidSource, Body(openapi_examples=request_examples.snapgene_plasmid_examples)],
 ):
-    try:
-        plasmid_set, plasmid_name = source.repository_id.split('/')
-        seq = await request_from_snapgene(plasmid_set, plasmid_name)
-        return format_products(source.id, [seq], None, source.output_name)
-    except Exception as exception:
-        handle_repository_errors(exception, 'Snapgene')
+    plasmid_set, plasmid_name = source.repository_id.split('/')
+    seq = await request_from_snapgene(plasmid_set, plasmid_name)
+    return format_products(source.id, [seq], None, source.output_name)
 
 
 @router.post(
@@ -404,11 +377,8 @@ async def get_from_repository_id_euroscarf(source: EuroscarfSource):
     Return the sequence from a plasmid in Euroscarf. Sometimes plasmid files do not contain correct topology information
     (they indicate linear sequence instead of circular). We force them to be circular.
     """
-    try:
-        dseq = await get_sequence_from_euroscarf_url(source.repository_id)
-        return format_products(source.id, [dseq], None, source.output_name)
-    except Exception as exception:
-        handle_repository_errors(exception, 'Euroscarf')
+    dseq = await get_sequence_from_euroscarf_url(source.repository_id)
+    return format_products(source.id, [dseq], None, source.output_name)
 
 
 @router.post(
@@ -418,22 +388,19 @@ async def get_from_repository_id_euroscarf(source: EuroscarfSource):
     ),
 )
 async def get_from_repository_id_igem(source: IGEMSource):
-    try:
-        dseq = await get_sequence_from_iGEM2024(*source.repository_id.split('-'))
-        return format_products(
-            source.id,
-            [dseq],
-            source if source.sequence_file_url is not None else None,
-            source.output_name,
-            wrong_completed_source_error_message=f'''
+    dseq = await get_sequence_from_iGEM2024(*source.repository_id.split('-'))
+    return format_products(
+        source.id,
+        [dseq],
+        source if source.sequence_file_url is not None else None,
+        source.output_name,
+        wrong_completed_source_error_message=f'''
             The provided source is not valid.
             We found the following:
               - repository_id: {source.repository_id}
               - sequence_file_url: {dseq.source.sequence_file_url}
             ''',
-        )
-    except Exception as exception:
-        handle_repository_errors(exception, 'iGEM')
+    )
 
 
 @router.post(
@@ -445,24 +412,21 @@ async def get_from_repository_id_igem(source: IGEMSource):
     ),
 )
 async def get_from_repository_id_open_dna_collections(source: OpenDNACollectionsSource):
-    try:
-        collection_name, plasmid_id = source.repository_id.split('/')
-        dseq = await get_sequence_from_openDNA_collections(collection_name, plasmid_id)
-        return format_products(
-            source.id,
-            [dseq],
-            source if source.sequence_file_url is not None else None,
-            source.output_name,
-            wrong_completed_source_error_message=f'''
+    collection_name, plasmid_id = source.repository_id.split('/')
+    dseq = await get_sequence_from_openDNA_collections(collection_name, plasmid_id)
+    return format_products(
+        source.id,
+        [dseq],
+        source if source.sequence_file_url is not None else None,
+        source.output_name,
+        wrong_completed_source_error_message=f'''
             The provided source is not valid.
             We found the following:
               - collection_name: {collection_name}
               - plasmid_id: {plasmid_id}
               - sequence_file_url: {dseq.source.sequence_file_url}
             ''',
-        )
-    except Exception as exception:
-        handle_repository_errors(exception, 'OpenDNA Collections')
+    )
 
 
 @router.post(
@@ -518,10 +482,7 @@ async def genome_coordinates(
 
     tasks = [validate_locus_task(), validate_assembly_task(), get_sequence_task()]
 
-    try:
-        gene_id, _, seq = await asyncio.gather(*tasks)
-    except Exception as exception:
-        handle_repository_errors(exception, 'NCBI')
+    gene_id, _, seq = await asyncio.gather(*tasks)
 
     source.gene_id = gene_id
 
@@ -542,10 +503,7 @@ async def get_from_repository_id_seva(source: SEVASource):
     """
     Return the sequence from a plasmid in SEVA.
     """
-    try:
-        dseq = await get_seva_plasmid(source.repository_id)
-    except Exception as exception:
-        handle_repository_errors(exception, 'SEVA')
+    dseq = await get_seva_plasmid(source.repository_id)
 
     return format_products(
         source.id,

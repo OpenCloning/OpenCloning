@@ -371,7 +371,8 @@ class GenBankTest(unittest.TestCase):
             repository_id='NM_001018957.2',
         )
         response = client.post('/repository_id/genbank', json=source.model_dump())
-        self.assertEqual(response.status_code, 504)
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json()['detail'], 'Cannot connect to eutils.ncbi.nlm.nih.gov, try again later')
 
         # Second request fails
         respx.post('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi').respond(
@@ -381,7 +382,21 @@ class GenBankTest(unittest.TestCase):
             side_effect=httpx2.ConnectError('Connection error')
         )
         response = client.post('/repository_id/genbank', json=source.model_dump())
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json()['detail'], 'Cannot connect to eutils.ncbi.nlm.nih.gov, try again later')
+
+    @respx.mock
+    def test_eutils_timeout(self):
+        """A slow NCBI answer gives a 504, not a 500"""
+        respx.post('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi').mock(
+            side_effect=httpx2.ReadTimeout('Timeout')
+        )
+        source = NCBISequenceSource(id=1, repository_id='NM_001018957.2')
+        response = client.post('/repository_id/genbank', json=source.model_dump())
         self.assertEqual(response.status_code, 504)
+        self.assertEqual(
+            response.json()['detail'], 'eutils.ncbi.nlm.nih.gov took too long to respond, try again later'
+        )
 
     @pytest.mark.flaky(reruns=2, reruns_delay=2)
     def test_redirect(self):
@@ -585,8 +600,8 @@ class AddgeneTest(unittest.TestCase):
             repository_id='39282',
         )
         response = client.post('/repository_id/addgene', json=source.model_dump())
-        self.assertEqual(response.status_code, 504)
-        self.assertIn('Unable to connect to Addgene', response.json()['detail'])
+        self.assertEqual(response.status_code, 503)
+        self.assertIn('Cannot connect to api.developers.addgene.org', response.json()['detail'])
 
     @respx.mock
     def test_missing_addgene_credentials_error(self):
@@ -645,8 +660,8 @@ class WekWikGeneSourceTest(unittest.TestCase):
             side_effect=httpx2.ConnectError('Connection error')
         )
         response = client.post('/repository_id/wekwikgene', json=source.model_dump())
-        self.assertEqual(response.status_code, 504)
-        self.assertIn('Unable to connect to WeKwikGene', response.json()['detail'])
+        self.assertEqual(response.status_code, 503)
+        self.assertIn('Cannot connect to wekwikgene.wllsb.edu.cn', response.json()['detail'])
 
     @pytest.mark.flaky(reruns=2, reruns_delay=2)
     def test_redirect(self):
@@ -1105,9 +1120,9 @@ class SEVASourceTest(unittest.TestCase):
         with respx.mock:
             respx.get(source.sequence_file_url).mock(side_effect=httpx2.ConnectError('Mock Error'))
             response = client.post('/repository_id/seva', json=source.model_dump())
-            self.assertEqual(response.status_code, 504)
+            self.assertEqual(response.status_code, 503)
             payload = response.json()
-            self.assertIn('Unable to connect to SEVA', payload['detail'])
+            self.assertIn('Cannot connect to', payload['detail'])
 
         # Mock incorrect file
         with respx.mock:

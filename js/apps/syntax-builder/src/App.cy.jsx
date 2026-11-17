@@ -5,19 +5,20 @@ import { setInputValue } from '../../../cypress/e2e/common_functions';
 
 // Wrapper component that exposes FormDataProvider context for spying
 // The context value is stored on window.cyFormDataContext for Cypress to access
+function ContextExposer({ children }) {
+  const context = useFormData();
+
+  React.useEffect(() => {
+    // Store context on window so Cypress can access it
+    if (typeof window !== 'undefined') {
+      window.cyFormDataContext = context;
+    }
+  }, [context]);
+
+  return <>{children}</>;
+}
+
 function FormDataProviderWithSpy({ children }) {
-  const ContextExposer = ({ children: innerChildren }) => {
-    const context = useFormData();
-
-    React.useEffect(() => {
-      // Store context on window so Cypress can access it
-      if (typeof window !== 'undefined') {
-        window.cyFormDataContext = context;
-      }
-    }, [context]);
-
-    return <>{innerChildren}</>;
-  };
 
   return (
     <FormDataProvider>
@@ -47,8 +48,10 @@ describe('App', () => {
     // Click on "Defining parts from overhangs" option
     cy.contains('Defining parts from overhangs').click();
     cy.get('[data-testid="overhangs-step"]').should('be.visible');
-    cy.get('[data-testid="overhangs-step"] textarea').first().focus().clear();
-    cy.get('[data-testid="overhangs-step"] textarea').first().focus().type('CCCT\nCGCT\nCCCT\n\nCGCT\nCACA\nCCCT', { delay: 0 });
+    cy.get('[data-testid="overhangs-step"] textarea').first().focus();
+    cy.get('[data-testid="overhangs-step"] textarea').first().clear();
+    cy.get('[data-testid="overhangs-step"] textarea').first().focus();
+    cy.get('[data-testid="overhangs-step"] textarea').first().type('CCCT\nCGCT\nCCCT\n\nCGCT\nCACA\nCCCT', { delay: 0 });
 
     // The first element of the overhangs preview table should be the first overhang
     cy.get('[data-testid="overhangs-step-container"] [data-testid="overhangs-preview-table"] tr').first().find('td').should('have.length', 3)

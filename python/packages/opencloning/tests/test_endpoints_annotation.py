@@ -78,7 +78,8 @@ class PlannotateTest(unittest.TestCase):
         response = self.client.post(
             '/annotate/plannotate', json={'sequence': seq.model_dump(), 'source': source.model_dump()}
         )
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 503)
+        self.assertIn('Cannot connect to', response.json()['detail'])
 
     @respx.mock
     def test_plannotate_timeout(self):
@@ -90,6 +91,7 @@ class PlannotateTest(unittest.TestCase):
             '/annotate/plannotate', json={'sequence': seq.model_dump(), 'source': source.model_dump()}
         )
         self.assertEqual(response.status_code, 504)
+        self.assertIn('took too long to respond', response.json()['detail'])
 
 
 class PlannotateAsyncTest(unittest.IsolatedAsyncioTestCase):

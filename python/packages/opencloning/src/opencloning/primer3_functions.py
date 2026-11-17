@@ -3,6 +3,7 @@ Functions to calculate primer melting temperature using primer3.
 primer3 should not be imported anywhere else.
 """
 
+import threading
 from pydantic import BaseModel, Field
 from itertools import product
 from primer3.bindings import (
@@ -12,6 +13,12 @@ from primer3.bindings import (
     calc_hairpin as _calc_hairpin,
     calc_heterodimer as _calc_heterodimer,
 )
+
+# primer3-py is not thread-safe: thal() keeps its buffers in static globals and releases
+# the GIL, and the bindings share a single global ThermoAnalysis object. FastAPI runs sync
+# endpoints in a threadpool, so concurrent calls crash the process or return wrong values.
+# Every call into primer3 must hold this lock.
+_PRIMER3_LOCK = threading.Lock()
 
 
 class PrimerDesignSettings(BaseModel):
@@ -33,18 +40,20 @@ class PrimerDesignSettings(BaseModel):
 
 
 def primer3_calc_tm(seq: str, settings: PrimerDesignSettings) -> float:
-    return _calc_tm(seq.upper(), **settings.to_primer3_args())
+    with _PRIMER3_LOCK:
+        return _calc_tm(seq.upper(), **settings.to_primer3_args())
 
 
 def primer3_design_primers(seq: str, seq_args: dict, global_args: dict):
-    report = _design_primers(
-        seq_args={
-            'SEQUENCE_ID': 'MH1000',
-            'SEQUENCE_TEMPLATE': seq,
-            **seq_args,
-        },
-        global_args=global_args,
-    )
+    with _PRIMER3_LOCK:
+        report = _design_primers(
+            seq_args={
+                'SEQUENCE_ID': 'MH1000',
+                'SEQUENCE_TEMPLATE': seq,
+                **seq_args,
+            },
+            global_args=global_args,
+        )
     return report
 
 
@@ -71,7 +80,8 @@ def get_sequence_thermodynamic_result(sequence: str, method: callable):
     else:
         sequences = [sequence[:60], sequence[-60:]]
 
-    results = [method(seq) for seq in sequences]
+    with _PRIMER3_LOCK:
+        results = [method(seq) for seq in sequences]
     results = [r for r in results if r.structure_found]
     if len(results) == 0:
         return None
@@ -98,9 +108,10 @@ def primer3_calc_heterodimer(seq1: str, seq2: str, settings: PrimerDesignSetting
     else:
         sequence_pairs = list(product((seq1[:60], seq1[-60:]), (seq2[:60], seq2[-60:])))
 
-    results = [
-        _calc_heterodimer(s1, s2, output_structure=True, **settings.to_primer3_args()) for s1, s2 in sequence_pairs
-    ]
+    with _PRIMER3_LOCK:
+        results = [
+            _calc_heterodimer(s1, s2, output_structure=True, **settings.to_primer3_args()) for s1, s2 in sequence_pairs
+        ]
     results = [r for r in results if r.structure_found]
     if len(results) == 0:
         return None

@@ -1,6 +1,17 @@
 import { aliasedEnzymesByName, getDigestFragmentsForRestrictionEnzymes, getReverseComplementSequenceString, getComplementSequenceString, getReverseComplementSequenceAndAnnotations } from "@teselagen/sequence-utils";
 import fs from 'fs';
-import { assignSequenceToSyntaxPart, simplifyDigestFragment, reverseComplementSimplifiedDigestFragment, tripletsToTranslation, partDataToDisplayData, arrayCombinations, getFilesToExportFromAssembler, getCloningStrategyFilesFromAssembler, getDefaultAssemblyOutputName, sanitizeOutputName } from "./assembler_utils";
+import {
+  assignSequenceToSyntaxPart,
+  simplifyDigestFragment,
+  reverseComplementSimplifiedDigestFragment,
+  tripletsToTranslation,
+  partDataToDisplayData,
+  arrayCombinations,
+  getFilesToExportFromAssembler,
+  getCloningStrategyFilesFromAssembler,
+  getDefaultAssemblyOutputName,
+  sanitizeOutputName,
+} from "./assembler_utils";
 import { partsToEdgesGraph } from "./graph_utils";
 
 
@@ -117,11 +128,9 @@ describe('assignSequenceToSyntaxPart', () => {
       expect(result2).toEqual([{left_overhang: 'AATG', right_overhang: 'AGGT', longestFeature: null}]);
 
       const result3 = assignSequenceToSyntaxPart(sequenceData3, enzymes, graph);
-      if (reverseComplement) {
-        expect(result3).toEqual([{left_overhang: 'AATG', right_overhang: 'AGGT', longestFeature: null}, {left_overhang: 'TACT', right_overhang: 'AATG', longestFeature: null}]);
-      } else {
-        expect(result3).toEqual([{left_overhang: 'TACT', right_overhang: 'AATG', longestFeature: null}, {left_overhang: 'AATG', right_overhang: 'AGGT', longestFeature: null}]);
-      }
+      const part1 = {left_overhang: 'TACT', right_overhang: 'AATG', longestFeature: null};
+      const part2 = {left_overhang: 'AATG', right_overhang: 'AGGT', longestFeature: null};
+      expect(result3).toEqual(reverseComplement ? [part2, part1] : [part1, part2]);
     }
 
     // Multi-spanning fragments are also picked up

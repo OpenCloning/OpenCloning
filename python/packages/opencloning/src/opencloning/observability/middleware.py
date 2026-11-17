@@ -11,6 +11,7 @@ from starlette.datastructures import MutableHeaders
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from ..external_service_errors import ExternalServiceError
 from .context import (
     RequestContext,
     current_request_id,
@@ -46,10 +47,19 @@ async def server_error_http_exception_handler(request: Request, exc: StarletteHT
     return await http_exception_handler(request, exc)
 
 
+async def external_service_error_handler(request: Request, exc: ExternalServiceError) -> JSONResponse:
+    """Timeouts, connection errors, etc. of requests to external services (see ``http_client``)."""
+    ctx = get_request_context()
+    if exc.status_code >= 500 and ctx is not None:
+        ctx.error_detail = str(exc)
+    return JSONResponse({'detail': str(exc)}, status_code=exc.status_code)
+
+
 def register_error_handlers(app: FastAPI) -> None:
     """Generic JSON 500 (with the request ID) for unhandled exceptions; failure reasons for handled 5xx."""
     app.add_exception_handler(Exception, internal_error_handler)
     app.add_exception_handler(StarletteHTTPException, server_error_http_exception_handler)
+    app.add_exception_handler(ExternalServiceError, external_service_error_handler)
 
 
 def _route_template(scope: Scope) -> str:

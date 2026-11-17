@@ -364,6 +364,18 @@ describe('test getPrimer', () => {
       sequence: PRIMER1_SEQUENCE,
     });
   });
+  it('get primer with capitalized Sequence field', async () => {
+    mockedScenarios.push({
+      ...mockPrimerGet,
+      response: { data: {
+        id: MAIN_RESOURCE_DATABASE_ID,
+        title: PRIMER1_NAME,
+        metadata: JSON.stringify({ extra_fields: { Sequence: { type: 'text', value: PRIMER1_SEQUENCE } } }),
+      } },
+    });
+    const result = await getPrimer(MAIN_RESOURCE_DATABASE_ID);
+    expect(result.sequence).toBe(PRIMER1_SEQUENCE);
+  });
   it('primer with no sequence does not raise an error when loading', async () => {
     mockedScenarios.push(mockPrimerGetNoSequence);
     const result = await getPrimer(MAIN_RESOURCE_DATABASE_ID);
