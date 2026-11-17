@@ -26,5 +26,8 @@
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
+    },
+    "devDependencies": {
+        "lodash-es": "^4.18.1"
     }
 }
