@@ -8,7 +8,7 @@ authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
 requires-python = ">=3.11,<4"
 dependencies = [
     "opencloning==2.2.2",                # x-release-please-version
-    "fastapi>=0.162.2",
+    "fastapi>=0.162.7",
     "fastapi-pagination>=0.16.2,<0.17",
     "opencloning-linkml>=1.0.0",
     "pydantic[email]>=2.14.3",
