@@ -16,7 +16,7 @@
 ARG APP_TARGET="cloning"
 
 # BUILDER — shared setup
-FROM python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df AS base-setup
+FROM python:3.15-slim-bookworm@sha256:96599df822d0e1c6bb700014a05c7f3c8cabc6e0f7ff3c4f9f69cee033b4b5d9 AS base-setup
 
 # Build toolchain for deps without prebuilt wheels on some platforms
 # (e.g. edlib and primer3-py on linux/aarch64, which need gcc/g++/make).
