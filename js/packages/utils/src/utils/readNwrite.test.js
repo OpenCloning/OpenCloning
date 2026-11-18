@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { jsonToDelimitedFile } from './readNwrite';
+import { jsonToDelimitedFile, getTeselaJsonFromBase64 } from './readNwrite';
 
 describe('jsonToDelimitedFile', () => {
   it('converts JSON array to delimited file with default tab delimiter', () => {
@@ -142,5 +142,22 @@ describe('jsonToDelimitedFile', () => {
     const result = jsonToDelimitedFile(json, ' | ');
 
     expect(result).toBe('name | sequence\nprimer1 | ATGC\nprimer2 | CGTG');
+  });
+});
+
+describe('getTeselaJsonFromBase64', () => {
+  it('parses a valid sequence file', async () => {
+    const result = await getTeselaJsonFromBase64(btoa('>seq1\nACGTACGT\n'), 'seq.fasta');
+    expect(result.sequence.toUpperCase()).toBe('ACGTACGT');
+  });
+
+  it('throws an error naming the file if it cannot be parsed', async () => {
+    await expect(getTeselaJsonFromBase64(btoa('this is not a genbank file\n'), 'corrupt.gbk'))
+      .rejects.toThrow('Error parsing corrupt.gbk: not a valid sequence file');
+  });
+
+  it('throws an error naming the file if it contains no sequence', async () => {
+    await expect(getTeselaJsonFromBase64(btoa('>seq1\n'), 'empty.fasta'))
+      .rejects.toThrow('Error parsing empty.fasta: the file contains no sequence');
   });
 });

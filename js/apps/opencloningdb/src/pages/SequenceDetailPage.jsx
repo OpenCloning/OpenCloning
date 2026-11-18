@@ -32,8 +32,8 @@ function SequenceDetailPage() {
   const { id: idString } = useParams();
   const id = parseInt(idString);
   const navigate = useNavigate();
-  const { addAlert } = useAppAlerts();
-  const alignmentMutation = useSequencingAlignment({ onError: (e) => addAlert({ message: e?.message || 'Alignment failed', severity: 'error' }) });
+  const { addAlert, addErrorAlert } = useAppAlerts();
+  const alignmentMutation = useSequencingAlignment({ onError: (e) => addErrorAlert(e) });
 
   const { data: data, isLoading: isLoading, error: error} = useQuery({
     retry: false,
@@ -100,9 +100,7 @@ function SequenceDetailPage() {
     onSuccess: (parsedFiles) => {
       alignmentMutation.mutate({ sequenceModel, sequenceData, parsedFiles });
     },
-    onError: (e) => {
-      addAlert({ message: e?.message || 'Failed to load sequencing files', severity: 'error' });
-    },
+    onError: (e) => addErrorAlert(e),
   });
 
   const queryClient = useQueryClient();
