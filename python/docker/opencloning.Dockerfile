@@ -103,8 +103,10 @@ FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57
 
 WORKDIR /home/backend
 COPY --from=base-setup /runtime-libs/ /
-# Same path as in the builder: the venvs' python symlink points to it
-COPY --from=base-setup /home/backend/python /home/backend/python
+# Same path as in the builder: the venvs' python symlink points to it.
+# Python and the venvs are owned by root, so the nonroot user that runs the app cannot modify
+# them
+COPY --from=base-setup --chown=0:0 /home/backend/python /home/backend/python
 ENV VIRTUAL_ENV="/home/backend/venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 USER nonroot
@@ -114,7 +116,7 @@ USER nonroot
 #   docker run <image> python -m pytest
 FROM runtime AS test
 
-COPY --from=builder-test /home/backend/venv /home/backend/venv
+COPY --from=builder-test --chown=0:0 /home/backend/venv /home/backend/venv
 COPY pyproject.toml conftest.py ./
 COPY packages/opencloning-db/alembic.ini packages/opencloning-db/
 COPY packages/opencloning-db/alembic packages/opencloning-db/alembic
@@ -130,7 +132,7 @@ FROM runtime AS production
 ARG APP_TARGET="cloning"
 ENV APP_TARGET="${APP_TARGET}"
 
-COPY --from=builder-selected /home/backend/venv /home/backend/venv
+COPY --from=builder-selected --chown=0:0 /home/backend/venv /home/backend/venv
 
 # Fail the build (not the running container) if a compiled dependency cannot load its libraries.
 # Exec form, since there is no shell.

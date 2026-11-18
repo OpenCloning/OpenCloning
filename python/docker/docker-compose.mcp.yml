@@ -1,4 +1,4 @@
-# Run the MCP server with Postgres, as it will run on App Platform (2 gunicorn workers).
+# Run the MCP server with Postgres
 # To run: docker compose -f docker/docker-compose.mcp.yml up --build
 # The server is then at http://localhost:8002/mcp
 services:
