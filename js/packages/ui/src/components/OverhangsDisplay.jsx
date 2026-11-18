@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box } from '@mui/material';
 import { formatSequenceForOverhangDisplay } from '@opencloning/utils/sequenceDisplay';
 
 function OverhangsDisplay({ sequence, sequenceData }) {
@@ -12,13 +13,25 @@ function OverhangsDisplay({ sequence, sequenceData }) {
   );
 
   return (
-    <div className="overhang-representation">
+    <Box
+      className="overhang-representation"
+      sx={{
+        display: 'inline-block',
+        mt: '10px',
+        typography: 'sequence',
+        fontSize: 'small',
+        // Keep the spaces that align the strands
+        whiteSpace: 'pre',
+        maxWidth: 300,
+        overflowX: 'auto',
+      }}
+    >
       {watson}
       <br />
       {middle}
       <br />
       {crick}
-    </div>
+    </Box>
   );
 }
 

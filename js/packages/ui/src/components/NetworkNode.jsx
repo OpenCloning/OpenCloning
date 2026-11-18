@@ -14,24 +14,23 @@ import { cloningActions } from '@opencloning/store/cloning';
 import SourceBox from './sources/SourceBox';
 import { getSortedSourceIds } from '@opencloning/utils/network';
 import useDatabase from '../hooks/useDatabase';
+import { TreeNodeContent, TreeNodeId } from './TreeNode';
 
 const { addToSourcesWithHiddenAncestors, removeFromSourcesWithHiddenAncestors, addSequenceInBetween } = cloningActions;
 
-function SequenceContent({ sequenceId, sequenceIsTemplate }) {
+function SequenceContent({ sequenceId, sequenceIsTemplate, isSavedToDatabase }) {
   return (
-    <span className="tf-nc">
-      <span className="node-text">
-        {sequenceIsTemplate ? (
-          <TemplateSequence sequenceId={sequenceId} />
-        ) : (
-          <>
-            <SequenceEditor {...{ sequenceId }} />
-            <MainSequenceCheckBox {...{ id: sequenceId }} />
-          </>
-        )}
-        <div className="corner-id">{sequenceId}</div>
-      </span>
-    </span>
+    <TreeNodeContent isSavedToDatabase={isSavedToDatabase}>
+      {sequenceIsTemplate ? (
+        <TemplateSequence sequenceId={sequenceId} />
+      ) : (
+        <>
+          <SequenceEditor {...{ sequenceId }} />
+          <MainSequenceCheckBox {...{ id: sequenceId }} />
+        </>
+      )}
+      <TreeNodeId isSavedToDatabase={isSavedToDatabase}>{sequenceId}</TreeNodeId>
+    </TreeNodeContent>
   );
 };
 
@@ -41,11 +40,11 @@ function SequenceWrapper({ children, sequenceId, sequenceIsTemplate, isSavedToDa
   if (sequenceId === null) {
     return children;
   }
-  // in-database also sets the colour of the node (index.css)
+  // in-database is a test hook
   const className = 'sequence-node' + (isSavedToDatabase ? ' in-database' : '');
   return (
     <li key={sequenceId} id={`sequence-${sequenceId}`} className={className}>
-      <MemoizedSequenceContent {...{ sequenceId, sequenceIsTemplate }} />
+      <MemoizedSequenceContent {...{ sequenceId, sequenceIsTemplate, isSavedToDatabase }} />
       <ul>
         {children}
       </ul>
@@ -101,48 +100,46 @@ function NetWorkNode({ sourceId }) {
   const Icon = ancestorsHidden ? VisibilityIcon : VisibilityOffIcon;
   const visibilityIconToolTip = ancestorsHidden ? 'Show ancestors' : 'Hide ancestors';
   const isSavedToDatabase = database && hasDatabaseId;
-  // in-database also sets the colour of the node (index.css)
+  // in-database is a test hook
   const className = 'source-node' + (isSavedToDatabase ? ' in-database' : '');
 
   return (
     <SequenceWrapper {...{ sequenceId, sequenceIsTemplate, isSavedToDatabase }}>
       <Box component="li" id={`source-${sourceId}`} className={className} sx={{ mb: ancestorsHidden ? '30px' : undefined }}>
-        <span className="tf-nc">
-          <span className="node-text">
-            <SourceBox {...{ sourceId }}>
-              {(sequenceId !== null && !sourceIsTemplate) ? (
-                <FinishedSource {...{ sourceId }} />
-              ) : (
-                <Source {...{ sourceId }} />
-              )}
-            </SourceBox>
-            <div className="corner-id">
-              {sourceId}
+        <TreeNodeContent isSavedToDatabase={isSavedToDatabase}>
+          <SourceBox {...{ sourceId }}>
+            {(sequenceId !== null && !sourceIsTemplate) ? (
+              <FinishedSource {...{ sourceId }} />
+            ) : (
+              <Source {...{ sourceId }} />
+            )}
+          </SourceBox>
+          <TreeNodeId isSavedToDatabase={isSavedToDatabase}>
+            {sourceId}
+          </TreeNodeId>
+          { (!sourceIsTemplate && sourceInput.length > 0 && sequenceId) && (
+            <div className="before-node before-node-visibility">
+              <Tooltip
+                title={visibilityIconToolTip}
+                placement="left"
+              >
+                <div ref={tooltipRef}>
+                  <Icon onClick={onVisibilityClick} color="action" />
+                </div>
+              </Tooltip>
             </div>
-            { (!sourceIsTemplate && sourceInput.length > 0 && sequenceId) && (
-              <div className="before-node before-node-visibility">
-                <Tooltip
-                  title={visibilityIconToolTip}
-                  placement="left"
-                >
-                  <div ref={tooltipRef}>
-                    <Icon onClick={onVisibilityClick} color="action" />
-                  </div>
-                </Tooltip>
-              </div>
-            )}
-            { (sourceIsTemplate && sourceInput.length > 0)
-            && (
-              <div className="before-node before-node-sequence-in-between">
-                <Tooltip title="Add sequence in between" placement={sourceInput.length > 1 ? 'top' : 'left'}>
-                  <div>
-                    <AddCircleIcon onClick={() => { dispatch(addSequenceInBetween(sourceId)); }} color="success" />
-                  </div>
-                </Tooltip>
-              </div>
-            )}
-          </span>
-        </span>
+          )}
+          { (sourceIsTemplate && sourceInput.length > 0)
+          && (
+            <div className="before-node before-node-sequence-in-between">
+              <Tooltip title="Add sequence in between" placement={sourceInput.length > 1 ? 'top' : 'left'}>
+                <div>
+                  <AddCircleIcon onClick={() => { dispatch(addSequenceInBetween(sourceId)); }} color="success" />
+                </div>
+              </Tooltip>
+            </div>
+          )}
+        </TreeNodeContent>
         {parentSourceIds.length > 0 && (
           <Box component="ul" sx={ancestorsHidden ? { visibility: 'hidden', height: 0, overflow: 'hidden' } : undefined}>
             {parentSourceIds.map((id) => (

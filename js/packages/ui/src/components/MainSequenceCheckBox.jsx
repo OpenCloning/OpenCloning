@@ -1,7 +1,7 @@
 import React from 'react';
 import { Visibility as VisibilityIcon, Download as DownloadIcon, Edit as EditIcon, Rule as CheckIcon } from '@mui/icons-material';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { isEqual } from 'lodash-es';
 import { cloningActions } from '@opencloning/store/cloning';
 import useStoreEditor from '../hooks/useStoreEditor';
@@ -42,7 +42,7 @@ function MainSequenceCheckBox({ id }) {
   const DatabaseIcon = hasDatabaseId ? database?.DatabaseIcon : database?.SubmitIcon;
 
   return (
-    <div className="node-corner">
+    <Box className="node-corner" sx={{ position: 'absolute', right: '-1px', top: '1px', display: 'flex', gap: '.2em' }}>
       {downloadDialogOpen && <DownloadSequenceFileDialog {...{ id, dialogOpen: downloadDialogOpen, setDialogOpen: setDownloadDialogOpen }} />}
       {editNameDialogOpen && <EditSequenceNameDialog {...{ id, dialogOpen: editNameDialogOpen, setDialogOpen: setEditNameDialogOpen }} />}
       {verificationDialogOpen && <VerificationFileDialog {...{ id, dialogOpen: verificationDialogOpen, setDialogOpen: setVerificationDialogOpen }} />}
@@ -72,8 +72,7 @@ function MainSequenceCheckBox({ id }) {
       <Tooltip title="Download sequence" placement="top">
         <DownloadIcon onClick={() => setDownloadDialogOpen(true)} type="button" className="node-corner-icon" sx={{ color: 'action.active', cursor: 'pointer', '&:hover': { filter: 'brightness(70%)' } }} />
       </Tooltip>
-
-    </div>
+    </Box>
   );
 }
 

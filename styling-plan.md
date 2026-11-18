@@ -51,7 +51,7 @@ render their children.
 Contents:
 
 - [x] **Palette:** `savedToDatabase`, for nodes of the cloning history saved in the database.
-- [ ] **Typography:** a `sequence` variant for monospace sequences (written inline 20 times), added with
+- [x] **Typography:** a `sequence` variant for monospace sequences (written inline 20 times), added with
   `SequenceText` in step 5.
 - [x] **Component overrides:** alerts vertically centred, tooltips with an arrow and `1rem` text,
   tables with a grey header row and rows highlighted on hover.
@@ -63,12 +63,12 @@ Contents:
 
 | Component | Evidence | Replaces |
 |---|---|---|
-| `ExternalLink` | 41 `target="_blank" rel=…` in 11 files; MUI `Link` used 5 times | the ~12 `…Message` functions in `FinishedSource.jsx` |
+| `ExternalLink` ✅ | 41 `target="_blank" rel=…` in 11 files; MUI `Link` used 5 times | the ~12 `…Message` functions in `FinishedSource.jsx` |
 | `CodeBlock` ✅ | the global `code` rule, used by 2 components | added in step 4 |
-| `SequenceText` | 20 inline `monospace` | `.sequence`, `.sequence-cell`, inline `fontFamily` |
-| `FileUploadButton` | 16 `type="file"` inputs, 15 `display: 'none'` | hidden-input boilerplate in 15 files |
-| `PreviewTable` (`columns` prop) | 5 bulk-upload tables with the same shell and hand-written `<col>` widths | ~30 lines per file |
-| `DetailTable` | `TableContainer component={Paper} sx={{ maxWidth: 800 }}` ×10 | `opencloningdb` detail pages |
+| `SequenceText` ✅ | 20 inline `monospace` | `.sequence`, `.sequence-cell`, inline `fontFamily` |
+| `FileUploadButton` ✅ | 16 `type="file"` inputs, 15 `display: 'none'` | hidden-input boilerplate in 15 files |
+| `PreviewTable` (`columns` prop) ✅ | 5 bulk-upload tables with the same shell and hand-written `<col>` widths | ~30 lines per file |
+| `DetailTable` ✅ | `TableContainer component={Paper} sx={{ maxWidth: 800 }}` ×10 | `opencloningdb` detail pages |
 | Dialog scaffold | 18 dialog files, 16 with the same title/content/actions shape | build on `ConfirmMutationDialog`, `EditTextDialog` |
 | `Stack` in parents | `mb: 2` ×34, `mt: 1` ×19; `Stack` imported in 2 files | per-child margins |
 | Filter field width | `MIN_WIDTH` defined in 3 pages, used 12 times | set once in `UrlParamsForm` / `SearchBarTextField` |
@@ -175,11 +175,15 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
   were deleted along the way (8 of 12), and `github-icon`, `import-primers-container`, `primer-designer`
   and `collapsed` with them. Screenshots: identical except the description (1px) and the heading of
   the drag and drop overlay (now `Typography` `h5`, slightly smaller).
-  - CSS that is left: `packages/ui/src/index.css` (only the cloning tree: nodes, corner ids, the
-    buttons above and below nodes, and `.overhang-representation`), `NetworkTree.css` (tree lines), and
-    the page styles of `apps/opencloningdb` and `standalone-app`.
-  - [ ] Possible follow-up: move the tree rules of `index.css` next to `NetworkTree.css`, and the
-    "saved to database" colour from the `in-database` class to `sx` in `NetworkNode`.
+  - CSS that is left: `NetworkTree.css` (the cloning tree), and the page styles of `apps/opencloningdb`
+    and `standalone-app`.
+  - [x] Follow-up: `packages/ui/src/index.css` deleted, so the library imports no CSS on load (only
+    `NetworkTree.css`, with the tree). Its tree layout rules (icons above a node, the "new source" circle
+    hanging from a root node, node text, padding below the tree) moved to `NetworkTree.css` unchanged.
+    New: `TreeNodeContent` and `TreeNodeId` (`components/TreeNode.jsx`), the box and corner id of a node,
+    which take the `savedToDatabase` colour from a prop: `in-database` is now a test hook only.
+    `.overhang-representation` and `.node-corner` moved to `sx` in their components. Screenshots of
+    the `restriction_then_ligation` tree with 3 nodes saved in a mock database: byte-identical.
 
 ## Decisions
 

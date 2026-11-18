@@ -27,8 +27,9 @@ Use the first option that fits:
 
 4. **`style`**: only on plain DOM elements that have no MUI equivalent (e.g. `<col>`), and only for a
    value computed at render time.
-5. **CSS files**: no new ones. A pre-commit hook rejects them. `NetworkTree.css` (tree lines drawn with
-   pseudo-elements) is expected to stay as CSS.
+5. **CSS files**: no new ones. A pre-commit hook rejects them. `NetworkTree.css` (the layout of the cloning
+   tree, and its lines drawn with pseudo-elements) is expected to stay as CSS. Node colours are not in
+   it: they come from `TreeNodeContent` and `TreeNodeId` (`components/TreeNode.jsx`).
 
 ## Colours
 

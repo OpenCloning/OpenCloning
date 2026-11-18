@@ -4,8 +4,6 @@ import { Provider } from 'react-redux';
 import store from '@opencloning/store';
 import { ConfigProvider } from './providers/ConfigProvider';
 import { OpenCloning } from './components';
-// Import styles
-import './index.css';
 
 /**
  * StandAloneOpenCloning - Mounts the OpenCloning component into a DOM element
