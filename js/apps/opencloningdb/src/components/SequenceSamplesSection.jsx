@@ -8,7 +8,6 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Download as DownloadIcon,
-  DriveFileMove as DriveFileMoveIcon,
   InsertDriveFile as InsertDriveFileIcon,
   UploadFile as UploadFileIcon,
   CallMade as CallMadeIcon,
@@ -22,7 +21,6 @@ import DetailPageSectionAction from './DetailPageSectionAction';
 import CreateSampleDialog from './CreateSampleDialog';
 import TransferSampleDialog from './TransferSampleDialog';
 import EditSampleDialog from './EditSampleDialog';
-import MoveSequencingFileDialog from './MoveSequencingFileDialog';
 import ConfirmMutationDialog from './ConfirmMutationDialog';
 import useSampleMutation from '../hooks/useSampleMutation';
 import useDeleteSequenceUIDMutation from '../hooks/useDeleteSequenceUIDMutation';
@@ -47,7 +45,6 @@ function SmallAction({ title, onClick, icon, disabled = false, ...rest }) {
 }
 
 function SequencingFileRow({ file }) {
-  const [moveOpen, setMoveOpen] = React.useState(false);
   const deleteMutation = useSampleMutation({
     mutationFn: () => openCloningDBHttpClient.delete(endpoints.sequencingFile(file.id)),
     successMessage: 'Sequencing file deleted successfully',
@@ -64,10 +61,8 @@ function SequencingFileRow({ file }) {
       <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.875rem', flexShrink: 0 }}>{file.name}</Box>
       <Box className="file-actions" sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
         <SmallAction title="Download" onClick={onDownload} icon={<DownloadIcon fontSize="small" />} />
-        <SmallAction title="Move to another sample" onClick={() => setMoveOpen(true)} icon={<DriveFileMoveIcon fontSize="small" />} />
         <SmallAction title="Delete" onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending} icon={<DeleteIcon fontSize="small" />} />
       </Box>
-      <MoveSequencingFileDialog file={file} open={moveOpen} onClose={() => setMoveOpen(false)} />
     </ListItem>
   );
 }

@@ -544,32 +544,11 @@ def test_sample_sequencing_files(seq_samples_client):
     items = c.get('/sequence_samples', headers=headers).json()['items']
     assert [f['original_name'] for f in items[0]['sequencing_files']] == ['a.ab1']
 
-    # Move the file to another sample
-    other = c.post(
-        '/sequence_samples',
-        headers=headers,
-        json={'uid': 'other', 'sequence_id': seq_samples_client['seq_w1_actual_id'], 'location': 'box 2'},
-    )
-    assert other.status_code == 200
-    r = c.patch(f'/sequencing_files/{file_id}', headers=headers, json={'sample_uid': 'OTHER'})
-    assert r.status_code == 200, r.text
-    assert r.json() == {'id': file_id, 'original_name': 'a.ab1', 'sample_uid': 'other'}
-    assert c.get(f'/sequence_samples/{uid}/sequencing_files', headers=headers).json() == []
-
-    # Cannot move it where a file with the same name exists
-    assert _upload(c, headers, uid, 'a.ab1').status_code == 200
-    r = c.patch(f'/sequencing_files/{file_id}', headers=headers, json={'sample_uid': uid})
-    assert r.status_code == 409
-
-    # Nor to a sample of a template sequence, and those cannot have files
+    # Samples of template sequences cannot have files
     c.post(
         '/sequence_samples',
         headers=headers,
         json={'uid': 'template-sample', 'sequence_id': seq_samples_client['template_w1_id']},
-    )
-    assert (
-        c.patch(f'/sequencing_files/{file_id}', headers=headers, json={'sample_uid': 'template-sample'}).status_code
-        == 400
     )
     assert _upload(c, headers, 'template-sample', 'c.ab1').status_code == 404
 

@@ -19,7 +19,6 @@ from opencloning_db.apimodels import (
     SequenceSampleUpdate,
     SequenceSampleWithSequence,
     SequencingFileRef,
-    SequencingFileUpdate,
     sequence_sample_read,
     sequence_sample_with_sequence,
     sequencing_file_ref,
@@ -251,35 +250,6 @@ def post_sequence_sample_sequencing_files(
     session.add_all(created)
     session.commit()
     return [sequencing_file_ref(f) for f in created]
-
-
-@router.patch('/sequencing_files/{file_id}', response_model=SequencingFileRef)
-def patch_sequencing_file(
-    file_id: int,
-    body: SequencingFileUpdate,
-    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
-):
-    """Move a sequencing file to another sample."""
-    current_user, session, workspace_id = ctx.destructure()
-    db_file = get_sequencing_file_in_workspace_for_user(
-        session, current_user, workspace_id, file_id, WorkspaceRole.editor
-    )
-    target = get_sequence_sample_in_workspace_for_user(
-        session, current_user, workspace_id, body.sample_uid, WorkspaceRole.editor
-    )
-    if target.id != db_file.sequence_instance_id:
-        require_real_sequence(
-            target.sequence, detail='Samples of template sequences cannot have sequencing files.', status_code=400
-        )
-        if any(f.original_name == db_file.original_name for f in target.sequencing_files):
-            raise HTTPException(
-                status_code=409,
-                detail=f"Sample '{target.uid}' already has a sequencing file called {db_file.original_name}",
-            )
-        db_file.instance = target
-        session.commit()
-        session.refresh(db_file)
-    return sequencing_file_ref(db_file)
 
 
 @router.delete('/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)

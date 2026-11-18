@@ -134,12 +134,6 @@ class SequencingFileRef(ApiModel):
     sample_uid: str | None = None
 
 
-class SequencingFileUpdate(ApiModel):
-    """Move a sequencing file to another sample of the workspace."""
-
-    sample_uid: StrippedStr
-
-
 # --- Common responses ---
 class IdResponse(ApiModel):
     id: int

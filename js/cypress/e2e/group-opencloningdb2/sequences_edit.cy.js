@@ -39,7 +39,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
   it('can remove and add tags from the detail page', () => {
     cy.addTagInDetailPageTest('sequences', 'pREX0008', 'example_sequencing');
   });
-  it('can add, move and remove sequencing files of samples from the detail page', () => {
+  it('can add and remove sequencing files of samples from the detail page', () => {
     const sequenceName = 'pREX0008';
     const sampleBlock = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`);
     cy.intercept('GET', Cypress.getDbURL(endpoints.sequences, '*')).as('getSequences');
@@ -69,7 +69,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
         cy.closeDbAlerts();
         sampleBlock(sample.uid).find('[data-testid="sequencing-file-row"]').contains('dummy_sequencing.fasta').should('exist');
 
-        // A new sample, with a location, and move the file to it
+        // A new sample, with a location
         cy.get('[aria-label="Add new UIDs"]').click();
         cy.get('[data-testid="create-sequence-sample-uid-dialog"]').within(() => {
           cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('clone-2');
@@ -79,17 +79,6 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
         cy.dbAlertExists('1 sample UID(s) created successfully');
         cy.closeDbAlerts();
         sampleBlock('clone-2').find('[data-testid="sample-block-location"]').should('contain', 'Location: box 7');
-
-        sampleBlock(sample.uid).find('[data-testid="sequencing-file-row"]').filter(':contains(dummy_sequencing.fasta)').within(() => {
-          cy.get('[aria-label="Move to another sample"]').click();
-        });
-        cy.get('[data-testid="move-sequencing-file-dialog"]').within(() => {
-          cy.setAutocompleteValue('Sample', 'clone-2', 'div', false);
-          cy.get('button').contains('Move').click();
-        });
-        cy.dbAlertExists('Sequencing file moved to sample clone-2');
-        sampleBlock('clone-2').find('[data-testid="sequencing-file-row"]').contains('dummy_sequencing.fasta').should('exist');
-        sampleBlock(sample.uid).contains('dummy_sequencing.fasta').should('not.exist');
       });
     });
   });
