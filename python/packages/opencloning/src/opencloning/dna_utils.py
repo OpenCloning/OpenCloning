@@ -77,9 +77,15 @@ def align_with_mafft(inputs: list[str], orientation_known: bool) -> list[str]:
     return [str(s.seq) for s in parse(result.stdout)]
 
 
-def _edlib_infix(query: str, target: str) -> dict:
-    """Align query as an infix of target (edlib HW mode), counting IUPAC-compatible bases as matches."""
-    return edlib.align(query, target, mode='HW', task='path', additionalEqualities=IUPAC_EQUALITIES)
+def _best_strand(trace: str, target: str) -> tuple[str, dict]:
+    """Roughly align the trace and its reverse complement as an infix of target (edlib HW mode, counting
+    IUPAC-compatible bases as matches), and return the best orientation of the trace with its alignment."""
+    trace_rc = reverse_complement(trace)
+    fwd, rvs = (
+        edlib.align(t, target, mode='HW', task='path', additionalEqualities=IUPAC_EQUALITIES)
+        for t in (trace, trace_rc)
+    )
+    return (trace_rc, rvs) if rvs['editDistance'] < fwd['editDistance'] else (trace, fwd)
 
 
 def _longest_exact_run(cigar: str, q_start: int, t_start: int) -> tuple[int, int]:
@@ -113,14 +119,7 @@ def _align_to_circular_reference(reference: str, trace: str) -> tuple[str, str]:
     reference repeated twice picks the strand of the trace and where it lands, both sequences are rotated
     so that the trace does not cross the origin, then the alignment is done with the pairwise aligner,
     and rotated back so the reference is in its original coordinates."""
-    reference_twice = reference + reference
-
-    fwd = _edlib_infix(trace, reference_twice)
-    rvs = _edlib_infix(reverse_complement(trace), reference_twice)
-    if rvs['editDistance'] < fwd['editDistance']:
-        trace, rough = reverse_complement(trace), rvs
-    else:
-        rough = fwd
+    trace, rough = _best_strand(trace, reference + reference)
     ref_start, ref_end = rough['locations'][0]
 
     if len(trace) / len(reference) >= 0.8:
@@ -158,13 +157,9 @@ def align_sanger_traces(dseqr: Dseqrecord, sanger_traces: list[str]) -> list[str
     for trace in sanger_traces:
         if dseqr.circular:
             aligned_pairs.append(_align_to_circular_reference(query_str, trace))
-            continue
-
-        # Pairwise-align both orientations and keep the best alignment
-        fwd_alignment = next(aligner.align(query_str, trace))
-        rvs_alignment = next(aligner.align(query_str, reverse_complement(trace)))
-        best_alignment = fwd_alignment if fwd_alignment.score > rvs_alignment.score else rvs_alignment
-        aligned_pairs.append(tuple(best_alignment))
+        else:
+            trace, _ = _best_strand(trace, query_str)
+            aligned_pairs.append(tuple(next(aligner.align(query_str, trace))))
 
     return aligned_tuples_to_MSA(aligned_pairs)
 
