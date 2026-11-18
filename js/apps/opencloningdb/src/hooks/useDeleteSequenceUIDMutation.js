@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from './useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 
 function useDeleteSequenceUIDMutation() {
@@ -21,7 +22,7 @@ function useDeleteSequenceUIDMutation() {
       addAlert({ message: `UID ${uid} deleted successfully`, severity: 'success' });
     },
     onError: (error) => {
-      addAlert({ message: error?.response?.data?.detail || error?.message || 'Error deleting sequence UID', severity: 'error' });
+      addAlert({ message: error2String(error), severity: 'error' });
     },
   });
   return deleteSequenceUIDMutation;

@@ -5,6 +5,7 @@ import { AddCircle as AddCircleIcon, Delete as DeleteIcon } from '@mui/icons-mat
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewSampleUID from './NewSampleUID';
 import useAppAlerts from '../hooks/useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 function CreateSampleDialog({ sequenceId, open, onClose }) {
   const { addAlert } = useAppAlerts();
@@ -50,7 +51,7 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error creating sample UIDs',
+        message: error2String(error),
         severity: 'error',
       });
     },
@@ -104,7 +105,7 @@ function CreateSampleDialog({ sequenceId, open, onClose }) {
           )}
           {createMutation.isError && (
             <Alert severity="error" sx={{ mt: 1 }}>
-              {createMutation.error?.response?.data?.detail || createMutation.error?.message || 'Failed to create sample UIDs'}
+              {error2String(createMutation.error)}
             </Alert>
           )}
           <FormControl fullWidth sx={{ mt: 2 }}>

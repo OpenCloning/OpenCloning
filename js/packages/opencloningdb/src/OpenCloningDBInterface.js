@@ -8,6 +8,7 @@ import LoadHistoryComponent from './LoadHistoryComponent';
 import SubmitToDatabaseComponent from './SubmitToDatabaseComponent';
 import SubmitCloningStrategiesInBulkComponent from './SubmitCloningStrategiesInBulkComponent';
 import PrimersNotInDatabaseComponent from './PrimersNotInDatabaseComponent';
+import error2String from '@opencloning/utils/error2String';
 
 function isSubmissionDataValid(submissionData) {
   return Boolean(submissionData.title);
@@ -66,7 +67,7 @@ async function submitSequencingFileToDatabase({ databaseId, sequencingFiles }) {
     return resp.data;
   } catch (e) {
     console.error(e);
-    throw new Error(e.response?.data?.detail || e.message || 'Error submitting sequencing files', { cause: e });
+    throw new Error(error2String(e), { cause: e });
   }
 }
 
@@ -94,7 +95,7 @@ async function getSequencingFiles(databaseId) {
     return (resp.data || []).map(sequencingFileFromRef);
   } catch (e) {
     console.error(e);
-    throw new Error(e.response?.data?.detail || e.message || 'Error getting sequencing files', { cause: e });
+    throw new Error(error2String(e), { cause: e });
   }
 }
 

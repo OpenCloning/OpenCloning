@@ -10,6 +10,7 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 
 import useAppAlerts from '../hooks/useAppAlerts';
 import SequenceTypeSelect from './SequenceTypeSelect';
+import error2String from '@opencloning/utils/error2String';
 
 function EditSequenceNameAndType({ sequenceData, sequenceInDb, presentInLine, onSave }) {
   const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ function EditSequenceNameAndType({ sequenceData, sequenceInDb, presentInLine, on
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error updating sequence',
+        message: error2String(error),
         severity: 'error',
       });
     },

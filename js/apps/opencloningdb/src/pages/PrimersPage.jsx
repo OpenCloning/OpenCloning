@@ -24,6 +24,7 @@ import BulkUploadPrimersButton from '../components/bulk_upload/BulkUploadPrimers
 import PageContainer from '../components/PageContainer';
 import PrimersTable from '../components/PrimersTable';
 import useRowSelection from '../hooks/useRowSelection';
+import error2String from '@opencloning/utils/error2String';
 
 function PrimerQueryFields({ pendingParams, setPendingParams }) {
   const { addErrorAlert } = useAppAlerts();
@@ -103,7 +104,7 @@ function PrimersPage() {
   const selectedPrimers = items.filter((primer) => selectedIds.has(primer.id));
 
   if (isLoading && !data) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error?.response?.data?.detail || error?.message || 'Failed to load primers'}</Alert>;
+  if (error) return <Alert severity="error">{error2String(error)}</Alert>;
 
   return (
     <PageContainer data-testid="primers-page">

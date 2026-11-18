@@ -4,6 +4,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
 import { QuerySelect, useDebouncedSearchQuery } from '@opencloning/ui';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from '../hooks/useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 const getSearchQuery = (sequenceId) => (uid) => ({
   queryKey: ['sequence_samples', { uid }],
@@ -35,7 +36,7 @@ function TransferSampleDialog({ sequenceId, open, onClose }) {
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error transferring UID',
+        message: error2String(error),
         severity: 'error',
       });
     },

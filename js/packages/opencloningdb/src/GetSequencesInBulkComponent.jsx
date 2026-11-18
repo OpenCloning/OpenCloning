@@ -6,6 +6,7 @@ import TagMultiSelect from './TagMultiSelect';
 import { formatSequenceName, openCloningDBHttpClient } from './common';
 import SequenceTypeSelect from './SequenceTypeSelect';
 import endpoints from './endpoints';
+import error2String from '@opencloning/utils/error2String';
 
 /**
  * Load several sequences from OpenCloningDB, either all the sequences with any of the selected tags,
@@ -81,7 +82,7 @@ function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes =
           onChange={setSelectedSequenceTypes}
         />
       )}
-      {error && <Alert severity="error">{error.response?.data?.detail || error.message || 'Could not load sequences from OpenCloningDB'}</Alert>}
+      {error && <Alert severity="error">{error2String(error)}</Alert>}
       {emptyResult && <Alert severity="info">{mode === 'tags' ? 'No sequences found with the selected tags and types.' : 'The selected sequences have no content (template sequences cannot be loaded).'}</Alert>}
       {isPending
         ? <CircularProgress sx={{ alignSelf: 'center' }} />

@@ -25,9 +25,11 @@ function handleSubmit(e) {
 }
 ```
 
-Error display from a mutation:
+Error display from a mutation (see the `frontend-error-handling` skill):
 ```jsx
-{error && <Alert severity="error">{error.response?.data?.detail ?? 'Something went wrong'}</Alert>}
+import error2String from '@opencloning/utils/error2String';
+
+{error && <Alert severity="error">{error2String(error)}</Alert>}
 ```
 
 ## Queries (GET)

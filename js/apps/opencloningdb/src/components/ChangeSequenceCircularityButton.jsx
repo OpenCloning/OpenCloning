@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 
 import useAppAlerts from '../hooks/useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 function ChangeSequenceCircularityButton({
   sequenceId,
@@ -31,7 +32,7 @@ function ChangeSequenceCircularityButton({
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Could not change circularity',
+        message: error2String(error),
         severity: 'error',
       });
     },

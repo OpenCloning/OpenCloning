@@ -5,6 +5,7 @@ import { useOidcAuth } from '../auth/OidcAuthContext';
 import useChangeWorkspace from './useChangeWorkspace';
 import { fetchUserAndFirstWorkspace, NoWorkspacesError } from '../utils/auth_utils';
 import { setSessionError } from '../store/authSlice';
+import error2String from '@opencloning/utils/error2String';
 
 export default function useAuthBootstrap() {
   const { isLoaded, isSignedIn, getToken } = useOidcAuth();
@@ -40,7 +41,7 @@ export default function useAuthBootstrap() {
         if (!cancelled && e?.response?.status !== 401) {
           console.error(e);
           dispatch(setSessionError({
-            message: e?.response?.data?.detail || e?.message || 'Could not load your account',
+            message: error2String(e),
             retryable: !(e instanceof NoWorkspacesError),
           }));
         }

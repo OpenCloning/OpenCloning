@@ -4,6 +4,7 @@ import PrimerSelect from './PrimerSelect';
 import { openCloningDBHttpClient } from './common';
 import endpoints from './endpoints';
 import { Box } from '@mui/material';
+import error2String from '@opencloning/utils/error2String';
 
 function GetPrimerComponent({ setPrimer, setError, existingDatabaseIds }) {
   const { mutate, reset } = useMutation({
@@ -18,7 +19,7 @@ function GetPrimerComponent({ setPrimer, setError, existingDatabaseIds }) {
       setError('');
     },
     onError: (err) => {
-      setError(err?.response?.data?.detail || err?.message || 'Could not retrieve primer from OpenCloningDB');
+      setError(error2String(err));
       setPrimer(null);
     },
   });

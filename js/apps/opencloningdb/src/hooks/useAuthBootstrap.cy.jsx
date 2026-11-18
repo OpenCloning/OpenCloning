@@ -195,7 +195,7 @@ describe('useAuthBootstrap', () => {
     cy.wait('@authMe');
     cy.get('[data-cy="path"]').should('have.text', '/');
     cy.wrap(store).invoke('getState').its('auth.sessionError')
-      .should('deep.equal', { message: 'Database unavailable', retryable: true });
+      .should('deep.equal', { message: 'Internal server error', retryable: true });
   });
 
   it('stores a session error when the user has no workspaces', () => {

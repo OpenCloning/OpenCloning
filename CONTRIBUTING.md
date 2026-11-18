@@ -15,7 +15,7 @@ You can contribute to this project in different ways, not only in the form of co
 * 💻 **As a developer**:
     * If you want to help with existing issues, check the [issues labeled with `help wanted`](https://github.com/OpenCloning/OpenCloning/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+).
     * If you want to suggest changes or additions to the code, create an [issue](https://github.com/OpenCloning/OpenCloning/issues/new). You can discuss the implementation in an issue, or make a pull request. The backend is in [`python/`](python/) and the frontend in [`js/`](js/); see the [README](README.md#development) to set up a development environment.
-    * Frontend code conventions (styling, MUI imports, data fetching, URL encoding) are in [`.claude/skills/`](.claude/skills/). They are plain markdown files, written for people and for AI coding agents. For styling, start with [`mui-styling`](.claude/skills/mui-styling/SKILL.md).
+    * Frontend code conventions (styling, MUI imports, data fetching, URL encoding, error handling) are in [`.claude/skills/`](.claude/skills/). They are plain markdown files, written for people and for AI coding agents. For styling, start with [`mui-styling`](.claude/skills/mui-styling/SKILL.md).
     * You can also provide general feedback on the installation instructions, etc. through a github issue.
 * 💻+🧬 **As a researcher with some programming knowledge** you came to the right place! OpenCloning was started as a side project of a researcher, and you can use it as a way to get started with contributing to Open Source. Even if you have no experience in web, you can still make important contributions to the project.
 	*  If you are familiar with python, you can  contribute to the backend.

@@ -23,4 +23,29 @@ describe('error2String', () => {
     const error = { code: 'ERR_BAD_RESPONSE', response: { status: 500, data: {} } };
     expect(error2String(error)).toBe('Internal server error');
   });
+
+  it('formats validation errors (list of details), without the input', () => {
+    const error = { code: 'ERR_BAD_REQUEST', response: { status: 422, data: { detail: [{ loc: ['body', 'name'], msg: 'Field required', input: 'big' }] } } };
+    const message = error2String(error);
+    expect(message).toContain('Field required');
+    expect(message).not.toContain('big');
+  });
+
+  it('returns the request message when the response has no usable detail', () => {
+    const response = (data) => ({
+      code: 'ERR_BAD_RESPONSE',
+      message: 'Request failed with status code 502',
+      response: { status: 502, data },
+    });
+    expect(error2String(response(undefined))).toBe('Request failed with status code 502');
+    expect(error2String(response('<html>Bad gateway</html>'))).toBe('Request failed with status code 502');
+    expect(error2String(response({ detail: null }))).toBe('Request failed with status code 502');
+    expect(error2String(response({ detail: { msg: 'not a list' } }))).toBe('Request failed with status code 502');
+  });
+
+  it('never returns an empty message', () => {
+    expect(error2String(undefined)).toBe('Unknown error');
+    expect(error2String(new Error())).toBe('Unknown error');
+    expect(error2String({ code: 'ERR_BAD_REQUEST', response: { status: 400, data: {} } })).toBe('Unknown error');
+  });
 });

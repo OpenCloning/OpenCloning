@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from './useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 export default function useCreateLineMutation() {
   const { addAlert } = useAppAlerts();
@@ -19,7 +20,7 @@ export default function useCreateLineMutation() {
       }
     },
     onError: (error) => {
-      addAlert({ message: error?.response?.data?.detail || error?.message || 'Failed to create line', severity: 'error' });
+      addAlert({ message: error2String(error), severity: 'error' });
     },
   });
 }

@@ -15,6 +15,7 @@ import useAppAlerts from '../hooks/useAppAlerts';
 import DeleteResourceButton from '../components/DeleteResourceButton';
 import { getPlasmidSequencesInLine, getAlleleSequencesInLine } from '../utils/models_utils';
 import DetailTable from '../components/DetailTable';
+import error2String from '@opencloning/utils/error2String';
 
 function TransformButton({ line }) {
   const [open, setOpen] = React.useState(false);
@@ -47,7 +48,7 @@ function EditLineUID({ line, onSave }) {
     },
     onError: (mutationError) => {
       addAlert({
-        message: mutationError?.response?.data?.detail || mutationError?.message || 'Error updating line UID',
+        message: error2String(mutationError),
         severity: 'error',
       });
     },
@@ -126,14 +127,14 @@ function LineDetailPage() {
     },
     onError: (mutationError) => {
       addAlert({
-        message: mutationError?.response?.data?.detail || mutationError?.message || 'Error deleting line',
+        message: error2String(mutationError),
         severity: 'error',
       });
     },
   });
 
   if (isLoading || isChildrenLoading) return <CircularProgress />;
-  if (error || childrenError) return <Alert severity="error">{error?.response?.data?.detail || error?.message || childrenError?.response?.data?.detail || childrenError?.message || 'Failed to load line or children'}</Alert>;
+  if (error || childrenError) return <Alert severity="error">{error2String(error || childrenError)}</Alert>;
 
   const alleles = getAlleleSequencesInLine(line);
   const plasmids = getPlasmidSequencesInLine(line);

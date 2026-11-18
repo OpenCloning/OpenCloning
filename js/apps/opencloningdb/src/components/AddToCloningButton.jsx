@@ -8,6 +8,7 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import { useDispatch, useStore } from 'react-redux';
 import { cloningActions } from '@opencloning/store/cloning';
 import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
+import error2String from '@opencloning/utils/error2String';
 
 const { addPrimer, deleteSourceAndItsChildren } = cloningActions;
 
@@ -31,7 +32,7 @@ function AddToCloningButton({ selectedEntities, children, entityType, disabled, 
         dispatch(addPrimer({ name: primer.name, sequence: primer.sequence, database_id: seqId }));
       }
     } catch (error) {
-      setHistoryFileError(error?.response?.data?.detail || error?.message || 'Failed to add to design tab');
+      setHistoryFileError(error2String(error));
     }
   };
   const addEntities = async () => {

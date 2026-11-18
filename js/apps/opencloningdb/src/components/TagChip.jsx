@@ -5,6 +5,7 @@ import { Tooltip } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useAppAlerts from '../hooks/useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 function TagChip({ tag, entityId, entityType, canDelete = false }) {
   const { addAlert } = useAppAlerts();
@@ -19,7 +20,7 @@ function TagChip({ tag, entityId, entityType, canDelete = false }) {
       queryClient.invalidateQueries({ queryKey: ['primer', entityId] });
     },
     onError: (error) => {
-      addAlert({ message: error?.response?.data?.detail || error?.message || 'Failed to delete tag', severity: 'error' });
+      addAlert({ message: error2String(error), severity: 'error' });
     },
   });
   if (canDelete !== true) {
