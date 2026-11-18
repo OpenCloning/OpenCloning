@@ -33,6 +33,16 @@ export function getStub(stubName) {
   );
 }
 
+// Since msw 3, the XHR interceptor wraps jsdom's real XMLHttpRequest, so jsdom enforces
+// CORS: requests with custom headers (Authorization, X-Workspace-Id) send a preflight, and
+// responses must include CORS headers, like the real backend does.
+const corsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-headers': '*',
+  'access-control-allow-methods': '*',
+  'access-control-expose-headers': '*',
+};
+
 /**
  * @param {unknown} server
  * @param {DbStub} stub
@@ -40,6 +50,7 @@ export function getStub(stubName) {
 export function addStubToServer(server, stub) {
   const url = new URL(stub.endpoint, baseUrl);
   server.use(
+    http.options(url.toString(), () => new HttpResponse(null, { status: 204, headers: corsHeaders })),
     http[stub.method.toLowerCase()](url.toString(), async ({ request, params }) => {
       const plainParams = Object.fromEntries(Object.entries(params ?? {}));
       const actualParams = Object.keys(plainParams).length === 0 ? null : plainParams;
@@ -63,13 +74,13 @@ export function addStubToServer(server, stub) {
       if (stub.response.headers['content-disposition']) {
         return new HttpResponse(Buffer.from(stub.response.body, 'base64'), {
           status: stub.response.status_code,
-          headers: stub.response.headers,
+          headers: { ...stub.response.headers, ...corsHeaders },
         });
       }
 
       return HttpResponse.json(stub.response.body, {
         status: stub.response.status_code,
-        headers: stub.response.headers,
+        headers: { ...stub.response.headers, ...corsHeaders },
       });
     }),
   );
