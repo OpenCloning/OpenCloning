@@ -23,7 +23,6 @@ import {
   sampleFiltersFromSequenceParams,
 } from '../utils/query_utils';
 import SearchBarTextField from '../components/SearchBarTextField';
-import useAppAlerts from '../hooks/useAppAlerts';
 import { UrlParamsForm, filterFieldSx } from '../components/urlParamsForm';
 import TagEntitiesButton from '../components/TagEntitiesButton';
 import TopButtonSection from '../components/TopButtonSection';
@@ -41,7 +40,6 @@ import useRowSelection from '../hooks/useRowSelection';
 import error2String from '@opencloning/utils/error2String';
 
 function SequenceQueryFields({ pendingParams, setPendingParams, value: view }) {
-  const { addErrorAlert } = useAppAlerts();
   return (
     <>
       <SearchBarTextField
@@ -63,7 +61,7 @@ function SequenceQueryFields({ pendingParams, setPendingParams, value: view }) {
         sx={filterFieldSx}
       />
       <TagMultiSelect
-        onCreateError={addErrorAlert}
+        allowCreate={false}
         value={pendingParams.tags ?? []}
         onChange={(value) => setPendingParams((p) => ({ ...p, tags: value }))}
         sx={filterFieldSx}

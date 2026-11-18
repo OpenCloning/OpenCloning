@@ -16,8 +16,9 @@ import error2String from '@opencloning/utils/error2String';
  *
  * onSequencesLoaded receives an array of { databaseId, name, seguid, textFileSequence, sequencingFiles },
  * where sequencingFiles are the references ({ id, original_name }) of the sequencing files of the sequence.
+ * name is formatName(sequenceRef), by default the name followed by the sample UIDs (formatSequenceName).
  */
-function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes = [] }) {
+function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes = [], formatName = formatSequenceName }) {
   const [mode, setMode] = React.useState('tags');
   const [selectedTags, setSelectedTags] = React.useState([]);
   const [selectedSequenceTypes, setSelectedSequenceTypes] = React.useState(defaultSequenceTypes);
@@ -29,7 +30,7 @@ function GetSequencesInBulkComponent({ onSequencesLoaded, defaultSequenceTypes =
       const { data } = await openCloningDBHttpClient.get(endpoints.sequenceTextFiles, { params });
       return data.map(({ sequence_ref, sequence, sequencing_files }) => ({
         databaseId: sequence_ref.id,
-        name: formatSequenceName(sequence_ref),
+        name: formatName(sequence_ref),
         seguid: sequence_ref.seguid,
         textFileSequence: sequence,
         sequencingFiles: sequencing_files,

@@ -4,13 +4,13 @@ import TagMultiSelect from '../TagMultiSelect';
 import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Info as InfoIcon, Warning as WarningIcon } from '@mui/icons-material';
 
 
-/** Scrollable container for the bulk tables, so that they fit in a BulkUploadModal. */
-export function BulkTableContainer({ children }) {
+/** Scrollable container for the bulk tables, so that they fit in a BulkUploadModal. sx overrides its style. */
+export function BulkTableContainer({ children, sx }) {
   return (
     <TableContainer
       component={Paper}
       variant="outlined"
-      sx={{ mb: 2, maxHeight: '55vh', overflowY: 'auto', flex: 1, minHeight: 0 }}
+      sx={{ mb: 2, maxHeight: '55vh', overflowY: 'auto', flex: 1, minHeight: 0, ...sx }}
     >
       {children}
     </TableContainer>

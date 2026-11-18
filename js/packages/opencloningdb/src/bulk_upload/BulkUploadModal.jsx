@@ -1,13 +1,17 @@
 import React from 'react';
 import { Box, Modal, Typography } from '@mui/material';
 
-/** Modal used by the bulk upload previews. Pass onClose undefined to prevent closing it (e.g. while submitting). */
+/**
+ * Modal used by the bulk upload previews. Pass onClose undefined to prevent closing it (e.g. while submitting).
+ * sx is merged into the style of the dialog box (e.g. to make it bigger).
+ */
 export default function BulkUploadModal({
   open,
   onClose,
   title,
   dataTestId,
   children,
+  sx,
 }) {
   const titleId = React.useId();
   return (
@@ -28,6 +32,7 @@ export default function BulkUploadModal({
           borderRadius: 1,
           display: 'flex',
           flexDirection: 'column',
+          ...sx,
         }}
       >
         <Typography id={titleId} variant="h6" sx={{ mb: 1, textAlign: 'center' }}>

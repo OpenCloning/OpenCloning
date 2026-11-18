@@ -1,5 +1,6 @@
 export { default as OpenCloningDBInterface, sequencingFileFromRef } from './OpenCloningDBInterface.js';
 export { openCloningDBHttpClient, setUnauthorizedHandler, setHttpClientTokenGetter, setWorkspaceHeader, clearWorkspaceHeader, baseUrl, formatSequenceName } from './common.js';
+export { default as SampleUidLabel, sampleUidLabelSx } from './SampleUidLabel.jsx';
 export { SEQUENCE_TYPE_LABELS } from './sequenceTypes.js';
 export { default as endpoints } from './endpoints.js';
 export { default as SequenceSelect } from './SequenceSelect.jsx';

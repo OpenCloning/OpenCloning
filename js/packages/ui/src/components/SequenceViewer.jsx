@@ -88,7 +88,8 @@ const baseViewerProps = {
   rightClickOverrides,
 };
 
-function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation, readOnly = false }) {
+/** height is the height of the editor in pixels (at least 400, the minimum of the editor). */
+function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation, readOnly = false, height = 800 }) {
   const store = useStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -211,7 +212,7 @@ function SequenceViewer({ sequenceData, alignmentData, onUpdateAnnotation, readO
       <Editor
         editorName={EDITOR_NAME}
         {...viewerProps}
-        height="800"
+        height={height}
       />
     </Paper>
   );

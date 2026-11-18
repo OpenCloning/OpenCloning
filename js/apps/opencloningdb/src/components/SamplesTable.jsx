@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Checkbox, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Checkbox, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { SequenceLink } from './EntityLinks';
 import TagChipList from './TagChipList';
 import SequenceTypeChip from './SequenceTypeChip';
 import SelectAllCheckbox from './SelectAllCheckbox';
-import { sampleUidBadgeSx } from './SampleUidBadge';
+import { SampleUidLabel } from '@opencloning/opencloningdb';
 
 /** One row per sample (output of GET /sequence_samples), with the sequence it points to. */
 function SamplesTable({ samples, withCheckbox = false, selectedIds = new Set(), toggleRow = () => {} }) {
@@ -47,7 +47,7 @@ function SamplesTable({ samples, withCheckbox = false, selectedIds = new Set(), 
               </TableCell>
             )}
             <TableCell>
-              <Box component="span" sx={sampleUidBadgeSx}>{sample.uid}</Box>
+              <SampleUidLabel uid={sample.uid} />
             </TableCell>
             <TableCell>
               <SequenceLink id={sample.sequence.id} name={sample.sequence.name} />

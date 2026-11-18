@@ -13,7 +13,7 @@ import {
   UploadFile as UploadFileIcon,
   CallMade as CallMadeIcon,
 } from '@mui/icons-material';
-import { openCloningDBHttpClient, endpoints, OpenCloningDBInterface, sequencingFileFromRef } from '@opencloning/opencloningdb';
+import { openCloningDBHttpClient, endpoints, OpenCloningDBInterface, sequencingFileFromRef, SampleUidLabel } from '@opencloning/opencloningdb';
 import { ImportSequencingFilesInput } from '@opencloning/ui/components/verification';
 import { QueryStatusWrapper } from '@opencloning/ui';
 import { downloadBlob } from '@opencloning/utils/readNwrite';
@@ -24,7 +24,6 @@ import TransferSampleDialog from './TransferSampleDialog';
 import EditSampleDialog from './EditSampleDialog';
 import MoveSequencingFileDialog from './MoveSequencingFileDialog';
 import ConfirmMutationDialog from './ConfirmMutationDialog';
-import { sampleUidBadgeSx } from './SampleUidBadge';
 import useSampleMutation from '../hooks/useSampleMutation';
 import useDeleteSequenceUIDMutation from '../hooks/useDeleteSequenceUIDMutation';
 import useAppAlerts from '../hooks/useAppAlerts';
@@ -98,7 +97,7 @@ function SampleBlock({ sample, sequenceId, canHaveFiles }) {
   return (
     <Paper variant="outlined" sx={{ p: 1, mb: 1, maxWidth: 800 }} data-testid="sample-block">
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-        <Box component="span" sx={sampleUidBadgeSx} data-testid="sample-block-uid">{sample.uid}</Box>
+        <SampleUidLabel uid={sample.uid} data-testid="sample-block-uid" />
         <Typography variant="body2" color="text.secondary" data-testid="sample-block-location">
           {sample.location ? `Location: ${sample.location}` : 'No location'}
         </Typography>

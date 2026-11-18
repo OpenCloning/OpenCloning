@@ -27,7 +27,13 @@ export default function useSequencingQueries() {
   return React.useMemo(() => {
     const getParsedFile = (file) => queryClient.ensureQueryData({
       queryKey: ['sequencing_file', file.id, 'parsed'],
-      queryFn: async () => (await readSequencingFile(await file.getFile())).teselaJson,
+      queryFn: async () => {
+        const { teselaJson } = await readSequencingFile(await file.getFile());
+        if (!teselaJson) {
+          throw new Error(`Could not read ${file.name}`);
+        }
+        return teselaJson;
+      },
       ...cacheOptions,
     });
 

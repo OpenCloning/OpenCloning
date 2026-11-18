@@ -102,27 +102,49 @@ function compareKeys(a, b) {
 }
 
 /**
+ * Group sorted files by sample, in the order of the first file of each sample (so samples are sorted by their
+ * lowest identity, and files stay sorted within each sample).
+ */
+function groupBySample(sortedFiles) {
+  const samples = new Map();
+  sortedFiles.forEach((item) => {
+    const { sampleUid = null } = item.file;
+    if (!samples.has(sampleUid)) {
+      samples.set(sampleUid, { sampleUid, files: [] });
+    }
+    samples.get(sampleUid).files.push(item);
+  });
+  return [...samples.values()];
+}
+
+/**
  * Build the table rows from the sequences, their sequencing files and the results, sorted by
  * percentage identity (lowest first), both the sequences and the files within each sequence.
  * Sequences without sequencing files go last. The sort is stable, so ties keep the original order.
  *
+ * The files of each sequence are grouped by sample (file.sampleUid): the samples are sorted by their lowest identity,
+ * and so are the files within each sample. files is the list of all the files, in the order of the samples.
+ *
  * @param {Array} sequences - [{ databaseId, name, ... }]
- * @param {Object} filesBySequenceId - { [databaseId]: [{ id, name, ... }] | undefined (loading) }
+ * @param {Object} filesBySequenceId - { [databaseId]: [{ id, name, sampleUid, ... }] | undefined (loading) }
  * @param {Object} results - { [fileId]: result }
- * @returns {Array} [{ sequence, files: [{ file, result, status }], status, identity }]
+ * @returns {Array} [{ sequence, samples: [{ sampleUid, files }], files: [{ file, result, status }], status, identity }]
  */
 export function buildSortedRows(sequences, filesBySequenceId, results) {
   const rows = sequences.map((sequence) => {
-    const files = (filesBySequenceId[sequence.databaseId] ?? [])
+    const sortedFiles = (filesBySequenceId[sequence.databaseId] ?? [])
       .map((file) => ({ file, result: results[file.id], status: fileRowStatus(results[file.id]), sortKey: fileSortKey(results[file.id]) }))
       .sort((a, b) => compareKeys(a.sortKey, b.sortKey));
+    const samples = groupBySample(sortedFiles);
+    const files = samples.flatMap((sample) => sample.files);
     const identities = files.map(({ result }) => result?.identity).filter((identity) => identity !== undefined);
     const filesLoaded = filesBySequenceId[sequence.databaseId] !== undefined;
     if (!filesLoaded) {
-      return { sequence, files, filesLoaded, status: 'pending', identity: undefined, sortKey: fileSortKey(undefined) };
+      return { sequence, samples, files, filesLoaded, status: 'pending', identity: undefined, sortKey: fileSortKey(undefined) };
     }
     return {
       sequence,
+      samples,
       files,
       filesLoaded,
       status: sequenceRowStatus(files.map(({ file }) => file), results),
