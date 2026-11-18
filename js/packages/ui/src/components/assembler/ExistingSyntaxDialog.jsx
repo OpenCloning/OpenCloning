@@ -6,6 +6,7 @@ import ServerStaticFileSelect from '../form/ServerStaticFileSelect';
 import { readSubmittedTextFile } from '@opencloning/utils/readNwrite';
 import { normalizeSyntaxEnzymes } from '@opencloning/utils/normalizeSyntax';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import FileUploadButton from '../common/FileUploadButton';
 
 const httpClient = getExternalHttpClient();
 const baseURL = 'https://assets.opencloning.org/syntaxes/syntaxes/';
@@ -76,7 +77,6 @@ function ExistingSyntaxDialog({ staticContentPath, onClose, onSyntaxSelect, disp
   const [connectAttempt, setConnectAttempt] = React.useState(0);
   const [requestStatus, setRequestStatus] = React.useState({ status: 'loading' });
   const [loadError, setLoadError] = React.useState(null);
-  const fileInputRef = React.useRef(null);
   const [localDialogOpen, setLocalDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -107,11 +107,8 @@ function ExistingSyntaxDialog({ staticContentPath, onClose, onSyntaxSelect, disp
     }
   }, [onSyntaxSelect, onClose]);
 
-  const handleFileUpload = React.useCallback(async (event) => {
+  const handleFileUpload = React.useCallback(async ([file]) => {
     setLoadError(null);
-    const file = event.target.files[0];
-    if (!file) return;
-
     try {
       const text = await file.text();
       const syntaxData = normalizeSyntaxEnzymes(JSON.parse(text));
@@ -120,11 +117,6 @@ function ExistingSyntaxDialog({ staticContentPath, onClose, onSyntaxSelect, disp
       onClose();
     } catch (error) {
       setLoadError(`Failed to parse JSON file: ${error.message}`);
-    } finally {
-      // Reset file input so the same file can be selected again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   }, [onSyntaxSelect, onClose]);
 
@@ -140,24 +132,15 @@ function ExistingSyntaxDialog({ staticContentPath, onClose, onSyntaxSelect, disp
             ))}
             {displayCreateYourOwnMessage && <ListItem>
               <ListItemText primary="🔎 Can't find your favourite syntax?" secondary="Add it yourself! It's very easy!" />
-              <Button type="a" color="success" href="https://syntax.opencloning.org" target="_blank">Create a syntax</Button>
+              <Button color="success" href="https://syntax.opencloning.org" target="_blank" rel="noopener noreferrer">Create a syntax</Button>
             </ListItem>}
           </List>
         </RequestStatusWrapper>
         <Box sx={{ mb: 2 }}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept=".json"
-            onChange={handleFileUpload}
-            style={{ display: 'none' }}
-          />
           <ButtonGroup sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-            >
-                Upload syntax from JSON file
-            </Button>
+            <FileUploadButton onFiles={handleFileUpload} accept=".json">
+              Upload syntax from JSON file
+            </FileUploadButton>
             {staticContentPath && (
               <Button
                 onClick={() => setLocalDialogOpen(true)}

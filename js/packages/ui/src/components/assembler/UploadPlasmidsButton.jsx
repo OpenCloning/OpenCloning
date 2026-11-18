@@ -85,7 +85,7 @@ function LoadPlasmidsMenuButton({ onFilesSelected, extraOptions }) {
   }
 
   return <>
-    <input multiple type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={onFileInputChange} accept=".gbk,.gb,.fasta,.fa,.dna" data-testid="load-plasmids-file-input" />
+    <input multiple type="file" ref={fileInputRef} hidden onChange={onFileInputChange} accept=".gbk,.gb,.fasta,.fa,.dna" data-testid="load-plasmids-file-input" />
     <Button
       color="primary"
       onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -123,7 +123,7 @@ function ImportPlasmidsDialog({ validPlasmids, invalidPlasmids, onImport, onCanc
         paper: { style: { maxHeight: '80vh' } }
       }}
     >
-      <DialogActions sx={{ justifyContent: 'center', position: 'sticky', top: 0, zIndex: 99, background: '#fff', py: 2 }}>
+      <DialogActions sx={{ justifyContent: 'center', position: 'sticky', top: 0, zIndex: 99, bgcolor: 'background.paper', py: 2 }}>
         <Button sx={{ p: 1.5, fontSize: '1rem' }} disabled={validPlasmids.length === 0} variant="contained" color="success" onClick={onImport}>Import valid plasmids</Button>
         <Button sx={{ p: 1.5, fontSize: '1rem' }} variant="contained" color="error" onClick={onCancel}>Cancel</Button>
       </DialogActions>

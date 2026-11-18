@@ -26,7 +26,7 @@ function NewSourceBox({ inputSequencesIds = [] }) {
   const tooltipText = <div className="tooltip-text">Add source</div>;
   return (
     <IconButton type="submit" sx={{ height: 'fit-content' }} onClick={onClick}>
-      <Tooltip title={tooltipText} arrow placement="bottom">
+      <Tooltip title={tooltipText} placement="bottom">
         <AddCircleIcon sx={{ fontSize: '1.8em' }} className="node-corner-icon" color="success" />
       </Tooltip>
     </IconButton>

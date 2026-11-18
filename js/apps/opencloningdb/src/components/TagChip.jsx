@@ -30,7 +30,7 @@ function TagChip({ tag, entityId, entityType, canDelete = false }) {
       data-testid="tag-chip-with-delete"
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Tooltip title="Remove tag" arrow placement="top">
+          <Tooltip title="Remove tag" placement="top">
             {deleteTagMutation.isPending ? <CircularProgress size={10} /> : (
               <ClearIcon onClick={() => deleteTagMutation.mutate()} fontSize="x-small" sx={{ cursor: 'pointer' }}/>
             )}

@@ -16,16 +16,28 @@ function PCRUnitWrapper({ index, children, onDelete }) {
   }
 
   return (
-    <Accordion className="pcr-unit" defaultExpanded>
+    // Rounded, and more compact than MUI's default (disableGutters: same size expanded and collapsed)
+    <Accordion
+      className="pcr-unit"
+      defaultExpanded
+      disableGutters
+      sx={{
+        borderRadius: '1.2em',
+        overflow: 'clip',
+        mb: '.5em',
+        '&:first-of-type, &:last-of-type': { borderRadius: '1.2em' },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls={`${index}-content`}
         id={`${index}-header`}
-        sx={{ backgroundColor: 'lightgray' }}
+        sx={{ backgroundColor: 'grey.300', minHeight: 0 }}
+        slotProps={{ content: { sx: { my: '.35em' } } }}
       >
         {(index !== 0) && (
-        <Tooltip onClick={onDelete} title="Delete primer pair" arrow placement="left">
-          <CancelIcon color="gray" />
+        <Tooltip onClick={onDelete} title="Delete primer pair" placement="left">
+          <CancelIcon color="action" />
         </Tooltip>
         )}
         <ListItemText sx={{ my: 0 }}>

@@ -1,28 +1,29 @@
 import React from 'react';
+import { Box } from '@mui/material';
 
 // Inactive panels are hidden instead of unmounted, so their content keeps its state when switching tabs
 function TabPanel({ children, value, index, ...other }) {
-  const style = value === index ? {
+  const sx = value === index ? {
     visibility: 'visible',
 
   } : {
     visibility: 'hidden',
     position: 'absolute',
     width: '1px',
-    height: '0px',
+    height: 0,
     overflow: 'hidden',
   };
 
   return (
-    <div
+    <Box
       role="tabpanel"
-      style={style}
+      sx={sx}
       id={`tab-panel-${index}`}
       aria-labelledby={`tab-${index}`}
       {...other}
     >
       {children}
-    </div>
+    </Box>
   );
 }
 

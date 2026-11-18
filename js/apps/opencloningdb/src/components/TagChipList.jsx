@@ -31,7 +31,7 @@ function TagChipList({tags, entityId=null, entityType=null, canDelete=false}) {
     {tags.length === 0 && noTagsText}
     {entityId && entityType && (
       <>
-        <Tooltip title="Add tag" arrow placement="right">
+        <Tooltip title="Add tag" placement="right">
           <Chip
             size="small"
             label={<AddIcon fontSize="small" />}

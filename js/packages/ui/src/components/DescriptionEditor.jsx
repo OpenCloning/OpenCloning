@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { TextField, Button, FormControl } from '@mui/material';
+import { TextField, Button, FormControl, Box, Typography } from '@mui/material';
 import { cloningActions } from '@opencloning/store/cloning';
 
 function DescriptionEditor() {
@@ -34,8 +34,9 @@ function DescriptionEditor() {
   };
   let textShown = (
     <>
-      <p>{text}</p>
-      <Button onClick={onClickEditButton} variant="contained" color="success" style={{ marginTop: 15 }}>Edit description</Button>
+      {/* pre-line: show the line breaks of the description */}
+      <Typography component="p" variant="inherit" sx={{ whiteSpace: 'pre-line', textAlign: 'left', mb: 1.25 }}>{text}</Typography>
+      <Button onClick={onClickEditButton} variant="contained" color="success" sx={{ mt: 2 }}>Edit description</Button>
 
     </>
   );
@@ -52,15 +53,15 @@ function DescriptionEditor() {
             label="Add a brief description"
           />
         </FormControl>
-        <Button type="submit" variant="contained" style={{ marginTop: 15 }}>Save description</Button>
+        <Button type="submit" variant="contained" sx={{ mt: 2 }}>Save description</Button>
       </form>
     );
   }
 
   return (
-    <div className="description-container">
+    <Box className="description-container" sx={{ mx: 'auto', mb: '2em', maxWidth: 600 }}>
       {textShown}
-    </div>
+    </Box>
   );
 }
 

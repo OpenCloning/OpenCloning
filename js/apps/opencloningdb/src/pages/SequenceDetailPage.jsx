@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Typography, CircularProgress, Alert, Box, IconButton, TableContainer, Paper, Tooltip } from '@mui/material';
+import { Typography, CircularProgress, Alert, Box, IconButton, Tooltip } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import { convertToTeselaJson, downloadBlob, readSequencingFile } from '@opencloning/utils/readNwrite';
 import SequenceViewer from '@opencloning/ui/components/SequenceViewer';
@@ -27,6 +27,7 @@ import useSequencingAlignment from '@opencloning/ui/hooks/useSequencingAlignment
 import { QueryStatusWrapper } from '@opencloning/ui';
 import SequenceSamplesSection from '../components/SequenceSamplesSection';
 import useUpdateAnnotationMutation from '../hooks/useUpdateAnnotationMutation';
+import DetailTable from '../components/DetailTable';
 
 const { getSequencingFiles, submitSequencingFileToDatabase } = OpenCloningDBInterface;
 
@@ -38,12 +39,12 @@ function SequencingFileRow({ file, sequenceId, onGetFile }) {
       </ListItemIcon>
       <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.875rem', flexShrink: 0 }}>{file.name}</Box>
       <Box className="file-actions" sx={{ display: 'flex', alignItems: 'center', ml: 0.5 }}>
-        <Tooltip title="Download" placement="top" arrow>
+        <Tooltip title="Download" placement="top">
           <IconButton size="small" onClick={() => onGetFile(file.getFile)}>
             <DownloadIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete" placement="top" arrow>
+        <Tooltip title="Delete" placement="top">
           <span>
             <DeleteSequencingFileButton sequenceId={sequenceId} fileId={file.id} />
           </span>
@@ -297,35 +298,35 @@ function SequenceDetailPage() {
             {parentSource.type}
           </Typography>
           {parentSequences?.length > 0  && (
-            <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+            <DetailTable>
               <SequenceTable sequences={parentSequences} />
-            </TableContainer>
+            </DetailTable>
           )}
         </DetailPageSection>
       )}
 
       {children?.length > 0 && (
         <DetailPageSection title="Children" data-testid="sequence-children">
-          <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+          <DetailTable>
             <SequenceTable sequences={children} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 
       {sequenceLines.length > 0 && (
         <DetailPageSection title="Lines" data-testid="sequence-lines">
-          <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+          <DetailTable>
             <LinesTable lines={sequenceLines} withCheckbox={false} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 
       <QueryStatusWrapper queryResult={primersQuery}>
         {primersQuery.isSuccess && (primers.templates.length > 0 || primers.products.length > 0) && (
           <DetailPageSection title="Linked primers">
-            <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+            <DetailTable>
               <PrimersTable primers={[...primers.templates, ...primers.products]} withCheckbox={false} />
-            </TableContainer>
+            </DetailTable>
           </DetailPageSection>
         )}
       </QueryStatusWrapper>

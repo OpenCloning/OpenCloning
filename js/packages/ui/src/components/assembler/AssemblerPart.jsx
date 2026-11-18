@@ -1,47 +1,73 @@
 import React from 'react'
-import styles from './assembly_component.module.css'
+import { Box } from '@mui/material'
 
 import { getSvgByGlyph } from './sbol_visual_glyphs'
 import { partDataToDisplayData } from './assembler_utils'
 
+// Width of the dashed outline of overhangs, also used as spacing so that the lines don't touch the letters
+const LINE = '2.5px'
+const dashedLine = (theme) => `${LINE} dashed ${theme.vars.palette.overhang.main}`
+
+// A column of sequence: translation on top, then the watson and crick strands (one div per line)
+const dnaSx = { typography: 'sequence', '& > div': { whiteSpace: 'pre', minHeight: '1em' } }
+
 export function AssemblerPartCore({ color = 'lightgray', glyph = 'engineered-region' }) {
   return (
-    <div data-testid="assembler-part-core" className={styles.boxContainer}>
-      <div className={styles.box}>
-        <div className={styles.imageContainer} style={{ backgroundColor: color }}>
+    <Box data-testid="assembler-part-core" sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          alignSelf: 'stretch',
+          border: 3,
+          borderColor: 'common.black',
+          borderRadius: 1.5,
+          width: '5em',
+          mx: '.2em',
+          mb: LINE,
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ textAlign: 'center', backgroundColor: color, '& img': { height: '2.2em' } }}>
           <img src={getSvgByGlyph(glyph)} alt={`${glyph}.svg`} />
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   )
 }
 
+// The overhang is outlined with a dashed line, and the strand that is single-stranded at the end is in bold
 export function DisplayOverhang( { overhang, overhangRc, translation, isRight = false } ) {
   return (
-    <div data-testid="display-overhang" className={`${styles.dna} ${styles.overhang} ${isRight ? styles.right : styles.left}`}>
-      <div className={styles.top}>{translation}</div>
-      <div className={styles.watson}>{overhang}</div>
-      <div className={styles.crick}>{overhangRc}</div>
-      <div className={styles.bottom}> </div>
-    </div>
+    <Box data-testid="display-overhang" sx={[dnaSx, { px: LINE }]}>
+      <Box sx={{ px: LINE }}>{translation}</Box>
+      <Box sx={(theme) => ({ borderLeft: dashedLine(theme), borderBottom: dashedLine(theme), fontWeight: isRight ? undefined : 'bold' })}>
+        {overhang}
+      </Box>
+      <Box sx={(theme) => ({ borderRight: dashedLine(theme), pl: LINE, fontWeight: isRight ? 'bold' : undefined })}>
+        {overhangRc}
+      </Box>
+      <div> </div>
+    </Box>
   )
 }
-export function DisplayInside( { inside, insideRc, translation, isRight = false } ) {
+export function DisplayInside( { inside, insideRc, translation } ) {
   return (
-    <div data-testid="display-inside" className={`${styles.dna} ${styles.inside} ${isRight ? styles.right : styles.left}`}>
-      <div className={styles.top}>{translation}</div>
-      <div className={styles.watson}>{inside}</div>
-      <div className={styles.crick}>{insideRc}</div>
-      <div className={styles.bottom}> </div>
-    </div>
+    <Box data-testid="display-inside" sx={dnaSx}>
+      <div>{translation}</div>
+      <Box sx={{ pb: LINE }}>{inside}</Box>
+      <div>{insideRc}</div>
+      <div> </div>
+    </Box>
   )
 }
 
 export function AssemblerPartContainer({ children }) {
   return (
-    <div className={styles.container}>
+    <Box
+      className="assembler-part-container"
+      sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', textAlign: 'left' }}
+    >
       {children}
-    </div>
+    </Box>
   )
 }
 

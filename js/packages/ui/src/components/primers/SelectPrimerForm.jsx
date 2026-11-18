@@ -55,7 +55,7 @@ function SelectPrimerForm({ primers, selected, onChange, goToPrimerTab, label, m
       >
         <MenuItem onClick={handleCreatePrimerClick} value="">
           <AddCircleIcon color="success" />
-          <em style={{ marginLeft: 8 }}>Create primer</em>
+          <Box component="em" sx={{ ml: 1 }}>Create primer</Box>
         </MenuItem>
         {primers.map(({ name, id }) => (<MenuItem key={id} value={id}>{name}</MenuItem>))}
       </Select>

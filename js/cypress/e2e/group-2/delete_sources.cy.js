@@ -48,9 +48,9 @@ describe('Test delete source functionality', () => {
     manuallyTypeSequence('ATGC');
     addLane();
     manuallyTypeSequence('ATGC');
-    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('have.css', 'color', 'rgb(128, 128, 128)');
+    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('have.css', 'color', 'rgba(0, 0, 0, 0.54)');
     cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').click();
-    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('not.have.css', 'color', 'rgb(128, 128, 128)');
+    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('have.css', 'color', 'rgb(46, 125, 50)');
     changeTab('Sequence');
     cy.get('.main-sequence-editor').contains('4 bps').should('be.visible');
     changeTab('Cloning');
@@ -65,6 +65,6 @@ describe('Test delete source functionality', () => {
     changeTab('Cloning');
     addLane();
     manuallyTypeSequence('ATGC');
-    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('have.css', 'color', 'rgb(128, 128, 128)');
+    cy.get('li#sequence-1 svg[data-testid="VisibilityIcon"]').should('have.css', 'color', 'rgba(0, 0, 0, 0.54)');
   });
 });

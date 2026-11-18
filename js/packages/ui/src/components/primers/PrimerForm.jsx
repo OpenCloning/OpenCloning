@@ -1,10 +1,11 @@
 import React from 'react';
 import { CheckCircle as CheckCircleIcon, Cancel as CancelIcon } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import ValidatedTextField from '../form/ValidatedTextField';
 
-import './PrimerForm.css';
+import primerRowSx from './primerRowSx';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
+import { sequenceInputSx } from '../common/SequenceText';
 
 function PrimerForm({
   primer = { name: '', sequence: '', id: null }, submitPrimer, cancelForm, existingNames, disabledSequenceText = '',
@@ -54,7 +55,7 @@ function PrimerForm({
   const nameErrorChecker = (s) => (existingNames.includes(s) ? { error: true, helperText: 'Name exists' } : { error: false, helperText: '' });
 
   return (
-    <form className="primer-row" onSubmit={onSubmit} style={{ margin: 'auto' }}>
+    <Box component="form" className="primer-row" onSubmit={onSubmit} sx={[primerRowSx, { m: 'auto' }]}>
       <ValidatedTextField
         id="name"
         label="Name"
@@ -72,7 +73,7 @@ function PrimerForm({
         label="Sequence"
         value={sequence}
         onInputChange={onSequenceChange}
-        sx={{ m: 1, display: { width: '60%' } }}
+        sx={[{ m: 1, display: { width: '60%' } }, sequenceInputSx]}
         className="sequence"
         submissionAttempted={submissionAttempted}
         required
@@ -85,20 +86,20 @@ function PrimerForm({
       {touched
       && (
       <IconButton type="submit" sx={{ height: 'fit-content' }}>
-        <Tooltip title={submissionAllowed ? 'Save changes' : 'Incorrect values'} arrow placement="top">
+        <Tooltip title={submissionAllowed ? 'Save changes' : 'Incorrect values'} placement="top">
           <CheckCircleIcon size={25} className={submissionAllowed ? '' : 'form-invalid'} color={submissionAllowed ? 'success' : 'grey'} />
         </Tooltip>
       </IconButton>
       )}
       {cancelForm !== null && (
       <IconButton onClick={cancelForm} type="button" sx={{ height: 'fit-content' }}>
-        <Tooltip title="Discard changes" arrow placement="top">
+        <Tooltip title="Discard changes" placement="top">
           <CancelIcon color="error" />
         </Tooltip>
       </IconButton>
       )}
 
-    </form>
+    </Box>
   );
 }
 

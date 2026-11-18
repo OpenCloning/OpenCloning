@@ -18,7 +18,7 @@ function DeleteResourceButton({
 
   return (
     <>
-      <Tooltip title={disabledReason ?? ''} arrow placement="right">
+      <Tooltip title={disabledReason ?? ''} placement="right">
         <span>
           <Button
             variant="outlined"

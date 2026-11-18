@@ -3,6 +3,7 @@ import { Box, Typography, Paper, Container, Alert, Link } from '@mui/material';
 import { useFormData, useLinkedPlasmids } from '../context/FormDataContext';
 import useUploadData from './useUploadData';
 import { ExistingSyntaxDialog } from '@opencloning/ui/components/assembler';
+import { ExternalLink } from '@opencloning/ui/components/common';
 
 
 
@@ -98,14 +99,9 @@ function StartingPage({ setOverhangsStep }) {
         <SectionPaper title="Documentation">
           <Typography variant="body2" color="text.secondary" align="center">
             Need help getting started? Visit{' '}
-            <Link
-              href="https://docs.opencloning.org/syntax_builder"
-              target="_blank"
-              rel="noopener noreferrer"
-              underline="hover"
-            >
+            <ExternalLink href="https://docs.opencloning.org/syntax_builder" underline="hover">
               the documentation
-            </Link>{' '}
+            </ExternalLink>{' '}
             to see step-by-step instructions and examples.
           </Typography>
         </SectionPaper>
@@ -135,7 +131,7 @@ function StartingPage({ setOverhangsStep }) {
                   <input
                     type="file"
                     ref={fileInputRef}
-                    style={{ display: 'none' }}
+                    hidden
                     onChange={onFileChange}
                     accept=".json,.tsv,.csv"
                   />
@@ -162,19 +158,14 @@ function StartingPage({ setOverhangsStep }) {
             <strong>Download Syntax</strong> button at the top of the page to save a JSON file.
             <br />
             <br />
-            You can use the syntax in <Link href="https://opencloning.org" target="_blank" underline="hover">OpenCloning</Link> to plan your assemblies.
+            You can use the syntax in <ExternalLink href="https://opencloning.org" underline="hover">OpenCloning</ExternalLink> to plan your assemblies.
             <br />
             <br />
             If
             you would like this syntax to be included for everyone, please{' '}
-            <Link
-              href="https://github.com/OpenCloning/syntaxes/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              underline="hover"
-            >
+            <ExternalLink href="https://github.com/OpenCloning/syntaxes/issues" underline="hover">
               open an issue in GitHub
-            </Link>{' '}
+            </ExternalLink>{' '}
             and attach the file, or email{' '}
             <Link href="mailto:manuel.lera-ramirez@ucl.ac.uk" underline="hover">
               manuel.lera-ramirez@ucl.ac.uk

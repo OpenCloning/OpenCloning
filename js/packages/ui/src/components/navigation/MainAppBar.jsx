@@ -1,7 +1,6 @@
 import React from 'react';
 import { AppBar, Box, Toolbar, Container, Button, Tooltip, IconButton, Menu, MenuItem } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
-import './MainAppBar.css';
 import { useDispatch } from 'react-redux';
 import ButtonWithMenu from './ButtonWithMenu';
 import { downloadCloningStrategyAsSvg, formatTemplate } from '@opencloning/utils/readNwrite';
@@ -21,6 +20,15 @@ import { getExternalHttpClient } from '@opencloning/utils/httpClients';
 const httpClient = getExternalHttpClient();
 
 const { setCurrentTab } = cloningActions;
+
+const DOCUMENTATION_URL = 'https://docs.opencloning.org';
+
+// rem, not em or unitless: the height of the app bar must not depend on the page's body font
+// (OpenCloning.jsx subtracts a fixed app bar height from 100vh)
+const appNameSx = { fontSize: '3.5rem', lineHeight: '4.5rem', fontWeight: 200, textAlign: 'center' };
+
+// The buttons of the app bar: large, spaced out, in the app bar's text colour
+const appBarButtonsSx = { '& .MuiButtonBase-root': { fontSize: 'large', mx: 2.5, color: 'primary.contrastText' } };
 
 function MainAppBar() {
   const [openExampleDialog, setOpenExampleDialog] = React.useState(false);
@@ -130,11 +138,12 @@ function MainAppBar() {
 
   return (
     <AppBar position="static" className="app-bar">
-      <div className="app-name">OpenCloning</div>
-      <Tooltip title="View source code on GitHub" placement="left" slotProps={{ tooltip: { sx: { fontSize: '1rem' } } }}>
+      <Box className="app-name" sx={appNameSx}>OpenCloning</Box>
+      <Tooltip title="View source code on GitHub" placement="left">
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <Button
             className="github-corner"
+            sx={{ position: 'fixed', top: 0, right: 0, p: 0 }}
             onClick={() => window.open('https://github.com/OpenCloning/OpenCloning')}
             aria-label="GitHub repository"
           >
@@ -142,7 +151,7 @@ function MainAppBar() {
           </Button>
         </Box>
       </Tooltip>
-      <Container className="app-bar-container">
+      <Container className="app-bar-container" sx={appBarButtonsSx}>
         <Toolbar variant="dense" sx={{ minHeight: 50, justifyContent: 'center' }}>
           {/* Mobile menu button and dropdown */}
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
@@ -173,7 +182,7 @@ function MainAppBar() {
                   {item.display}
                 </MenuItem>
               ))}
-              <MenuItem><a style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" href="https://docs.opencloning.org">Documentation</a></MenuItem>
+              <MenuItem component="a" href={DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer" onClick={handleMenuClose}>Documentation</MenuItem>
               <MenuItem onClick={() => { setOpenExampleDialog(true); handleMenuClose(); }}>Examples</MenuItem>
               <MenuItem onClick={() => { setOpenTemplateDialog(true); handleMenuClose(); }}>Templates</MenuItem>
               <MenuItem onClick={() => { setOpenFeedbackDialog(true); handleMenuClose(); }}>Feedback</MenuItem>
@@ -183,10 +192,10 @@ function MainAppBar() {
           {/* Desktop buttons - hidden on mobile */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
             <ButtonWithMenu menuItems={fileMenu}>File</ButtonWithMenu>
-            <input type="file" ref={setFileInput} style={{ display: 'none' }} onChange={onFileChange} accept=".json,.zip" />
+            <input type="file" ref={setFileInput} hidden onChange={onFileChange} accept=".json,.zip" />
             {fileList && <LoadCloningHistoryWrapper fileList={fileList} clearFiles={() => setFileList([])} />}
             <ButtonWithMenu menuItems={helpMenu}>About</ButtonWithMenu>
-            <Button><a style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" href="https://docs.opencloning.org">Documentation</a></Button>
+            <Button href={DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer">Documentation</Button>
             <Button onClick={() => setOpenExampleDialog(true)}>Examples</Button>
             <Button onClick={() => setOpenTemplateDialog(true)}>Templates</Button>
             <Button onClick={() => setOpenFeedbackDialog(true)}>Feedback</Button>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { TableCell } from '@mui/material';
 import {
   cloningStrategyRowIssues,
   cloningStrategyRowStatus,
   getCloningStrategyRowsInfo,
 } from './bulk_upload_utils';
-import { CommonTableRow } from './common';
+import { CommonTableRow, PreviewTable } from './common';
 import BulkUploadPreview from './BulkUploadPreview';
 
 function statusLabel(status) {
@@ -43,36 +43,24 @@ function CloningStrategyBulkUploadPreviewTableRow({ row }) {
   );
 }
 
+const COLUMNS = [
+  { label: 'File Name', width: '25%' },
+  { label: 'Sync State', width: '17%' },
+  { label: 'Sequences', width: '10%' },
+  { label: 'Primers', width: '10%' },
+  { label: 'Issues', width: '38%' },
+];
+
 function TableComponent({ rows }) {
   return (
-    <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
-      <colgroup>
-        <col style={{ width: '48px' }} />
-        <col style={{ width: '25%' }} />
-        <col style={{ width: '17%' }} />
-        <col style={{ width: '10%' }} />
-        <col style={{ width: '10%' }} />
-        <col style={{ width: '38%' }} />
-      </colgroup>
-      <TableHead sx={{ textAlign: 'center' }}>
-        <TableRow sx={{ textAlign: 'center' }}>
-          <TableCell padding="checkbox"></TableCell>
-          <TableCell>File Name</TableCell>
-          <TableCell>Sync State</TableCell>
-          <TableCell>Sequences</TableCell>
-          <TableCell>Primers</TableCell>
-          <TableCell>Issues</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row, index) => (
-          <CloningStrategyBulkUploadPreviewTableRow
-            key={`${row.file_name || 'cloning-strategy'}-${index}`}
-            row={row}
-          />
-        ))}
-      </TableBody>
-    </Table>
+    <PreviewTable columns={COLUMNS}>
+      {rows.map((row, index) => (
+        <CloningStrategyBulkUploadPreviewTableRow
+          key={`${row.file_name || 'cloning-strategy'}-${index}`}
+          row={row}
+        />
+      ))}
+    </PreviewTable>
   );
 }
 

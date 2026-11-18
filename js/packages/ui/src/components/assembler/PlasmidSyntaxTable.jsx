@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid'
 function PartChip({ name, overhang}) {
   const label = name ? `${overhang} (${name})` : overhang;
   return (
-    <Chip label={label} size="small" sx={{ fontSize: '0.7rem', height: 20, fontFamily: 'monospace' }}
+    <Chip label={label} size="small" sx={{ typography: 'sequence', fontSize: '0.7rem', height: 20 }}
     />
   )
 }
@@ -86,7 +86,7 @@ function PlasmidSyntaxTable({ plasmids, maxHeight = 500 }) {
             flexWrap: 'wrap',
             gap: 0.5,
             width: '100%',
-            ...(params.row.multipleParts ? { backgroundColor: 'red' } : {}),
+            ...(params.row.multipleParts ? { backgroundColor: 'error.main' } : {}),
           }}
           >
             {noParts ? '-' : parts.map((part, idx) => (

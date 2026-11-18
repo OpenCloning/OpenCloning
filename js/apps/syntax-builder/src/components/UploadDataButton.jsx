@@ -1,13 +1,12 @@
 import React from 'react'
-import { Button } from '@mui/material'
 import { Upload as UploadIcon } from '@mui/icons-material'
+import { FileUploadButton } from '@opencloning/ui/components/common'
 
 function UploadDataButton({ onFileChange }) {
-  const fileInputRef = React.useRef(null);
-  return (<>
-    <Button size="large" variant="contained" startIcon={<UploadIcon />} onClick={() => fileInputRef.current.click()}>Upload syntax</Button>
-    <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={(event) => onFileChange(event.target.files[0])} accept=".json,.tsv,.csv" />
-  </>
+  return (
+    <FileUploadButton size="large" variant="contained" startIcon={<UploadIcon />} onFiles={([file]) => onFileChange(file)} accept=".json,.tsv,.csv">
+      Upload syntax
+    </FileUploadButton>
   )
 }
 

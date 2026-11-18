@@ -86,12 +86,7 @@ export default function BulkUploadSequencesButton() {
   return (
     <>
       <Tooltip
-        arrow
-        title={(
-          <span style={{ fontSize: '1.2em' }}>
-            Upload sequence files (.fasta, .gb, .dna, .gbk, .ape)
-          </span>
-        )}
+        title="Upload sequence files (.fasta, .gb, .dna, .gbk, .ape)"
       >
         <Button onClick={handleUploadClick} data-testid="bulk-upload-sequences-button">
           Upload Sequences
@@ -99,7 +94,7 @@ export default function BulkUploadSequencesButton() {
       </Tooltip>
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         multiple
         ref={hiddenFileInput}

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel } from '@mui/material';
+import { Button, Checkbox, CircularProgress, DialogContentText, FormControlLabel } from '@mui/material';
 import useDatabase from '../../hooks/useDatabase';
 import { sequencingFileExtensions } from '@opencloning/utils/sequencingFileExtensions';
+import FormDialog from '../common/FormDialog';
 
 function LoadFromDatabaseButton({ databaseId, onFileChange, setError, existingFileNames }) {
   const database = useDatabase();
@@ -51,45 +52,44 @@ function LoadFromDatabaseButton({ databaseId, onFileChange, setError, existingFi
       >
         {`Load from ${database.name}`}
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Select sequencing files to load</DialogTitle>
-        <DialogContent>
-          {loading && <CircularProgress />}
-          {!loading && files.length > 0 && (
-            <div>
-              {files.map((file, index) => (
-                <div key={file.name}>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        disabled={existingFileNames.includes(file.name)}
-                        checked={selectedFiles.includes(file.name) || existingFileNames.includes(file.name)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedFiles([...selectedFiles, file.name]);
-                          } else {
-                            setSelectedFiles(selectedFiles.filter((f) => f !== file.name));
-                          }
-                        }}
-                      />
-                    )}
-                    label={file.name}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-          {!loading && files.length === 0 && (
-            <DialogContentText>
-              No sequencing files found in the database.
-            </DialogContentText>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button color="error" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button color="primary" onClick={handleSubmit}>Load</Button>
-        </DialogActions>
-      </Dialog>
+      <FormDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Select sequencing files to load"
+        submitLabel="Load"
+        onSubmit={handleSubmit}
+      >
+        {loading && <CircularProgress />}
+        {!loading && files.length > 0 && (
+          <div>
+            {files.map((file, index) => (
+              <div key={file.name}>
+                <FormControlLabel
+                  control={(
+                    <Checkbox
+                      disabled={existingFileNames.includes(file.name)}
+                      checked={selectedFiles.includes(file.name) || existingFileNames.includes(file.name)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedFiles([...selectedFiles, file.name]);
+                        } else {
+                          setSelectedFiles(selectedFiles.filter((f) => f !== file.name));
+                        }
+                      }}
+                    />
+                  )}
+                  label={file.name}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        {!loading && files.length === 0 && (
+          <DialogContentText>
+            No sequencing files found in the database.
+          </DialogContentText>
+        )}
+      </FormDialog>
     </>
   );
 }

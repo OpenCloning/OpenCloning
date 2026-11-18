@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField } from '@mui/material';
+import { filterFieldSx } from './urlParamsForm';
 
 function SearchBarTextField({ label, placeholder, value, onChange, sx }) {
   return (
@@ -10,7 +11,7 @@ function SearchBarTextField({ label, placeholder, value, onChange, sx }) {
       placeholder={placeholder}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      sx={sx}
+      sx={{ ...filterFieldSx, ...sx }}
     />
   );
 }

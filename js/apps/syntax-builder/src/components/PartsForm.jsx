@@ -13,6 +13,9 @@ const isPartProblematic = (part, problematicNodes) => {
   if (!problematicNodes || problematicNodes.length === 0) return false
   return problematicNodes.includes(`${part.left_overhang}-${part.right_overhang}`)
 }
+// Columns that hold a sequence
+const SEQUENCE_FIELDS = ['left_overhang', 'right_overhang', 'left_inside', 'right_inside'];
+
 
 export default function PartsForm() {
   const { parts, addDefaultPart, setParts, problematicNodes, graphErrorMessage, mermaidString } = useFormData()
@@ -63,8 +66,9 @@ export default function PartsForm() {
   const renderValidatedCell = useCallback((field, params) => {
     const errorMessage = validateField(field, params.value, params.row)
     return (
-      <Tooltip title={errorMessage || ''} placement="top" arrow>
-        <Box className={field} sx={{
+      <Tooltip title={errorMessage || ''} placement="top">
+        <Box sx={{
+          typography: SEQUENCE_FIELDS.includes(field) ? 'sequence' : undefined,
           color: errorMessage ? 'error.main' : 'inherit',
           fontWeight: errorMessage ? 'bold' : 'normal',
           width: '100%'
@@ -116,7 +120,7 @@ export default function PartsForm() {
       editable: true,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src={getSvgByGlyph(params.value)} alt={params.value} style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+          <Box component="img" src={getSvgByGlyph(params.value)} alt={params.value} sx={{ width: 24, height: 24, objectFit: 'contain' }} />
           <span>{params.value}</span>
         </Box>
       ),
@@ -178,15 +182,16 @@ export default function PartsForm() {
       renderCell: (params) => {
         const errorMessage = validateField('color', params.value)
         return (
-          <Tooltip title={errorMessage || ''} placement="top" arrow>
+          <Tooltip title={errorMessage || ''} placement="top">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box sx={{
                 width: 20, height: 20,
                 backgroundColor: errorMessage ? 'transparent' : (params.value || 'transparent'),
-                border: errorMessage ? '2px solid red' : '1px solid #ccc',
-                borderRadius: '4px'
+                border: errorMessage ? 2 : 1,
+                borderColor: errorMessage ? 'error.main' : 'grey.400',
+                borderRadius: 1,
               }} />
-              <span style={{ color: errorMessage ? 'red' : 'inherit', fontFamily: 'monospace' }}>{params.value}</span>
+              <Box component="span" sx={{ color: errorMessage ? 'error.main' : 'inherit', fontFamily: 'monospace' }}>{params.value}</Box>
             </Box>
           </Tooltip>
         )
@@ -228,18 +233,18 @@ export default function PartsForm() {
         disableColumnMenu
         hideFooter
         autoHeight
-        sx={{
+        sx={(theme) => ({
           '& .MuiDataGrid-cell': { fontSize: '0.875rem' },
           '& .MuiDataGrid-columnHeader': { fontWeight: 'bold' },
           '& .problematic-row': {
-            backgroundColor: 'rgba(255, 152, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 152, 0, 0.25)' }
+            backgroundColor: theme.alpha(theme.palette.warning.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.warning.main, 0.25) }
           },
           '& .error-row': {
-            backgroundColor: 'rgba(255, 0, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.25)' }
+            backgroundColor: theme.alpha(theme.palette.error.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.error.main, 0.25) }
           }
-        }}
+        })}
       />
 
       <EditTextDialog

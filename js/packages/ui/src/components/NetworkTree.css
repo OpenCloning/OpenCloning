@@ -47,7 +47,7 @@
 }
 
 .tf-tree li li:before {
-    border-top: 2px solid #000;
+    border-top: 2px solid var(--opencloning-palette-text-primary);
     content: "";
     display: block;
     height: .0625em;
@@ -89,7 +89,7 @@
 }
 
 .tf-tree .tf-nc:after, .tf-tree .tf-nc:before, .tf-tree .tf-node-content:after, .tf-tree .tf-node-content:before {
-    border-left: 2px solid #000;
+    border-left: 2px solid var(--opencloning-palette-text-primary);
     content: "";
     display: block;
     height: 1.2em;
@@ -124,4 +124,68 @@
 .tf-nc {
     border-radius: 15px;
     text-align: center;
+}
+
+/* Room below the tree for the source boxes that hang from the root nodes */
+div.tf-tree.tf-ancestor-tree {
+    padding-bottom: 150px;
+}
+
+/* Icons above a source node (show/hide ancestors, add a sequence in between) */
+div.before-node {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -38px);
+    z-index: 1;
+}
+
+div.before-node svg {
+    background-color: var(--opencloning-palette-background-default);
+    cursor: pointer;
+}
+
+/* The circle with the "new source" button that hangs from a root node, and its line */
+div.hang-from-node {
+    box-sizing: content-box;
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 40px);
+    border: 3px solid;
+    border-color: var(--opencloning-palette-primary-main);
+    border-radius: 100%;
+}
+
+/* To center the icon vertically */
+div.hang-from-node div {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.hang-from-node::before {
+    position: absolute;
+    border: 1px solid;
+    width: 0;
+    height: 30px;
+    display: block;
+    content: '';
+    top: -3%;
+    left: 50%;
+    margin-left: -1px;
+    transform: translate(0, -100%);
+}
+
+/* Prevents a scrollbar on small editors, caused by the numbers at the edges of the x axis */
+span.node-text svg.veAxis {
+    width: 100%;
+}
+
+span.node-text > div:first-child {
+    margin: 20px
 }

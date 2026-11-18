@@ -27,6 +27,7 @@ import { useConfig } from '../../providers';
 import { isEqual } from 'lodash-es';
 import SyntaxOverviewTable from './SyntaxOverviewTable';
 import { graphToMSA, partsToGraph } from './graph_utils';
+import ExternalLink from '../common/ExternalLink';
 
 
 const { setState: setCloningState, setCurrentTab: setCurrentTabAction } = cloningActions;
@@ -135,12 +136,12 @@ function AssemblerProductTable({
         disableColumnMenu
         hideFooter
         autoHeight
-        sx={{
+        sx={(theme) => ({
           '& .error-row': {
-            backgroundColor: 'rgba(255, 0, 0, 0.15)',
-            '&:hover': { backgroundColor: 'rgba(255, 0, 0, 0.25)' },
+            backgroundColor: theme.alpha(theme.palette.error.main, 0.15),
+            '&:hover': { backgroundColor: theme.alpha(theme.palette.error.main, 0.25) },
           },
-        }}
+        })}
       />
       <EditTextDialog
         open={editDialog.open}
@@ -193,7 +194,7 @@ function AssemblerBox({ item, index, setCategory, setId, categories, plasmids, a
                 const { key, ...restProps } = props
                 const plasmid = plasmids.find((d) => d.id === option)
                 return (
-                  <Box component="li" key={key} {...restProps} sx={{ backgroundColor: plasmid.type === 'loadedFile' ? '#dcedc8' : undefined }}>
+                  <Box component="li" key={key} {...restProps} sx={(theme) => ({ backgroundColor: plasmid.type === 'loadedFile' ? theme.alpha(theme.palette.success.main, 0.15) : undefined })}>
                     {formatItemName(plasmid)}
                   </Box>
                 )}}
@@ -266,9 +267,9 @@ export function AssemblerComponent({ plasmids, categories, assemblyEnzymes, addA
       }
     } catch (e) {
       if (e.assembly) {
-        errorMessage = (<><div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</div><div>Error assembling {e.assembly.map((p) => formatItemName(p.plasmid)).join(', ')}</div></>)
+        errorMessage = (<><Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</Box><div>Error assembling {e.assembly.map((p) => formatItemName(p.plasmid)).join(', ')}</div></>)
       } else if (e.plasmid) {
-        errorMessage = (<><div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</div><div>Error fetching sequence for {formatItemName(e.plasmid)}</div></>)
+        errorMessage = (<><Box sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{error2String(e)}</Box><div>Error fetching sequence for {formatItemName(e.plasmid)}</div></>)
       }
       setErrorMessage(errorMessage)
     } finally {
@@ -515,7 +516,7 @@ function Assembler() {
   return (
     <>
       <Alert severity="warning" sx={{ maxWidth: '400px', margin: 'auto', fontSize: '.9rem', mb: 2 }}>
-        The Assembler is experimental. Use with caution. Visit <a href="https://docs.opencloning.org/assembler" target="_blank">the documentation</a> for more information.
+        The Assembler is experimental. Use with caution. Visit <ExternalLink href="https://docs.opencloning.org/assembler">the documentation</ExternalLink> for more information.
       </Alert>
       <ButtonGroup>
         <LoadSyntaxButton setSyntax={setSyntax} addPlasmids={addPlasmids} clearPlasmids={clearPlasmids} />

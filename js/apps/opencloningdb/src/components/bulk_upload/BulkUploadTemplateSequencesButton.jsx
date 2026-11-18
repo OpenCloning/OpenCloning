@@ -95,18 +95,18 @@ export default function BulkUploadTemplateSequencesButton() {
         onUploadClick={handleUploadClick}
         templatePath={BULK_SUBMISSION_TEMPLATES.templateSequences}
         tooltip={(
-          <span style={{ fontSize: '1.2em' }}>
+          <>
             Upload a .csv or .tsv file with headers name, sequence_type (case-insensitive).
             {' '}
             Valid sequence_type values:
             {' '}
             {VALID_TYPES_HINT}
-          </span>
+          </>
         )}
       />
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         accept=".csv,.tsv"
         ref={hiddenFileInput}

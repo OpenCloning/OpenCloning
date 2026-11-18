@@ -3,7 +3,7 @@ import React from 'react';
 
 function CustomFormHelperText({ children }) {
   return (
-    <FormHelperText component="div" style={{ fontSize: 'x-small', marginLeft: 0, marginRight: 0, position: 'absolute', botom: '0px' }}>{children}</FormHelperText>
+    <FormHelperText component="div" sx={{ fontSize: 'x-small', mx: 0, position: 'absolute' }}>{children}</FormHelperText>
   );
 }
 

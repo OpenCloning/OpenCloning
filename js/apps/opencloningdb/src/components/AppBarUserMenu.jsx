@@ -32,10 +32,10 @@ export default function AppBarUserMenu({ userName, workspaceName, onLogout, onSw
               <PersonIcon fontSize="small" />
             </Avatar>
             <Box sx={{ textAlign: 'left', lineHeight: 1.1 }}>
-              <Typography variant="body2" sx={{ color: 'white' }}>
+              <Typography variant="body2">
                 {userName}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+              <Typography variant="caption" sx={{ opacity: 0.8 }}>
                 {workspaceName}
               </Typography>
             </Box>

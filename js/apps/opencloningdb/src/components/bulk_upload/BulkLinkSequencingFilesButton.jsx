@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Alert, Box, Button, CircularProgress, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Stack, Tooltip, Typography } from '@mui/material';
 import { openCloningDBHttpClient, endpoints, BulkUploadModal, MAX_CONCURRENT_CHECKS, runWithConcurrency } from '@opencloning/opencloningdb';
 import { useBackendHttpClient } from '@opencloning/ui/hooks';
 import { downloadTextFile, readSequencingFile } from '@opencloning/utils/readNwrite';
@@ -97,13 +97,13 @@ export default function BulkLinkSequencingFilesButton() {
 
   return (
     <>
-      <Tooltip arrow title={<span style={{ fontSize: '1.2em' }}>Link the .final.fastq files of a zipped sequencing run to sequences</span>}>
+      <Tooltip title="Link the .final.fastq files of a zipped sequencing run to sequences">
         <Button onClick={() => zipInput.current?.click()} disabled={readZip.isPending} data-testid="bulk-link-sequencing-files-button">
           {readZip.isPending ? <CircularProgress size={24} /> : 'Link sequencing files'}
         </Button>
       </Tooltip>
-      <input style={{ display: 'none' }} type="file" accept=".zip" ref={zipInput} onChange={onFileSelected(readZip.mutate)} data-testid="bulk-link-sequencing-files-zip-input" />
-      <input style={{ display: 'none' }} type="file" accept=".csv,.tsv" ref={tableInput} onChange={onFileSelected(link.mutate)} data-testid="bulk-link-sequencing-files-table-input" />
+      <input hidden type="file" accept=".zip" ref={zipInput} onChange={onFileSelected(readZip.mutate)} data-testid="bulk-link-sequencing-files-zip-input" />
+      <input hidden type="file" accept=".csv,.tsv" ref={tableInput} onChange={onFileSelected(link.mutate)} data-testid="bulk-link-sequencing-files-table-input" />
 
       <BulkUploadModal
         open={run !== null}
@@ -112,17 +112,17 @@ export default function BulkLinkSequencingFilesButton() {
         dataTestId="bulk-link-sequencing-files-modal"
       >
         {run && (
-          <>
-            <Typography sx={{ mb: 2 }} data-testid="bulk-link-sequencing-files-count">
+          <Stack spacing={2}>
+            <Typography data-testid="bulk-link-sequencing-files-count">
               Found {run.files.length} .final.fastq file{run.files.length === 1 ? '' : 's'} in {run.zipName}
               {' '}({Object.keys(run.sequenceNames).length} match an existing sequence exactly).
             </Typography>
-            <Typography variant="body2" sx={{ mb: 2 }}>
+            <Typography variant="body2">
               Download the sample table, fill in the sequence_name column with the sequence each sample should be
               linked to (leave it empty to skip a sample), and upload it. The samples that match an existing
               sequence are already filled in.
             </Typography>
-            {link.error && <Alert severity="error" sx={{ mb: 2 }}>{error2String(link.error)}</Alert>}
+            {link.error && <Alert severity="error">{error2String(link.error)}</Alert>}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
               <Button variant="outlined" color="error" onClick={closeModal} disabled={link.isPending}>
                 Cancel
@@ -137,7 +137,7 @@ export default function BulkLinkSequencingFilesButton() {
                 {link.isPending ? <CircularProgress size={24} /> : 'Upload filled table'}
               </Button>
             </Box>
-          </>
+          </Stack>
         )}
       </BulkUploadModal>
     </>

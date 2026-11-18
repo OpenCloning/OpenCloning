@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Chip, FormControl, TextField } from '@mui/material';
 import LabelWithTooltip from '../form/LabelWithTooltip';
+import { sequenceInputSx } from '../common/SequenceText';
 
 const SITE_PATTERN = /^[A-Z]+[a-z]+[A-Z]+$/;
 const DEFAULT_SITE1_NAME = 'attB';
@@ -79,7 +80,7 @@ function RecombinaseList({ recombinases, setRecombinases }) {
           helperText={site1Error}
           size="small"
           placeholder="e.g. AAaaTTC"
-          sx={{ '& input': { fontFamily: 'monospace' } }}
+          sx={sequenceInputSx}
         />
         <TextField
           label="Site 1 name"
@@ -98,7 +99,7 @@ function RecombinaseList({ recombinases, setRecombinases }) {
           helperText={site2Error}
           size="small"
           placeholder="e.g. CCaaGC"
-          sx={{ '& input': { fontFamily: 'monospace' } }}
+          sx={sequenceInputSx}
         />
         <TextField
           label="Site 2 name"

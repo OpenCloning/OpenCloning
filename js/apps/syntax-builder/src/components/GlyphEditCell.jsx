@@ -39,10 +39,11 @@ function GlyphEditCell({ id, value, field }) {
       {glyphOptions.map((option) => (
         <MenuItem key={option} value={option}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <img
+            <Box
+              component="img"
               src={getSvgByGlyph(option)}
               alt={option}
-              style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+              sx={{ width: 24, height: 24, objectFit: 'contain' }}
             />
             <span>{option}</span>
           </Box>

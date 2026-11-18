@@ -1,7 +1,5 @@
 import React from 'react';
 import { FormControl, TextField } from '@mui/material';
-import '../../PrimerForm.css';
-import '../../PrimerList.css';
 
 function PrimerResultForm({
   primer: { name, sequence }, updatePrimerName, existingPrimerNames,

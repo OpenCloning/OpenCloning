@@ -1,4 +1,4 @@
-import { Alert, FormControl, TextField } from '@mui/material';
+import { Alert, Box, FormControl, TextField } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Edit as EditIcon } from '@mui/icons-material';
@@ -22,10 +22,10 @@ function SubmitToDatabaseComponent({ id, setSubmissionData, resourceType }) {
   return (
     <>
       <Alert severity="info" sx={{ mb: 2 }}>
-        <span style={{ display: 'flex', alignItems: 'center' }}>
+        <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
           {`To change the ${resourceType} name, go back and click on the icon`}
           <EditIcon sx={{ verticalAlign: 'middle', ml: 0.5, fontSize: '1.5rem' }} />
-        </span>
+        </Box>
 
       </Alert>
       <FormControl fullWidth sx={{ mb: 2 }}>

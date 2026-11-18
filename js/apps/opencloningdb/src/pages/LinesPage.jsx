@@ -15,7 +15,7 @@ import { openCloningDBHttpClient, endpoints, TagMultiSelect } from '@opencloning
 import { parseLinesParams, applyLinesParamsToSearchParams } from '../utils/query_utils';
 import SearchBarTextField from '../components/SearchBarTextField';
 import useAppAlerts from '../hooks/useAppAlerts';
-import { UrlParamsForm } from '../components/urlParamsForm';
+import { UrlParamsForm, filterFieldSx } from '../components/urlParamsForm';
 import TagEntitiesButton from '../components/TagEntitiesButton';
 import TopButtonSection from '../components/TopButtonSection';
 import PageContainer from '../components/PageContainer';
@@ -23,8 +23,6 @@ import LinesTable from '../components/LinesTable';
 import BulkUploadLinesButton from '../components/bulk_upload/BulkUploadLinesButton';
 import CreateLineDialog from '../components/CreateLineDialog';
 import useRowSelection from '../hooks/useRowSelection';
-
-const MIN_WIDTH = 150;
 
 function LinesQueryFields({ pendingParams, setPendingParams }) {
   const { addErrorAlert } = useAppAlerts();
@@ -35,35 +33,31 @@ function LinesQueryFields({ pendingParams, setPendingParams }) {
         placeholder="Search by UID"
         value={pendingParams.uid ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, uid: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
       />
       <SearchBarTextField
         label="Genotype"
         placeholder="Search by allele names"
         value={pendingParams.genotype ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, genotype: value }))}
-        sx={{ minWidth: MIN_WIDTH * 1.5 }}
       />
       <SearchBarTextField
         label="Plasmid"
         placeholder="Search by plasmid"
         value={pendingParams.plasmid ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, plasmid: value }))}
-        sx={{ minWidth: MIN_WIDTH * 1.5 }}
       />
       <TagMultiSelect
         onCreateError={addErrorAlert}
         size="small"
         value={pendingParams.tags ?? []}
         onChange={(value) => setPendingParams((p) => ({ ...p, tags: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
+        sx={filterFieldSx}
       />
       <SearchBarTextField
         label="Created by"
         placeholder="Search by user name"
         value={pendingParams.created_by ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, created_by: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
       />
       <Button variant="contained" color="primary" type="submit">
         Search

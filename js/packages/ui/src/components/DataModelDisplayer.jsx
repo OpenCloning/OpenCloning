@@ -1,6 +1,9 @@
 import { isEqual } from 'lodash-es';
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
+import CodeBlock from './common/CodeBlock';
+import ExternalLink from './common/ExternalLink';
 
 function DataModelDisplayer() {
   const { sources,  sequences, primers } = useSelector((state) => state.cloning, isEqual);
@@ -12,18 +15,18 @@ function DataModelDisplayer() {
 
   // TODO: proper json syntax highlighting here
   return (
-    <div className="data-model-displayer">
-      <p>
+    <Box className="data-model-displayer" sx={{ textAlign: 'center' }}>
+      <Typography component="p" variant="inherit" sx={{ fontSize: 'large', mb: 1.25 }}>
         Visit the
         {' '}
-        <a href="https://opencloning.github.io/OpenCloning_LinkML" target="_blank" rel="noopener noreferrer">data model documentation</a>
+        <ExternalLink href="https://opencloning.github.io/OpenCloning_LinkML">data model documentation</ExternalLink>
         .
-      </p>
+      </Typography>
 
-      <code>
+      <CodeBlock sx={{ display: 'inline-block', minWidth: '40%', maxWidth: '50%', mb: 4, whiteSpace: 'pre-wrap' }}>
         {JSON.stringify({ sources, sequences: trimmedSequences, primers }, null, 4)}
-      </code>
-    </div>
+      </CodeBlock>
+    </Box>
   );
 }
 

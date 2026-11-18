@@ -1,8 +1,10 @@
 import React from 'react';
-import { Checkbox, FormControl, FormControlLabel, TextField } from '@mui/material';
+import { FormControl, TextField } from '@mui/material';
 import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import ValidatedTextField from '../form/ValidatedTextField';
 import { stringIsNotDNA } from '@opencloning/store/cloning_utils';
+import { sequenceInputSx } from '../common/SequenceText';
+import CheckboxField from '../form/CheckboxField';
 
 function SourceManuallyTyped({ source, requestStatus, sendSourceRequest }) {
   const { id: sourceId } = source;
@@ -74,6 +76,7 @@ function SourceManuallyTyped({ source, requestStatus, sendSourceRequest }) {
         value={userInput}
         onInputChange={onInputChange}
         className="sequence"
+        sx={sequenceInputSx}
         submissionAttempted={submissionAttempted}
         required
         errorChecker={sequenceErrorChecker}
@@ -102,9 +105,7 @@ function SourceManuallyTyped({ source, requestStatus, sendSourceRequest }) {
         )
       }
 
-      <FormControl fullWidth style={{ textAlign: 'left' }}>
-        <FormControlLabel control={<Checkbox value={isCircular} onChange={onCircularChange} />} label="Circular DNA" />
-      </FormControl>
+      <CheckboxField value={isCircular} onChange={onCircularChange} label="Circular DNA" />
       <SubmitButtonBackendAPI
         requestStatus={requestStatus}
         {...(import.meta.env.VITE_UMAMI_WEBSITE_ID && { "data-umami-event": "submit-manually-typed" })}

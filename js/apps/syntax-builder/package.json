@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
     "@mui/x-data-grid": "^9.18.0",
     "@opencloning/ui": "workspace:*",
     "@opencloning/utils": "workspace:*",

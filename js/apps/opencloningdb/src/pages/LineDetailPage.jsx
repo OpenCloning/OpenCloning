@@ -1,15 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  Typography,
-  Button,
-  CircularProgress,
-  Alert,
-  Box,
-  TableContainer,
-  Paper,
-} from '@mui/material';
+import { Typography, Button, CircularProgress, Alert, Box } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewLineUID from '../components/NewLineUID';
 import CreateLineDialog from '../components/CreateLineDialog';
@@ -22,6 +14,7 @@ import TopButtonSection from '../components/TopButtonSection';
 import useAppAlerts from '../hooks/useAppAlerts';
 import DeleteResourceButton from '../components/DeleteResourceButton';
 import { getPlasmidSequencesInLine, getAlleleSequencesInLine } from '../utils/models_utils';
+import DetailTable from '../components/DetailTable';
 
 function TransformButton({ line }) {
   const [open, setOpen] = React.useState(false);
@@ -177,17 +170,17 @@ function LineDetailPage() {
 
       {alleles.length > 0 && (
         <DetailPageSection title="Genotype" data-testid="line-genotype">
-          <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+          <DetailTable>
             <SequenceTable sequences={alleles} showType={false} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 
       {plasmids.length > 0 && (
         <DetailPageSection title="Plasmids" data-testid="line-plasmids">
-          <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+          <DetailTable>
             <SequenceTable sequences={plasmids} showType={false} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 
@@ -197,17 +190,17 @@ function LineDetailPage() {
 
       {parentLines.length > 0 && (
         <DetailPageSection title="Parent lines" data-testid="line-parent-lines">
-          <TableContainer component={Paper} sx={{ maxWidth: 1000 }}>
+          <DetailTable maxWidth={1000}>
             <LinesTable lines={parentLines} withCheckbox={false} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 
       {children.length > 0 && (
         <DetailPageSection title="Children" data-testid="line-children">
-          <TableContainer component={Paper} sx={{ maxWidth: 1000 }}>
+          <DetailTable maxWidth={1000}>
             <LinesTable lines={children} withCheckbox={false} />
-          </TableContainer>
+          </DetailTable>
         </DetailPageSection>
       )}
 

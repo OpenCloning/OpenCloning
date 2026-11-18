@@ -11,7 +11,23 @@ export default function HeaderActions() {
   const { uploadData } = useUploadData()
 
   return (
-    <Box className="header-actions">
+    // Stays at the top of the page when scrolling
+    <Box
+      sx={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 'appBar',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 0.5,
+        py: 1.25,
+        px: '1.5px',
+        bgcolor: 'grey.100',
+        borderBottom: 2,
+        borderColor: 'divider',
+      }}
+    >
       <Button
         variant="contained"
         startIcon={<DownloadIcon />}

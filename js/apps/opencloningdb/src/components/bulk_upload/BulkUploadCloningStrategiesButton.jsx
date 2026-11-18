@@ -1,11 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Tooltip } from '@mui/material';
 import { SubmitCloningStrategiesInBulkComponent } from '@opencloning/opencloningdb';
 import useAppAlerts from '../../hooks/useAppAlerts';
+import { FileUploadButton } from '@opencloning/ui/components/common';
 
 export default function BulkUploadCloningStrategiesButton() {
-  const hiddenFileInput = React.useRef(null);
   const { addAlert } = useAppAlerts();
   const isViewer = useSelector((state) => state.auth.workspace?.role) === 'viewer';
   // Files being uploaded (null if the dialog is closed)
@@ -15,13 +14,6 @@ export default function BulkUploadCloningStrategiesButton() {
     return null;
   }
 
-  const handleFileUpload = (event) => {
-    const uploadedFiles = Array.from(event.target.files ?? []);
-    event.target.value = null;
-    if (uploadedFiles.length > 0) {
-      setFiles(uploadedFiles);
-    }
-  };
 
   const onSuccess = (sequenceRefs, syncResults) => {
     const strategyCount = syncResults.length;
@@ -39,27 +31,15 @@ export default function BulkUploadCloningStrategiesButton() {
 
   return (
     <>
-      <Tooltip
-        arrow
-        title={(
-          <span style={{ fontSize: '1.2em' }}>
-            Upload OpenCloning JSON files (cloning strategy files) or SnapGene (.dna) files
-          </span>
-        )}
-      >
-        <Button onClick={() => hiddenFileInput.current?.click()} data-testid="bulk-upload-cloning-strategies-button">
-          Upload sequences with history
-        </Button>
-      </Tooltip>
-
-      <input
-        style={{ display: 'none' }}
-        type="file"
+      <FileUploadButton
+        onFiles={setFiles}
         accept=".json,.dna"
         multiple
-        ref={hiddenFileInput}
-        onChange={handleFileUpload}
-      />
+        data-testid="bulk-upload-cloning-strategies-button"
+        tooltip="Upload OpenCloning JSON files (cloning strategy files) or SnapGene (.dna) files"
+      >
+        Upload sequences with history
+      </FileUploadButton>
 
       {files && (
         <SubmitCloningStrategiesInBulkComponent

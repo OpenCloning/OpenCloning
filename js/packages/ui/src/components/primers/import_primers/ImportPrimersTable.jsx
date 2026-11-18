@@ -2,6 +2,9 @@ import React from 'react';
 import { Table, TableCell, TableRow, TableHead, TableBody, Tooltip } from '@mui/material';
 import { Cancel as CancelIcon, Warning as WarningIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 
+// The status and name columns are as narrow as their content, the sequence takes the rest
+const narrowColumnSx = { width: '1%', whiteSpace: 'nowrap' };
+
 function CustomTableRow({ primer }) {
   const { name, sequence, error } = primer;
 
@@ -17,18 +20,18 @@ function CustomTableRow({ primer }) {
 
   return (
     <TableRow>
-      <TableCell align="center">
+      <TableCell align="center" sx={narrowColumnSx}>
         <Tooltip title={msg} placement="top">{icon}</Tooltip>
       </TableCell>
-      <TableCell>{name}</TableCell>
-      <TableCell className="sequence-cell">{sequence}</TableCell>
+      <TableCell sx={narrowColumnSx}>{name}</TableCell>
+      <TableCell className="sequence-cell" sx={{ typography: 'sequence' }}>{sequence}</TableCell>
     </TableRow>
   );
 }
 
 function PrimersImportTable({ importedPrimers }) {
   return (
-    <Table className="primers-table">
+    <Table className="primers-table" sx={{ mb: 3 }}>
       <TableHead>
         <TableRow>
           <TableCell align="center">Status</TableCell>

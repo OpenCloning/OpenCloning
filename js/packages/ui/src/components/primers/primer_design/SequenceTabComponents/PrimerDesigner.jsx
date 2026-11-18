@@ -64,7 +64,7 @@ function PrimerDesigner() {
       )}
       <Box className="primer-design" sx={{ display: showPrimerDesigner ? 'auto' : 'none', width: '60%', minWidth: '600px', margin: 'auto', border: 1, borderRadius: 2, overflow: 'hidden', borderColor: 'primary.main', marginBottom: 5 }}>
         <Box sx={{ margin: 'auto', display: 'flex', height: 'auto', borderBottom: 2, borderColor: 'primary.main', backgroundColor: 'primary.main' }}>
-          <Box component="h2" sx={{ margin: 'auto', py: 1, color: 'white' }}>Primer designer</Box>
+          <Box component="h2" sx={{ margin: 'auto', py: 1, color: 'primary.contrastText' }}>Primer designer</Box>
         </Box>
         {component}
       </Box>

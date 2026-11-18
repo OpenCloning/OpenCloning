@@ -1,5 +1,6 @@
 import React from 'react';
 import { TableCell, TableRow } from '@mui/material';
+import CodeBlock from '../../common/CodeBlock';
 
 export default function Primer3Figure({ figure }) {
   // Remove all trailing spaces
@@ -8,17 +9,13 @@ export default function Primer3Figure({ figure }) {
   return (
     <TableRow>
       <TableCell colSpan={3} sx={{ padding: 0, margin: 0 }}>
-        <code style={{ width: '100%',
+        <CodeBlock sx={{
           whiteSpace: 'pre',
-          fontFamily: 'monospace',
-          display: 'block',
-          maxWidth: '100%',
           overflow: 'auto',
-          margin: 0,
           fontSize: `min(calc(100% * 80 / ${longestRow}), 1rem)` }}
         >
           {trimmedRows.join('\n')}
-        </code>
+        </CodeBlock>
       </TableCell>
     </TableRow>
   );

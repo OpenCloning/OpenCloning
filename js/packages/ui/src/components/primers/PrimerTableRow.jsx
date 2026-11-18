@@ -1,10 +1,11 @@
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
 import { Delete as DeleteIcon, Edit as EditIcon, Clear as ClearIcon } from '@mui/icons-material';
 import SubmitToDatabaseDialog from '../form/SubmitToDatabaseDialog';
 import useDatabase from '../../hooks/useDatabase';
 import PrimerDetailsTds from './primer_details/PrimerDetailsTds';
 import PrimerInfoIcon from './primer_details/PrimerInfoIcon';
+import SequenceText from '../common/SequenceText';
 
 function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick, pcrDetails }) {
   const [saveToDatabaseDialogOpen, setSaveToDatabaseDialogOpen] = useState(false);
@@ -27,14 +28,14 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
   }
 
   return (
-    <tr>
-      <td className="icons">
-        <Tooltip arrow title={deleteMessage} placement="top">
+    <TableRow>
+      <TableCell className="icons" sx={{ width: '15%', whiteSpace: 'nowrap' }}>
+        <Tooltip title={deleteMessage} placement="top">
           <IconButton onClick={() => (canBeDeleted && deletePrimer(primerDetails.id))}>
             {isSavedToDatabase ? <ClearIcon /> : <DeleteIcon />}
           </IconButton>
         </Tooltip>
-        <Tooltip arrow title={isSavedToDatabase ? `Stored in ${database.name}` : 'Edit'} placement="top">
+        <Tooltip title={isSavedToDatabase ? `Stored in ${database.name}` : 'Edit'} placement="top">
           {isSavedToDatabase ? (
             <IconButton
               onClick={() => window.open(database.getPrimerLink(primerDetails.database_id), '_blank')}
@@ -51,7 +52,7 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
         <PrimerInfoIcon primerDetails={primerDetails} pcrDetails={pcrDetails} />
         {database && !primerDetails.database_id && (
           <>
-            <Tooltip arrow title={`Save to ${database.name}`} placement="top">
+            <Tooltip title={`Save to ${database.name}`} placement="top">
               <IconButton onClick={() => setSaveToDatabaseDialogOpen(true)}>
                 <database.SubmitIcon />
               </IconButton>
@@ -66,15 +67,15 @@ function PrimerTableRow({ primerDetails, deletePrimer, canBeDeleted, onEditClick
             )}
           </>
         )}
-      </td>
-      <td className="name">{primerDetails.name}</td>
+      </TableCell>
+      <TableCell className="name">{primerDetails.name}</TableCell>
       <PrimerDetailsTds
         primerId={primerDetails.id}
         primerDetails={primerDetails}
         pcrDetails={pcrDetails}
       />
-      <td className="sequence">{primerDetails.sequence}</td>
-    </tr>
+      <TableCell className="sequence"><SequenceText>{primerDetails.sequence}</SequenceText></TableCell>
+    </TableRow>
   );
 }
 

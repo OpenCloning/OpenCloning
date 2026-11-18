@@ -115,7 +115,7 @@ function PrimerInfoIcon({ primerDetails, pcrDetails }) {
   }
   return (
     <>
-      <Tooltip title={tooltipTitle} placement="top" arrow>
+      <Tooltip title={tooltipTitle} placement="top">
         {/* This span is necessary to work when the button is disabled */}
         <span>
           <IconButton disabled={disabled} onClick={handleOpen}>

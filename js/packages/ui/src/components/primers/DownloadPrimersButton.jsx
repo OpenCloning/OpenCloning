@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material';
+import { Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material';
 import { useSelector } from 'react-redux';
 import primersToTabularFile from './primersToTabularFile';
 
 import { downloadTextFile } from '@opencloning/utils/readNwrite';
 import { usePCRDetails } from './primer_details/usePCRDetails';
 import RequestStatusWrapper from '../form/RequestStatusWrapper';
+import FormDialog from '../common/FormDialog';
 import useMultiplePrimerDetails from './primer_details/useMultiplePrimerDetails';
 import { isCompleteOligoHybridizationSource, isCompletePCRSource } from '@opencloning/store/cloning_utils';
 
@@ -29,55 +30,46 @@ function DownloadPrimersDialog({ primers, open, onClose }) {
     onClose();
   };
   return (
-    <Dialog
+    <FormDialog
       open={open}
       onClose={onClose}
-      slotProps={{
-        paper: {
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-            handleDownload();
-          },
-        }
-      }}
-    >
-      <DialogTitle>Save Primers to File</DialogTitle>
-      <DialogContent>
-        <FormControl fullWidth>
-          <TextField
-            autoFocus
-            required
-            id="file_name"
-            label="File name"
-            variant="standard"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <FormLabel id="save-primers-radio-group-label">File format</FormLabel>
-          <RadioGroup
-            aria-labelledby="save-primers-radio-group-label"
-            value={extension}
-            variant="standard"
-            onChange={(e) => setExtension(e.target.value)}
-          >
-            <FormControlLabel value=".csv" control={<Radio />} label="csv" />
-            <FormControlLabel value=".tsv" control={<Radio />} label="tsv" />
-          </RadioGroup>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
+      title="Save Primers to File"
+      onSubmit={handleDownload}
+      actions={(
+        // Save only once the primer details are loaded
         <RequestStatusWrapper requestStatus={primerDetailsRequestStatus} retry={() => { retryGetPrimerDetails(); retryGetPCRDetails(); }}>
           <RequestStatusWrapper requestStatus={pcrDetailsRequestStatus} retry={retryGetPCRDetails}>
-            <Button onClick={onClose}>
+            <Button color="error" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit">Save file</Button>
           </RequestStatusWrapper>
         </RequestStatusWrapper>
-      </DialogActions>
-    </Dialog>
+      )}
+    >
+      <FormControl fullWidth>
+        <TextField
+          autoFocus
+          required
+          id="file_name"
+          label="File name"
+          variant="standard"
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+        <FormLabel id="save-primers-radio-group-label">File format</FormLabel>
+        <RadioGroup
+          aria-labelledby="save-primers-radio-group-label"
+          value={extension}
+          variant="standard"
+          onChange={(e) => setExtension(e.target.value)}
+        >
+          <FormControlLabel value=".csv" control={<Radio />} label="csv" />
+          <FormControlLabel value=".tsv" control={<Radio />} label="tsv" />
+        </RadioGroup>
+      </FormControl>
+    </FormDialog>
   );
 }
 

@@ -5,7 +5,7 @@ import { usePrimerDesign } from './PrimerDesignContext';
 function ToolTipWrapper({ title, children, enabled = false }) {
   if (enabled) {
     return (
-      <Tooltip title={title} placement="top" arrow>
+      <Tooltip title={title} placement="top">
         <span>
           {children}
         </span>

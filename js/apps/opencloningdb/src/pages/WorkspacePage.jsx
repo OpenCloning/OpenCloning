@@ -16,6 +16,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Stack,
   TextField,
   Tooltip,
   Typography,
@@ -213,80 +214,82 @@ function WorkspaceMembersSection({ workspaceId }) {
 
   return (
     <SectionBox title="Workspace members">
-      {isLoading && <CircularProgress size={24} />}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error2String(error)}
-        </Alert>
-      )}
-      {!isLoading && !error && members?.length > 0 && (
-        <List dense disablePadding sx={{ mb: 2 }} data-testid="workspace-members-list">
-          {members.map((member) => {
-            const isSelf = member.id === currentUserId;
-            return (
-              <ListItem
-                key={member.id}
-                disableGutters
-                secondaryAction={(
-                  <Tooltip title={isSelf ? 'Cannot remove yourself' : 'Remove member'} arrow>
-                    <span>
-                      <IconButton
-                        edge="end"
-                        aria-label={`Remove ${member.display_name}`}
-                        disabled={isSelf}
-                        onClick={() => setUserToRemove(member)}
-                        data-testid={`remove-member-${member.id}`}
-                      >
-                        <PersonRemoveIcon />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                )}
-              >
-                <ListItemText
-                  primary={member.display_name}
-                  secondary={formatRole(member.role)}
-                />
-              </ListItem>
-            );
-          })}
-        </List>
-      )}
-      <Box component="form" onSubmit={handleAddMember} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <TextField
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          size="small"
-          sx={{ flex: 1, minWidth: 180 }}
-        />
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel id="member-role-label">Role</InputLabel>
-          <Select
-            labelId="member-role-label"
-            label="Role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
+      <Stack spacing={2}>
+        {isLoading && <CircularProgress size={24} />}
+        {error && (
+          <Alert severity="error">
+            {error2String(error)}
+          </Alert>
+        )}
+        {!isLoading && !error && members?.length > 0 && (
+          <List dense disablePadding data-testid="workspace-members-list">
+            {members.map((member) => {
+              const isSelf = member.id === currentUserId;
+              return (
+                <ListItem
+                  key={member.id}
+                  disableGutters
+                  secondaryAction={(
+                    <Tooltip title={isSelf ? 'Cannot remove yourself' : 'Remove member'}>
+                      <span>
+                        <IconButton
+                          edge="end"
+                          aria-label={`Remove ${member.display_name}`}
+                          disabled={isSelf}
+                          onClick={() => setUserToRemove(member)}
+                          data-testid={`remove-member-${member.id}`}
+                        >
+                          <PersonRemoveIcon />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  )}
+                >
+                  <ListItemText
+                    primary={member.display_name}
+                    secondary={formatRole(member.role)}
+                  />
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
+        <Box component="form" onSubmit={handleAddMember} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            size="small"
+            sx={{ flex: 1, minWidth: 180 }}
+          />
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel id="member-role-label">Role</InputLabel>
+            <Select
+              labelId="member-role-label"
+              label="Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              {WORKSPACE_ROLES.map((workspaceRole) => (
+                <MenuItem key={workspaceRole} value={workspaceRole}>
+                  {formatRole(workspaceRole)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Alert severity="info" sx={{ my: 2 }}>
+            To update a member role (e.g. change from viewer to editor), just add them again with the new role, and it will be updated.
+          </Alert>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!email.trim() || addMemberMutation.isPending}
           >
-            {WORKSPACE_ROLES.map((workspaceRole) => (
-              <MenuItem key={workspaceRole} value={workspaceRole}>
-                {formatRole(workspaceRole)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Alert severity="info" sx={{ my: 2 }}>
-          To update a member role (e.g. change from viewer to editor), just add them again with the new role, and it will be updated.
-        </Alert>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={!email.trim() || addMemberMutation.isPending}
-        >
-          Add
-        </Button>
-      </Box>
+            Add
+          </Button>
+        </Box>
+      </Stack>
       <ConfirmMutationDialog
         open={Boolean(userToRemove)}
         onClose={() => setUserToRemove(null)}

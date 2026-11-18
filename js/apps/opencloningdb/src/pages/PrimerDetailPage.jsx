@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Typography, CircularProgress, Alert, TableContainer, Paper } from '@mui/material';
+import { Typography, CircularProgress, Alert } from '@mui/material';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import ResourceDetailHeader from '../components/ResourceDetailHeader';
 import SequenceTable from '../components/SequenceTable';
@@ -13,6 +13,7 @@ import SampleUidBadge from '../components/SampleUidBadge';
 import EditPrimerNameAndUid from '../components/EditPrimerNameAndUid';
 import DeleteResourceButton from '../components/DeleteResourceButton';
 import useAppAlerts from '../hooks/useAppAlerts';
+import DetailTable from '../components/DetailTable';
 
 function PrimerDetailPage() {
   const { id } = useParams();
@@ -80,17 +81,17 @@ function PrimerDetailPage() {
         />
       </TopButtonSection>
       <DetailPageSection title="Sequence" data-testid="sequence">
-        <Typography sx={{ mt: 1, fontFamily: 'monospace' }}>{primer.sequence}</Typography>
+        <Typography sx={{ mt: 1, typography: 'sequence' }}>{primer.sequence}</Typography>
       </DetailPageSection>
       <DetailPageSection title="Linked templates" data-testid="linked-templates">
-        <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+        <DetailTable>
           <SequenceTable sequences={templates} />
-        </TableContainer>
+        </DetailTable>
       </DetailPageSection>
       <DetailPageSection title="Linked products" data-testid="linked-products">
-        <TableContainer component={Paper} sx={{ maxWidth: 800 }}>
+        <DetailTable>
           <SequenceTable sequences={products} />
-        </TableContainer>
+        </DetailTable>
       </DetailPageSection>
     </PageContainer>
   );

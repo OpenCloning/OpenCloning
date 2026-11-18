@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Alert } from '@mui/material';
+import { TextField, Alert } from '@mui/material';
+import FormDialog from '../common/FormDialog';
 
 export default function EditTextDialog({
   open,
@@ -23,28 +24,30 @@ export default function EditTextDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
-        {maxLength && <Alert severity="info" sx={{ mb: 2 }}>Maximum input length is {maxLength} characters</Alert>}
-        <TextField
-          autoFocus
-          multiline={multiline}
-          rows={multiline ? 6 : undefined}
-          fullWidth
-          value={tempValue}
-          onChange={handleChange}
-          placeholder={placeholder}
-          sx={{ mt: 1 }}
-          slotProps={{
-            htmlInput: maxLength ? { maxLength } : undefined
-          }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={() => onSave(tempValue)} variant="contained">Save</Button>
-      </DialogActions>
-    </Dialog>
+    <FormDialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      title={title}
+      submitLabel="Save"
+      submitButtonProps={{ variant: 'contained' }}
+      onSubmit={() => onSave(tempValue)}
+    >
+      {maxLength && <Alert severity="info" sx={{ mb: 2 }}>Maximum input length is {maxLength} characters</Alert>}
+      <TextField
+        autoFocus
+        multiline={multiline}
+        rows={multiline ? 6 : undefined}
+        fullWidth
+        value={tempValue}
+        onChange={handleChange}
+        placeholder={placeholder}
+        sx={{ mt: 1 }}
+        slotProps={{
+          htmlInput: maxLength ? { maxLength } : undefined
+        }}
+      />
+    </FormDialog>
   );
 }

@@ -1,4 +1,5 @@
-import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography } from '@mui/material';
+import FormDialog from '../common/FormDialog';
 import React from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import useDatabase from '../../hooks/useDatabase';
@@ -90,12 +91,14 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
       <Dialog open={dialogOpen} onClose={handleClose} sx={{ textAlign: 'center' }}>
         <DialogTitle>Unsaved Intermediates</DialogTitle>
         <DialogContent sx={{ fontSize: '1.2em' }}>
-          <p>There are intermediate sequences between the sequence being saved and its first ancestor in the database.</p>
-          <p>
+          <Typography variant="inherit" sx={{ mb: 1.25 }}>
+            There are intermediate sequences between the sequence being saved and its first ancestor in the database.
+          </Typography>
+          <Typography variant="inherit" sx={{ mb: 1.25 }}>
             Intermediate sequences will be stored in the history of the sequence you are saving, but not as separate entities
             in the database.
-          </p>
-          <img style={{ marginTop: '10px' }} src={IntermediatesDisclaimer} alt="Intermediates Disclaimer" />
+          </Typography>
+          <Box component="img" sx={{ mt: '10px' }} src={IntermediatesDisclaimer} alt="Intermediates Disclaimer" />
         </DialogContent>
         <DialogActions>
           <Button color="success" onClick={() => setDisclaimerAccepted(true)}>I understand</Button>
@@ -106,29 +109,20 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
   }
 
   return (
-    <Dialog
+    <FormDialog
       open={dialogOpen}
       onClose={handleClose}
       data-testid="submit-to-database-component"
-      slotProps={{
-        paper: {
-          component: 'form',
-          sx: { width: '40%' },
-          onSubmit: handleSubmit,
-        }
-      }}
+      paperSx={{ width: '40%' }}
+      title={`Save ${resourceType} to ${database.name}`}
+      onSubmit={handleSubmit}
+      submitLabel={isSubmitting ? <CircularProgress /> : 'Submit'}
+      submitDisabled={isSubmitting || submissionData === null || !database.isSubmissionDataValid(submissionData)}
     >
-      <DialogTitle>{`Save ${resourceType} to ${database.name}`}</DialogTitle>
-      <DialogContent>
-        <database.SubmitToDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} resourceType={resourceType} />
-        {resourceType === 'sequence' && !isSubmitting && <database.PrimersNotInDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} />}
-        {errorMessage && <Alert sx={{ marginTop: 2 }} severity="error">{errorMessage}</Alert>}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting || submissionData === null || !database.isSubmissionDataValid(submissionData)}>{isSubmitting ? <CircularProgress /> : 'Submit'}</Button>
-      </DialogActions>
-    </Dialog>
+      <database.SubmitToDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} resourceType={resourceType} />
+      {resourceType === 'sequence' && !isSubmitting && <database.PrimersNotInDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} />}
+      {errorMessage && <Alert sx={{ marginTop: 2 }} severity="error">{errorMessage}</Alert>}
+    </FormDialog>
   );
 }
 

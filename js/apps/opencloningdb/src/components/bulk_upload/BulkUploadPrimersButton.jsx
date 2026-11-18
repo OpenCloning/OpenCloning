@@ -89,15 +89,11 @@ export default function BulkUploadPrimersButton() {
         dataTestId="bulk-upload-primers-button"
         onUploadClick={handleUploadClick}
         templatePath={BULK_SUBMISSION_TEMPLATES.primers}
-        tooltip={(
-          <span style={{ fontSize: '1.2em' }}>
-            Upload a .csv or .tsv file with headers name, sequence, uid
-          </span>
-        )}
+        tooltip="Upload a .csv or .tsv file with headers name, sequence, uid"
       />
 
       <input
-        style={{ display: 'none' }}
+        hidden
         type="file"
         accept=".csv,.tsv"
         ref={hiddenFileInput}

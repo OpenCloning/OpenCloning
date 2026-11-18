@@ -6,6 +6,7 @@ import NetWorkNode from './NetworkNode';
 import NewSourceBox from './sources/NewSourceBox';
 import DragAndDropCloningHistoryWrapper from './DragAndDropCloningHistoryWrapper';
 import CloningSpeedDial from './CloningSpeedDial';
+import { TreeNodeContent } from './TreeNode';
 
 function CloningHistory() {
   const startingSourceIds = useSelector(
@@ -29,7 +30,7 @@ function CloningHistory() {
             ))}
             {/* There is always a box on the right side to add a source */}
             <li key="new_source_box" className="new_source_box">
-              <span className="tf-nc"><span className="node-text"><NewSourceBox /></span></span>
+              <TreeNodeContent><NewSourceBox /></TreeNodeContent>
             </li>
           </ul>
         </div>

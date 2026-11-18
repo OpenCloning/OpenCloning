@@ -24,10 +24,11 @@ import { mount } from '@cypress/react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import store from '@opencloning/store';
+import { OpenCloningThemeProvider } from '@opencloning/ui/providers/ThemeProvider';
 import '@cypress/code-coverage/support';
 
 Cypress.Commands.add('mount', (component, options = {}) => {
-  const { reduxStore = store, ...mountOptions } = options;
+  const { reduxStore = store, themeOptions, ...mountOptions } = options;
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -38,7 +39,11 @@ Cypress.Commands.add('mount', (component, options = {}) => {
   const wrapped = React.createElement(
     Provider,
     { store: reduxStore },
-    React.createElement(QueryClientProvider, { client: queryClient }, component),
+    React.createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      React.createElement(OpenCloningThemeProvider, { themeOptions }, component),
+    ),
   );
   return mount(wrapped, mountOptions);
 });

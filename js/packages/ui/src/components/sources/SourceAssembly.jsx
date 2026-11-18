@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
-import { Checkbox, FormControlLabel, InputLabel, MenuItem, Select, TextField, FormControl, InputAdornment } from '@mui/material';
+import { InputLabel, MenuItem, Select, TextField, FormControl, InputAdornment } from '@mui/material';
 import MultipleInputsSelector from './MultipleInputsSelector';
 import { anyAssemblyInputIsLinear, getInputSequencesFromSourceId } from '@opencloning/store/cloning_utils';
 import EnzymeMultiSelect from '../form/EnzymeMultiSelect';
@@ -9,6 +9,7 @@ import { classNameToEndPointMap } from '@opencloning/utils/sourceFunctions';
 import { cloningActions } from '@opencloning/store/cloning';
 import LabelWithTooltip from '../form/LabelWithTooltip';
 import RecombinaseList from './RecombinaseList';
+import CheckboxField from '../form/CheckboxField';
 
 const helpSingleSite = 'Even if input sequences contain multiple att sites '
   + '(typically 2), a product could be generated where only one site recombines. '
@@ -166,35 +167,28 @@ function SourceAssembly({ source, requestStatus, sendSourceRequest }) {
         { (assemblyType === 'RecombinaseSource') && (
           <>
             <RecombinaseList recombinases={recombinases} setRecombinases={setRecombinases} />
-            <FormControl fullWidth style={{ textAlign: 'left' }}>
-              <FormControlLabel
-                control={<Checkbox checked={reverseRecombinase} onChange={() => setReverseRecombinase(!reverseRecombinase)} />}
+            <CheckboxField
+              checked={reverseRecombinase}
+              onChange={() => setReverseRecombinase(!reverseRecombinase)}
+              label={(
+                <LabelWithTooltip
+                  label="Reverse reaction"
+                  tooltip="Include the reverse reaction of each recombinase (e.g. excision in addition to integration)"
+                />
+              )}
+            />
+            {(anyInputIsLinear && inputSequences.length > 1) && inputContainsGenome !== undefined && (
+              <CheckboxField
+                data-testid="input-contains-genome-checkbox"
+                checked={inputContainsGenome}
+                onChange={() => setInputContainsGenome(prev => !prev)}
                 label={(
                   <LabelWithTooltip
-                    label="Reverse reaction"
-                    tooltip="Include the reverse reaction of each recombinase (e.g. excision in addition to integration)"
+                    label="Input contains genome"
+                    tooltip="Select this option if any of the linear input sequences is part of a genome. This will be used to simulate genome integration rather than treating it as a linear DNA sequence"
                   />
                 )}
               />
-            </FormControl>
-            {(anyInputIsLinear && inputSequences.length > 1) && inputContainsGenome !== undefined && (
-              <FormControl fullWidth style={{ textAlign: 'left' }}>
-                <FormControlLabel
-                  control={(
-                    <Checkbox
-                      data-testid="input-contains-genome-checkbox"
-                      checked={inputContainsGenome}
-                      onChange={() => setInputContainsGenome(prev => !prev)}
-                    />
-                  )}
-                  label={(
-                    <LabelWithTooltip
-                      label="Input contains genome"
-                      tooltip="Select this option if any of the linear input sequences is part of a genome. This will be used to simulate genome integration rather than treating it as a linear DNA sequence"
-                    />
-                  )}
-                />
-              </FormControl>
             )}
           </>
         )}
@@ -213,38 +207,26 @@ function SourceAssembly({ source, requestStatus, sendSourceRequest }) {
                 <MenuItem value="LR">LR</MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <FormControlLabel
-                control={<Checkbox checked={gatewaySettings.greedy} onChange={() => setGatewaySettings({ ...gatewaySettings, greedy: !gatewaySettings.greedy })} />}
-                label={(
-                  <LabelWithTooltip label="Greedy attP finder" tooltip="Use a more greedy consensus site to find attP sites (might give false positives)" />
-                )}
-              />
-            </FormControl>
-            <FormControl fullWidth>
-              <FormControlLabel
-                control={<Checkbox checked={!gatewaySettings.onlyMultiSite} onChange={() => setGatewaySettings({ ...gatewaySettings, onlyMultiSite: !gatewaySettings.onlyMultiSite })} />}
-                label={(
-                  <LabelWithTooltip label="Single-site recombination" tooltip={helpSingleSite} />
-                )}
-              />
-            </FormControl>
+            <CheckboxField
+              checked={gatewaySettings.greedy}
+              onChange={() => setGatewaySettings({ ...gatewaySettings, greedy: !gatewaySettings.greedy })}
+              label={<LabelWithTooltip label="Greedy attP finder" tooltip="Use a more greedy consensus site to find attP sites (might give false positives)" />}
+            />
+            <CheckboxField
+              checked={!gatewaySettings.onlyMultiSite}
+              onChange={() => setGatewaySettings({ ...gatewaySettings, onlyMultiSite: !gatewaySettings.onlyMultiSite })}
+              label={<LabelWithTooltip label="Single-site recombination" tooltip={helpSingleSite} />}
+            />
           </>
         )}
         { ['RestrictionAndLigationSource', 'GibsonAssemblySource', 'LigationSource', 'OverlapExtensionPCRLigationSource', 'GatewaySource', 'InFusionSource', 'InVivoAssemblySource'].includes(assemblyType) && (
-          <FormControl fullWidth style={{ textAlign: 'left' }}>
-            <FormControlLabel control={<Checkbox checked={circularOnly} onChange={() => setCircularOnly(!circularOnly)} />} label="Circular assemblies only" />
-          </FormControl>
+          <CheckboxField checked={circularOnly} onChange={() => setCircularOnly(!circularOnly)} label="Circular assemblies only" />
         )}
         { ['LigationSource'].includes(assemblyType) && (
-          <FormControl fullWidth style={{ textAlign: 'left' }}>
-            <FormControlLabel control={<Checkbox checked={allowPartialOverlap} onChange={flipAllowPartialOverlap} />} label="Allow partial overlaps" />
-          </FormControl>
+          <CheckboxField checked={allowPartialOverlap} onChange={flipAllowPartialOverlap} label="Allow partial overlaps" />
         )}
         { (assemblyType === 'LigationSource') && (
-          <FormControl fullWidth style={{ textAlign: 'left' }}>
-            <FormControlLabel control={<Checkbox checked={bluntLigation} onChange={flipBluntLigation} />} label="Blunt ligation" />
-          </FormControl>
+          <CheckboxField checked={bluntLigation} onChange={flipBluntLigation} label="Blunt ligation" />
         )}
 
         {!preventSubmit && (
