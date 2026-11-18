@@ -114,7 +114,7 @@ def align_sanger(
     dseqr = read_dsrecord_from_json(sequence)
     try:
         return align_sanger_traces(dseqr, traces)
-    except RuntimeError as e:
+    except (RuntimeError, ValueError) as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 

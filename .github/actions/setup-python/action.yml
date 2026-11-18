@@ -1,9 +1,9 @@
 name: Set up Python (uv)
-description: Installs uv and Python, and optionally the mafft and MARS binaries the cloning API shells out to.
+description: Installs uv and Python, and optionally the mafft binary the cloning API shells out to.
 
 inputs:
   alignment-tools:
-    description: Install mafft and MARS
+    description: Install mafft
     default: 'false'
 
 runs:
@@ -18,12 +18,9 @@ runs:
         enable-cache: true
         cache-dependency-glob: python/uv.lock
 
-    - name: Install mafft and MARS
+    - name: Install mafft
       if: inputs.alignment-tools == 'true'
       shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y mafft
-        wget -q https://github.com/manulera/MARS/releases/download/v0.2/mars-Linux
-        chmod +x mars-Linux
-        sudo mv mars-Linux /usr/local/bin/mars

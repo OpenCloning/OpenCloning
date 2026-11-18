@@ -81,7 +81,7 @@ docker build -f docker/opencloning.Dockerfile -t manulera/opencloningbackend .
 docker run -d --name backendcontainer -p 8000:8000 manulera/opencloningbackend
 ```
 
-To run with a read-only root filesystem while still allowing temporary files (required for tools like mafft), mount `/tmp` as tmpfs (RAM-backed writable storage).
+To run with a read-only root filesystem while still allowing temporary files, mount `/tmp` as tmpfs (RAM-backed writable storage).
 
 ```bash
 docker run -d --name backendcontainer -p 8000:8000 \
@@ -93,7 +93,7 @@ docker run -d --name backendcontainer -p 8000:8000 \
 If you want to build the test image locally, you can do so by:
 
 ```bash
-docker build -f docker/opencloning.Dockerfile -t manulera/opencloningbackend-test --target builder-test .
+docker build -f docker/opencloning.Dockerfile -t manulera/opencloningbackend-test --target test .
 ```
 
 If you don't want to download the repository and build the image, you can fetch the latest image from dockerhub.

@@ -1,7 +1,7 @@
 [project]
 name = "opencloning-workspace"
 version = "0.0.0"
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 dependencies = [
     "opencloning",
     "opencloning-db",

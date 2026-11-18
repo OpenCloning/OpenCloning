@@ -21,6 +21,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # How the Cypress jobs run the backend containers. Read-only root filesystem with a tmpfs /tmp,
+  # as in production (and docker-compose.ci-tests.yml). Host network: the backend reaches Postgres
+  # and listens on localhost:8000 of the runner.
+  BACKEND_RUN_FLAGS: --network host --read-only --tmpfs /tmp:rw,noexec,nosuid,size=256M
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -149,19 +155,18 @@ jobs:
         with:
           context: python
           file: python/docker/opencloning.Dockerfile
-          target: builder-test
+          target: test
           tags: manulera/opencloningbackend-test
           load: true
       - name: Run tests in the container
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
-        run: >-
-          docker compose
-          -f python/docker/docker-compose.postgres.yml
-          -f python/docker/docker-compose.ci-tests.yml
-          run --rm tests
-          sh -c 'alembic -c packages/opencloning-db/alembic.ini upgrade head && python -m pytest -vs -o cache_dir=/tmp/pytest-cache'
+        # The image has no shell: run the migrations and the tests as two commands
+        run: |
+          compose="docker compose -f python/docker/docker-compose.postgres.yml -f python/docker/docker-compose.ci-tests.yml"
+          $compose run --rm tests alembic -c packages/opencloning-db/alembic.ini upgrade head
+          $compose run --rm tests python -m pytest -vs -o cache_dir=/tmp/pytest-cache
 
   # ---------------------------------------------------------------------------
   # js/
@@ -181,32 +186,64 @@ jobs:
           name: coverage-js-vitest
           path: js/coverage/coverage-final.json
 
+  # The production backend images, which the Cypress jobs run (gunicorn, distroless), so that the
+  # frontend is tested against what is deployed. Built once and passed on as artifacts.
+  backend-images:
+    name: backend image (${{ matrix.target }})
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.js == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [cloning, db]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - name: Build production image
+        uses: docker/build-push-action@v7
+        with:
+          context: python
+          file: python/docker/opencloning.Dockerfile
+          build-args: APP_TARGET=${{ matrix.target }}
+          tags: opencloning-backend:${{ matrix.target }}
+          outputs: type=docker,dest=${{ runner.temp }}/backend-${{ matrix.target }}.tar
+          cache-from: type=gha,scope=backend-${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=backend-${{ matrix.target }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: backend-image-${{ matrix.target }}
+          path: ${{ runner.temp }}/backend-${{ matrix.target }}.tar
+          retention-days: 1
+
   # Some component tests (e.g. enzymes) call the cloning API, so this needs the backend and runs on
   # python/ changes too
   cypress-component:
-    needs: changes
+    needs: [changes, backend-images]
     if: needs.changes.outputs.python == 'true' || needs.changes.outputs.js == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-python
-        with:
-          alignment-tools: 'true'
-      - name: Install Python dependencies
-        working-directory: python
-        run: uv sync --frozen
       - uses: ./.github/actions/setup-js
         with:
           cypress: 'true'
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: backend-image-cloning
+          path: ${{ runner.temp }}
       - name: Start backend (cloning API)
-        working-directory: python
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
           # Cypress serves component tests from Vite's default port (5173), not 3000
           ALLOWED_ORIGINS: http://localhost:5173
-        run: uv run uvicorn opencloning.main:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+        # -e VAR (no value) passes the variable from the step's env
+        run: |
+          docker load -i "$RUNNER_TEMP/backend-cloning.tar"
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS \
+            -e NCBI_API_KEY -e ADDGENE_TOKEN -e ALLOWED_ORIGINS \
+            opencloning-backend:cloning
       - name: Wait for backend
         run: curl -sf --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:8000 > /dev/null
 
@@ -228,6 +265,9 @@ jobs:
           name: cypress-screenshots-component
           path: js/cypress/screenshots
           if-no-files-found: ignore
+      - name: Save backend log
+        if: failure()
+        run: docker logs backend > backend.log 2>&1
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -240,7 +280,7 @@ jobs:
   # ---------------------------------------------------------------------------
   cypress-e2e:
     name: cypress-e2e (${{ matrix.group }})
-    needs: changes
+    needs: [changes, backend-images]
     if: needs.changes.outputs.python == 'true' || needs.changes.outputs.js == 'true'
     runs-on: ubuntu-latest
     strategy:
@@ -263,17 +303,26 @@ jobs:
       # Used by the db/clerk backends and by `db seed`
       OPENCLONING_TESTING: '1'
       OPENCLONING_DB_URL: postgresql+psycopg://dbuser:dbpassword@localhost:5432/opencloning_dev
+      # Backend image: cloning API, or the combined API for db/clerk
+      BACKEND_IMAGE: opencloning-backend:${{ matrix.app == 'cloning' && 'cloning' || 'db' }}
+      # Variables passed to the backend container (-e VAR takes the value from the step's env;
+      # unset ones are left unset)
+      BACKEND_ENV: >-
+        -e NCBI_API_KEY -e ADDGENE_TOKEN -e OPENCLONING_TESTING -e OPENCLONING_DB_URL
+        -e OIDC_TEST_MODE -e OIDC_ISSUER_URL -e OIDC_AUTHORIZED_PARTIES -e OIDC_SUBJECT_CLAIM
+        -e OIDC_EMAIL_CLAIM -e OIDC_NAME_CLAIM -e CLERK_SECRET_KEY
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-python
-        with:
-          alignment-tools: 'true'
-      - name: Install Python dependencies
-        working-directory: python
-        run: uv sync --frozen
       - uses: ./.github/actions/setup-js
         with:
           cypress: 'true'
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: backend-image-${{ matrix.app == 'cloning' && 'cloning' || 'db' }}
+          path: ${{ runner.temp }}
+      - name: Load backend image
+        run: docker load -i "$RUNNER_TEMP"/backend-*.tar
 
       - name: Start Postgres
         if: matrix.app != 'cloning'
@@ -281,25 +330,25 @@ jobs:
 
       - name: Start backend (cloning API)
         if: matrix.app == 'cloning'
-        working-directory: python
         run: |
-          uv run uvicorn opencloning.main:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000" >> "$GITHUB_ENV"
 
       - name: Start backend (combined API, test OIDC)
         if: matrix.app == 'db'
-        working-directory: python
         env:
           OIDC_TEST_MODE: '1'
           OIDC_ISSUER_URL: http://dummy.value.test
         run: |
-          uv run opencloning-cli db seed
-          uv run uvicorn opencloning_db.combined:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run --rm $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
 
       - name: Start backend (combined API, Clerk)
         if: matrix.app == 'clerk'
-        working-directory: python
         env:
           OIDC_TEST_MODE: '0'
           OIDC_ISSUER_URL: ${{ secrets.OIDC_ISSUER_URL }}
@@ -309,8 +358,10 @@ jobs:
           OIDC_NAME_CLAIM: display_name
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
         run: |
-          uv run opencloning-cli db seed
-          uv run uvicorn opencloning_db.combined:app --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run --rm $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
 
       - name: Wait for backend
@@ -341,6 +392,9 @@ jobs:
           name: cypress-screenshots-${{ matrix.group }}
           path: js/cypress/screenshots
           if-no-files-found: ignore
+      - name: Save backend log
+        if: failure()
+        run: docker logs backend > backend.log 2>&1
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

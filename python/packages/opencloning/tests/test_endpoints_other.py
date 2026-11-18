@@ -173,7 +173,7 @@ class AlignSangerTest(unittest.TestCase):
         seq = Dseqrecord('ACGT', circular=True)
         json_seq = format_sequence_genbank(seq)
         json_seq.id = 0
-        response = client.post('/align_sanger', json={'sequence': json_seq.model_dump(), 'traces': ['ACGT']})
+        response = client.post('/align_sanger', json={'sequence': json_seq.model_dump(), 'traces': ['helloworld']})
         assert response.status_code == 400
 
 

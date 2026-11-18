@@ -5,7 +5,7 @@ description = "Backend of OpenCloning, a web application to generate molecular c
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 dependencies = [
     "beautifulsoup4>=4.15.0,<5",
     "biopython>=1.87",
@@ -13,7 +13,6 @@ dependencies = [
     "fastapi>=0.162.7",
     "httpx2>=2.16.0",
     "networkx>=3.6.1",
-    "numpy>=2.4.4",
     "opencloning-linkml>=1.0.0",
     "python-multipart>=0.0.26",
     "uvicorn>=0.44.0",
@@ -29,6 +28,7 @@ dependencies = [
     "gunicorn>=27.0.1",
     "python-json-logger>=4.2.0,<5",
     "uvicorn-worker>=0.4.0,<0.5",
+    "edlib>=1.3.9",
 ]
 
 [project.urls]
