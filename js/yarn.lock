@@ -10637,8 +10637,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "syntax-builder@workspace:apps/syntax-builder"
   dependencies:
-    "@mui/material": "npm:^9.5.0"
     "@mui/icons-material": "npm:^9.5.0"
+    "@mui/material": "npm:^9.5.0"
     "@mui/x-data-grid": "npm:^9.18.0"
     "@opencloning/ui": "workspace:*"
     "@opencloning/utils": "workspace:*"
