@@ -1,19 +1,18 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControl, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControl } from '@mui/material';
 import { openCloningDBHttpClient, endpoints, SequenceSelect } from '@opencloning/opencloningdb';
 import SampleSelect from './SampleSelect';
 import useSampleMutation from '../hooks/useSampleMutation';
 
 /**
  * Move a sample (and its sequencing files) to another sequence, e.g. a sample planned as one sequence that turned
- * out to be another one when sequenced. The move is kept in the sample history of both sequences.
+ * out to be another one when sequenced.
  * With sample, the sample is fixed and the user picks the target sequence; without it, the user picks a sample
  * of another sequence to move it to sequenceId.
  */
 function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
   const [selectedSample, setSelectedSample] = React.useState(null);
   const [targetSequence, setTargetSequence] = React.useState(null);
-  const [note, setNote] = React.useState('');
 
   const movedSample = sample ?? selectedSample;
   const target = sample ? targetSequence : { id: sequenceId };
@@ -21,13 +20,12 @@ function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
   const handleClose = () => {
     setSelectedSample(null);
     setTargetSequence(null);
-    setNote('');
     onClose();
   };
 
   const transferMutation = useSampleMutation({
     mutationFn: async () => {
-      const body = { sequence_id: target.id, note: note.trim() || null };
+      const body = { sequence_id: target.id };
       const { data } = await openCloningDBHttpClient.post(endpoints.sequenceSampleReassign(movedSample.uid), body);
       return data;
     },
@@ -49,22 +47,12 @@ function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
             : <SampleSelect value={selectedSample} onChange={setSelectedSample} filter={excludeOwnSamples} />}
         </FormControl>
         {movedSample && target && (
-          <>
-            <Typography sx={{ mt: 2 }}>
-              Are you sure you want to transfer UID <strong>{movedSample.uid}</strong>
-              {!sample && <> from sequence <strong>{movedSample.sequence?.name ?? movedSample.sequence_id}</strong></>}
-              {sample ? <> to sequence <strong>{target.name}</strong>?</> : ' to this one?'}
-              {' '}Its sequencing files are moved with it.
-            </Typography>
-            <TextField
-              fullWidth
-              sx={{ mt: 2 }}
-              label="Note (optional)"
-              placeholder="e.g. point mutation found by sequencing"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </>
+          <Typography sx={{ mt: 2 }}>
+            Are you sure you want to transfer UID <strong>{movedSample.uid}</strong>
+            {!sample && <> from sequence <strong>{movedSample.sequence?.name ?? movedSample.sequence_id}</strong></>}
+            {sample ? <> to sequence <strong>{target.name}</strong>?</> : ' to this one?'}
+            {' '}Its sequencing files are moved with it.
+          </Typography>
         )}
       </DialogContent>
       <DialogActions>

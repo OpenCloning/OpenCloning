@@ -39,11 +39,9 @@ from opencloning_db.apimodels import (
     SequenceUpdate,
     SequenceWithTextFile,
     SequencingFileRef,
-    SequenceInstanceReassignmentRef,
     PrimerRef,
     line_ref,
     primer_ref,
-    reassignment_ref,
     sequence_ref,
     sequencing_file_ref,
 )
@@ -54,7 +52,6 @@ from opencloning_db.models import (
     Sequence,
     SequenceInLine,
     SequenceInstance,
-    SequenceInstanceReassignment,
     Source,
     SequenceType,
     Tag,
@@ -296,16 +293,6 @@ def delete_sequence(
             raise HTTPException(status_code=409, detail='Cannot delete sequence: it has child sequences.')
         if any(isinstance(instance, SequenceInLine) for instance in db_sequence.instances):
             raise HTTPException(status_code=409, detail='Cannot delete sequence: it is present in a line.')
-    moved_away = session.scalar(
-        select(SequenceInstanceReassignment.id)
-        .where(SequenceInstanceReassignment.from_sequence_id == sequence_id)
-        .limit(1)
-    )
-    if moved_away is not None:
-        raise HTTPException(
-            status_code=409,
-            detail='Cannot delete sequence: a sample was moved from it to another sequence (see the sample history).',
-        )
 
     session.delete(db_sequence)
     session.commit()
@@ -825,26 +812,6 @@ def get_sequence_sequencing_files(
     )
     db_sequence = require_real_sequence(db_sequence, detail='sequencing_files endpoint only supports real sequences.')
     return [sequencing_file_ref(f) for f in db_sequence.sequencing_files]
-
-
-@router.get('/sequences/{sequence_id}/sample_history', response_model=List[SequenceInstanceReassignmentRef])
-def get_sequence_sample_history(
-    sequence_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
-):
-    """Samples moved to or from this sequence (e.g. planned as one sequence, but sequencing showed another),
-    oldest first."""
-    current_user, session, workspace_id = ctx.destructure()
-    get_sequence_in_workspace_for_user(session, current_user, workspace_id, sequence_id, WorkspaceRole.viewer)
-    reassignments = session.scalars(
-        select(SequenceInstanceReassignment)
-        .where(
-            (SequenceInstanceReassignment.from_sequence_id == sequence_id)
-            | (SequenceInstanceReassignment.to_sequence_id == sequence_id)
-        )
-        .order_by(SequenceInstanceReassignment.id)
-    ).all()
-    return [reassignment_ref(r) for r in reassignments]
 
 
 def _bulk_samples(

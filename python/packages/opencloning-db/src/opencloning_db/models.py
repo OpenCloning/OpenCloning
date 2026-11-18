@@ -652,59 +652,18 @@ class SequenceInstance(Base):
     sequencing_files: Mapped[List['SequencingFile']] = relationship(
         back_populates='instance', cascade='all, delete-orphan', order_by='SequencingFile.id'
     )
-    reassignments: Mapped[List['SequenceInstanceReassignment']] = relationship(
-        back_populates='instance', cascade='all, delete-orphan', order_by='SequenceInstanceReassignment.id'
-    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'sequence_instance',
     }
 
-    def reassign(self, sequence: 'BaseSequence', *, user_id: int, note: Optional[str] = None) -> None:
-        """Point the instance to another sequence, keeping a record of the sequence it pointed to before."""
-        self.reassignments.append(
-            SequenceInstanceReassignment(
-                from_sequence_id=self.sequence_id,
-                to_sequence=sequence,
-                created_by_id=user_id,
-                note=note,
-            )
-        )
-        self.sequence = sequence
-
-
-class SequenceInstanceReassignment(Base):
-    """
-    Record of an instance being re-pointed from one sequence to another, e.g. a sample that was planned
-    as one sequence and turned out to be another one when sequenced. Rows are never updated.
-    """
-
-    __tablename__ = 'sequence_instance_reassignment'
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    sequence_instance_id: Mapped[int] = mapped_column(ForeignKey('sequence_instance.id'), nullable=False)
-    from_sequence_id: Mapped[int] = mapped_column(ForeignKey('base_sequence.id'), nullable=False)
-    to_sequence_id: Mapped[int] = mapped_column(ForeignKey('base_sequence.id'), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-    )
-    created_by_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
-    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-
-    instance: Mapped['SequenceInstance'] = relationship(back_populates='reassignments')
-    from_sequence: Mapped['BaseSequence'] = relationship(foreign_keys=[from_sequence_id])
-    to_sequence: Mapped['BaseSequence'] = relationship(foreign_keys=[to_sequence_id])
-    created_by: Mapped['User'] = relationship(foreign_keys=[created_by_id])
-
 
 class SequenceSample(SequenceInstance):
     """
     A physical lab sample with a user-defined UID pointing to the sequence the
     user considers correct. UID is assigned before sequencing; after sequencing
-    it can be re-pointed to a corrected sequence with SequenceInstance.reassign.
+    it can be re-pointed to a corrected sequence.
     """
 
     __tablename__ = 'sequence_sample'

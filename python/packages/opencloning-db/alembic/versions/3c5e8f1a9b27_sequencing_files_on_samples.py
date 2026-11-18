@@ -1,5 +1,4 @@
-"""Sequencing files belong to sequence instances (samples), samples get a location, creator and creation date,
-and instances keep a history of the sequences they pointed to
+"""Sequencing files belong to sequence instances (samples), samples get a location, creator and creation date
 
 Revision ID: 3c5e8f1a9b27
 Revises: eae106d3b1d2
@@ -126,22 +125,6 @@ def upgrade() -> None:
     op.alter_column('sequence_sample', 'created_by_id', nullable=False)
     op.create_foreign_key('sequence_sample_created_by_id_fkey', 'sequence_sample', 'user', ['created_by_id'], ['id'])
 
-    op.create_table(
-        'sequence_instance_reassignment',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column('sequence_instance_id', sa.Integer(), nullable=False),
-        sa.Column('from_sequence_id', sa.Integer(), nullable=False),
-        sa.Column('to_sequence_id', sa.Integer(), nullable=False),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.Column('created_by_id', sa.Integer(), nullable=False),
-        sa.Column('note', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['sequence_instance_id'], ['sequence_instance.id']),
-        sa.ForeignKeyConstraint(['from_sequence_id'], ['base_sequence.id']),
-        sa.ForeignKeyConstraint(['to_sequence_id'], ['base_sequence.id']),
-        sa.ForeignKeyConstraint(['created_by_id'], ['user.id']),
-        sa.PrimaryKeyConstraint('id'),
-    )
-
     # Sequencing files: from sequences to sequence instances
     op.add_column('sequencing_file', sa.Column('sequence_instance_id', sa.Integer(), nullable=True))
     _assign_files_to_samples(conn)
@@ -215,8 +198,6 @@ def downgrade() -> None:
     op.create_unique_constraint(
         'uq_sequencefile_sequenceid_originalname', 'sequencing_file', ['sequence_id', 'original_name']
     )
-
-    op.drop_table('sequence_instance_reassignment')
 
     op.drop_constraint('sequence_sample_created_by_id_fkey', 'sequence_sample', type_='foreignkey')
     op.drop_column('sequence_sample', 'created_by_id')

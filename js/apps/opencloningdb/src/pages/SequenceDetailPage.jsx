@@ -22,7 +22,6 @@ import useAppAlerts from '../hooks/useAppAlerts';
 import useSequencingAlignment from '@opencloning/ui/hooks/useSequencingAlignment';
 import { QueryStatusWrapper } from '@opencloning/ui';
 import SequenceSamplesSection from '../components/SequenceSamplesSection';
-import SampleHistorySection from '../components/SampleHistorySection';
 import useUpdateAnnotationMutation from '../hooks/useUpdateAnnotationMutation';
 import DetailTable from '../components/DetailTable';
 import error2String from '@opencloning/utils/error2String';
@@ -193,7 +192,6 @@ function SequenceDetailPage() {
         onSeeAlignments={isTemplateSequence ? null : () => handleSeeAlignmentsMutation.mutate()}
         alignmentLoading={handleSeeAlignmentsMutation.isPending || alignmentMutation.isPending || sequencingFilesQuery.isFetching}
       />
-      <SampleHistorySection sequenceId={id} />
       {sequenceInDb.type !== 'template_sequence' && (
         <DetailPageSection title="Provenance" data-testid="sequence-provenance">
           <Typography color="text.secondary" sx={{ mb: 1 }}>

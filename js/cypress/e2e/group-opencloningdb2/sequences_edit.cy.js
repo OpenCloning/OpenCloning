@@ -107,24 +107,14 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       cy.get('[aria-label="Transfer UID from another sequence"]').click();
       cy.setAutocompleteValue('Search UIDs', 'cre_lox_recombination-sample', 'body', false);
       cy.contains('Are you sure you want to transfer UID cre_lox_recombination-sample from sequence reconstituted_locus to this one').should('exist');
-      cy.get('[data-testid="transfer-sample-dialog"]').within(() => {
-        cy.get('label').contains('Note').siblings('div').find('input').type('wrong sequence');
-        cy.contains('button', 'Confirm').click();
-      });
+      cy.get('[data-testid="transfer-sample-dialog"]').contains('button', 'Confirm').click();
       cy.wait('@transferSample').then(({ request }) => {
-        expect(request.body).to.deep.equal({ sequence_id: sequence.id, note: 'wrong sequence' });
+        expect(request.body).to.deep.equal({ sequence_id: sequence.id });
       });
       cy.get('[data-testid="sequence-samples-section"]').contains('cre_lox_recombination-sample').should('exist');
       cy.get('[data-testid="sequence-samples-section"]').contains('example_sequencing-sample').should('exist');
       cy.dbAlertExists('UID transferred successfully');
       cy.closeDbAlerts();
-      // The move is in the sample history
-      cy.get('[data-testid="sample-history-row"]').should('have.length', 1).first().within(() => {
-        cy.contains('cre_lox_recombination-sample').should('exist');
-        cy.contains('reconstituted_locus').should('exist');
-        cy.contains('this sequence').should('exist');
-        cy.contains('wrong sequence').should('exist');
-      });
 
       cy.get('[aria-label="Add new UIDs"]').click();
       cy.get('[data-testid="create-sequence-sample-uid-dialog"]').should('be.visible');
@@ -173,10 +163,10 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.dbAlertExists('UID transferred successfully');
     cy.closeDbAlerts();
     cy.get('[data-testid="sequence-samples-section"]').contains('example_sequencing-sample').should('not.exist');
-    cy.get('[data-testid="sample-history-row"]').contains('pFA6a-5FLAG').click();
+    cy.visit('/sequences?name=pFA6a-5FLAG');
+    cy.get('tbody tr button').contains('pFA6a-5FLAG').click();
     cy.get('[data-testid="sequence-header"]').contains('pFA6a-5FLAG').should('exist');
     cy.get('[data-testid="sample-block"]').filter(':contains(example_sequencing-sample)').find('[data-testid="sequencing-file-row"]').should('have.length.greaterThan', 0);
-    cy.get('[data-testid="sample-history-row"]').contains('pREX0008').should('exist');
   });
   it('can change name but not sequence type in circular sequence', () => {
 

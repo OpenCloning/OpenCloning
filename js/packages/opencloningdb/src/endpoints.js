@@ -14,7 +14,6 @@ const endpoints = {
   sequenceChangeCircularity: (id) => `/sequences/${e(id)}/change_circularity`,
   sequencePrimers: (id) => `/sequences/${e(id)}/primers`,
   sequenceSequencingFiles: (id) => `/sequences/${e(id)}/sequencing_files`,
-  sequenceSampleHistory: (id) => `/sequences/${e(id)}/sample_history`,
   sequencingFilesBulk: '/sequences/sequencing_files/bulk',
   sequenceSearch: '/sequences/search',
   sequencesBySeguid: (seguid) => `/sequences/by-seguid/${e(seguid)}`,

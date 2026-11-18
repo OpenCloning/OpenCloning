@@ -14,7 +14,6 @@ from opencloning_db.models import (
     Primer,
     Line,
     SequenceInLine,
-    SequenceInstanceReassignment,
     SequenceSample,
     SequencingFile,
     WorkspaceRole,
@@ -93,7 +92,6 @@ class SequenceSampleUpdate(ApiModel):
 
 class SequenceSampleReassign(ApiModel):
     sequence_id: int
-    note: StrippedStr | None = None
 
 
 class SequenceSampleRead(ApiModel):
@@ -277,16 +275,6 @@ class SequenceSampleWithSequence(ApiModel):
     created_by: UserRef
 
 
-class SequenceInstanceReassignmentRef(ApiModel):
-    id: int
-    sample_uid: str | None
-    from_sequence: SequenceRef
-    to_sequence: SequenceRef
-    note: str | None
-    created_at: datetime
-    created_by: UserRef
-
-
 # --- Line ---
 class SequenceInLineRef(ApiModel):
     """Sequence in a line, including the SequenceInLine instance id."""
@@ -402,19 +390,6 @@ def sequence_sample_with_sequence(sample: SequenceSample) -> SequenceSampleWithS
         sequencing_files=[sequencing_file_ref(f) for f in sample.sequencing_files],
         created_at=sample.created_at,
         created_by=_user_ref(sample.created_by),
-    )
-
-
-def reassignment_ref(reassignment: SequenceInstanceReassignment) -> SequenceInstanceReassignmentRef:
-    instance = reassignment.instance
-    return SequenceInstanceReassignmentRef(
-        id=reassignment.id,
-        sample_uid=instance.uid if isinstance(instance, SequenceSample) else None,
-        from_sequence=sequence_ref(reassignment.from_sequence),
-        to_sequence=sequence_ref(reassignment.to_sequence),
-        note=reassignment.note,
-        created_at=reassignment.created_at,
-        created_by=_user_ref(reassignment.created_by),
     )
 
 

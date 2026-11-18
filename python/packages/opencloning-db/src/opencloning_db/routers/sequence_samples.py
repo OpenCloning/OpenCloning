@@ -180,7 +180,7 @@ def reassign_sequence_sample(
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
     """Point a sample to another sequence (e.g. the sequence found by sequencing it), together with its
-    sequencing files. The sequence it pointed to is kept in the sample history."""
+    sequencing files."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
     sequence = get_sequence_in_workspace_for_user(
@@ -192,7 +192,7 @@ def reassign_sequence_sample(
         require_real_sequence(
             sequence, detail='Samples with sequencing files cannot point to a template sequence.', status_code=400
         )
-    ps.reassign(sequence, user_id=current_user.id, note=body.note or None)
+    ps.sequence = sequence
     session.commit()
     session.refresh(ps)
     return sequence_sample_read(ps)

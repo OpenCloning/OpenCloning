@@ -482,14 +482,14 @@ def _upload(client, headers, uid, *names):
     )
 
 
-def test_reassign_sequence_sample_moves_files_and_keeps_history(seq_samples_client):
+def test_reassign_sequence_sample_moves_files(seq_samples_client):
     c = seq_samples_client['client']
     headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
     uid = seq_samples_client['sample_w1_uid']
     planned, actual = seq_samples_client['seq_w1_id'], seq_samples_client['seq_w1_actual_id']
     assert _upload(c, headers, uid, 'a.ab1', 'b.ab1').status_code == 200
 
-    r = c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual, 'note': ' SNP '})
+    r = c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual})
     assert r.status_code == 200, r.text
     assert r.json()['sequence_id'] == actual
 
@@ -497,21 +497,6 @@ def test_reassign_sequence_sample_moves_files_and_keeps_history(seq_samples_clie
     assert c.get(f'/sequences/{planned}/sequencing_files', headers=headers).json() == []
     files = c.get(f'/sequences/{actual}/sequencing_files', headers=headers).json()
     assert [(f['sample_uid'], f['original_name']) for f in files] == [(uid, 'a.ab1'), (uid, 'b.ab1')]
-
-    # Both sequences show the history
-    for sequence_id in (planned, actual):
-        history = c.get(f'/sequences/{sequence_id}/sample_history', headers=headers).json()
-        assert len(history) == 1
-        assert history[0]['sample_uid'] == uid
-        assert history[0]['from_sequence']['id'] == planned
-        assert history[0]['to_sequence']['id'] == actual
-        assert history[0]['note'] == 'SNP'
-        assert history[0]['created_by']['id'] == seq_samples_client['owner_w1_id']
-
-    # The planned sequence cannot be deleted anymore, as the history refers to it
-    r = c.delete(f'/sequences/{planned}', headers=headers)
-    assert r.status_code == 409
-    assert 'sample history' in r.json()['detail']
 
     # Reassigning to the same sequence fails
     r = c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual})
@@ -525,24 +510,9 @@ def test_reassign_sequence_sample_moves_files_and_keeps_history(seq_samples_clie
     )
     assert r.status_code == 400
 
-    # Deleting the sample removes its history, then the planned sequence can be deleted
-    assert c.delete(f'/sequence_samples/{uid}', headers=headers).status_code == 200
-    assert c.get(f'/sequences/{actual}/sample_history', headers=headers).json() == []
+    # The sequence the sample was moved from can be deleted
     assert c.delete(f'/sequences/{planned}', headers=headers).status_code == 200
-
-
-def test_delete_sequence_with_sample_history_pointing_to_it(seq_samples_client):
-    """A sequence a sample was moved to can be deleted (the sample and its history go with it)."""
-    c = seq_samples_client['client']
-    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
-    uid = seq_samples_client['sample_w1_uid']
-    actual = seq_samples_client['seq_w1_actual_id']
-    assert (
-        c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual}).status_code == 200
-    )
-    assert c.delete(f'/sequences/{actual}', headers=headers).status_code == 200
-    assert c.get(f'/sequence_samples/{uid}', headers=headers).status_code == 404
-    assert c.get(f"/sequences/{seq_samples_client['seq_w1_id']}/sample_history", headers=headers).json() == []
+    assert c.get(f'/sequence_samples/{uid}', headers=headers).status_code == 200
 
 
 @readonly_db
