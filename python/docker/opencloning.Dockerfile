@@ -7,14 +7,16 @@
 # CI tests:                docker build -f docker/opencloning.Dockerfile --target test .
 #
 # The production and test images are distroless: no shell or package manager. The test image
-# runs on the same base and interpreter as production, only with a different venv. Use
-# --build-arg RUNTIME_TAG=debug-nonroot to get a busybox shell when troubleshooting.
+# runs on the same base and interpreter as production, only with a different venv. To get a
+# busybox shell when troubleshooting, build locally with the runtime tag changed to debug-nonroot.
+#
+# Base images are pinned by digest (multi-arch index) for reproducible builds; Dependabot
+# (docker ecosystem) bumps the digests.
 
 ARG APP_TARGET="cloning"
-ARG RUNTIME_TAG="nonroot"
 
 # BUILDER — shared setup
-FROM python:3.12-slim-bookworm AS base-setup
+FROM python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df AS base-setup
 
 # Build toolchain for deps without prebuilt wheels on some platforms
 # (e.g. edlib and primer3-py on linux/aarch64, which need gcc/g++/make).
@@ -34,7 +36,7 @@ WORKDIR /home/backend
 ENV UV_COMPILE_BYTECODE=1
 
 # Keep in sync with the uv version in .github/actions/setup-python and .devcontainer/Dockerfile
-COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490 /uv /uvx /usr/local/bin/
 
 # Python itself comes from uv (python-build-standalone), installed under /home/backend/python,
 # so that the production stage can copy the interpreter together with the venv (its
@@ -97,7 +99,7 @@ FROM builder-prod-${APP_TARGET} AS builder-selected
 # RUNTIME — shared by the production and test images
 # cc = glibc + libstdc++/libgcc (needed by compiled wheels like edlib, primer3-py, numpy),
 # plus ca-certificates and tzdata. Same Debian release as the builder (bookworm).
-FROM gcr.io/distroless/cc-debian12:${RUNTIME_TAG} AS runtime
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57b217585af0786db3845d1f0ec1a0dd182f AS runtime
 
 WORKDIR /home/backend
 COPY --from=base-setup /runtime-libs/ /

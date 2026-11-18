@@ -21,6 +21,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # How the Cypress jobs run the backend containers. Read-only root filesystem with a tmpfs /tmp,
+  # as in production (and docker-compose.ci-tests.yml). Host network: the backend reaches Postgres
+  # and listens on localhost:8000 of the runner.
+  BACKEND_RUN_FLAGS: --network host --read-only --tmpfs /tmp:rw,noexec,nosuid,size=256M
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -231,11 +237,11 @@ jobs:
           ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
           # Cypress serves component tests from Vite's default port (5173), not 3000
           ALLOWED_ORIGINS: http://localhost:5173
-        # -e VAR (no value) passes the variable from the step's env. Host network: the backend
-        # listens on localhost:8000 of the runner
+        # -e VAR (no value) passes the variable from the step's env
         run: |
           docker load -i "$RUNNER_TEMP/backend-cloning.tar"
-          docker run -d --name backend --network host \
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS \
             -e NCBI_API_KEY -e ADDGENE_TOKEN -e ALLOWED_ORIGINS \
             opencloning-backend:cloning
       - name: Wait for backend
@@ -300,7 +306,7 @@ jobs:
       # Backend image: cloning API, or the combined API for db/clerk
       BACKEND_IMAGE: opencloning-backend:${{ matrix.app == 'cloning' && 'cloning' || 'db' }}
       # Variables passed to the backend container (-e VAR takes the value from the step's env;
-      # unset ones are left unset). Host network: it reaches Postgres and listens on localhost.
+      # unset ones are left unset)
       BACKEND_ENV: >-
         -e NCBI_API_KEY -e ADDGENE_TOKEN -e OPENCLONING_TESTING -e OPENCLONING_DB_URL
         -e OIDC_TEST_MODE -e OIDC_ISSUER_URL -e OIDC_AUTHORIZED_PARTIES -e OIDC_SUBJECT_CLAIM
@@ -325,7 +331,8 @@ jobs:
       - name: Start backend (cloning API)
         if: matrix.app == 'cloning'
         run: |
-          docker run -d --name backend --network host $BACKEND_ENV "$BACKEND_IMAGE"
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000" >> "$GITHUB_ENV"
 
       - name: Start backend (combined API, test OIDC)
@@ -334,8 +341,10 @@ jobs:
           OIDC_TEST_MODE: '1'
           OIDC_ISSUER_URL: http://dummy.value.test
         run: |
-          docker run --rm --network host $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
-          docker run -d --name backend --network host $BACKEND_ENV "$BACKEND_IMAGE"
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run --rm $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
 
       - name: Start backend (combined API, Clerk)
@@ -349,8 +358,10 @@ jobs:
           OIDC_NAME_CLAIM: display_name
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
         run: |
-          docker run --rm --network host $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
-          docker run -d --name backend --network host $BACKEND_ENV "$BACKEND_IMAGE"
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run --rm $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE" opencloning-cli db seed
+          # shellcheck disable=SC2086 # the flag variables are split into words on purpose
+          docker run -d --name backend $BACKEND_RUN_FLAGS $BACKEND_ENV "$BACKEND_IMAGE"
           echo "HEALTH_URL=http://127.0.0.1:8000/db/docs" >> "$GITHUB_ENV"
 
       - name: Wait for backend
