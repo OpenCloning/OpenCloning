@@ -5,7 +5,7 @@ description = "Backend of OpenCloning, a web application to generate molecular c
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 dependencies = [
     "beautifulsoup4>=4.15.0,<5",
     "biopython>=1.87",

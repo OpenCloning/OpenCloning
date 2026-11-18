@@ -5,7 +5,7 @@ description = "Proof of concept MCP server to build OpenCloning cloning strategi
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 dependencies = [
     "opencloning",
     "opencloning-linkml>=1.0.0",
