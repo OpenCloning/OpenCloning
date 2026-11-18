@@ -4,6 +4,7 @@ import { convertToTeselaJson, parseHistoryFile } from '@opencloning/utils/readNw
 import { getIdsOfSequencesWithoutChildSource } from '@opencloning/store/cloning_utils';
 import useCloningHistoryLoader from './useCloningHistoryLoader';
 import useDatabase from './useDatabase';
+import useLoadingTask from './useLoadingTask';
 import { useStore } from 'react-redux';
 
 export default function useLoadDatabaseFile({ source, sendSourceRequest, setHistoryFileError }) {
@@ -11,8 +12,9 @@ export default function useLoadDatabaseFile({ source, sendSourceRequest, setHist
   const store = useStore();
   const database = useDatabase();
   const { applyCloningStrategy } = useCloningHistoryLoader();
+  const withLoading = useLoadingTask();
 
-  const loadDatabaseFile = async (file, databaseId, ancestors = false) => {
+  const loadFile = async (file, databaseId, ancestors = false) => {
     if (file.name.endsWith('.json')) {
       let cloningStrategy;
       try {
@@ -90,6 +92,14 @@ export default function useLoadDatabaseFile({ source, sendSourceRequest, setHist
       const modifySource = (s) => ({ ...s, database_id: databaseId });
       sendSourceRequest({ endpoint: 'read_from_file', requestData, config, source, modifySource });
     }
+  };
+  const loadDatabaseFile = async (file, databaseId, ancestors = false) => {
+    // History files are fetched/validated here, so block the UI. Sequence files go through
+    // sendSourceRequest, which shows its own loading state in the source.
+    if (file.name.endsWith('.json')) {
+      return withLoading(() => loadFile(file, databaseId, ancestors), 'Loading from database...');
+    }
+    return loadFile(file, databaseId, ancestors);
   };
   return { loadDatabaseFile };
 }

@@ -1,6 +1,7 @@
 
 import React from 'react'
-import { Button } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
+import { useMutation } from '@tanstack/react-query';
 import useCloningAlerts from '@opencloning/ui/hooks/useCloningAlerts';
 import useLoadDatabaseFile from '@opencloning/ui/hooks/useLoadDatabaseFile';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
@@ -10,16 +11,13 @@ import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
 
 const { addPrimer, deleteSourceAndItsChildren } = cloningActions;
 
-function AddToCloningButton({ selectedEntities, children, entityType, ...rest }) {
+function AddToCloningButton({ selectedEntities, children, entityType, disabled, ...rest }) {
 
   const { addAlert } = useCloningAlerts();
   const setHistoryFileError = (e) => addAlert({ message: e, severity: 'error' });
   const { loadDatabaseFile } = useLoadDatabaseFile({ source: null, sendSourceRequest: null, setHistoryFileError });
   const dispatch = useDispatch();
   const store = useStore();
-  if (selectedEntities.length < 1) {
-    return null;
-  }
   const handleAddEntity = async (seqId) => {
     try {
       if (entityType === 'sequence') {
@@ -36,7 +34,7 @@ function AddToCloningButton({ selectedEntities, children, entityType, ...rest })
       setHistoryFileError(error?.response?.data?.detail || error?.message || 'Failed to add to design tab');
     }
   };
-  const handleAddEntities = async () => {
+  const addEntities = async () => {
     const prevState = store.getState().cloning;
     const emptySource = getEmptyPlaceholderSource(prevState.sources)
     const promises = selectedEntities.filter((entity) => entity.type !== 'template_sequence').map((entity) => handleAddEntity(entity.id));
@@ -46,8 +44,22 @@ function AddToCloningButton({ selectedEntities, children, entityType, ...rest })
     }
   };
 
+  // Errors are reported per entity in handleAddEntity, so this never rejects
+  const { mutate, isPending } = useMutation({ mutationFn: addEntities });
+
+  if (selectedEntities.length < 1) {
+    return null;
+  }
+
   return (
-    <Button variant="contained" color="primary" onClick={handleAddEntities} {...rest}>
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => mutate()}
+      disabled={disabled || isPending}
+      startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : null}
+      {...rest}
+    >
       {children}
     </Button>
   )

@@ -11,6 +11,7 @@ import DataModelDisplayer from './DataModelDisplayer';
 import CloningHistory from './CloningHistory';
 import SequenceTab from './SequenceTab';
 import AppAlerts from './AppAlerts';
+import LoadingBackdrop from './LoadingBackdrop';
 import Assembler from './assembler/Assembler';
 import { useConfig } from '../hooks/useConfig';
 import useCloningAlerts from '../hooks/useCloningAlerts';
@@ -78,6 +79,7 @@ function OpenCloning({ themeOptions }) {
         </Tabs>
         <Box className="tab-panels-container" ref={tabPanelsRef} sx={{ height: '100%', overflow: 'auto', textAlign: 'center' }}>
           <AppAlerts reducerName="cloning" removeAlert={removeAlert} />
+          <LoadingBackdrop />
           <TabPanel index={1} value={currentTab} className="primer-tab-pannel">
             <div className="primer-list-container">
               <PrimerList />

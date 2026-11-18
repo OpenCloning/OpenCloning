@@ -8,6 +8,7 @@ import { cloningActions } from '@opencloning/store/cloning';
 import useCloningAlerts from '../hooks/useCloningAlerts';
 import { cloneDeep } from 'lodash-es';
 import useBackendHttpClient from '../hooks/useBackendHttpClient';
+import useLoadingTask from '../hooks/useLoadingTask';
 
 const { setState: setCloningState } = cloningActions;
 
@@ -20,7 +21,8 @@ function useLocateSequencesInDatabaseAction() {
   const url = 'normalize_cloning_strategy';
 
   const { addAlert } = useCloningAlerts();
-  const main = React.useCallback(async () => {
+  const withLoading = useLoadingTask();
+  const locateSequences = React.useCallback(async () => {
     const { sequences: seqState, sources: srcState, primers, description } = store.getState().cloning;
     let sequences = cloneDeep(seqState);
     let sources = cloneDeep(srcState);
@@ -79,6 +81,16 @@ function useLocateSequencesInDatabaseAction() {
     //   console.log(result);
     // }
   }, [database, store, dispatch, addAlert, httpClient, url]);
+
+  // Block the UI: the state is read at the start and replaced at the end, so edits made meanwhile would be lost
+  const main = React.useCallback(async () => {
+    try {
+      await withLoading(locateSequences, 'Synchronizing sequences with database...');
+    } catch (e) {
+      console.error(e);
+      addAlert({ message: 'Could not synchronize sequences with the database', severity: 'error' });
+    }
+  }, [withLoading, locateSequences, addAlert]);
   return main;
 }
 function CloningSpeedDial() {

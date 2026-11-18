@@ -6,6 +6,7 @@ import useLoadDatabaseFile from './useLoadDatabaseFile';
 import useCloningAlerts from './useCloningAlerts';
 import useValidateState from './useValidateState';
 import useCloningHistoryLoader from './useCloningHistoryLoader';
+import useLoadingTask from './useLoadingTask';
 import { formatSequenceLocationString, getUrlParameters } from '@opencloning/utils/other';
 import { formatTemplate } from '@opencloning/utils/readNwrite';
 import { encodePathSegment } from '@opencloning/utils/urlUtils';
@@ -31,18 +32,19 @@ export default function useUrlParamsLoader() {
   const { loadDatabaseFile } = useLoadDatabaseFile({ source: { id: 1 }, sendSourceRequest: null, setHistoryFileError });
   const validateState = useValidateState();
   const { applyCloningStrategy, loadHistoryFromFile } = useCloningHistoryLoader();
+  const withLoading = useLoadingTask();
 
   useEffect(() => {
-    async function loadSequenceFromUrlParams() {
-      const urlParams = getUrlParameters();
+    const urlParams = getUrlParameters();
 
+    async function loadSequenceFromUrlParams() {
       if (urlParams.source === 'database') {
         try {
           if (!database) {
             return;
           }
           const { file, databaseId } = await database.loadSequenceFromUrlParams(urlParams);
-          loadDatabaseFile(file, databaseId);
+          await loadDatabaseFile(file, databaseId);
         } catch (error) {
           addAlert({
             message: 'Error loading sequence from URL parameters',
@@ -173,7 +175,10 @@ export default function useUrlParamsLoader() {
         dispatch(updateSource(source));
       }
     }
-    loadSequenceFromUrlParams();
+    if (urlParams.source) {
+      // Block the UI until the load ends, so that the user does not start working on a state that will be replaced
+      withLoading(loadSequenceFromUrlParams, 'Loading from URL...');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

@@ -6,6 +6,7 @@ import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
 import { cloningActions } from '@opencloning/store/cloning';
 import HistoryLoadedDialog from './HistoryLoadedDialog';
 import useBackendHttpClient from '../hooks/useBackendHttpClient';
+import useLoadingTask from '../hooks/useLoadingTask';
 
 const { deleteSourceAndItsChildren, addSourceAndItsOutputSequence } = cloningActions;
 
@@ -60,6 +61,7 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
   const httpClient = useBackendHttpClient();
   const { loadHistoryFromFile, loadSnapgeneHistory } = useCloningHistoryLoader();
   const [fileLoaderFunctions, setFileLoaderFunctions] = React.useState(null);
+  const withLoading = useLoadingTask();
 
   React.useEffect(() => {
     if (fileList.length === 0) {
@@ -89,7 +91,7 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
         };
         // If there are no sequences in the cloning state, load the history file
         if (cloningState.sequences.length === 0) {
-          errorWrapper(prepared.replace)();
+          await errorWrapper(prepared.replace)();
         } else {
           setFileLoaderFunctions({
             addState: errorWrapper(prepared.merge),
@@ -133,7 +135,7 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
         });
       }
     };
-    processFileSubmission();
+    withLoading(processFileSubmission, 'Loading files...');
   }, [fileList]);
   return (
     <>

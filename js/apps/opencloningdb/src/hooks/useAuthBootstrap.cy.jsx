@@ -8,7 +8,7 @@ import {
   endpoints,
 } from '@opencloning/opencloningdb';
 import store from '../store';
-import { clearUser, setUser, setWorkspace } from '../store/authSlice';
+import { clearUser, setSessionError, setUser, setWorkspace } from '../store/authSlice';
 import { TestOidcAuthProvider } from '../auth/providers/testOidc';
 import useAuthBootstrap from './useAuthBootstrap';
 import { LAST_WORKSPACE_ID_KEY } from '../utils/auth_utils';
@@ -80,6 +80,7 @@ describe('useAuthBootstrap', () => {
     clearWorkspaceHeader();
     store.dispatch(clearUser());
     store.dispatch(setWorkspace(null));
+    store.dispatch(setSessionError(null));
   });
 
   it('bootstraps the session when a token is present', () => {
@@ -178,6 +179,37 @@ describe('useAuthBootstrap', () => {
       expect(store.getState().auth.user).to.equal(null);
       expect(store.getState().auth.workspace).to.equal(null);
       expect(openCloningDBHttpClient.defaults.headers.common['X-Workspace-Id']).to.equal(undefined);
+    });
+  });
+
+  it('stores a session error instead of hanging when bootstrap fails with a non-401 error', () => {
+    localStorage.setItem('token', 'bootstrap-token');
+
+    cy.intercept('GET', `${DB_URL}${endpoints.authMe}`, {
+      statusCode: 500,
+      body: { detail: 'Database unavailable' },
+    }).as('authMe');
+
+    mountHook();
+
+    cy.wait('@authMe');
+    cy.get('[data-cy="path"]').should('have.text', '/');
+    cy.wrap(store).invoke('getState').its('auth.sessionError')
+      .should('deep.equal', { message: 'Database unavailable', retryable: true });
+  });
+
+  it('stores a session error when the user has no workspaces', () => {
+    localStorage.setItem('token', 'bootstrap-token');
+
+    cy.intercept('GET', `${DB_URL}${endpoints.authMe}`, { statusCode: 200, body: TEST_USER }).as('authMe');
+    cy.intercept('GET', `${DB_URL}${endpoints.workspaces}`, { statusCode: 200, body: [] }).as('workspaces');
+
+    mountHook();
+
+    cy.wait('@workspaces');
+    cy.wrap(store).invoke('getState').its('auth.sessionError').its('retryable').should('equal', false);
+    return cy.then(() => {
+      expect(store.getState().auth.workspace).to.equal(null);
     });
   });
 });

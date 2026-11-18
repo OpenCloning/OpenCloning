@@ -13,6 +13,7 @@ import useCloningAlerts from '../../hooks/useCloningAlerts';
 import DownloadCloningStrategyDialog from '../DownloadCloningStrategyDialog';
 import LoadCloningHistoryWrapper from '../LoadCloningHistoryWrapper';
 import useCloningHistoryLoader from '../../hooks/useCloningHistoryLoader';
+import useLoadingTask from '../../hooks/useLoadingTask';
 import GithubCornerRight from './GithubCornerRight';
 import { getExternalHttpClient } from '@opencloning/utils/httpClients';
 
@@ -43,6 +44,7 @@ function MainAppBar() {
   const dispatch = useDispatch();
   const { addAlert } = useCloningAlerts();
   const { applyCloningStrategy, loadHistoryFromFile } = useCloningHistoryLoader();
+  const withLoading = useLoadingTask();
 
   // Hidden input field, used to load files.
   const [fileInput, setFileInput] = React.useState(null);
@@ -61,34 +63,49 @@ function MainAppBar() {
   ];
 
 
-  const handleCloseDialog = async (url, isTemplate) => {
-    setOpenExampleDialog(false);
-    setOpenTemplateDialog(false);
-    if (url) {
-      const fileName = url.split('/').pop();
-      let file;
-      if (url.endsWith('.zip')) {
-        const { data: blob } = await httpClient.get(url, { responseType: 'blob' });
-        file = new File([blob], fileName);
-      } else {
-        const { data: jsonData } = await httpClient.get(url);
-        file = new File([JSON.stringify(jsonData)], fileName);
-      }
-      const prepared = await loadHistoryFromFile(file, {
-        onError: (message) => addAlert({ message, severity: 'error' }),
-      });
-      if (!prepared) {
-        return;
-      }
-      let strategy = prepared.cloningStrategy;
-      if (isTemplate) {
-        strategy = formatTemplate(strategy, url);
-      }
+  const loadExampleOrTemplate = async (url, isTemplate) => {
+    const fileName = url.split('/').pop();
+    let file;
+    if (url.endsWith('.zip')) {
+      const { data: blob } = await httpClient.get(url, { responseType: 'blob' });
+      file = new File([blob], fileName);
+    } else {
+      const { data: jsonData } = await httpClient.get(url);
+      file = new File([JSON.stringify(jsonData)], fileName);
+    }
+    const prepared = await loadHistoryFromFile(file, {
+      onError: (message) => addAlert({ message, severity: 'error' }),
+    });
+    if (!prepared) {
+      return;
+    }
+    let strategy = prepared.cloningStrategy;
+    if (isTemplate) {
+      strategy = formatTemplate(strategy, url);
+    }
+    try {
       await applyCloningStrategy(strategy, {
         verificationFiles: prepared.verificationFiles,
         mode: 'replace',
       });
-      dispatch(setCurrentTab(0));
+    } catch {
+      // Error already reported by applyCloningStrategy, which restores the previous state
+      return;
+    }
+    dispatch(setCurrentTab(0));
+  };
+
+  const handleCloseDialog = async (url, isTemplate) => {
+    setOpenExampleDialog(false);
+    setOpenTemplateDialog(false);
+    if (!url) {
+      return;
+    }
+    try {
+      await withLoading(() => loadExampleOrTemplate(url, isTemplate), `Loading ${isTemplate ? 'template' : 'example'}...`);
+    } catch (e) {
+      console.error(e);
+      addAlert({ message: `Could not load the ${isTemplate ? 'template' : 'example'}`, severity: 'error' });
     }
   };
 
