@@ -73,6 +73,9 @@ describe('Test download sequence file', () => {
   });
   it('Can download the file as zip', () => {
     cy.get('div.cloning-history').selectFile('cypress/test_files/sequencing/3seqs_with_sequencing.zip', { action: 'drag-drop' });
+    // The file uses an older version of the model: close the migration warning, it covers the tree
+    cy.openCloningAlertExists('has been migrated to the latest version');
+    cy.closeAlerts();
 
     const expectedFileContents = {
       2: ['verification-2-seq2.fasta', 'verification-2-seq2_2.fasta'],
