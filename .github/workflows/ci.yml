@@ -149,19 +149,18 @@ jobs:
         with:
           context: python
           file: python/docker/opencloning.Dockerfile
-          target: builder-test
+          target: test
           tags: manulera/opencloningbackend-test
           load: true
       - name: Run tests in the container
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           ADDGENE_TOKEN: ${{ secrets.ADDGENE_TOKEN }}
-        run: >-
-          docker compose
-          -f python/docker/docker-compose.postgres.yml
-          -f python/docker/docker-compose.ci-tests.yml
-          run --rm tests
-          sh -c 'alembic -c packages/opencloning-db/alembic.ini upgrade head && python -m pytest -vs -o cache_dir=/tmp/pytest-cache'
+        # The image has no shell: run the migrations and the tests as two commands
+        run: |
+          compose="docker compose -f python/docker/docker-compose.postgres.yml -f python/docker/docker-compose.ci-tests.yml"
+          $compose run --rm tests alembic -c packages/opencloning-db/alembic.ini upgrade head
+          $compose run --rm tests python -m pytest -vs -o cache_dir=/tmp/pytest-cache
 
   # ---------------------------------------------------------------------------
   # js/

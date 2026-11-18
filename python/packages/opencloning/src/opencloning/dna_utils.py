@@ -58,7 +58,11 @@ def sum_is_sticky(three_prime_end: tuple[str, str], five_prime_end: tuple[str, s
 
 
 def align_with_mafft(inputs: list[str], orientation_known: bool) -> list[str]:
-    """Align a sanger track to a dseqr sequence"""
+    """Multiple sequence alignment of inputs with mafft (not used at the moment, and mafft
+    is not installed in the production image)."""
+
+    if not shutil.which('mafft'):
+        raise RuntimeError("'mafft' executable not found in PATH")
 
     with tempfile.TemporaryDirectory() as tmpdir:
         input_file = os.path.join(tmpdir, 'input.fa')
@@ -144,10 +148,6 @@ def align_sanger_traces(dseqr: Dseqrecord, sanger_traces: list[str]) -> list[str
     # Ensure sequences are in upper case
     query_str = str(dseqr.seq).upper()
     sanger_traces = [trace.upper() for trace in sanger_traces]
-
-    # Check that required executables exist in PATH
-    if not shutil.which('mafft'):
-        raise RuntimeError("'mafft' executable not found in PATH")
 
     for trace in sanger_traces:
         if not set(trace) <= IUPAC_BASES:

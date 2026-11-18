@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch
 from Bio.SeqFeature import SeqFeature
 from opencloning.dna_utils import (
+    align_with_mafft,
     sum_is_sticky,
     align_sanger_traces,
     compound_location_to_capitalized_str,
@@ -229,13 +230,10 @@ class AlignSangerTrackTest(unittest.TestCase):
             ('AAC-GTGC--', 'AACCG-GCTT'),
         )
 
-    def test_binaries_missing(self):
-        seq = Dseqrecord('ACGT')
-
-        # Test mafft missing
+    def test_mafft_missing(self):
         with patch('shutil.which', lambda x: None if x == 'mafft' else True):
             with self.assertRaises(RuntimeError) as cm:
-                align_sanger_traces(seq, ['ACGT'])
+                align_with_mafft(['ACGT', 'ACGT'], orientation_known=False)
             self.assertEqual(str(cm.exception), "'mafft' executable not found in PATH")
 
 

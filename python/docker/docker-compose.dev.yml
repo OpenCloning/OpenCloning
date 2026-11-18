@@ -24,7 +24,8 @@ services:
       # Paths are relative to this file's directory (`docker/`). Use `../` to reach repo `packages/`.
       - ../packages/opencloning/src/opencloning:/home/backend/venv/lib/python3.12/site-packages/opencloning
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      # No curl in the distroless image
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
       interval: 30s
       timeout: 10s
       retries: 3
