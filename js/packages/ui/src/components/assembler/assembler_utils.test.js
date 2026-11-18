@@ -13,6 +13,8 @@ import {
   sanitizeOutputName,
 } from "./assembler_utils";
 import { partsToEdgesGraph } from "./graph_utils";
+import { getNextCategories, isAssemblyComplete } from "./assembler_utils";
+import { getOverhangOrder } from "./syntax_layout";
 
 
 const sequenceBsaI  = 'tgggtctcaTACTagagtcacacaggactactaAATGagagacctac';
@@ -341,6 +343,87 @@ const dummyData = {
 };
 
 
+
+describe('getNextCategories and isAssemblyComplete', () => {
+  const makeCategories = (keys) => keys.split(' ').map((key, index) => {
+    const [left, right] = key.split('-');
+    return { id: index + 1, key, left_overhang: left, right_overhang: right };
+  });
+  // A circle of five overhangs, a part that covers two steps (B-D), and its counterpart, which goes around the origin (D-B)
+  const categories = makeCategories('A-B B-C C-D D-E E-A B-D D-B');
+  const order = getOverhangOrder(categories);
+  const pick = (keys) => keys.split(' ').map((key) => categories.find((category) => category.key === key));
+  const nextKeys = (chosenKeys) => getNextCategories(categories, chosenKeys ? pick(chosenKeys) : [], order).map((category) => category.key);
+
+  it('starts with the categories that start at the origin or go around it', () => {
+    expect(nextKeys('')).toEqual(['A-B', 'D-B']);
+  });
+
+  it('continues with the categories that start where the previous one ends', () => {
+    expect(nextKeys('A-B')).toEqual(['B-C', 'B-D']);
+    expect(nextKeys('A-B B-D')).toEqual(['D-E']);
+    expect(nextKeys('A-B B-C C-D D-E')).toEqual(['E-A']);
+  });
+
+  it('does not allow going past the start of the first category', () => {
+    // After A-B B-D, D-B would go around the origin and past A
+    expect(nextKeys('A-B B-D')).not.toContain('D-B');
+    // After D-B, only B-D fits before getting back to D
+    expect(nextKeys('D-B')).toEqual(['B-C', 'B-D']);
+    expect(nextKeys('D-B B-C')).toEqual(['C-D']);
+  });
+
+  it('is complete when the last category ends where the first one starts', () => {
+    expect(isAssemblyComplete([])).toBe(false);
+    expect(isAssemblyComplete(pick('A-B'))).toBe(false);
+    expect(isAssemblyComplete(pick('A-B B-D D-E'))).toBe(false);
+    expect(isAssemblyComplete(pick('A-B B-D D-E E-A'))).toBe(true);
+    expect(isAssemblyComplete(pick('D-B'))).toBe(false);
+    expect(isAssemblyComplete(pick('D-B B-D'))).toBe(true);
+    expect(isAssemblyComplete(pick('D-B B-C C-D'))).toBe(true);
+  });
+
+  // In the Assembler, the order is worked out from all the categories, including the ones that come from plasmids
+  // (they are listed after the parts of the syntax, so they cannot change how the parts of the syntax are read)
+  it('does not start with categories that go around the origin but are not defined in the syntax (they come from plasmids)', () => {
+    const withPlasmidCategory = [...categories, { id: 8, key: 'E-C', left_overhang: 'E', right_overhang: 'C', fromPlasmid: true }];
+    const orderWithPlasmids = getOverhangOrder(withPlasmidCategory);
+    expect(orderWithPlasmids).toEqual(order);
+    expect(getNextCategories(withPlasmidCategory, [], orderWithPlasmids).map((category) => category.key)).toEqual(['A-B', 'D-B']);
+    // But they can be used after another category, if they fit before the start of the assembly (E-C would not)
+    expect(getNextCategories(withPlasmidCategory, pick('A-B B-D D-E'), orderWithPlasmids).map((category) => category.key)).toEqual(['E-A']);
+  });
+
+  it('allows plasmids with overhangs that are not in the syntax to split a part', () => {
+    // B-X and X-C replace B-C. X is only known because of the plasmids, so it must be in the order.
+    const withSplit = [...categories,
+      { id: 8, key: 'B-X', left_overhang: 'B', right_overhang: 'X', fromPlasmid: true },
+      { id: 9, key: 'X-C', left_overhang: 'X', right_overhang: 'C', fromPlasmid: true },
+    ];
+    const orderWithSplit = getOverhangOrder(withSplit);
+    const pickSplit = (keys) => keys.split(' ').map((key) => withSplit.find((category) => category.key === key));
+    const next = (chosenKeys) => getNextCategories(withSplit, pickSplit(chosenKeys), orderWithSplit).map((category) => category.key);
+    expect(next('A-B')).toEqual(['B-C', 'B-D', 'B-X']);
+    expect(next('A-B B-X')).toEqual(['X-C']);
+    expect(next('A-B B-X X-C')).toEqual(['C-D']);
+    expect(next('D-B B-X')).toEqual(['X-C']);
+    expect(isAssemblyComplete(pickSplit('A-B B-X X-C C-D D-E E-A'))).toBe(true);
+  });
+
+  it('handles categories that no longer exist', () => {
+    expect(getNextCategories(categories, [undefined], order)).toEqual([]);
+    expect(isAssemblyComplete([undefined])).toBe(false);
+  });
+
+  it('handles syntaxes in which no part goes around the origin as before', () => {
+    const simpleCategories = makeCategories('A-B B-C C-A A-C');
+    const simpleOrder = getOverhangOrder(simpleCategories);
+    const keys = (found) => found.map((category) => category.key);
+    expect(keys(getNextCategories(simpleCategories, [], simpleOrder))).toEqual(['A-B', 'A-C']);
+    expect(keys(getNextCategories(simpleCategories, [simpleCategories[0]], simpleOrder))).toEqual(['B-C']);
+    expect(keys(getNextCategories(simpleCategories, [simpleCategories[3]], simpleOrder))).toEqual(['C-A']);
+  });
+});
 
 describe('getDefaultAssemblyOutputName', () => {
   it('returns default name from plasmid names', () => {

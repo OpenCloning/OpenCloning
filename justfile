@@ -34,6 +34,12 @@ dev-frontend-cloning:
 dev-frontend-db:
     yarn workspace opencloningdb dev:test
 
+# Syntax builder frontend (3000)
+[working-directory: 'js']
+[group('frontend')]
+dev-frontend-syntax:
+    yarn workspace syntax-builder dev
+
 # Cloning API + OpenCloning frontend in one terminal (Ctrl+C stops both)
 [group('dev')]
 dev-cloning:

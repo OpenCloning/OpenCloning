@@ -110,4 +110,47 @@ describe('<OverhangsPreview />', () => {
     cy.get('[data-testid="overhangs-preview-table"] tr').eq(1).find('td').should('have.length', 5);
     cy.contains('Part 1').should('not.exist');
   });
+
+  it('displays a part that goes around the first overhang', () => {
+    // The overhangs go CCCT -> AACG -> AAAA -> back to CCCT, so this part goes AAAA -> CCCT -> AACG
+    const partAroundOrigin = { ...twoParts[3], id: 5, name: 'Part 5', info: 'Goes around', right_overhang: 'AACG' };
+    cy.mount(
+      <TestWrapper initialParts={[...twoParts, partAroundOrigin]}>
+        <OverhangsPreview />
+      </TestWrapper>
+    );
+    const rows = () => cy.get('[data-testid="overhangs-preview-table"] tr');
+    rows().should('have.length', 3);
+    rows().eq(0).contains('Part 4').should('exist');
+    rows().eq(1).contains('Part 2').should('exist');
+
+    // Its row starts at the second overhang (empty cell) with part 3, and it continues past the end of the other rows
+    rows().eq(2).find('td').should('have.length', 3);
+    rows().eq(2).find('td').eq(0).should('have.text', '');
+    rows().eq(2).find('td').eq(1).contains('Part 3').should('exist');
+    rows().eq(2).find('td').eq(2).contains('Part 5').should('exist');
+    rows().eq(2).find('td').eq(2).contains('Goes around').should('exist');
+    rows().eq(2).find('td').eq(2).should('have.prop', 'colSpan', 2);
+
+    // It can also be split in two
+    cy.contains('label', 'Split parts that go around the first overhang').click();
+    rows().eq(2).find('td').should('have.length', 3);
+    rows().eq(2).find('td').eq(0).contains('Part 5').should('exist');
+    rows().eq(2).find('td').eq(1).contains('Part 3').should('exist');
+    rows().eq(2).find('td').eq(2).contains('Part 5').should('exist');
+
+    // And displayed in compact mode
+    cy.get('label').contains('Detailed').click({ force: true });
+    rows().should('have.length', 3);
+    cy.contains('Part 5').should('not.exist');
+  });
+
+  it('displays nothing if there are no valid parts', () => {
+    cy.mount(
+      <TestWrapper initialParts={[{ ...twoParts[0], left_overhang: 'XX' }]}>
+        <OverhangsPreview />
+      </TestWrapper>
+    );
+    cy.get('[data-testid="overhangs-preview-table"]').should('not.exist');
+  });
 });
