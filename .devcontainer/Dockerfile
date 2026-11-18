@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   shellcheck build-essential postgresql-client \
   xvfb libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 \
   libasound2t64 libxtst6 xauth \
+  mafft \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Non-root user (Claude Code refuses --dangerously-skip-permissions as root).
@@ -60,8 +61,6 @@ RUN chmod 755 /usr/local/bin/init-firewall.sh /usr/local/bin/check-isolation.sh 
 
 ENV DEVCONTAINER=true
 ENV PATH="/opt/venv/bin:/home/${USERNAME}/.local/bin:${PATH}"
-
-RUN apt-get update && apt-get install -y --no-install-recommends mafft
 
 WORKDIR /workspace
 USER $USERNAME
