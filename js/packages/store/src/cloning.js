@@ -22,6 +22,8 @@ const initialState = {
   sourcesWithHiddenAncestors: [],
   teselaJsonCache: {},
   alerts: [],
+  // Async tasks that block the UI (loading/validating a cloning strategy, etc.): [{ id, message }]
+  loadingTasks: [],
   files: [],
   appInfo: {},
   // Global primer design settings affecting Tm calculations
@@ -36,7 +38,8 @@ const initialState = {
 const reducer = {
 
   reset(state) {
-    return { ...initialState, appInfo: { ...state.appInfo } };
+    // Keep loadingTasks: a task still running when the state is reset will remove itself when it ends
+    return { ...initialState, appInfo: { ...state.appInfo }, loadingTasks: [...state.loadingTasks] };
   },
 
   setCurrentTab(state, action) {
@@ -363,6 +366,14 @@ const reducer = {
   removeFromSourcesWithHiddenAncestors(state, action) {
     const sourceId = action.payload;
     state.sourcesWithHiddenAncestors = state.sourcesWithHiddenAncestors.filter((id) => id !== sourceId);
+  },
+
+  startLoadingTask(state, action) {
+    state.loadingTasks.push(action.payload);
+  },
+
+  stopLoadingTask(state, action) {
+    state.loadingTasks = state.loadingTasks.filter((t) => t.id !== action.payload);
   },
 
   addAlert(state, action) {

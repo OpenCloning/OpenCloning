@@ -23,6 +23,7 @@ import LinesTable from '../components/LinesTable';
 import BulkUploadLinesButton from '../components/bulk_upload/BulkUploadLinesButton';
 import CreateLineDialog from '../components/CreateLineDialog';
 import useRowSelection from '../hooks/useRowSelection';
+import error2String from '@opencloning/utils/error2String';
 
 function LinesQueryFields({ pendingParams, setPendingParams }) {
   const { addErrorAlert } = useAppAlerts();
@@ -99,7 +100,7 @@ function LinesPage() {
   const selectedEntities = useMemo(() => items.filter((item) => selectedIds.has(item.id)), [items, selectedIds]);
 
   if (isLoading && !data) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error?.response?.data?.detail || error?.message || 'Failed to load lines'}</Alert>;
+  if (error) return <Alert severity="error">{error2String(error)}</Alert>;
 
   return (
     <PageContainer data-testid="lines-page">

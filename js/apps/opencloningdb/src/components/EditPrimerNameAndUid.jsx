@@ -5,6 +5,7 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 
 import useAppAlerts from '../hooks/useAppAlerts';
 import NewPrimerUID from './NewPrimerUID';
+import error2String from '@opencloning/utils/error2String';
 
 function EditPrimerNameAndUid({ primer, onSave }) {
   const queryClient = useQueryClient();
@@ -41,7 +42,7 @@ function EditPrimerNameAndUid({ primer, onSave }) {
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error updating primer',
+        message: error2String(error),
         severity: 'error',
       });
     },

@@ -17,6 +17,7 @@ import NewLineUID from './NewLineUID';
 import LineSelect from './LineSelect';
 import { getPlasmidSequencesInLine, getAlleleSequencesInLine } from '../utils/models_utils';
 import useCreateLineMutation from '../hooks/useCreateLineMutation';
+import error2String from '@opencloning/utils/error2String';
 
 const MAX_PARENTS = 2;
 
@@ -202,7 +203,7 @@ function CreateLineDialog({ open, onClose, fixedParents = null }) {
           </FormControl>
           {createLineMutation.isError && (
             <Alert severity="error" sx={{ mt: 1 }}>
-              {createLineMutation.error?.response?.data?.detail || createLineMutation.error?.message || 'Failed to create line'}
+              {error2String(createLineMutation.error)}
             </Alert>
           )}
           <FormControl fullWidth sx={{ mt: 2 }}>

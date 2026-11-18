@@ -6,6 +6,7 @@ import { normalizePrimerSubmission } from '../../utils/bulk_upload';
 import BulkUploadMenuButton from './BulkUploadMenuButton';
 import { BULK_SUBMISSION_TEMPLATES } from './bulkSubmissionTemplates';
 import useBulkUploadFlow from './useBulkUploadFlow';
+import error2String from '@opencloning/utils/error2String';
 
 
 export default function BulkUploadPrimersButton() {
@@ -62,7 +63,7 @@ export default function BulkUploadPrimersButton() {
       await validateSubmission(normalizedRows);
     } catch (error) {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Failed to parse or validate primers file',
+        message: error2String(error),
         severity: 'error',
       });
     } finally {

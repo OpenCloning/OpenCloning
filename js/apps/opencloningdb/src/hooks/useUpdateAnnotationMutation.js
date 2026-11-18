@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from './useAppAlerts';
+import error2String from '@opencloning/utils/error2String';
 
 export default function useUpdateAnnotationMutation(sequenceId, textFileSequence) {
   const { addAlert } = useAppAlerts();
@@ -16,7 +17,7 @@ export default function useUpdateAnnotationMutation(sequenceId, textFileSequence
       queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'cloning_strategy'] });
     },
     onError: (error) => {
-      addAlert({ message: error?.response?.data?.detail || error?.message || 'Error updating annotation', severity: 'error' });
+      addAlert({ message: error2String(error), severity: 'error' });
     },
   });
 }

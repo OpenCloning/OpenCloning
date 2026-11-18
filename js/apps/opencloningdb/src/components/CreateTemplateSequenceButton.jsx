@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from '../hooks/useAppAlerts';
 import SequenceTypeSelect from './SequenceTypeSelect';
+import error2String from '@opencloning/utils/error2String';
 
 export default function CreateTemplateSequenceButton() {
   const queryClient = useQueryClient();
@@ -27,7 +28,7 @@ export default function CreateTemplateSequenceButton() {
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Failed to create template sequence',
+        message: error2String(error),
         severity: 'error',
       });
     },

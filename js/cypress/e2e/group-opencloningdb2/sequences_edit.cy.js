@@ -521,7 +521,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
 
     cy.get('[data-testid="annotation-changed-alert"] button').contains('Save').click();
     cy.wait('@updateAnnotation');
-    cy.dbAlertExists('Network Error');
+    cy.dbAlertExists('Cannot connect to backend server');
     cy.closeDbAlerts();
     cy.get('[data-testid="annotation-changed-alert"]').should('exist');
     cy.get('.veEditor').contains('feature_name3').should('exist');

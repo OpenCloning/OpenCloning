@@ -28,6 +28,7 @@ import { QueryStatusWrapper } from '@opencloning/ui';
 import SequenceSamplesSection from '../components/SequenceSamplesSection';
 import useUpdateAnnotationMutation from '../hooks/useUpdateAnnotationMutation';
 import DetailTable from '../components/DetailTable';
+import error2String from '@opencloning/utils/error2String';
 
 const { getSequencingFiles, submitSequencingFileToDatabase } = OpenCloningDBInterface;
 
@@ -67,7 +68,7 @@ function DeleteSequencingFileButton({ sequenceId, fileId }) {
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error deleting sequencing file',
+        message: error2String(error),
         severity: 'error',
       });
     },
@@ -99,7 +100,7 @@ function SequencingFileSectionActions({ sequencingFiles, databaseId, onSeeAlignm
     },
     onError: (error) => {
       addAlert({
-        message: error?.response?.data?.detail || error?.message || 'Error submitting sequencing files',
+        message: error2String(error),
         severity: 'error',
       });
     },
@@ -229,7 +230,7 @@ function SequenceDetailPage() {
     },
     onError: (mutationError) => {
       addAlert({
-        message: mutationError?.response?.data?.detail || mutationError?.message || 'Error deleting sequence',
+        message: error2String(mutationError),
         severity: 'error',
       });
     },
@@ -238,7 +239,7 @@ function SequenceDetailPage() {
   const updateAnnotationMutation = useUpdateAnnotationMutation(id, sequenceModel);
 
   if (isLoading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error?.response?.data?.detail || error?.message || 'Failed to load sequence'}</Alert>;
+  if (error) return <Alert severity="error">{error2String(error)}</Alert>;
 
   return (
     <PageContainer>

@@ -14,6 +14,7 @@ import EditPrimerNameAndUid from '../components/EditPrimerNameAndUid';
 import DeleteResourceButton from '../components/DeleteResourceButton';
 import useAppAlerts from '../hooks/useAppAlerts';
 import DetailTable from '../components/DetailTable';
+import error2String from '@opencloning/utils/error2String';
 
 function PrimerDetailPage() {
   const { id } = useParams();
@@ -43,14 +44,14 @@ function PrimerDetailPage() {
     },
     onError: (mutationError) => {
       addAlert({
-        message: mutationError?.response?.data?.detail || mutationError?.message || 'Error deleting primer',
+        message: error2String(mutationError),
         severity: 'error',
       });
     },
   });
 
   if (isLoading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error?.response?.data?.detail || error?.message || 'Failed to load primer'}</Alert>;
+  if (error) return <Alert severity="error">{error2String(error)}</Alert>;
 
   return (
     <PageContainer>

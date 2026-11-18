@@ -89,7 +89,7 @@ function TagEntitiesDialog({ selectedEntities, entityType, label, open, onClose,
           </FormControl>
           {attachTagsMutation.isError && (
             <Alert severity="error" sx={{ mt: 1 }}>
-              {error2String(attachTagsMutation.error) || 'Failed to tag entities'}
+              {error2String(attachTagsMutation.error)}
             </Alert>
           )}
           <FormControl fullWidth sx={{ mt: 2 }}>

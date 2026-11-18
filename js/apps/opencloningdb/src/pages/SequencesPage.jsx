@@ -30,6 +30,7 @@ import CreateTemplateSequenceButton from '../components/CreateTemplateSequenceBu
 import CheckSequencingButton from '../components/CheckSequencingButton';
 import BulkLinkSequencingFilesButton from '../components/bulk_upload/BulkLinkSequencingFilesButton';
 import useRowSelection from '../hooks/useRowSelection';
+import error2String from '@opencloning/utils/error2String';
 
 function SequenceQueryFields({ pendingParams, setPendingParams }) {
   const { addErrorAlert } = useAppAlerts();
@@ -119,7 +120,7 @@ function SequencesPage() {
   const selectedSequences = items.filter((seq) => selectedIds.has(seq.id));
 
   if (isLoading && !data) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error?.response?.data?.detail || error?.message || 'Failed to load sequences'}</Alert>;
+  if (error) return <Alert severity="error">{error2String(error)}</Alert>;
 
   return (
     <PageContainer data-testid="sequences-page">

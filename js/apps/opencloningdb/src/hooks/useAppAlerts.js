@@ -15,7 +15,7 @@ export default function useAppAlerts() {
 
   // Shows the message of an error (e.g. from a failed request)
   const addErrorAlert = (error) => {
-    addAlert({ message: error2String(error) || 'Unknown error', severity: 'error' });
+    addAlert({ message: error2String(error), severity: 'error' });
   };
 
   const removeAlert = (message) => {

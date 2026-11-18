@@ -2,6 +2,14 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 
 export const LAST_WORKSPACE_ID_KEY = 'lastWorkspaceId';
 
+// The user is signed in but belongs to no workspace (e.g. removed from all of them). Retrying does not help.
+export class NoWorkspacesError extends Error {
+  constructor() {
+    super('You are not a member of any workspace. Ask a workspace owner to add you.');
+    this.name = 'NoWorkspacesError';
+  }
+}
+
 export function getRememberedWorkspaceId() {
   const raw = localStorage.getItem(LAST_WORKSPACE_ID_KEY);
   if (raw == null || raw === '') return null;
@@ -26,5 +34,8 @@ export function pickWorkspace(workspaces) {
 export async function fetchUserAndFirstWorkspace() {
   const { data: user } = await openCloningDBHttpClient.get(endpoints.authMe);
   const { data: workspaces } = await openCloningDBHttpClient.get(endpoints.workspaces);
+  if (!workspaces?.length) {
+    throw new NoWorkspacesError();
+  }
   return { user, workspace: pickWorkspace(workspaces) };
 }
