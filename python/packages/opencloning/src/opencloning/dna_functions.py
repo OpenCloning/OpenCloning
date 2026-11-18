@@ -30,7 +30,7 @@ import io
 
 from opencloning.catalogs import iGEM2024_catalog, openDNA_collections_catalog, seva_catalog, snapgene_catalog
 from . import addgene_api
-from .http_client import get_http_client, ConnectError, TimeoutException
+from .http_client import get_http_client
 from .ncbi_requests import get_genbank_sequence
 from typing import Callable
 
@@ -38,6 +38,11 @@ from typing import Callable
 def format_sequence_genbank(seq: Dseqrecord, seq_name: str = None) -> TextFileSequence:
 
     if seq_name is not None:
+        # GenBank LOCUS names cannot contain whitespace, BioPython would raise a ValueError
+        if seq_name == '' or any(c.isspace() for c in seq_name):
+            raise HTTPException(
+                422, f'Invalid sequence name "{seq_name}": it must be non-empty and contain no spaces.'
+            )
         seq.name = seq_name
     elif seq.name.lower() == 'exported':
         correct_name(seq)
@@ -289,24 +294,15 @@ async def get_sequence_from_euroscarf_url(plasmid_id: str) -> Dseqrecord:
 async def annotate_with_plannotate(
     file_content: str, file_name: str, url: str, timeout: int = 20
 ) -> tuple[Dseqrecord, PlannotateAnnotationReport, str]:
-    async with get_http_client() as client:
-        try:
-            response = await client.post(
-                url,
-                files={'file': (file_name, file_content, 'text/plain')},
-                timeout=timeout,
-            )
-            if response.status_code != 200:
-                detail = response.json().get('detail', 'plannotate server error')
-                raise HTTPException(response.status_code, detail)
-            data = response.json()
-            dseqr = (await asyncio.to_thread(custom_file_parser, io.StringIO(data['gb_file']), 'genbank'))[0]
-            report = [PlannotateAnnotationReport.model_validate(r) for r in data['report']]
-            return dseqr, report, data['version']
-        except TimeoutException as e:
-            raise HTTPException(504, 'plannotate server timeout') from e
-        except ConnectError as e:
-            raise HTTPException(500, 'cannot connect to plannotate server') from e
+    async with get_http_client(timeout) as client:
+        response = await client.post(url, files={'file': (file_name, file_content, 'text/plain')})
+    if response.status_code != 200:
+        detail = response.json().get('detail', 'plannotate server error')
+        raise HTTPException(response.status_code, detail)
+    data = response.json()
+    dseqr = (await asyncio.to_thread(custom_file_parser, io.StringIO(data['gb_file']), 'genbank'))[0]
+    report = [PlannotateAnnotationReport.model_validate(r) for r in data['report']]
+    return dseqr, report, data['version']
 
 
 async def get_sequence_from_openDNA_collections(collection_name: str, plasmid_id: str) -> Dseqrecord:

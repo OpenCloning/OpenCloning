@@ -37,11 +37,14 @@ function MainAppBar() {
   const { applyCloningStrategy, loadHistoryFromFile } = useCloningHistoryLoader();
 
   // Hidden input field, used to load files.
-  const fileInputRef = React.useRef(null);
+  const [fileInput, setFileInput] = React.useState(null);
+
+  // The value is cleared in onFileChange, so the same file can be loaded again
+  const openFileInput = () => fileInput.click();
 
   const fileMenu = [
     { display: 'Save cloning history to file', onClick: () => setOpenCloningStrategyDialog(true) },
-    { display: 'Load cloning history from file', onClick: () => { fileInputRef.current.click(); fileInputRef.current.value = ''; } },
+    { display: 'Load cloning history from file', onClick: openFileInput },
     { display: 'Print cloning history to svg',
       onClick: async () => {
         await dispatch(setCurrentTab(0));
@@ -180,7 +183,7 @@ function MainAppBar() {
           {/* Desktop buttons - hidden on mobile */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
             <ButtonWithMenu menuItems={fileMenu}>File</ButtonWithMenu>
-            <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={onFileChange} accept=".json,.zip" />
+            <input type="file" ref={setFileInput} style={{ display: 'none' }} onChange={onFileChange} accept=".json,.zip" />
             {fileList && <LoadCloningHistoryWrapper fileList={fileList} clearFiles={() => setFileList([])} />}
             <ButtonWithMenu menuItems={helpMenu}>About</ButtonWithMenu>
             <Button><a style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" href="https://docs.opencloning.org">Documentation</a></Button>

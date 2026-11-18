@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 
 function TemplateSequence({ sequenceId }) {
   const circular = useSelector((state) => state.cloning.sequences.find((e) => e.id === sequenceId).circular);
-  let svgContent = null;
-  let tooltipText = null;
+  let svgContent;
+  let tooltipText;
 
   if (circular === true) {
     tooltipText = 'Circular sequence expected';

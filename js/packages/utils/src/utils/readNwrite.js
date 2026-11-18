@@ -209,7 +209,7 @@ export async function parseHistoryFile(file) {
   try {
     cloningStrategy = JSON.parse(await readSubmittedTextFile(cloningStrategyFile));
   } catch (error) {
-    throw new Error('Invalid JSON file.');
+    throw new Error('Invalid JSON file.', { cause: error });
   }
   const newCloningStrategy = { ...cloningStrategy };
 
@@ -295,7 +295,7 @@ export async function getTeselaJsonFromBase64(ab1Base64, fileName = null) {
     return results[0].parsedSequence;
   } catch (error) {
     const fileNameError = fileName || 'file';
-    throw new Error(`Error parsing ${fileNameError}: ${error.message}`);
+    throw new Error(`Error parsing ${fileNameError}: ${error.message}`, { cause: error });
   }
 }
 

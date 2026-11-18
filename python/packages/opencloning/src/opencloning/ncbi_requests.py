@@ -33,14 +33,14 @@ def _check_ncbi_response(resp: Response) -> Response:
 
 async def async_get(url, headers, params=None) -> Response:
     async with get_http_client() as client:
-        resp = await client.get(url, headers=headers, params=params, timeout=20.0)
+        resp = await client.get(url, headers=headers, params=params)
         return _check_ncbi_response(resp)
 
 
 async def async_post_form(url, headers=None, params=None) -> Response:
     """POST ``params`` as a form body (E-utilities accept POST, keeping ``api_key`` out of the URL)."""
     async with get_http_client() as client:
-        resp = await client.post(url, headers=headers, data=params, timeout=20.0)
+        resp = await client.post(url, headers=headers, data=params)
         return _check_ncbi_response(resp)
 
 

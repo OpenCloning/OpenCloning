@@ -34,10 +34,10 @@ async function processSequenceFiles(files, httpClient) {
       return { sources, sequences, warnings };
     } catch (e) {
       if (e.code === 'ERR_NETWORK') {
-        throw new Error('Cannot connect to backend server');
+        throw new Error('Cannot connect to backend server', { cause: e });
       } else {
         console.error(e);
-        throw new Error(`Could not read the file ${fileName}`);
+        throw new Error(`Could not read the file ${fileName}`, { cause: e });
       }
     }
   };

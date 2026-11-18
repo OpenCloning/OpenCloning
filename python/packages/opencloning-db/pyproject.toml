@@ -8,17 +8,17 @@ authors = [{ name = "Manuel Lera-Ramirez", email = "manulera14@gmail.com" }]
 requires-python = ">=3.11,<4"
 dependencies = [
     "opencloning==2.2.2",                # x-release-please-version
-    "fastapi>=0.162.2",
+    "fastapi>=0.162.7",
     "fastapi-pagination>=0.16.2,<0.17",
     "opencloning-linkml>=1.0.0",
     "pydantic[email]>=2.14.3",
-    "psycopg[binary]>=3.3.8,<4",
+    "psycopg[binary]>=3.3.9,<4",
     "sqlalchemy>=2.0.41,<3",
     "alembic>=1.18.4",
     "PyJWT[crypto]>=2.10.1,<3",
     "pydna>=5.5.16",
     "starlette>=1.3.1",
-    "gunicorn>=26.0.0",
+    "gunicorn>=27.0.1",
 ]
 
 [project.urls]

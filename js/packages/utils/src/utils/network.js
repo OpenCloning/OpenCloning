@@ -127,7 +127,7 @@ export function mergePrimersInState(mergedState) {
     for (let j = i + 1; j < newState.primers.length; j++) {
       const p2 = newState.primers[j];
       if (p1.name === p2.name) {
-        const sameDatabaseId = (!Boolean(p1.database_id) && !Boolean(p2.database_id)) || p1.database_id === p2.database_id;
+        const sameDatabaseId = (!p1.database_id && !p2.database_id) || p1.database_id === p2.database_id;
         if (p1.sequence === p2.sequence && sameDatabaseId) {
           newState.sources = newState.sources.map((s) => mergePrimersInSource(s, p1.id, p2.id));
           removedPrimerIds.push(p2.id);

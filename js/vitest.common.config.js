@@ -11,6 +11,7 @@ export const testConfig = {
       'src/**/*.{test,spec}.{js,jsx}',
       '**/*.test.{js,jsx}',
       '**/*.spec.{js,jsx}',
+      '**/*.cy.{js,jsx}',
     ],
   }
 }

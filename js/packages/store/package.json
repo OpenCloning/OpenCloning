@@ -15,9 +15,12 @@
         "directory": "js/packages/store"
     },
     "dependencies": {
+        "@opencloning/utils": "workspace:*",
         "@reduxjs/toolkit": "^2.14.0",
         "@teselagen/bio-parsers": "^0.4.38",
+        "@teselagen/ove": "^0.8.42",
         "@teselagen/range-utils": "^0.3.20",
+        "@teselagen/ui": "0.10.20",
         "redux": "^5.0.1",
         "redux-form": "^8.3.10"
     },

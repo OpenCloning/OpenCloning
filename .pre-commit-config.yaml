@@ -115,3 +115,20 @@ repos:
         language: pygrep
         entry: "from '@mui/(material/[A-Z]|icons-material/)"
         files: ^js/(apps|packages)/.*/src/.*\.jsx?$
+      # Only errors fail the hook (--quiet); warnings are not enforced. Runs from js/ (where
+      # eslint.config.js is), so the js/ prefix is stripped from the paths. Needs the js/ dependencies (yarn install).
+      - id: eslint
+        name: eslint (errors only)
+        entry: bash -c 'cd js && exec node_modules/.bin/eslint --quiet --no-warn-ignored "${@#js/}"' --
+        language: system
+        files: ^js/.*\.(js|jsx|mjs|cjs)$
+      # JS equivalent of deptry: fails on dependencies that are declared but not imported, or imported
+      # but not declared (each workspace must declare what it imports, not rely on yarn hoisting).
+      # Runs on the whole js/ tree, so filenames are not passed. Needs the js/ dependencies (yarn install).
+      - id: knip
+        name: knip (unused / unlisted JS dependencies)
+        entry: bash -c 'cd js && exec node_modules/.bin/knip --include dependencies,unlisted'
+        language: system
+        pass_filenames: false
+        files: ^js/(.*/)?(package\.json|[^/]+\.config\.[cm]?js|.*\.(js|jsx|mjs|cjs))$
+        exclude: ^js/.*/(node_modules|dist|build)/

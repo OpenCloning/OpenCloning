@@ -51,6 +51,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-python
+      # For the eslint and knip hooks
+      - uses: ./.github/actions/setup-js
       - uses: actions/cache@v6
         with:
           path: ~/.cache/pre-commit

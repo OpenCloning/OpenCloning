@@ -10,14 +10,14 @@ dependencies = [
     "opencloning",
     "opencloning-linkml>=1.0.0",
     "biopython>=1.88",
-    "fastapi>=0.135.3",
+    "fastapi>=0.162.7",
     "mcp>=2.3,<3",
     "pydantic>=2.7.1",
     "pydna>=5.5.16",
     "sqlalchemy>=2.0.41,<3",
     "starlette>=1.3.1",
     "uvicorn",
-    "psycopg[binary]>=3.3.8,<4",
+    "psycopg[binary]>=3.3.9,<4",
 ]
 
 [project.scripts]

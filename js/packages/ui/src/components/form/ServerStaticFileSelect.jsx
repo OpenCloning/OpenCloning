@@ -34,11 +34,11 @@ function ServerStaticFileSelect({ onFileSelected, multiple = false, type = 'sequ
     if (!option.path) {
       throw new Error('Malformatted option, must have a path');
     }
-    let fileContent = null;
+    let fileContent;
     try {
       fileContent = await requestFile(option.path);
     } catch (error) {
-      throw new Error(`Error requesting file: ${error.message}`);
+      throw new Error(`Error requesting file: ${error.message}`, { cause: error });
     }
     if (typeof fileContent !== 'string') {
       fileContent = JSON.stringify(fileContent);

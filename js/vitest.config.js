@@ -14,6 +14,7 @@ export default defineConfig({
         '**/node_modules/**',
         '**/*.test.{js,jsx}',
         '**/*.spec.{js,jsx}',
+        '**/*.cy.{js,jsx}',
         '**/tests/**',
         '**/cypress/**',
         '**/coverage/**',

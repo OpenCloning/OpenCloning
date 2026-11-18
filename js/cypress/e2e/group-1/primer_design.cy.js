@@ -16,7 +16,8 @@ function checkCurrentStep(label) {
 function updateSpacer(index, value) {
   cy.get('.primer-spacer-form input').eq(index).clear('');
   cy.get('.primer-spacer-form input').eq(index).type(value);
-  // Wait for the sequence to update
+  // Wait for the sequence to update (debounced, nothing to assert on)
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(500);
 }
 
