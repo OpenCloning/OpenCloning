@@ -10,10 +10,9 @@ import os
 import shutil
 from pydna.parsers import parse
 from Bio.Align import PairwiseAligner
-from Bio.Data.IUPACData import ambiguous_dna_values as _ambiguous_dna_values
+from Bio.Data.IUPACData import ambiguous_dna_values
 from pairwise_alignments_to_msa.alignment import aligned_tuples_to_MSA
 import edlib
-import logging
 import re
 from itertools import combinations
 from pydna.utils import location_boundaries, shift_location
@@ -21,19 +20,13 @@ from Bio.SeqFeature import SimpleLocation, CompoundLocation
 
 aligner = PairwiseAligner(scoring='blastn')
 
-ambiguous_only_dna_values = {**_ambiguous_dna_values}
-for normal_base in 'ACGT':
-    del ambiguous_only_dna_values[normal_base]
-
-IUPAC_BASES = set(_ambiguous_dna_values)
+IUPAC_BASES = set(ambiguous_dna_values)
 # Pairs of IUPAC codes that can represent the same base, so edlib counts them as matches
 IUPAC_EQUALITIES = [
     (a, b)
-    for a, b in combinations(sorted(_ambiguous_dna_values), 2)
-    if set(_ambiguous_dna_values[a]) & set(_ambiguous_dna_values[b])
+    for a, b in combinations(sorted(ambiguous_dna_values), 2)
+    if set(ambiguous_dna_values[a]) & set(ambiguous_dna_values[b])
 ]
-
-logger = logging.getLogger(__name__)
 
 
 def sum_is_sticky(three_prime_end: tuple[str, str], five_prime_end: tuple[str, str], partial: bool = False) -> int:
@@ -116,42 +109,30 @@ def _rotate_alignment_to_reference_origin(ref_aln: str, trace_aln: str, ref_shif
 
 
 def _align_to_circular_reference(reference: str, trace: str) -> tuple[str, str]:
-    """Align a trace to a circular reference. Edlib fixes the strand of the trace and a rotation
-    of both sequences in which the trace does not cross the origin, then the alignment is done with
-    the pairwise aligner, and rotated back so the reference is in its original coordinates."""
-    trace_is_shorter = len(trace) <= len(reference)
-    short, long = (trace, reference) if trace_is_shorter else (reference, trace)
-    long_twice = long + long
+    """Align a trace to a circular reference. A fast rough alignment (edlib) of the trace against the
+    reference repeated twice picks the strand of the trace and where it lands, both sequences are rotated
+    so that the trace does not cross the origin, then the alignment is done with the pairwise aligner,
+    and rotated back so the reference is in its original coordinates."""
+    reference_twice = reference + reference
 
-    fwd = _edlib_infix(short, long_twice)
-    rvs = _edlib_infix(reverse_complement(short), long_twice)
-    is_reverse = rvs['editDistance'] < fwd['editDistance']
-    rough = rvs if is_reverse else fwd
-    t_start, t_end = rough['locations'][0]
-
-    if t_end - t_start + 1 > len(long):
-        logger.warning(
-            'Sanger trace aligns to more than one full turn of the sequence, '
-            'the sequences may contain repeats or be too different, the alignment may be wrong'
-        )
-
-    if is_reverse:
-        trace = reverse_complement(trace)
+    fwd = _edlib_infix(trace, reference_twice)
+    rvs = _edlib_infix(reverse_complement(trace), reference_twice)
+    if rvs['editDistance'] < fwd['editDistance']:
+        trace, rough = reverse_complement(trace), rvs
+    else:
+        rough = fwd
+    ref_start, ref_end = rough['locations'][0]
 
     if len(trace) / len(reference) >= 0.8:
-        # Plasmid vs plasmid: rotate both to start at the middle of the longest exact match
-        i, t = _longest_exact_run(rough['cigar'], 0, t_start)
-        if is_reverse and not trace_is_shorter:
-            # The alignment is rc(reference) vs trace + trace, map it to reference vs rc(trace) + rc(trace)
-            i, t = len(short) - 1 - i, 2 * len(long) - 1 - t
-        j = t % len(long)
-        ref_shift, trace_shift = (j, i) if trace_is_shorter else (i, j)
+        # Full plasmid: the trace is circular too, rotate both to start in the middle of the longest exact match
+        trace_shift, ref_shift = _longest_exact_run(rough['cigar'], 0, ref_start)
+        ref_shift %= len(reference)
         trace = trace[trace_shift:] + trace[:trace_shift]
     else:
-        # Short read (always shorter than the reference): rotate the reference to the middle of the
-        # region the read does not cover, so that the read lies inside it without crossing the origin
-        span = t_end - t_start + 1
-        ref_shift = (t_end + 1 + max(len(reference) - span, 0) // 2) % len(reference)
+        # Sanger read: rotate the reference to the middle of the region the read does not cover,
+        # so that the read lies inside it without crossing the origin
+        span = ref_end - ref_start + 1
+        ref_shift = (ref_end + 1 + max(len(reference) - span, 0) // 2) % len(reference)
 
     rotated_reference = reference[ref_shift:] + reference[:ref_shift]
     ref_aln, trace_aln = next(aligner.align(rotated_reference, trace))

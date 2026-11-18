@@ -194,12 +194,11 @@ class AlignSangerTrackTest(unittest.TestCase):
                     rotated = reverse_complement(rotated)
                 self.assertEqual(align_sanger_traces(seq, [rotated]), expected)
 
-    def test_align_sanger_traces_warning(self):
+    def test_align_sanger_traces_unrelated(self):
         # Unrelated sequences, where the rough alignment spans more than a full turn of the reference
         seq = Dseqrecord('TTAGTTGTGCCGCAGCGAAGTAGTGCTTGAAATATGCGAC', circular=True)
         trace = 'CCCTAAGTAGGAGCGTATGCGCCCAGTAACCAATGCCTGT'
-        with self.assertLogs('opencloning.dna_utils', level='WARNING'):
-            alignment = align_sanger_traces(seq, [trace])
+        alignment = align_sanger_traces(seq, [trace])
         # The alignment is still returned
         self.assertEqual(alignment[0].replace('-', ''), str(seq.seq))
 
