@@ -42,7 +42,7 @@ function ImportPrimersButton({ addPrimer }) {
       <FileUploadButton
         onFiles={handleFileUpload}
         accept=".csv,.tsv"
-        tooltip={<Box component="span" sx={{ fontSize: '1.4em' }}>Upload a .csv or .tsv file with headers &apos;name&apos; and &apos;sequence&apos;</Box>}
+        tooltip="Upload a .csv or .tsv file with headers 'name' and 'sequence'"
       >
         Import from file
       </FileUploadButton>

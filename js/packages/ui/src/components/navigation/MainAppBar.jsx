@@ -139,7 +139,7 @@ function MainAppBar() {
   return (
     <AppBar position="static" className="app-bar">
       <Box className="app-name" sx={appNameSx}>OpenCloning</Box>
-      <Tooltip title="View source code on GitHub" placement="left" slotProps={{ tooltip: { sx: { fontSize: '1rem' } } }}>
+      <Tooltip title="View source code on GitHub" placement="left">
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <Button
             className="github-corner"

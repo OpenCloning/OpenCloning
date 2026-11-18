@@ -3,7 +3,6 @@ import { Button, Tooltip } from '@mui/material';
 import { openCloningDBHttpClient, endpoints, BulkUploadModal } from '@opencloning/opencloningdb';
 import SequenceBulkUploadPreviewTable from './SequenceBulkUploadPreviewTable';
 import useBulkUploadFlow from './useBulkUploadFlow';
-import ButtonTooltipText from '../ButtonTooltipText';
 
 export default function BulkUploadSequencesButton() {
   const {
@@ -87,11 +86,7 @@ export default function BulkUploadSequencesButton() {
   return (
     <>
       <Tooltip
-        title={(
-          <ButtonTooltipText>
-            Upload sequence files (.fasta, .gb, .dna, .gbk, .ape)
-          </ButtonTooltipText>
-        )}
+        title="Upload sequence files (.fasta, .gb, .dna, .gbk, .ape)"
       >
         <Button onClick={handleUploadClick} data-testid="bulk-upload-sequences-button">
           Upload Sequences

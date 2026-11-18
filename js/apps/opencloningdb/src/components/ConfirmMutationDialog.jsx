@@ -12,7 +12,8 @@ function ConfirmMutationDialog({ open, onClose, mutation, title, content, confir
       submitLabel={mutation.isPending ? 'Submitting...' : confirmButtonText}
       submitDisabled={mutation.isPending}
       submitButtonProps={{ color: 'error', variant: 'contained' }}
-      cancelButtonProps={{ disabled: mutation.isPending }}
+      // Not red: the confirm button already is
+      cancelButtonProps={{ color: 'primary', disabled: mutation.isPending }}
     >
       <Typography>
         {content}

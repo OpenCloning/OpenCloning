@@ -5,8 +5,8 @@ description: Where styles go in the JS frontend (MUI theme, shared components, s
 
 # MUI styling conventions
 
-The migration to these rules is tracked in [`styling-plan.md`](../../../styling-plan.md). Old code
-still breaks them. Follow them in new code, and in old code you are already changing.
+Some old code may still break these rules. Follow them in new code, and in old code you are already
+changing.
 
 ## Where a style goes
 
@@ -73,7 +73,7 @@ In `js/packages/ui/src/components/common/` (apps import them from `@opencloning/
 - `FileUploadButton`: a button that opens the file picker (`onFiles` gets an array of files). For a file
   picker opened from a menu, use `<input type="file" hidden ref={…}>`, not `style={{ display: 'none' }}`.
 - `CodeBlock`: code or other preformatted text.
-- `FormDialog`: a dialog with a title, content, and Cancel and submit buttons (`onSubmit`, `submitLabel`,
+- `FormDialog`: a dialog with a title, content, and Cancel (red) and submit buttons (`onSubmit`, `submitLabel`,
   `submitDisabled`). The dialog is a form, so Enter in a field submits it. Use it rather than writing
   `Dialog`, `DialogTitle`, `DialogContent` and `DialogActions` by hand.
 
@@ -90,8 +90,9 @@ render it. Wrap any new app root or test harness in it too. Only the outermost o
 (its CSS variables are set on `:root`); nested ones just render their children. In component tests,
 pass theme options with `cy.mount(component, { themeOptions })`.
 
-Theme defaults: Tooltips have an arrow (don't pass `arrow`), Alerts centre their icon vertically, and
-table rows highlight on hover (don't pass `hover`) under a grey header row.
+Theme defaults: Tooltips have an arrow and `1rem` text (don't pass `arrow` or wrap the title to resize
+it), Alerts centre their icon vertically, and table rows highlight on hover (don't pass `hover`) under a
+grey header row.
 
 ## CSS that stays
 

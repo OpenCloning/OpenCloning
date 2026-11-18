@@ -1,4 +1,4 @@
-import { Tooltip, Box } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -23,10 +23,9 @@ function TemplateSequence({ sequenceId }) {
     );
     tooltipText = 'Linear/circular sequence expected';
   }
-  const toolTipElement = <Box sx={{ fontSize: 'medium' }}>{tooltipText}</Box>;
   return (
     <div>
-      <Tooltip title={toolTipElement}>
+      <Tooltip title={tooltipText}>
         <svg width="120" height="120" xmlns="http://www.w3.org/2000/svg">
           {svgContent}
         </svg>

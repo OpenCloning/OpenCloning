@@ -6,7 +6,7 @@ function LabelWithTooltip({ label, tooltip }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <span>{label}</span>
-      <Tooltip title={<Box component="span" sx={{ fontSize: '1.4em' }}>{tooltip}</Box>} placement="right">
+      <Tooltip title={tooltip} placement="right">
         <InfoIcon fontSize="small" color="primary" sx={{ marginLeft: '0.25em' }} />
       </Tooltip>
     </Box>

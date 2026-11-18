@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 /**
- * A dialog with a title, its content, and a Cancel and a submit button. The dialog is a form,
+ * A dialog with a title, its content, and a Cancel (red) and a submit button. The dialog is a form,
  * so pressing Enter in a field submits it.
  *
  * @param {Function} onSubmit - called with the submit event (its default and propagation are already stopped)
@@ -11,7 +11,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/
  * @param {boolean} [submitDisabled] - disables the submit button
  * @param {boolean} [hideSubmit] - hides the submit button
  * @param {Object} [submitButtonProps] - extra props of the submit button, e.g. `{ variant: 'contained' }`
- * @param {Object} [cancelButtonProps] - extra props of the Cancel button
+ * @param {Object} [cancelButtonProps] - extra props of the Cancel button, e.g. `{ color: 'primary' }`
  * @param {React.ReactNode} [actions] - replaces the two buttons (include a `type="submit"` button)
  * @param {Object} [contentSx] - sx of the DialogContent
  * @param {Object} [paperSx] - sx of the dialog's paper (the form)
@@ -55,7 +55,7 @@ export default function FormDialog({
       <DialogActions>
         {actions ?? (
           <>
-            <Button onClick={onClose} {...cancelButtonProps}>Cancel</Button>
+            <Button color="error" onClick={onClose} {...cancelButtonProps}>Cancel</Button>
             {!hideSubmit && <Button type="submit" disabled={submitDisabled} {...submitButtonProps}>{submitLabel}</Button>}
           </>
         )}

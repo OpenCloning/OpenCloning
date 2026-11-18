@@ -31,7 +31,7 @@ function CustomTableRow({ primer }) {
 
 function PrimersImportTable({ importedPrimers }) {
   return (
-    <Table className="primers-table" sx={{ mb: 3, '& th': { fontWeight: 'bold', fontSize: '1.2em' } }}>
+    <Table className="primers-table" sx={{ mb: 3 }}>
       <TableHead>
         <TableRow>
           <TableCell align="center">Status</TableCell>

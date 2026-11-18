@@ -24,7 +24,6 @@ export function TreeNodeId({ isSavedToDatabase = false, children }) {
         position: 'absolute',
         left: 0,
         top: 0,
-        fontFamily: 'sans-serif',
         fontSize: 'large',
         fontWeight: 'bold',
         color: nodeColor(isSavedToDatabase),

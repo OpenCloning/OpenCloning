@@ -7,7 +7,6 @@ import { prepareLineRowsForValidation } from '../../utils/bulk_upload';
 import BulkUploadMenuButton from './BulkUploadMenuButton';
 import { BULK_SUBMISSION_TEMPLATES } from './bulkSubmissionTemplates';
 import useBulkUploadFlow from './useBulkUploadFlow';
-import ButtonTooltipText from '../ButtonTooltipText';
 
 export default function BulkUploadLinesButton() {
   const {
@@ -93,12 +92,7 @@ export default function BulkUploadLinesButton() {
         dataTestId="bulk-upload-lines-button"
         onUploadClick={handleUploadClick}
         templatePath={BULK_SUBMISSION_TEMPLATES.lines}
-        tooltip={(
-          <ButtonTooltipText>
-            Upload a .csv or .tsv file with headers uid, plasmids, genotype, parent_uids (case-insensitive).
-            Plasmids, genotype, and parent_uids are space-separated lists. At most two parent UIDs per line.
-          </ButtonTooltipText>
-        )}
+        tooltip="Upload a .csv or .tsv file with headers uid, plasmids, genotype, parent_uids (case-insensitive). Plasmids, genotype, and parent_uids are space-separated lists. At most two parent UIDs per line."
       />
 
       <input

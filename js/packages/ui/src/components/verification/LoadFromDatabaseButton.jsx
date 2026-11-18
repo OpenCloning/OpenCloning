@@ -58,7 +58,6 @@ function LoadFromDatabaseButton({ databaseId, onFileChange, setError, existingFi
         title="Select sequencing files to load"
         submitLabel="Load"
         onSubmit={handleSubmit}
-        cancelButtonProps={{ color: 'error' }}
       >
         {loading && <CircularProgress />}
         {!loading && files.length > 0 && (

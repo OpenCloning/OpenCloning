@@ -167,7 +167,6 @@ export default function DomesticateDialog({ open, onClose, initialContext, mainS
       submitLabel={isSubmitting ? 'Submitting…' : 'Submit'}
       submitDisabled={!validationOk || isSubmitting}
       submitButtonProps={{ variant: 'contained' }}
-      cancelButtonProps={{ color: 'inherit' }}
     >
       <Alert severity="info" sx={{ mb: 2 }}>
         {helperCategory}

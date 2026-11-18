@@ -39,7 +39,7 @@ function DownloadPrimersDialog({ primers, open, onClose }) {
         // Save only once the primer details are loaded
         <RequestStatusWrapper requestStatus={primerDetailsRequestStatus} retry={() => { retryGetPrimerDetails(); retryGetPCRDetails(); }}>
           <RequestStatusWrapper requestStatus={pcrDetailsRequestStatus} retry={retryGetPCRDetails}>
-            <Button onClick={onClose}>
+            <Button color="error" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit">Save file</Button>
