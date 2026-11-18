@@ -12,6 +12,11 @@ ARG APP_TARGET="cloning"
 # BUILDER — shared setup
 FROM python:3.12-slim-bookworm AS base-setup
 
+# Build toolchain for deps without prebuilt wheels on some platforms
+# (e.g. edlib and primer3-py on linux/aarch64, which need gcc/g++/make).
+# Only in builder stages; the production stage copies the venv and does not include it.
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+
 RUN useradd -m -s /bin/bash backend
 USER backend
 WORKDIR /home/backend
