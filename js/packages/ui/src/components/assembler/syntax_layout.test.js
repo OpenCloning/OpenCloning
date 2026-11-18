@@ -96,7 +96,7 @@ describe('goesAroundOrigin', () => {
 
 describe('getSyntaxLayout', () => {
   it('handles no parts', () => {
-    expect(getSyntaxLayout([])).toEqual({ order: [], rows: [], incompleteParts: [], unreachableOverhangs: [] });
+    expect(getSyntaxLayout([])).toEqual({ order: [], rows: [], incompleteParts: [], unreachableOverhangs: [], originSpanningParts: [] });
   });
 
   it('returns a single row for a simple circle', () => {
@@ -160,6 +160,18 @@ describe('getSyntaxLayout', () => {
       incompleteParts: [],
       unreachableOverhangs: [],
     });
+  });
+
+  it('lists the parts that go around the origin', () => {
+    const spanning = (keys) => getSyntaxLayout(makeParts(keys)).originSpanningParts.map(partKey);
+    expect(spanning(CIRCLE)).toEqual([]);
+    // A part that ends at the origin does not go around it
+    expect(spanning(`${CIRCLE} C-A`)).toEqual([]);
+    expect(spanning(`${CIRCLE} B-D D-B`)).toEqual(['D-B']);
+    // A typo (C-D written as C-B) makes the part look like it goes around the origin
+    expect(spanning('A-B B-C C-B D-E E-A')).toEqual(['C-B']);
+    // Listing it first starts the circle there, so nothing goes around the origin
+    expect(spanning(`D-B ${CIRCLE} B-D`)).toEqual([]);
   });
 
   it('draws parts with the same overhangs only once', () => {

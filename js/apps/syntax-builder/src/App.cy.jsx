@@ -104,7 +104,9 @@ describe('App', () => {
 
     // A path that goes around the first overhang (CACA -> CCCT -> CGCT) is accepted
     typeOverhangs('CCCT\nCGCT\nCACA\nCCCT\n\nCACA\nCGCT');
-    cy.get('[data-testid="overhangs-step-container"] .MuiAlert-root').should('not.exist');
+    // No warnings, only the information about which parts go around the first overhang
+    cy.get('[data-testid="overhangs-step-container"] .MuiAlert-root').should('have.length', 1);
+    cy.get('[data-testid="origin-spanning-parts-info"]').should('have.text', 'Parts that go around the first overhang (CCCT): CACA-CGCT.');
     previewRows().should('have.length', 2);
     previewRows().eq(1).find('h6').eq(0).should('have.text', '2');
     previewRows().eq(1).find('h6').eq(1).should('have.text', '4');

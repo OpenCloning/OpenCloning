@@ -93,6 +93,9 @@ function selectRows(rows) {
  * - incompleteParts: parts that are not in any assembly that goes around the whole circle. They are
  *   still included in rows, so that a syntax can be seen while it is being written.
  * - unreachableOverhangs: overhangs that we could not place after any other overhang.
+ * - originSpanningParts: parts that go around the origin. This is worked out from the order in which
+ *   the parts are listed (see getOverhangOrder), so it is worth showing to the user: a typo in an
+ *   overhang can make a part look like it goes around the origin.
  */
 export function getSyntaxLayout(parts) {
   const order = getOverhangOrder(parts);
@@ -125,7 +128,9 @@ export function getSyntaxLayout(parts) {
 
   const unreachableOverhangs = order.slice(1).filter((overhang) => forwardGraph.inDegree(overhang) === 0);
 
-  return { order, rows: [...completeRows, ...incompleteRows], incompleteParts, unreachableOverhangs };
+  const originSpanningParts = uniqueParts.filter((part) => goesAroundOrigin(part, order));
+
+  return { order, rows: [...completeRows, ...incompleteRows], incompleteParts, unreachableOverhangs, originSpanningParts };
 }
 
 /**

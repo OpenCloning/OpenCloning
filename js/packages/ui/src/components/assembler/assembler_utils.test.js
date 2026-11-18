@@ -383,11 +383,31 @@ describe('getNextCategories and isAssemblyComplete', () => {
     expect(isAssemblyComplete(pick('D-B B-C C-D'))).toBe(true);
   });
 
+  // In the Assembler, the order is worked out from all the categories, including the ones that come from plasmids
+  // (they are listed after the parts of the syntax, so they cannot change how the parts of the syntax are read)
   it('does not start with categories that go around the origin but are not defined in the syntax (they come from plasmids)', () => {
     const withPlasmidCategory = [...categories, { id: 8, key: 'E-C', left_overhang: 'E', right_overhang: 'C', fromPlasmid: true }];
-    expect(getNextCategories(withPlasmidCategory, [], order).map((category) => category.key)).toEqual(['A-B', 'D-B']);
+    const orderWithPlasmids = getOverhangOrder(withPlasmidCategory);
+    expect(orderWithPlasmids).toEqual(order);
+    expect(getNextCategories(withPlasmidCategory, [], orderWithPlasmids).map((category) => category.key)).toEqual(['A-B', 'D-B']);
     // But they can be used after another category, if they fit before the start of the assembly (E-C would not)
-    expect(getNextCategories(withPlasmidCategory, pick('A-B B-D D-E'), order).map((category) => category.key)).toEqual(['E-A']);
+    expect(getNextCategories(withPlasmidCategory, pick('A-B B-D D-E'), orderWithPlasmids).map((category) => category.key)).toEqual(['E-A']);
+  });
+
+  it('allows plasmids with overhangs that are not in the syntax to split a part', () => {
+    // B-X and X-C replace B-C. X is only known because of the plasmids, so it must be in the order.
+    const withSplit = [...categories,
+      { id: 8, key: 'B-X', left_overhang: 'B', right_overhang: 'X', fromPlasmid: true },
+      { id: 9, key: 'X-C', left_overhang: 'X', right_overhang: 'C', fromPlasmid: true },
+    ];
+    const orderWithSplit = getOverhangOrder(withSplit);
+    const pickSplit = (keys) => keys.split(' ').map((key) => withSplit.find((category) => category.key === key));
+    const next = (chosenKeys) => getNextCategories(withSplit, pickSplit(chosenKeys), orderWithSplit).map((category) => category.key);
+    expect(next('A-B')).toEqual(['B-C', 'B-D', 'B-X']);
+    expect(next('A-B B-X')).toEqual(['X-C']);
+    expect(next('A-B B-X X-C')).toEqual(['C-D']);
+    expect(next('D-B B-X')).toEqual(['X-C']);
+    expect(isAssemblyComplete(pickSplit('A-B B-X X-C C-D D-E E-A'))).toBe(true);
   });
 
   it('handles categories that no longer exist', () => {

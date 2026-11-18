@@ -104,5 +104,9 @@ The preview shows all the valid parts, even while the syntax is not finished, an
   one. Usually some parts are not connected to the rest of the syntax, or a part that goes around the
   first overhang is listed too early.
 
+It also lists the **parts that go around the first overhang**, as information rather than a warning. A typo
+in an overhang can make a part look like it goes around the first overhang without causing any of the
+warnings above, so check that the list contains only the parts you meant.
+
 The code that works out the order and the rows is in
 [`syntax_layout.js`](../../packages/ui/src/components/assembler/syntax_layout.js).

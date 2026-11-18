@@ -13,7 +13,7 @@ const SEQUENCE_FIELDS = ['left_overhang', 'right_overhang', 'left_inside', 'righ
 
 
 export default function PartsForm() {
-  const { parts, addDefaultPart, setParts, problematicParts, graphErrorMessage, mermaidString } = useFormData()
+  const { parts, addDefaultPart, setParts, problematicParts, graphErrorMessage, graphInfoMessage, mermaidString } = useFormData()
   const [infoDialog, setInfoDialog] = React.useState({ open: false, rowId: null, value: '' })
   const apiRef = useGridApiRef()
 
@@ -212,6 +212,11 @@ export default function PartsForm() {
       {graphErrorMessage && graphErrorMessage.length > 0 && (
         <Alert severity="warning" sx={{ my: 2 }}>
           {graphErrorMessage}
+        </Alert>
+      )}
+      {graphInfoMessage && (
+        <Alert severity="info" sx={{ my: 2 }} data-testid="origin-spanning-parts-info">
+          {graphInfoMessage}
         </Alert>
       )}
       <DataGrid

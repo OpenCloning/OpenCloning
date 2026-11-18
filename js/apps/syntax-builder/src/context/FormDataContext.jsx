@@ -60,10 +60,12 @@ export const validatePart = (part) => {
 }
 
 // Checks that the parts form a syntax in which every part can be used in an assembly.
-// Returns the message to display ('' if there are no problems) and the keys of the parts with problems.
+// Returns the message to display ('' if there are no problems), the keys of the parts with problems, and
+// an informative message listing the parts that go around the first overhang ('' if there are none), so that
+// the user can check that this is what they meant (a typo in an overhang can also make a part go around it).
 // See the README for how the order of the overhangs is worked out from the parts.
 export function validateSyntaxParts(parts) {
-  const { order, incompleteParts, unreachableOverhangs } = getSyntaxLayout(parts);
+  const { order, incompleteParts, unreachableOverhangs, originSpanningParts } = getSyntaxLayout(parts);
   const messages = [];
   if (incompleteParts.length > 0) {
     messages.push(`Parts that are not in a complete assembly: ${incompleteParts.map(partKey).join(', ')}.`);
@@ -74,7 +76,10 @@ export function validateSyntaxParts(parts) {
       + 'If a part goes around the first overhang, list it after the other parts.'
     );
   }
-  return { error: messages.join(' '), problematicParts: incompleteParts.map(partKey) };
+  const info = originSpanningParts.length > 0
+    ? `Parts that go around the first overhang (${order[0]}): ${originSpanningParts.map(partKey).join(', ')}.`
+    : '';
+  return { error: messages.join(' '), problematicParts: incompleteParts.map(partKey), info };
 }
 
 const FormDataContext = React.createContext();
@@ -165,7 +170,7 @@ export function FormDataProvider({ children }) {
 
   // Parts with invalid fields (e.g. while they are being typed) are left out of the preview and the checks
   const validParts = React.useMemo(() => parts.filter(validatePart), [parts]);
-  const { error: graphErrorMessage, problematicParts } = React.useMemo(() => validateSyntaxParts(validParts), [validParts]);
+  const { error: graphErrorMessage, problematicParts, info: graphInfoMessage } = React.useMemo(() => validateSyntaxParts(validParts), [validParts]);
 
   const resetFormData = React.useCallback(() => {
     setParts([]);
@@ -193,6 +198,7 @@ export function FormDataProvider({ children }) {
     resetFormData,
     validParts,
     graphErrorMessage,
+    graphInfoMessage,
     problematicParts,
     addDefaultPart,
     overhangNames,
@@ -206,7 +212,7 @@ export function FormDataProvider({ children }) {
     mermaidString,
   }), [
     relatedDois, setRelatedDois, submitters, setSubmitters, assemblyEnzymes, setAssemblyEnzymes, domesticationEnzyme, setDomesticationEnzyme, parts, setParts,
-    resetFormData, validParts, graphErrorMessage, problematicParts, addDefaultPart, overhangNames, setOverhangNames, updateOverhangName, syntaxName, setSyntaxName,
+    resetFormData, validParts, graphErrorMessage, graphInfoMessage, problematicParts, addDefaultPart, overhangNames, setOverhangNames, updateOverhangName, syntaxName, setSyntaxName,
     linkedPlasmids, setLinkedPlasmids, uploadPlasmids, mermaidString]);
 
   return (

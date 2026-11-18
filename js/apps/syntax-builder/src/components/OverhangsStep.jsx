@@ -162,7 +162,7 @@ function OverhangsField() {
 
 function OverhangsStep({ setOverhangsStep }) {
 
-  const { graphErrorMessage } = useFormData();
+  const { graphErrorMessage, graphInfoMessage } = useFormData();
 
   return (
     <Box data-testid="overhangs-step-container" sx={{ p: 3 }}>
@@ -170,6 +170,11 @@ function OverhangsStep({ setOverhangsStep }) {
       {graphErrorMessage && (
         <Alert severity="warning" sx={{ my: 2 }}>
           {graphErrorMessage}
+        </Alert>
+      )}
+      {graphInfoMessage && (
+        <Alert severity="info" sx={{ my: 2 }} data-testid="origin-spanning-parts-info">
+          {graphInfoMessage}
         </Alert>
       )}
       <OverhangsPreview />
