@@ -29,7 +29,8 @@ Problems found:
   `'default'` fallback that is not a valid CSS colour.
 - **The sequence editor's CSS also leaks into the host page.** `@teselagen/ove` imports its own `ove.css`
   (~12,000 lines, including Blueprint's CSS), which styles `html` and `*` (`box-sizing`), `body` (14px
-  system font, line height, text colour) and bare elements such as `p` and `small`. It is loaded with the
+  system font, line height, text colour) and bare elements such as `p`, `small` and `h1`-`h6` (dark text,
+  weight 300). It is loaded with the
   library, so every page that embeds OpenCloning gets it. It is a dependency's CSS, so the steps below
   don't remove it: it would need a scoped copy of the file, or an upstream fix in OVE.
 
@@ -69,9 +70,9 @@ Contents:
 | `FileUploadButton` ✅ | 16 `type="file"` inputs, 15 `display: 'none'` | hidden-input boilerplate in 15 files |
 | `PreviewTable` (`columns` prop) ✅ | 5 bulk-upload tables with the same shell and hand-written `<col>` widths | ~30 lines per file |
 | `DetailTable` ✅ | `TableContainer component={Paper} sx={{ maxWidth: 800 }}` ×10 | `opencloningdb` detail pages |
-| Dialog scaffold | 18 dialog files, 16 with the same title/content/actions shape | build on `ConfirmMutationDialog`, `EditTextDialog` |
+| Dialog scaffold ✅ (`FormDialog`) | 18 dialog files, 16 with the same title/content/actions shape | build on `ConfirmMutationDialog`, `EditTextDialog` |
 | `Stack` in parents | `mb: 2` ×34, `mt: 1` ×19; `Stack` imported in 2 files | per-child margins |
-| Filter field width | `MIN_WIDTH` defined in 3 pages, used 12 times | set once in `UrlParamsForm` / `SearchBarTextField` |
+| Filter field width ✅ | `MIN_WIDTH` defined in 3 pages, used 12 times | set once in `UrlParamsForm` / `SearchBarTextField` |
 
 Shared primitives go in `js/packages/ui/src/components/common/`.
 
@@ -161,9 +162,31 @@ so every step from 3 onwards attaches before/after screenshots of the main scree
     with a larger tooltip. `<col>` widths use `Box component="col"`. Screenshots of the 5 previews and the
     tables of 5 detail pages: all pixel-identical (the seeded sequences have no detail tables, so
     `SequenceDetailPage` is not covered). The DB e2e tests were not run: they reset the local database.
-    - [ ] Not done: the dialog scaffold and `Stack` rows from the table above. Filter field width:
-      `MIN_WIDTH` is 200 in the sequences and primers pages but 150 (and 1.5×) in the lines page, so a
-      single width would change the lines filters. Decide the width first.
+    - [x] Dialog scaffold: `FormDialog` (`components/common/`), a dialog that is a form, with a title, its
+      content, and Cancel and submit buttons (`onSubmit`, `submitLabel`, `submitDisabled`, `hideSubmit`;
+      `actions` replaces the buttons). It stops the submit event, which React would otherwise bubble
+      through the portal to a form around the dialog. Used by 12 dialogs: `HistoryLoadedDialog`,
+      `DownloadCloningStrategyDialog`, `DownloadSequenceFileDialog`, `EditSequenceNameDialog`,
+      `DownloadPrimersButton`, `SubmitToDatabaseDialog`, `DomesticateDialog`, `LoadFromDatabaseButton`,
+      `EditTextDialog`, and in `opencloningdb` `ConfirmMutationDialog`, `CreateTemplateSequenceButton` and
+      `SwitchWorkspaceDialog`. The last 5 were not forms: Enter in a field now submits them. Not converted:
+      dialogs without actions (information, pickers), `VerifyDeleteDialog` (no content),
+      `VerificationFileDialog` (only Close), `TransferSampleDialog` (actions only while confirming),
+      the `SubmitToDatabaseDialog` disclaimer, and `CreateLineDialog`, `CreateSampleDialog` and
+      `TagEntitiesDialog`, whose full-width submit button is inside the content (a different layout).
+      Screenshots of 11 dialogs in component tests: all byte-identical (`DomesticateDialog` not covered:
+      its service is down; `SwitchWorkspaceDialog` needs the OIDC provider). The e2e specs that open
+      these dialogs pass, except one test where an alert covers the button before the dialog opens.
+    - [x] Fix: the title of the `opencloningdb` app bar was dark. Its `color: 'white'` had been removed,
+      and the `h6` rule of `ove.css` won over the colour inherited from the app bar. It is now
+      `sx={{ color: 'inherit' }}` (the `color="inherit"` prop writes no CSS), and the skill says so for
+      headings. Checked in the running app: the title is white.
+    - [ ] Not done: the `Stack` row from the table above.
+    - [x] Filter field width: `filterFieldSx` (`minWidth: 200`, in `urlParamsForm.jsx`), the default of
+      `SearchBarTextField` and passed to the tag and type selects of the filter forms. The 3 `MIN_WIDTH`
+      constants are gone. The lines page used 150 (and 1.5× for genotype and plasmid). Screenshots of
+      the 3 filter bars: sequences and primers byte-identical, lines fields a few px narrower or wider
+      (a `TextField` is ~220px wide anyway).
   - [x] `apps/syntax-builder`: no styling warnings left (3 before), and `index.css` deleted: the page
     styles were already in `GlobalStyles` (step 4), the rest moved to `sx` (sticky header in
     `HeaderActions`, background in `App`, overhang columns in the `sequence` typography). Colour

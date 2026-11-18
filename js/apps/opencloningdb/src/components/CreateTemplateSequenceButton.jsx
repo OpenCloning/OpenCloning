@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from '@mui/material';
+import { Button, TextField } from '@mui/material';
+import { FormDialog } from '@opencloning/ui/components/common';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import useAppAlerts from '../hooks/useAppAlerts';
@@ -54,44 +48,35 @@ export default function CreateTemplateSequenceButton() {
         Create Template Sequence
       </Button>
 
-      <Dialog
+      <FormDialog
         open={dialogOpen}
         onClose={handleClose}
         data-testid="create-template-sequence-dialog"
-        slotProps={{
-          paper: {
-            component: 'form',
-            onSubmit: (e) => {
-              e.preventDefault();
-              if (!submissionAllowed) return;
-              createMutation.mutate({ name: name.trim(), sequence_type: sequenceType });
-            },
-          }
+        title="Create Template Sequence"
+        submitLabel="Create"
+        submitDisabled={!submissionAllowed}
+        onSubmit={() => {
+          if (!submissionAllowed) return;
+          createMutation.mutate({ name: name.trim(), sequence_type: sequenceType });
         }}
+        contentSx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 350, pt: 1 }}
       >
-        <DialogTitle>Create Template Sequence</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 350, pt: 1 }}>
-          <TextField
-            autoFocus
-            required
-            label="Name"
-            variant="standard"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            error={name.length > 0 && name.trim().length === 0}
-            helperText={name.length > 0 && name.trim().length === 0 ? 'Name cannot be empty' : undefined}
-          />
-          <SequenceTypeSelect
-            value={sequenceType}
-            onChange={setSequenceType}
-            isTemplateSequence
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" disabled={!submissionAllowed}>Create</Button>
-        </DialogActions>
-      </Dialog>
+        <TextField
+          autoFocus
+          required
+          label="Name"
+          variant="standard"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          error={name.length > 0 && name.trim().length === 0}
+          helperText={name.length > 0 && name.trim().length === 0 ? 'Name cannot be empty' : undefined}
+        />
+        <SequenceTypeSelect
+          value={sequenceType}
+          onChange={setSequenceType}
+          isTemplateSequence
+        />
+      </FormDialog>
     </>
   );
 }

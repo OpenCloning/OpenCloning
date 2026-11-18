@@ -4,12 +4,7 @@ import React from 'react';
 import {
   Alert,
   Box,
-  Button,
   Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -21,6 +16,7 @@ import {
 } from '@mui/material';
 import error2String from '@opencloning/utils/error2String';
 import useBackendHttpClient from '../../hooks/useBackendHttpClient';
+import FormDialog from '../common/FormDialog';
 import { featureToGenbankLocationString, mergeStates } from '@opencloning/utils';
 import { useDispatch, useStore } from 'react-redux';
 import { cloningActions } from '@opencloning/store/cloning';
@@ -161,117 +157,117 @@ export default function DomesticateDialog({ open, onClose, initialContext, mainS
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle>Domesticate (experimental)</DialogTitle>
-        <DialogContent>
-          <Alert severity="info" sx={{ mb: 2 }}>
-            {helperCategory}
-          </Alert>
-          <TextField
-            margin="dense"
-            label="Location"
-            value={location}
-            disabled
-            fullWidth
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Part name"
-            value={partName}
-            onChange={(ev) => setPartName(ev.target.value)}
-            fullWidth
-            required
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="cloning-type-label">Cloning type</InputLabel>
-            <Select
-              labelId="cloning-type-label"
-              label="Cloning type"
-              value={cloningType}
-              onChange={(ev) => setCloningType(ev.target.value)}
-            >
-              {CLONING_TYPES.map((t) => (
-                <MenuItem key={t} value={t}>{t}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {location.includes('join') && cloningType === 'synthesis' &&
-          <Alert severity="info" sx={{ mb: 2 }}>Synthesis will remove introns in this feature</Alert>
-          }
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="category-label" shrink>
-              Category
-            </InputLabel>
-            <Select
-              labelId="category-label"
-              label="Category"
-              value={category}
-              onChange={handleCategoryChange}
-              displayEmpty
-              notched
-            >
-              <MenuItem value="">
-                <em>None — use 4 bp prefix/suffix</em>
-              </MenuItem>
-              {ALLOWED_CATEGORIES.map((c) => (
-                <MenuItem key={c} value={c}>{c}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            label="Prefix"
-            value={prefix}
-            onChange={(ev) => setPrefix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
-            fullWidth
-            disabled={Boolean(category)}
-            helperText={category ? 'Clear category to edit' : 'Exactly 4 A/C/G/T when no category'}
-            slotProps={{
-              htmlInput: { maxLength: 4 }
-            }}
-          />
-          <TextField
-            margin="dense"
-            label="Suffix"
-            value={suffix}
-            onChange={(ev) => setSuffix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
-            fullWidth
-            disabled={Boolean(category)}
-            slotProps={{
-              htmlInput: { maxLength: 4 }
-            }}
-          />
-          <Box sx={{ mt: 1 }}>
-            <FormControl component="fieldset" variant="standard" required error={enzymes.length === 0}>
-              <FormHelperText>Enzymes to remove (at least one)</FormHelperText>
-              <FormGroup row>
-                {ENZYMES_TO_REMOVE.map((enz) => (
-                  <FormControlLabel
-                    key={enz}
-                    control={(
-                      <Checkbox
-                        checked={enzymes.includes(enz)}
-                        onChange={() => toggleEnzyme(enz)}
-                        name={enz}
-                      />
-                    )}
-                    label={enz}
+    <FormDialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      title="Domesticate (experimental)"
+      onSubmit={handleSubmit}
+      submitLabel={isSubmitting ? 'Submitting…' : 'Submit'}
+      submitDisabled={!validationOk || isSubmitting}
+      submitButtonProps={{ variant: 'contained' }}
+      cancelButtonProps={{ color: 'inherit' }}
+    >
+      <Alert severity="info" sx={{ mb: 2 }}>
+        {helperCategory}
+      </Alert>
+      <TextField
+        margin="dense"
+        label="Location"
+        value={location}
+        disabled
+        fullWidth
+        required
+      />
+      <TextField
+        margin="dense"
+        label="Part name"
+        value={partName}
+        onChange={(ev) => setPartName(ev.target.value)}
+        fullWidth
+        required
+      />
+      <FormControl fullWidth margin="dense">
+        <InputLabel id="cloning-type-label">Cloning type</InputLabel>
+        <Select
+          labelId="cloning-type-label"
+          label="Cloning type"
+          value={cloningType}
+          onChange={(ev) => setCloningType(ev.target.value)}
+        >
+          {CLONING_TYPES.map((t) => (
+            <MenuItem key={t} value={t}>{t}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {location.includes('join') && cloningType === 'synthesis' &&
+      <Alert severity="info" sx={{ mb: 2 }}>Synthesis will remove introns in this feature</Alert>
+      }
+      <FormControl fullWidth margin="dense">
+        <InputLabel id="category-label" shrink>
+          Category
+        </InputLabel>
+        <Select
+          labelId="category-label"
+          label="Category"
+          value={category}
+          onChange={handleCategoryChange}
+          displayEmpty
+          notched
+        >
+          <MenuItem value="">
+            <em>None — use 4 bp prefix/suffix</em>
+          </MenuItem>
+          {ALLOWED_CATEGORIES.map((c) => (
+            <MenuItem key={c} value={c}>{c}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <TextField
+        margin="dense"
+        label="Prefix"
+        value={prefix}
+        onChange={(ev) => setPrefix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
+        fullWidth
+        disabled={Boolean(category)}
+        helperText={category ? 'Clear category to edit' : 'Exactly 4 A/C/G/T when no category'}
+        slotProps={{
+          htmlInput: { maxLength: 4 }
+        }}
+      />
+      <TextField
+        margin="dense"
+        label="Suffix"
+        value={suffix}
+        onChange={(ev) => setSuffix(ev.target.value.toUpperCase().replace(/[^ACGT]/g, ''))}
+        fullWidth
+        disabled={Boolean(category)}
+        slotProps={{
+          htmlInput: { maxLength: 4 }
+        }}
+      />
+      <Box sx={{ mt: 1 }}>
+        <FormControl component="fieldset" variant="standard" required error={enzymes.length === 0}>
+          <FormHelperText>Enzymes to remove (at least one)</FormHelperText>
+          <FormGroup row>
+            {ENZYMES_TO_REMOVE.map((enz) => (
+              <FormControlLabel
+                key={enz}
+                control={(
+                  <Checkbox
+                    checked={enzymes.includes(enz)}
+                    onChange={() => toggleEnzyme(enz)}
+                    name={enz}
                   />
-                ))}
-              </FormGroup>
-            </FormControl>
-          </Box>
-          {error && <Alert severity="error">{error}</Alert>}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="inherit">Cancel</Button>
-          <Button type="submit" variant="contained" disabled={!validationOk || isSubmitting}>
-            {isSubmitting ? 'Submitting…' : 'Submit'}
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+                )}
+                label={enz}
+              />
+            ))}
+          </FormGroup>
+        </FormControl>
+      </Box>
+      {error && <Alert severity="error">{error}</Alert>}
+    </FormDialog>
   );
 }

@@ -37,7 +37,10 @@ Never hard-code a colour (`'green'`, `'#1976d2'`, `rgb(...)`). Use a palette tok
 `'primary.main'`, `'error.main'`, `'text.secondary'` or `'divider'`. If none fits, add a token to the
 theme and use it.
 
-- Text on the app bar inherits its colour: don't set `'white'`, set nothing (or `color="inherit"`).
+- Text on the app bar inherits its colour: don't set `'white'`. Plain text needs nothing, but a heading
+  (`Typography variant="h1"`...`"h6"`) needs `sx={{ color: 'inherit' }}`: the sequence editor's `ove.css`
+  gives bare `h1`-`h6` a dark colour, which wins over the inherited one. The `color="inherit"` prop is
+  not enough, because MUI writes no CSS for it.
 - Translucent colours: `sx={(theme) => ({ backgroundColor: theme.alpha(theme.palette.error.main, 0.15) })}`.
 - In CSS, use the theme's CSS variables: `var(--opencloning-palette-primary-main)`.
 
@@ -70,6 +73,9 @@ In `js/packages/ui/src/components/common/` (apps import them from `@opencloning/
 - `FileUploadButton`: a button that opens the file picker (`onFiles` gets an array of files). For a file
   picker opened from a menu, use `<input type="file" hidden ref={…}>`, not `style={{ display: 'none' }}`.
 - `CodeBlock`: code or other preformatted text.
+- `FormDialog`: a dialog with a title, content, and Cancel and submit buttons (`onSubmit`, `submitLabel`,
+  `submitDisabled`). The dialog is a form, so Enter in a field submits it. Use it rather than writing
+  `Dialog`, `DialogTitle`, `DialogContent` and `DialogActions` by hand.
 
 ## Spacing between siblings
 

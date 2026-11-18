@@ -1,4 +1,5 @@
 import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography } from '@mui/material';
+import FormDialog from '../common/FormDialog';
 import React from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import useDatabase from '../../hooks/useDatabase';
@@ -108,29 +109,20 @@ function SubmitToDatabaseDialog({ id, dialogOpen, setDialogOpen, resourceType })
   }
 
   return (
-    <Dialog
+    <FormDialog
       open={dialogOpen}
       onClose={handleClose}
       data-testid="submit-to-database-component"
-      slotProps={{
-        paper: {
-          component: 'form',
-          sx: { width: '40%' },
-          onSubmit: handleSubmit,
-        }
-      }}
+      paperSx={{ width: '40%' }}
+      title={`Save ${resourceType} to ${database.name}`}
+      onSubmit={handleSubmit}
+      submitLabel={isSubmitting ? <CircularProgress /> : 'Submit'}
+      submitDisabled={isSubmitting || submissionData === null || !database.isSubmissionDataValid(submissionData)}
     >
-      <DialogTitle>{`Save ${resourceType} to ${database.name}`}</DialogTitle>
-      <DialogContent>
-        <database.SubmitToDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} resourceType={resourceType} />
-        {resourceType === 'sequence' && !isSubmitting && <database.PrimersNotInDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} />}
-        {errorMessage && <Alert sx={{ marginTop: 2 }} severity="error">{errorMessage}</Alert>}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting || submissionData === null || !database.isSubmissionDataValid(submissionData)}>{isSubmitting ? <CircularProgress /> : 'Submit'}</Button>
-      </DialogActions>
-    </Dialog>
+      <database.SubmitToDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} resourceType={resourceType} />
+      {resourceType === 'sequence' && !isSubmitting && <database.PrimersNotInDatabaseComponent id={id} submissionData={submissionData} setSubmissionData={setSubmissionData} />}
+      {errorMessage && <Alert sx={{ marginTop: 2 }} severity="error">{errorMessage}</Alert>}
+    </FormDialog>
   );
 }
 

@@ -28,6 +28,9 @@ export function useQueryParamsForm(parse, applyToSearchParams) {
   return { paramsFromUrl, pendingParams, setPendingParams, submitToUrl };
 }
 
+// Width of the fields of a filter form (SearchBarTextField uses it by default)
+export const filterFieldSx = { minWidth: 200 };
+
 /**
  * Form wrapper that submits pending params to the URL on submit.
  * Renders children with (pendingParams, setPendingParams) so you can plug in your fields.

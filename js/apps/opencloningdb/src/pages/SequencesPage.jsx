@@ -17,7 +17,7 @@ import { openCloningDBHttpClient, endpoints, TagMultiSelect, SequenceTypeSelect 
 import { parseSequenceParams, applySequenceParamsToSearchParams } from '../utils/query_utils';
 import SearchBarTextField from '../components/SearchBarTextField';
 import useAppAlerts from '../hooks/useAppAlerts';
-import { UrlParamsForm } from '../components/urlParamsForm';
+import { UrlParamsForm, filterFieldSx } from '../components/urlParamsForm';
 import TagEntitiesButton from '../components/TagEntitiesButton';
 import TopButtonSection from '../components/TopButtonSection';
 import AddToCloningButton from '../components/AddToCloningButton';
@@ -31,8 +31,6 @@ import CheckSequencingButton from '../components/CheckSequencingButton';
 import BulkLinkSequencingFilesButton from '../components/bulk_upload/BulkLinkSequencingFilesButton';
 import useRowSelection from '../hooks/useRowSelection';
 
-const MIN_WIDTH = 200;
-
 function SequenceQueryFields({ pendingParams, setPendingParams }) {
   const { addErrorAlert } = useAppAlerts();
   return (
@@ -42,33 +40,30 @@ function SequenceQueryFields({ pendingParams, setPendingParams }) {
         placeholder="Search by UID"
         value={pendingParams.uid ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, uid: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
       />
       <SearchBarTextField
         label="Name"
         placeholder="Search by name"
         value={pendingParams.name ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, name: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
       />
       <SequenceTypeSelect
         multiple
         value={pendingParams.sequence_types ?? []}
         onChange={(value) => setPendingParams((p) => ({ ...p, sequence_types: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
+        sx={filterFieldSx}
       />
       <TagMultiSelect
         onCreateError={addErrorAlert}
         value={pendingParams.tags ?? []}
         onChange={(value) => setPendingParams((p) => ({ ...p, tags: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
+        sx={filterFieldSx}
       />
       <SearchBarTextField
         label="Created by"
         placeholder="Search by user name"
         value={pendingParams.created_by ?? ''}
         onChange={(value) => setPendingParams((p) => ({ ...p, created_by: value }))}
-        sx={{ minWidth: MIN_WIDTH }}
       />
       <FormControlLabel
         control={

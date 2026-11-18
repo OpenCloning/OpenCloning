@@ -49,7 +49,7 @@ function AppLayout() {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', overflowX: 'auto' }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ mr: 4 }}>
+          <Typography variant="h6" sx={{ mr: 4, color: 'inherit' }}>
             OpenCloning
           </Typography>
           <Tabs
