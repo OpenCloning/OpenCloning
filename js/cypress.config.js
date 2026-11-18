@@ -1,6 +1,5 @@
 import { defineConfig } from 'cypress';
 import fs from 'fs';
-import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import registerCodeCoverageTasks from '@cypress/code-coverage/task';
 import { clerkSetup } from '@clerk/testing/cypress';
 import react from '@vitejs/plugin-react';
@@ -89,9 +88,6 @@ export default defineConfig({
                 'apps/*/src/*'
               ],
               extension: ['.js', '.jsx'],
-            }),
-            ViteEjsPlugin({
-              umami_website_id: process.env.VITE_UMAMI_WEBSITE_ID,
             }),
             react(),
           ],

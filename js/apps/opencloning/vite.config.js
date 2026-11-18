@@ -1,5 +1,4 @@
 import react from '@vitejs/plugin-react';
-import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { loadEnv } from 'vite';
 
 import { resolve } from 'path';
@@ -46,9 +45,19 @@ export default ({ mode }) => {
         extension: ['.js', '.jsx'],
         cwd: resolve(import.meta.dirname, '../..'),
       }),
-      ViteEjsPlugin({
-        umami_website_id: env.VITE_UMAMI_WEBSITE_ID,
-      }),
+      {
+        // Include umami analytics only when a website id is configured
+        name: 'umami-analytics',
+        transformIndexHtml() {
+          const websiteId = env.VITE_UMAMI_WEBSITE_ID;
+          if (!websiteId) return;
+          return [{
+            tag: 'script',
+            attrs: { async: true, defer: true, src: 'https://cloud.umami.is/script.js', 'data-website-id': websiteId },
+            injectTo: 'head',
+          }];
+        },
+      },
       {
         name: 'copy-config',
         configResolved() {
