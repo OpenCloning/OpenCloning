@@ -22,7 +22,7 @@ services:
     # use a specific version tag to pin the image
     # example: elabftw/elabimg:4.0.5
     # default value: elabftw/elabimg:stable
-    image: elabftw/elabimg:stable
+    image: elabftw/elabimg:5.6.15
     # this ensures the container will be restarted after a reboot of the server
     # default value: always
     restart: always
@@ -420,7 +420,7 @@ services:
   #    - elabftw-net
 
   opencloning-plugin:
-    image: manulera/opencloning:prod-baseurl-opencloning
+    image: manulera/opencloning:local
     container_name: opencloning-plugin
     restart: always
     # platform: linux/amd64
