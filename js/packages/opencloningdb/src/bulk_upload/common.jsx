@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, TableContainer, Paper, Button, CircularProgress, Box, Table, TableBody, TableHead, TableRow, TableCell, FormControl } from '@mui/material';
+import { Typography, TableContainer, Paper, Button, CircularProgress, Box, Stack, Table, TableBody, TableHead, TableRow, TableCell, FormControl } from '@mui/material';
 import TagMultiSelect from '../TagMultiSelect';
 import { Cancel as CancelIcon, CheckCircle as CheckCircleIcon, Info as InfoIcon, Warning as WarningIcon } from '@mui/icons-material';
 
@@ -46,9 +46,10 @@ export function BulkUploadPreviewTableWrapper({
 
   const clearButtonText = warningRowsCount === 0 ? 'Import' : 'Import entries without warnings';
   return (
-    <>
+    // flex and minHeight: the table scrolls inside the modal (a flex column)
+    <Stack spacing={2} sx={{ flex: 1, minHeight: 0 }}>
       {onBulkTagsChange && (
-        <FormControl fullWidth sx={{ mb: 2 }}>
+        <FormControl fullWidth>
           <TagMultiSelect
             label="Tags to apply (optional)"
             value={bulkTags}
@@ -58,7 +59,7 @@ export function BulkUploadPreviewTableWrapper({
           />
         </FormControl>
       )}
-      <Typography variant="body2" sx={{ mb: 2 }}>
+      <Typography variant="body2">
         {orderingText}
       </Typography>
 
@@ -66,7 +67,7 @@ export function BulkUploadPreviewTableWrapper({
         {children}
       </BulkTableContainer>
 
-      <Typography variant="body2" sx={{ mb: 2 }}>
+      <Typography variant="body2">
         {summaryText}
       </Typography>
 
@@ -110,7 +111,7 @@ export function BulkUploadPreviewTableWrapper({
           </>
         )}
       </Box>
-    </>
+    </Stack>
   );
 }
 
