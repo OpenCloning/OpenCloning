@@ -1,7 +1,8 @@
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import React from 'react';
 import { useSelector, useStore } from 'react-redux';
-import { downloadStateAsJson, downloadStateAsZip } from '@opencloning/utils/readNwrite';
+import { downloadState } from '@opencloning/utils/readNwrite';
+import error2String from '@opencloning/utils/error2String';
 import useCloningAlerts from '../hooks/useCloningAlerts';
 import FormDialog from './common/FormDialog';
 
@@ -23,16 +24,11 @@ function DownloadCloningStrategyDialog({ open, setOpen }) {
       submitLabel="Save file"
       onSubmit={async () => {
         setOpen(false);
-        const cloningState = store.getState().cloning;
-        if (extension === '.zip') {
-          try {
-            await downloadStateAsZip(cloningState, fileName + extension);
-          } catch (error) {
-            console.error(error);
-            addAlert({ message: error.message, severity: 'error' });
-          }
-        } else {
-          downloadStateAsJson(cloningState, fileName + extension);
+        try {
+          await downloadState(store.getState().cloning, fileName + extension);
+        } catch (error) {
+          console.error(error);
+          addAlert({ message: error2String(error), severity: 'error' });
         }
       }}
     >

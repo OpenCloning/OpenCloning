@@ -4,16 +4,10 @@ import { cloningActions } from '@opencloning/store/cloning';
 import useDatabase from './useDatabase';
 import useLoadDatabaseFile from './useLoadDatabaseFile';
 import useCloningAlerts from './useCloningAlerts';
-import useValidateState from './useValidateState';
 import useCloningHistoryLoader from './useCloningHistoryLoader';
 import useLoadingTask from './useLoadingTask';
 import { formatSequenceLocationString, getUrlParameters } from '@opencloning/utils/other';
-import { formatTemplate } from '@opencloning/utils/readNwrite';
 import { encodePathSegment } from '@opencloning/utils/urlUtils';
-import { getExternalHttpClient } from '@opencloning/utils/httpClients';
-
-// For public urls (not the backend)
-const httpClient = getExternalHttpClient();
 
 const { updateSource } = cloningActions;
 
@@ -30,8 +24,7 @@ export default function useUrlParamsLoader() {
   const { addAlert } = useCloningAlerts();
   const setHistoryFileError = (e) => addAlert({ message: e, severity: 'error' });
   const { loadDatabaseFile } = useLoadDatabaseFile({ source: { id: 1 }, sendSourceRequest: null, setHistoryFileError });
-  const validateState = useValidateState();
-  const { applyCloningStrategy, loadHistoryFromFile } = useCloningHistoryLoader();
+  const { loadHistoryFromUrl } = useCloningHistoryLoader();
   const withLoading = useLoadingTask();
 
   useEffect(() => {
@@ -55,24 +48,8 @@ export default function useUrlParamsLoader() {
       } else if (urlParams.source === 'example' && urlParams.example) {
         try {
           const url = `${import.meta.env.BASE_URL}examples/${encodePathSegment(urlParams.example)}`;
-          const fileName = urlParams.example;
-          if (fileName.endsWith('.zip')) {
-            const resp = await httpClient.get(url, { responseType: 'blob' });
-            if (resp.headers['content-type'] !== 'application/zip') {
-              throw new Error('Not found');
-            }
-            const file = new File([resp.data], fileName);
-            const prepared = await loadHistoryFromFile(file, { onError: setHistoryFileError });
-            await prepared?.replace();
-          } else {
-            const resp = await httpClient.get(url);
-            if (resp.headers['content-type'] !== 'application/json') {
-              throw new Error('Not found');
-            }
-            const file = new File([JSON.stringify(resp.data)], fileName);
-            const prepared = await loadHistoryFromFile(file, { onError: setHistoryFileError });
-            await prepared?.replace();
-          }
+          const validated = await loadHistoryFromUrl(url, { onError: setHistoryFileError });
+          await validated?.replace();
         } catch (error) {
           addAlert({
             message: 'Error loading example',
@@ -90,10 +67,8 @@ export default function useUrlParamsLoader() {
             throw new Error('Invalid strategy id');
           }
           const url = `${mcpUrl.replace(/\/$/, '')}/strategies/${encodePathSegment(urlParams.strategy)}.json`;
-          const resp = await httpClient.get(url);
-          const file = new File([JSON.stringify(resp.data)], 'mcp_strategy.json');
-          const prepared = await loadHistoryFromFile(file, { onError: setHistoryFileError });
-          await prepared?.replace();
+          const validated = await loadHistoryFromUrl(url, { onError: setHistoryFileError });
+          await validated?.replace();
         } catch (error) {
           addAlert({
             message: 'Error loading strategy from the MCP server (it may have expired or not exist)',
@@ -105,11 +80,8 @@ export default function useUrlParamsLoader() {
         try {
           const baseUrl = 'https://assets.opencloning.org/OpenCloning-submission';
           const url = `${baseUrl}/processed/${encodePathSegment(urlParams.key)}/templates/${encodePathSegment(urlParams.template)}`;
-          const { data } = await httpClient.get(url);
-          const validatedData = await validateState(data);
-          const newState = formatTemplate(validatedData, url);
-
-          await applyCloningStrategy(newState, { mode: 'replace' });
+          const validated = await loadHistoryFromUrl(url, { isTemplate: true, onError: setHistoryFileError });
+          await validated?.replace();
         } catch (error) {
           addAlert({
             message: 'Error loading template',

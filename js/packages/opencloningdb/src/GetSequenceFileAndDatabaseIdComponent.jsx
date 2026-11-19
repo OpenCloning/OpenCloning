@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import SequenceSelect from './SequenceSelect';
 import { openCloningDBHttpClient } from './common';
 import endpoints from './endpoints';
+import databaseSequenceToHistoryFile from './databaseSequenceToHistoryFile';
 import { CircularProgress, FormControl } from '@mui/material';
 import RetryAlert from '@opencloning/ui/components/form/RetryAlert';
 
@@ -13,14 +14,9 @@ function GetSequenceFileAndDatabaseIdComponent({ setFile, setDatabaseId }) {
     mutationFn: async (selectedSequence) => {
       const selectedId = selectedSequence.id;
       const response = await openCloningDBHttpClient.get(endpoints.sequenceTextFile(selectedId));
-      const sequence = { ...response.data, id: 1 };
-      const source = { id: 1, input: [], database_id: selectedId, type: 'DatabaseSource' };
-      const cloningStrategy = { sources: [source], sequences: [sequence], primers: [] };
-      const fileContent = JSON.stringify(cloningStrategy);
-
       return {
         databaseId: selectedId,
-        file: new File([fileContent], 'cloning_strategy.json', { type: 'application/json' }),
+        file: databaseSequenceToHistoryFile(response.data, selectedId),
       };
     },
     onSuccess: ({ file, databaseId }) => {
