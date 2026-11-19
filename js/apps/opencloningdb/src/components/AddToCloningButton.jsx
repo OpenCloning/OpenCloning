@@ -4,7 +4,7 @@ import { Button, CircularProgress } from '@mui/material'
 import { useMutation } from '@tanstack/react-query';
 import useCloningAlerts from '@opencloning/ui/hooks/useCloningAlerts';
 import useLoadDatabaseFile from '@opencloning/ui/hooks/useLoadDatabaseFile';
-import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
+import { openCloningDBHttpClient, endpoints, databaseSequenceToHistoryFile } from '@opencloning/opencloningdb';
 import { useDispatch, useStore } from 'react-redux';
 import { cloningActions } from '@opencloning/store/cloning';
 import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
@@ -23,10 +23,7 @@ function AddToCloningButton({ selectedEntities, children, entityType, disabled, 
     try {
       if (entityType === 'sequence') {
         const { data: sequence } = await openCloningDBHttpClient.get(endpoints.sequenceTextFile(seqId));
-        const source = { id: sequence.id, input: [], database_id: seqId, type: 'DatabaseSource' };
-        const cloningStrategy = { sources: [source], sequences: [sequence], primers: [] };
-        const file = new File([JSON.stringify(cloningStrategy)], 'cloning_strategy.json', { type: 'application/json' });
-        await loadDatabaseFile(file, seqId);
+        await loadDatabaseFile(databaseSequenceToHistoryFile(sequence, seqId), seqId);
       } else if (entityType === 'primer') {
         const { data: primer } = await openCloningDBHttpClient.get(endpoints.primer(seqId));
         dispatch(addPrimer({ name: primer.name, sequence: primer.sequence, database_id: seqId }));

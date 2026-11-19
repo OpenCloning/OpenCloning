@@ -3,7 +3,7 @@ import { AppBar, Box, Toolbar, Container, Button, Tooltip, IconButton, Menu, Men
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import ButtonWithMenu from './ButtonWithMenu';
-import { downloadCloningStrategyAsSvg, formatTemplate } from '@opencloning/utils/readNwrite';
+import { downloadCloningStrategyAsSvg } from '@opencloning/utils/readNwrite';
 import SelectExampleDialog from './SelectExampleDialog';
 import SelectTemplateDialog from './SelectTemplateDialog';
 import FeedbackDialog from './FeedbackDialog';
@@ -15,10 +15,6 @@ import LoadCloningHistoryWrapper from '../LoadCloningHistoryWrapper';
 import useCloningHistoryLoader from '../../hooks/useCloningHistoryLoader';
 import useLoadingTask from '../../hooks/useLoadingTask';
 import GithubCornerRight from './GithubCornerRight';
-import { getExternalHttpClient } from '@opencloning/utils/httpClients';
-
-// External urls (not the backend): no auth token, only whitelisted urls
-const httpClient = getExternalHttpClient();
 
 const { setCurrentTab } = cloningActions;
 
@@ -43,7 +39,7 @@ function MainAppBar() {
 
   const dispatch = useDispatch();
   const { addAlert } = useCloningAlerts();
-  const { applyCloningStrategy, loadHistoryFromFile } = useCloningHistoryLoader();
+  const { loadHistoryFromUrl } = useCloningHistoryLoader();
   const withLoading = useLoadingTask();
 
   // Hidden input field, used to load files.
@@ -64,30 +60,12 @@ function MainAppBar() {
 
 
   const loadExampleOrTemplate = async (url, isTemplate) => {
-    const fileName = url.split('/').pop();
-    let file;
-    if (url.endsWith('.zip')) {
-      const { data: blob } = await httpClient.get(url, { responseType: 'blob' });
-      file = new File([blob], fileName);
-    } else {
-      const { data: jsonData } = await httpClient.get(url);
-      file = new File([JSON.stringify(jsonData)], fileName);
-    }
-    const prepared = await loadHistoryFromFile(file, {
-      onError: (message) => addAlert({ message, severity: 'error' }),
-    });
-    if (!prepared) {
+    const validated = await loadHistoryFromUrl(url, { isTemplate });
+    if (!validated) {
       return;
     }
-    let strategy = prepared.cloningStrategy;
-    if (isTemplate) {
-      strategy = formatTemplate(strategy, url);
-    }
     try {
-      await applyCloningStrategy(strategy, {
-        verificationFiles: prepared.verificationFiles,
-        mode: 'replace',
-      });
+      await validated.replace();
     } catch {
       // Error already reported by applyCloningStrategy, which restores the previous state
       return;

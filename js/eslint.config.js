@@ -83,6 +83,8 @@ export default [
         Cypress: 'readonly',
         describe: 'readonly',
         it: 'readonly',
+        before: 'readonly',
+        after: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
         expect: 'readonly',

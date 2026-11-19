@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash-es';
-import { base64ToBlob, downloadStateAsJson, downloadStateAsZip, loadFilesToVerificationStore } from './readNwrite';
+import { base64ToBlob, downloadState, loadFilesToVerificationStore } from './readNwrite';
 import { cloningActions } from '@opencloning/store/cloning';
 import { collectParentSequencesAndSources, getSubState, mergeStates } from './network';
 import { getVerificationFileName } from './readNwrite';
@@ -8,17 +8,11 @@ import { getUsedPrimerIds } from '@opencloning/store/cloning_utils';
 
 const { setState: setCloningState } = cloningActions;
 
-export const exportSubStateThunk = (fileName, sequenceId, format = 'json') => async (dispatch, getState) => {
-  // Download the subHistory for a given sequence
-  const state = getState();
-  const substate = getSubState(state, sequenceId);
-  if (format === 'json') {
-    downloadStateAsJson({ ...substate, description: '' }, fileName);
-  } else if (format === 'zip') {
-    downloadStateAsZip({ ...substate, description: '' }, fileName);
-  } else {
-    throw new Error(`Invalid format: ${format}`);
-  }
+// Download the history of a given sequence, as json or zip (by default, the extension of fileName).
+// Rejects if the file cannot be made (e.g. a verification file is missing).
+export const exportSubStateThunk = (fileName, sequenceId, format = undefined) => async (dispatch, getState) => {
+  const substate = getSubState(getState(), sequenceId);
+  await downloadState({ ...substate, description: '' }, fileName, format);
 };
 
 export const CopySequenceThunk = (sequenceId) => async (dispatch, getState) => {

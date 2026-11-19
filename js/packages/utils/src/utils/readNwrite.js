@@ -111,6 +111,20 @@ export const downloadStateAsZip = async (cloningState, zipFileName = 'cloning_st
   downloadBlob(blob, zipFileName);
 };
 
+/**
+ * Download a cloning state as json or zip (with the verification files). The format is 'json' or 'zip',
+ * by default the extension of fileName. Rejects for other formats, or if a verification file is missing.
+ */
+export const downloadState = async (cloningState, fileName, format = fileName.split('.').pop()) => {
+  if (format === 'json') {
+    return downloadStateAsJson(cloningState, fileName);
+  }
+  if (format === 'zip') {
+    return downloadStateAsZip(cloningState, fileName);
+  }
+  throw new Error(`Cannot save cloning strategy as ${fileName}, the format must be json or zip`);
+};
+
 export const downloadSequence = (fileName, sequenceData) => {
   if (sequenceData === undefined) {
     return;
@@ -178,7 +192,12 @@ export async function extractFilesFromZip(zipFile, filter) {
   }
 }
 
-export async function parseHistoryFile(file) {
+/**
+ * Read a history file (.json, or .zip with a json and its verification files).
+ * Returns { cloningStrategy, verificationFiles }. The shape of the cloning strategy is not checked
+ * (see checkCloningStrategyShape), but the verification files of a zip must match the ones in the json.
+ */
+export async function readHistoryFile(file) {
   const isZipFile = file.name.endsWith('.zip');
   const isJsonFile = file.name.endsWith('.json');
 
@@ -239,22 +258,57 @@ export async function parseHistoryFile(file) {
     }
   }
 
-  // Validate the cloning strategy
-  if (newCloningStrategy.primers === undefined || newCloningStrategy.sequences === undefined || newCloningStrategy.sources === undefined) {
+  return { cloningStrategy: newCloningStrategy, verificationFiles };
+}
+
+/** Throw if the cloning strategy does not have the arrays primers, sequences and sources. */
+export function checkCloningStrategyShape(cloningStrategy) {
+  if (cloningStrategy === null || typeof cloningStrategy !== 'object'
+    || cloningStrategy.primers === undefined || cloningStrategy.sequences === undefined || cloningStrategy.sources === undefined) {
     throw new Error('JSON file should contain at least keys: primers, sequences and sources');
   }
   // They should be arrays
-  if (!Array.isArray(newCloningStrategy.primers)) {
+  if (!Array.isArray(cloningStrategy.primers)) {
     throw new Error('primers should be an array');
   }
-  if (!Array.isArray(newCloningStrategy.sequences)) {
+  if (!Array.isArray(cloningStrategy.sequences)) {
     throw new Error('sequences should be an array');
   }
-  if (!Array.isArray(newCloningStrategy.sources)) {
+  if (!Array.isArray(cloningStrategy.sources)) {
     throw new Error('sources should be an array');
   }
+}
 
-  return { cloningStrategy: newCloningStrategy, verificationFiles };
+/** readHistoryFile + checkCloningStrategyShape */
+export async function parseHistoryFile(file) {
+  const { cloningStrategy, verificationFiles } = await readHistoryFile(file);
+  checkCloningStrategyShape(cloningStrategy);
+  return { cloningStrategy, verificationFiles };
+}
+
+/**
+ * Set the app versions on a cloning strategy that does not have them (e.g. one built in the app from a
+ * database sequence), so that the backend does not treat it as an old version to migrate.
+ * The versions that the cloning strategy already has are kept, so that old files are migrated.
+ */
+export function fillMissingVersions(cloningStrategy, { backendVersion, schemaVersion, frontendVersion }) {
+  return {
+    ...cloningStrategy,
+    backend_version: cloningStrategy.backend_version ?? backendVersion,
+    schema_version: cloningStrategy.schema_version ?? schemaVersion,
+    frontend_version: cloningStrategy.frontend_version ?? frontendVersion,
+  };
+}
+
+/** The data and config to post a file to an endpoint that takes a file (e.g. read_from_file). */
+export function fileUploadRequest(file, params = undefined) {
+  const requestData = new FormData();
+  requestData.append('file', file);
+  const config = { headers: { 'content-type': 'multipart/form-data' } };
+  if (params !== undefined) {
+    config.params = params;
+  }
+  return { requestData, config };
 }
 
 export const loadFilesToVerificationStore = async (files, idShift = 0) => {

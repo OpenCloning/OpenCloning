@@ -1,65 +1,14 @@
 import React from 'react';
-import { useDispatch, useStore } from 'react-redux';
+import { useStore } from 'react-redux';
 import useCloningAlerts from '../hooks/useCloningAlerts';
 import useCloningHistoryLoader from '../hooks/useCloningHistoryLoader';
-import { getEmptyPlaceholderSource } from '@opencloning/store/cloning_utils';
-import { cloningActions } from '@opencloning/store/cloning';
 import HistoryLoadedDialog from './HistoryLoadedDialog';
-import useBackendHttpClient from '../hooks/useBackendHttpClient';
 import useLoadingTask from '../hooks/useLoadingTask';
-
-const { deleteSourceAndItsChildren, addSourceAndItsOutputSequence } = cloningActions;
-
-async function processSequenceFiles(files, httpClient) {
-  const allSources = [];
-  const allSequences = [];
-  const allWarnings = [];
-
-  const processFile = async (file) => {
-    const fileName = file.name;
-    const fileContent = await file.arrayBuffer();
-    const newFile = new File([fileContent], fileName);
-
-    const formData = new FormData();
-    formData.append('file', newFile);
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
-    const url = 'read_from_file';
-    try {
-      const { data: { sources, sequences }, headers } = await httpClient.post(url, formData, config);
-      // If there are warnings, add them to the list of warnings
-      const warnings = headers['x-warning'] ? [`${fileName}: ${headers['x-warning']}`] : [];
-      return { sources, sequences, warnings };
-    } catch (e) {
-      if (e.code === 'ERR_NETWORK') {
-        throw new Error('Cannot connect to backend server', { cause: e });
-      } else {
-        console.error(e);
-        throw new Error(`Could not read the file ${fileName}`, { cause: e });
-      }
-    }
-  };
-
-  const results = await Promise.all(Array.from(files).map((file) => processFile(file)));
-
-  results.forEach(({ sources, sequences, warnings }) => {
-    allSources.push(...sources);
-    allSequences.push(...sequences);
-    allWarnings.push(...warnings);
-  });
-
-  return { sources: allSources, sequences: allSequences, warnings: allWarnings };
-}
 
 function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
   const { addAlert } = useCloningAlerts();
-  const dispatch = useDispatch();
   const store = useStore();
-  const httpClient = useBackendHttpClient();
-  const { loadHistoryFromFile, loadSnapgeneHistory } = useCloningHistoryLoader();
+  const { loadHistoryFromFile, loadSequenceFiles, loadSnapgeneHistory } = useCloningHistoryLoader();
   const [fileLoaderFunctions, setFileLoaderFunctions] = React.useState(null);
   const withLoading = useLoadingTask();
 
@@ -76,26 +25,25 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
       const isJsonFile = files.length === 1 && files[0].name.endsWith('.json');
       // If the file is a zip or json file, load the history file
       if (isZipFile || isJsonFile) {
-        const prepared = await loadHistoryFromFile(files[0]);
-        if (!prepared) {
+        const validated = await loadHistoryFromFile(files[0]);
+        if (!validated) {
           return;
         }
 
         const errorWrapper = (fn) => async () => {
           try {
             await fn();
-          } catch (e) {
-            console.error(e);
-            addAlert({ message: e.message, severity: 'error' });
+          } catch {
+            // Error already reported by applyCloningStrategy, which restores the previous state
           }
         };
         // If there are no sequences in the cloning state, load the history file
         if (cloningState.sequences.length === 0) {
-          await errorWrapper(prepared.replace)();
+          await errorWrapper(validated.replace)();
         } else {
           setFileLoaderFunctions({
-            addState: errorWrapper(prepared.merge),
-            replaceState: errorWrapper(prepared.replace),
+            addState: errorWrapper(validated.merge),
+            replaceState: errorWrapper(validated.replace),
             clear: () => setFileLoaderFunctions(null),
           });
         }
@@ -116,24 +64,8 @@ function LoadCloningHistoryWrapper({ fileList, clearFiles, children }) {
           return;
         }
       }
-      try {
-        const { sources, sequences, warnings } = await processSequenceFiles(files, httpClient);
-        // If there is only one source and it is empty, delete it
-        const emptyPlaceholder = getEmptyPlaceholderSource(cloningState.sources);
-        if (emptyPlaceholder) {
-          dispatch(deleteSourceAndItsChildren(emptyPlaceholder.id));
-        }
-        for (let i = 0; i < sources.length; i += 1) {
-          dispatch(addSourceAndItsOutputSequence({ source: sources[i], sequence: sequences[i] }));
-        }
-        warnings.forEach((warning) => addAlert({ message: warning, severity: 'warning' }));
-      } catch (e) {
-        console.error(e);
-        addAlert({
-          message: e.message,
-          severity: 'error',
-        });
-      }
+      // Errors are reported by loadSequenceFiles
+      await loadSequenceFiles(files);
     };
     withLoading(processFileSubmission, 'Loading files...');
   }, [fileList]);
