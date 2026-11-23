@@ -172,6 +172,43 @@ describe('Actions that can be perfomed by an edit user on the Lines page', () =>
     cy.get('[data-testid="line-parent-lines"]').contains('crispr_hdr-line').should('exist');
     cy.get('[data-testid="line-parent-lines"]').contains('homologous_recombination-line').should('exist');
   });
+  it('can create more isolates of a line', () => {
+    cy.e2eLogin('/lines', 'bootstrap+clerk_test@example.com', 'password');
+    cy.get('tbody tr').contains('crispr_hdr-line').click();
+    cy.get('[data-testid="resource-detail-header-title"]').contains('crispr_hdr-line').should('exist');
+    cy.get('button').contains('More isolates').click();
+    cy.get('[data-testid="create-isolates-dialog"]').within(() => {
+      // Existing UID, cannot submit
+      cy.setInputValue('Line UID 1', 'crispr_hdr-line', 'div');
+      cy.contains('Line UID already exists').should('exist');
+      cy.get('button').contains('Create 1 line').should('be.disabled');
+      cy.setInputValue('Line UID 1', 'isolate-1', 'div');
+      cy.get('button').contains('Create 1 line').should('be.enabled');
+
+      // Duplicated UIDs (case-insensitive), cannot submit
+      cy.get('button').contains('Add another UID').click();
+      cy.setInputValue('Line UID 2', 'ISOLATE-1', 'div');
+      cy.contains('Duplicate UIDs').should('exist');
+      cy.get('button').contains('Create 2 lines').should('be.disabled');
+      cy.setInputValue('Line UID 2', 'isolate-2', 'div');
+      cy.contains('Duplicate UIDs').should('not.exist');
+
+      cy.intercept('POST', Cypress.getDbURL(endpoints.postLine)).as('postLine');
+      cy.get('button').contains('Create 2 lines').click();
+    });
+    cy.wait('@postLine');
+    cy.wait('@postLine');
+    cy.dbAlertExists('2 line(s) created: isolate-1, isolate-2');
+    cy.closeDbAlerts();
+    cy.get('[data-testid="create-isolates-dialog"]').should('not.exist');
+
+    // The new lines have the same alleles and plasmids as the original line
+    cy.get('button').contains('Back to Lines').click();
+    cy.get('tbody tr').contains('isolate-2').click();
+    cy.get('[data-testid="resource-detail-header-title"]').contains('isolate-2').should('exist');
+    cy.get('[data-testid="line-genotype"]').contains('3xHA-ase1').should('exist');
+    cy.get('[data-testid="line-plasmids"]').contains('pFA6a-3HA-kanMX6').should('exist');
+  });
   it('can create a line without parents nor alleles nor plasmids', () => {
     cy.e2eLogin('/lines', 'bootstrap+clerk_test@example.com', 'password');
     cy.get('button').contains('Create line').click();

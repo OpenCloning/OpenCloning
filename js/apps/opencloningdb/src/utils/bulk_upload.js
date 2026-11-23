@@ -260,39 +260,69 @@ export async function finalFastqFilesFromZip(zipFile) {
 }
 
 /**
- * Table to fill by hand with the sample UID and the sequence of each sample of the run, sorted by sample name.
- * The sample UID is pre-filled with the sample name. known ({ sampleName: sequenceName }) pre-fills the sequence
- * names that are already known (the sequence of an existing sample with that UID, or a sequence that matches).
+ * A row of the table to link a sequencing file to a sample:
+ * - uid: UID of the sample the file goes to, null if not chosen yet
+ * - sample: the existing sample with that UID (with its sequence), null for a new sample
+ * - sequence: the sequence of the new sample (null if not chosen yet), unused for existing samples
+ * - matchedByRead: the sequence was found by "Find exact matches" (the read is that sequence)
+ * - candidates: sequences found by "Find exact matches" when there were several, for the user to choose
+ * - skip: the file is not linked
  */
-export function sampleTableTsv(files, known = {}) {
-  const sampleNames = files.map(fastqSampleName).sort((a, b) => a.localeCompare(b));
-  const rows = sampleNames.map((name) => `${name}\t${name}\t${known[name] ?? ''}`);
-  return `${['sample_name\tsample_uid\tsequence_name', ...rows].join('\n')}\n`;
-}
+export const linkRow = (file, sample = null) => ({
+  sampleName: fastqSampleName(file),
+  file,
+  uid: sample?.uid ?? null,
+  sample,
+  sequence: null,
+  matchedByRead: false,
+  candidates: [],
+  skip: false,
+});
 
 /**
- * Pair the fastq files with the filled sample table (rows of delimitedFileToJson). Rows without sequence name are
- * skipped, an empty sample UID means the sample name. Returns [{ sampleUid, sequenceName, file }]: the file goes to
- * the sample with that UID, which is created for the sequence if it does not exist.
+ * Status of each row: { status, duplicates, conflict, blocking }
+ * - status: 'skip', 'existing' (existing sample), 'new' (new sample with its sequence), 'no_sample' (no sample
+ *   chosen), 'no_sequence' (new sample without sequence)
+ * - duplicates: sample names of the other rows that link a file to the same sample (allowed, e.g. two reads of
+ *   the same colony, but flagged in case it is a mistake)
+ * - conflict: the rows that create this new sample give it different sequences
+ * - blocking: the files cannot be linked until this is fixed
  */
-export function pairFastqFilesWithSequences(files, rows) {
-  const filesBySample = Object.fromEntries(files.map((file) => [fastqSampleName(file), file]));
-  const filledRows = rows
-    .map((row) => {
-      const sampleName = String(row.sample_name ?? '').trim();
-      return {
-        sampleName,
-        sampleUid: String(row.sample_uid ?? '').trim() || sampleName,
-        sequenceName: String(row.sequence_name ?? '').trim(),
-      };
-    })
-    .filter(({ sequenceName }) => sequenceName);
-  if (filledRows.length === 0) {
-    throw new Error('No sequence names were filled in the table');
-  }
-  const unknownSamples = filledRows.filter(({ sampleName }) => !filesBySample[sampleName]).map(({ sampleName }) => sampleName);
-  if (unknownSamples.length > 0) {
-    throw new Error(`Samples not found in the zip file: ${unknownSamples.join(', ')}`);
-  }
-  return filledRows.map(({ sampleName, sampleUid, sequenceName }) => ({ sampleUid, sequenceName, file: filesBySample[sampleName] }));
+export function linkRowStatuses(rows) {
+  const byUid = {};
+  rows.forEach((row) => {
+    if (!row.skip && row.uid) {
+      const key = row.uid.toLowerCase();
+      byUid[key] = [...(byUid[key] ?? []), row];
+    }
+  });
+  return rows.map((row) => {
+    if (row.skip) {
+      return { status: 'skip', duplicates: [], conflict: false, blocking: false };
+    }
+    if (!row.uid) {
+      return { status: 'no_sample', duplicates: [], conflict: false, blocking: true };
+    }
+    const sameUid = byUid[row.uid.toLowerCase()];
+    const duplicates = sameUid.filter((other) => other !== row).map((other) => other.sampleName);
+    if (row.sample) {
+      return { status: 'existing', duplicates, conflict: false, blocking: false };
+    }
+    const sequenceIds = new Set(sameUid.filter((other) => !other.sample && other.sequence).map((other) => other.sequence.id));
+    const conflict = sequenceIds.size > 1;
+    const status = row.sequence ? 'new' : 'no_sequence';
+    return { status, duplicates, conflict, blocking: conflict || status === 'no_sequence' };
+  });
+}
+
+/** The rows that are linked, as [{ sampleUid, sequenceId, file }], sequenceId '' for existing samples. */
+export function linkEntries(rows) {
+  return rows
+    .filter((row) => !row.skip)
+    .map((row) => ({ sampleUid: row.uid, sequenceId: row.sample ? '' : String(row.sequence?.id ?? ''), file: row.file }));
+}
+
+/** Number of samples that linking the rows creates. */
+export function newSampleCount(rows) {
+  return new Set(rows.filter((row) => !row.skip && row.uid && !row.sample).map((row) => row.uid.toLowerCase())).size;
 }

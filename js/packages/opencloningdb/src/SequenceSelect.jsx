@@ -9,7 +9,7 @@ const messages = {
 };
 
 
-const getGetQuery = (sequenceTypes) => {
+const getGetQuery = (sequenceTypes, filter) => {
   return (query) => ({
     queryKey: ['sequences', { sequence_types: sequenceTypes, query }],
     queryFn: async () => {
@@ -23,10 +23,13 @@ const getGetQuery = (sequenceTypes) => {
       ]);
       return [...results[0].data.items, ...results[1].data.items];
     },
+    ...(filter && { select: (sequences) => sequences.filter(filter) }),
   })};
 
-function SequenceSelect({ value, onChange, label, multiple = true, sequenceTypes = undefined, ...rest }) {
-  const { query, autocompleteProps, clearInput } = useDebouncedSearchQuery(getGetQuery(sequenceTypes), {minChars: 1});
+/** filter(sequence): only the sequences for which it is true are options (pass a stable function). */
+function SequenceSelect({ value, onChange, label, multiple = true, sequenceTypes = undefined, filter = undefined, ...rest }) {
+  const getQuery = React.useMemo(() => getGetQuery(sequenceTypes, filter), [sequenceTypes, filter]);
+  const { query, autocompleteProps, clearInput } = useDebouncedSearchQuery(getQuery, {minChars: 1});
 
   return (
     <QuerySelect

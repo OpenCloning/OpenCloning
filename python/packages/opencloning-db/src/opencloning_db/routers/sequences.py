@@ -698,6 +698,7 @@ def post_cloning_strategy_bulk(
 def get_sequences_by_seguid(
     seguid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
+    without_samples: bool = Query(description='Only the sequences that have no samples', default=False),
 ):
     """
     Look up all sequences with the given SEGUID.
@@ -705,6 +706,8 @@ def get_sequences_by_seguid(
     """
     _, session, workspace_id = ctx.destructure()
     stmt = _seguid_query(seguid, workspace_id)
+    if without_samples:
+        stmt = stmt.where(~exists().where(SequenceSample.sequence_id == Sequence.id))
     return [sequence_ref(seq) for seq in session.scalars(stmt).all()]
 
 
@@ -815,7 +818,7 @@ def get_sequence_sequencing_files(
 
 
 def _bulk_samples(
-    session, ctx, sample_uids: list[str], sequence_names: list[str]
+    session, ctx, sample_uids: list[str], sequence_ids: list[int | None]
 ) -> tuple[list[SequenceSample], list[str]]:
     """The sample each file goes to (existing ones, or new ones of the given sequence), and the errors."""
     workspace_id = ctx.workspace_id
@@ -828,30 +831,34 @@ def _bulk_samples(
             )
         )
     }
-    sequences = {}
-    for seq in session.scalars(
-        select(Sequence)
-        .where(Sequence.workspace_id == workspace_id, Sequence.name.in_({n for n in sequence_names if n}))
-        .order_by(Sequence.id)
-    ):
-        sequences.setdefault(seq.name, seq)
+    # Only real sequences: samples cannot be created for template sequences
+    sequences = {
+        seq.id: seq
+        for seq in session.scalars(
+            select(Sequence).where(
+                Sequence.workspace_id == workspace_id, Sequence.id.in_({i for i in sequence_ids if i is not None})
+            )
+        )
+    }
 
     errors = []
     new_samples: dict[str, SequenceSample] = {}
     samples = []
-    for uid, sequence_name in zip(sample_uids, sequence_names):
+    for uid, sequence_id in zip(sample_uids, sequence_ids):
         sample = existing.get(uid.lower()) or new_samples.get(uid.lower())
-        if sample is not None:
-            if sequence_name and sample.sequence.name != sequence_name:
-                errors.append(f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequence_name}')
+        if sequence_id is not None and sequence_id not in sequences:
+            errors.append(f'Sequence not found: {sequence_id}')
+        elif sample is not None:
+            if sequence_id is not None and sample.sequence.id != sequence_id:
+                errors.append(
+                    f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequences[sequence_id].name}'
+                )
             elif not isinstance(sample.sequence, Sequence):
                 errors.append(f'Sample {uid} belongs to a template sequence')
-        elif not sequence_name:
-            errors.append(f'Sample {uid} does not exist, give the sequence it belongs to')
-        elif sequence_name not in sequences:
-            errors.append(f'Sequence not found: {sequence_name}')
+        elif sequence_id is None:
+            errors.append(f'Sample {uid} does not exist: choose a sequence to create it')
         else:
-            sample = SequenceSample.from_create(uid=uid, sequence=sequences[sequence_name], ctx=ctx)
+            sample = SequenceSample.from_create(uid=uid, sequence=sequences[sequence_id], ctx=ctx)
             new_samples[uid.lower()] = sample
         samples.append(sample)
     return samples, errors
@@ -861,24 +868,27 @@ def _bulk_samples(
 def post_sequencing_files_bulk(
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
     sample_uids: List[str] = Form(...),
-    sequence_names: List[str] = Form(default_factory=list),
+    sequence_ids: List[str] = Form(default_factory=list),
     files: List[UploadFile] = File(...),
 ):
     """Link sequencing files to samples in bulk: files[i] is linked to the sample sample_uids[i]. If that sample
-    does not exist, it is created for the sequence called sequence_names[i] (the first one if several sequences
-    have that name). If the sample exists, sequence_names[i] can be empty, otherwise it must be the name of the
-    sequence of the sample. Nothing is linked or created if there is any error."""
+    does not exist, it is created for the sequence with id sequence_ids[i]. If the sample exists, sequence_ids[i]
+    can be empty, otherwise it must be the id of the sequence of the sample. Several files can go to the same
+    sample, also to a new one. Nothing is linked or created if there is any error."""
     _, session, workspace_id = ctx.destructure()
     sample_uids = [uid.strip() for uid in sample_uids]
-    sequence_names = [name.strip() for name in sequence_names] or [''] * len(sample_uids)
-    if not (len(sample_uids) == len(sequence_names) == len(files)):
-        raise HTTPException(400, 'Submit one sample UID (and one sequence name, possibly empty) per file')
+    sequence_ids = [i.strip() for i in sequence_ids] or [''] * len(sample_uids)
+    if not (len(sample_uids) == len(sequence_ids) == len(files)):
+        raise HTTPException(400, 'Submit one sample UID (and one sequence ID, possibly empty) per file')
     if any(not uid for uid in sample_uids):
         raise HTTPException(400, 'Sample UIDs cannot be empty')
+    if any(i and not i.isdigit() for i in sequence_ids):
+        raise HTTPException(400, 'Sequence IDs must be integers (or empty)')
+    sequence_ids = [int(i) if i else None for i in sequence_ids]
     max_size_mb = get_config().max_sequencing_file_size_mb
     contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
 
-    samples, errors = _bulk_samples(session, ctx, sample_uids, sequence_names)
+    samples, errors = _bulk_samples(session, ctx, sample_uids, sequence_ids)
     if not errors:
         # Pairs of sample and file name, to ensure that the same file is not added twice
         taken = {(id(sample), f.original_name) for sample in samples for f in sample.sequencing_files}

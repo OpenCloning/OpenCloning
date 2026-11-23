@@ -959,6 +959,27 @@ def test_get_sequences_by_seguid_known(sequences_client):
     assert sequences_client['pcr_product_id'] in ids
 
 
+def test_get_sequences_by_seguid_without_samples(sequences_client):
+    c = sequences_client['client']
+    headers = workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1'])
+    # A sequence without samples
+    seq_id = sequences_client['seq_patch_linear_id']
+    with Session(sequences_client['engine']) as session:
+        seguid = session.get(Sequence, seq_id).seguid
+
+    def ids(without_samples):
+        r = c.get(f'/sequences/by-seguid/{seguid}', headers=headers, params={'without_samples': without_samples})
+        assert r.status_code == 200
+        return {item['id'] for item in r.json()}
+
+    assert seq_id in ids(False)
+    assert seq_id in ids(True)
+    r = c.post('/sequence_samples', headers=headers, json={'uid': 'PATCH-SAMPLE', 'sequence_id': seq_id})
+    assert r.status_code == 200, r.text
+    assert seq_id in ids(False)
+    assert seq_id not in ids(True)
+
+
 @readonly_db
 def test_get_sequences_by_seguid_unknown_empty(sequences_client):
     c = sequences_client['client']
@@ -2287,13 +2308,14 @@ def test_post_cloning_strategy_long_primer(sequences_client):
 
 
 def _post_bulk_sequencing_files(ctx, rows, token_key='token_owner_w1', sample_uids=None):
-    """rows: [(sample_uid, sequence_name, file_name)], all files have the same dummy content."""
+    """rows: [(sample_uid, sequence, file_name)], all files have the same dummy content. sequence is the key of
+    the sequence id in ctx, or the value to submit as is if it is not a key (e.g. '' for existing samples)."""
     return ctx['client'].post(
         '/sequences/sequencing_files/bulk',
         headers=workspace_headers(ctx[token_key], ctx['w1']),
         data={
             'sample_uids': sample_uids if sample_uids is not None else [uid for uid, _, _ in rows],
-            'sequence_names': [name for _, name, _ in rows],
+            'sequence_ids': [str(ctx.get(sequence, sequence)) for _, sequence, _ in rows],
         },
         files=[('files', (file_name, b'@r\nACGT\n+\nIIII\n', 'application/octet-stream')) for *_, file_name in rows],
     )
@@ -2310,11 +2332,11 @@ def _sequencing_files(ctx, seq_id):
 def test_post_sequencing_files_bulk(sequences_client):
     ctx = sequences_client
     rows = [
-        # Existing sample, with or without its sequence name
-        ('SEQFILE-SAMPLE', 'seq_with_sequencing_file', 'A1-P1.final.fastq'),
+        # Existing sample, with or without its sequence id, case-insensitive UID
+        ('SEQFILE-SAMPLE', 'seq_with_sequencing_file_id', 'A1-P1.final.fastq'),
         ('seqfile-sample', '', 'A1-P1-2.final.fastq'),
         # New sample, created once for both files
-        ('NEW-SAMPLE', 'patch-linear-target', 'A1-P1.final.fastq'),
+        ('NEW-SAMPLE', 'seq_patch_linear_id', 'A1-P1.final.fastq'),
         ('NEW-SAMPLE', '', 'A1-P1-2.final.fastq'),
     ]
     r = _post_bulk_sequencing_files(ctx, rows)
@@ -2345,20 +2367,26 @@ def test_post_sequencing_files_bulk(sequences_client):
         (
             [('SEQFILE-SAMPLE', '', 'a.fastq')],
             ['SEQFILE-SAMPLE', 'OTHER'],
-            'Submit one sample UID (and one sequence name, possibly empty) per file',
+            'Submit one sample UID (and one sequence ID, possibly empty) per file',
         ),
-        ([(' ', 'patch-linear-target', 'a.fastq')], None, 'Sample UIDs cannot be empty'),
+        ([(' ', 'seq_patch_linear_id', 'a.fastq')], None, 'Sample UIDs cannot be empty'),
+        ([('NEW-1', 'not_an_id', 'a.fastq')], None, 'Sequence IDs must be integers (or empty)'),
         (
             [
-                ('NEW-1', 'missing', 'a.fastq'),
-                ('NEW-2', 'template_sequence', 'b.fastq'),
+                ('NEW-1', '999999', 'a.fastq'),
+                # Template sequences cannot have samples created this way
+                ('NEW-2', 'template_sequence_id', 'b.fastq'),
                 ('NEW-3', '', 'c.fastq'),
-                ('SEQFILE-SAMPLE', 'patch-linear-target', 'd.fastq'),
+                ('SEQFILE-SAMPLE', 'seq_patch_linear_id', 'd.fastq'),
+                # Two files for the same new sample, with different sequences
+                ('NEW-4', 'seq_patch_linear_id', 'e.fastq'),
+                ('new-4', 'seq_with_sequencing_file_id', 'f.fastq'),
             ],
             None,
-            'Sample NEW-3 does not exist, give the sequence it belongs to; '
+            'Sample NEW-3 does not exist: choose a sequence to create it; '
             'Sample SEQFILE-SAMPLE belongs to sequence seq_with_sequencing_file, not patch-linear-target; '
-            'Sequence not found: missing; Sequence not found: template_sequence',
+            'Sample new-4 belongs to sequence patch-linear-target, not seq_with_sequencing_file; '
+            'Sequence not found: {template_sequence_id}; Sequence not found: 999999',
         ),
         (
             [('SEQFILE-SAMPLE', '', 'hello_world.txt')],
@@ -2366,7 +2394,7 @@ def test_post_sequencing_files_bulk(sequences_client):
             'SEQFILE-SAMPLE already has a sequencing file called hello_world.txt',
         ),
         (
-            [('NEW-SAMPLE', 'patch-linear-target', 'a.fastq'), ('NEW-SAMPLE', '', 'a.fastq')],
+            [('NEW-SAMPLE', 'seq_patch_linear_id', 'a.fastq'), ('NEW-SAMPLE', '', 'a.fastq')],
             None,
             'NEW-SAMPLE already has a sequencing file called a.fastq',
         ),
@@ -2376,12 +2404,12 @@ def test_post_sequencing_files_bulk_errors(sequences_client, rows, sample_uids, 
     ctx = sequences_client
     r = _post_bulk_sequencing_files(ctx, rows, sample_uids=sample_uids)
     assert r.status_code == 400
-    assert r.json()['detail'] == detail
+    assert r.json()['detail'] == detail.format(template_sequence_id=ctx['template_sequence_id'])
     # Nothing was linked or created
     assert _sequencing_files(ctx, ctx['seq_with_sequencing_file_id']) == [('SEQFILE-SAMPLE', 'hello_world.txt')]
     assert _sequencing_files(ctx, ctx['seq_patch_linear_id']) == []
     with Session(ctx['engine']) as session:
-        assert session.scalar(select(SequenceSample).where(SequenceSample.uid.like('NEW%'))) is None
+        assert session.scalar(select(SequenceSample).where(SequenceSample.uid.ilike('NEW%'))) is None
 
 
 def test_post_sequencing_files_bulk_viewer_forbidden(sequences_client):
