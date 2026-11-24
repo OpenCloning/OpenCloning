@@ -421,9 +421,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cypress/react@npm:^9.0.2":
-  version: 9.0.2
-  resolution: "@cypress/react@npm:9.0.2"
+"@cypress/react@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "@cypress/react@npm:10.0.1"
   peerDependencies:
     "@types/react": ^18 || ^19
     "@types/react-dom": ^18 || ^19
@@ -433,7 +433,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/874909aab290417d3436a1bc3bce14df991563649400b6887d2743c02b68839af08745d544574dcc7a0811e61497ea4cb0098f929854956f6466762d0c75249e
+  checksum: 10/97a8b4428355b04117787c5f5058948a39a2524dce492d2751ae857328a3d7f4c8fbef004cba92fd2fd4114c9a0ca58e4fab151b2b8dc46bc556ded206bbeea9
   languageName: node
   linkType: hard
 
@@ -8372,7 +8372,7 @@ __metadata:
   dependencies:
     "@clerk/testing": "patch:@clerk/testing@npm%3A2.2.37#~/.yarn/patches/@clerk-testing-npm-2.2.37-69582bb577.patch"
     "@cypress/code-coverage": "npm:^4.1.3"
-    "@cypress/react": "npm:^9.0.2"
+    "@cypress/react": "npm:^10.0.1"
     "@eslint/js": "npm:^10.0.1"
     "@tanstack/react-query": "npm:^5.107.1"
     "@testing-library/react": "npm:^14.3.1"
