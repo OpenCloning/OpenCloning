@@ -12,6 +12,8 @@ import {
   prepareLineRowsForValidation,
   prepareTemplateSequenceRowsForValidation,
   splitSpaceSeparatedField,
+  withMatches,
+  withTarget,
 } from './bulk_upload';
 
 describe('prepareTemplateSequenceRowsForValidation', () => {
@@ -123,7 +125,7 @@ describe('rows to link sequencing files', () => {
   const existing = { uid: 'S1', sequence_id: 1, sequence: pREX0008 };
 
   it('starts with the existing sample of the same name, or no sample', () => {
-    expect(linkRow(file('S1'), existing)).toMatchObject({ sampleName: 'S1', uid: 'S1', sample: existing, sequence: null, skip: false });
+    expect(linkRow(file('S1'), existing)).toMatchObject({ sampleName: 'S1', uid: 'S1', sample: existing, sequence: pREX0008, skip: false });
     expect(linkRow(file('A1-P1'))).toMatchObject({ sampleName: 'A1-P1', uid: null, sample: null, candidates: [] });
   });
 
@@ -200,5 +202,39 @@ describe('rows to link sequencing files', () => {
       ['S1', 'A1.final.fastq'],
       ['NEW', 'S1.final.fastq'],
     ]);
+  });
+
+  it('changes the sample of a row, keeping the sequence for a new sample', () => {
+    const other = { uid: 'S2', sequence_id: 2, sequence: pJOG684 };
+    const atExisting = linkRow(file('S1'), existing);
+    // Another existing sample: its sequence
+    expect(withTarget(atExisting, { uid: 'S2', sample: other })).toMatchObject({ uid: 'S2', sample: other, sequence: pJOG684 });
+    // A new sample: the sequence of the existing sample
+    const atNew = withTarget(atExisting, { uid: 'NEW', sample: null });
+    expect(atNew).toMatchObject({ uid: 'NEW', sample: null, sequence: pREX0008, matchedByRead: false });
+    expect(linkRowStatuses([atNew])[0].status).toBe('new');
+    // Renaming a new sample matched by read keeps the match
+    const matched = { ...linkRow(file('A1')), uid: 'A1', sequence: pJOG684, matchedByRead: true };
+    expect(withTarget(matched, { uid: 'A1-bis', sample: null })).toMatchObject({ uid: 'A1-bis', sequence: pJOG684, matchedByRead: true });
+    // Choosing an existing sample, or none, drops the match
+    expect(withTarget(matched, { uid: 'S1', sample: existing })).toMatchObject({ sequence: pREX0008, matchedByRead: false });
+    expect(withTarget(matched, null)).toMatchObject({ uid: null, sample: null, sequence: null, matchedByRead: false });
+  });
+
+  it('applies the sequences that match the read to rows without sample', () => {
+    const row = linkRow(file('A1'));
+    expect(withMatches(row, [pJOG684])).toMatchObject({ uid: 'A1', sample: null, sequence: pJOG684, matchedByRead: true, candidates: [] });
+    expect(withMatches(row, [pJOG684, pREX0008]))
+      .toMatchObject({ uid: 'A1', sequence: null, matchedByRead: false, candidates: [pJOG684, pREX0008] });
+    // No matches, unreadable file, or rows that have a sample or are skipped: unchanged
+    const unchanged = [
+      [row, []],
+      [row, null],
+      [row, undefined],
+      [linkRow(file('S1'), existing), [pJOG684]],
+      [{ ...row, uid: 'NEW' }, [pJOG684]],
+      [{ ...row, skip: true }, [pJOG684]],
+    ];
+    unchanged.forEach(([r, matches]) => expect(withMatches(r, matches)).toBe(r));
   });
 });

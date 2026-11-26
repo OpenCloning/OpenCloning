@@ -263,7 +263,8 @@ export async function finalFastqFilesFromZip(zipFile) {
  * A row of the table to link a sequencing file to a sample:
  * - uid: UID of the sample the file goes to, null if not chosen yet
  * - sample: the existing sample with that UID (with its sequence), null for a new sample
- * - sequence: the sequence of the new sample (null if not chosen yet), unused for existing samples
+ * - sequence: the sequence of the sample: that of the existing sample, or the one chosen for the new sample (null
+ *   if not chosen yet)
  * - matchedByRead: the sequence was found by "Find exact matches" (the read is that sequence)
  * - candidates: sequences found by "Find exact matches" when there were several, for the user to choose
  * - skip: the file is not linked
@@ -273,11 +274,46 @@ export const linkRow = (file, sample = null) => ({
   file,
   uid: sample?.uid ?? null,
   sample,
-  sequence: null,
+  sequence: sample?.sequence ?? null,
   matchedByRead: false,
   candidates: [],
   skip: false,
 });
+
+/**
+ * The row with another sample, target ({ uid, sample }, sample null for a new sample, see SampleTargetSelect), or
+ * without sample if target is null. A new sample keeps the sequence of the previous sample (existing or new).
+ */
+export function withTarget(row, target) {
+  if (!target) {
+    return { ...row, uid: null, sample: null, sequence: null, matchedByRead: false };
+  }
+  if (target.sample) {
+    return { ...row, uid: target.uid, sample: target.sample, sequence: target.sample.sequence, matchedByRead: false };
+  }
+  // The sequence of an existing sample was not matched by read
+  return { ...row, uid: target.uid, sample: null, matchedByRead: !row.sample && row.matchedByRead };
+}
+
+/**
+ * The row with the sequences that are exactly its read (see "Find exact matches"), null if the file could not be
+ * read: a new sample named as the file with the sequence if there is one, the candidates to choose from if there
+ * are several. Rows with a sample, skipped, or without matches are not changed.
+ */
+export function withMatches(row, matches) {
+  if (!matches?.length || row.skip || row.uid) {
+    return row;
+  }
+  const single = matches.length === 1;
+  return {
+    ...row,
+    uid: row.sampleName,
+    sample: null,
+    sequence: single ? matches[0] : null,
+    matchedByRead: single,
+    candidates: single ? [] : matches,
+  };
+}
 
 /** The existing sample of the row already has a sequencing file with the name of the file. */
 export const isAlreadyLinked = (row) => Boolean(row.sample?.sequencing_files?.some(({ original_name: name }) => name === row.file.name));

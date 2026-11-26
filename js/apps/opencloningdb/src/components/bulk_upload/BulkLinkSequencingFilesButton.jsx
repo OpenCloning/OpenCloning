@@ -14,6 +14,7 @@ import error2String from '@opencloning/utils/error2String';
 import useAppAlerts from '../../hooks/useAppAlerts';
 import {
   fastqSampleName, finalFastqFilesFromZip, isAlreadyLinked, linkEntries, linkRow, linkRowStatuses, newSampleCount,
+  withMatches, withTarget,
 } from '../../utils/bulk_upload';
 import SampleTargetSelect from './SampleTargetSelect';
 
@@ -77,7 +78,7 @@ function SequenceCell({ row, onChange }) {
     return null;
   }
   if (row.sample) {
-    return <Typography variant="body2">{row.sample.sequence?.name ?? `Sequence ${row.sample.sequence_id}`}</Typography>;
+    return <Typography variant="body2">{row.sequence.name}</Typography>;
   }
   return (
     <Stack spacing={0.5}>
@@ -117,9 +118,13 @@ export default function BulkLinkSequencingFilesButton() {
   const queryClient = useQueryClient();
   const backendHttpClient = useBackendHttpClient();
 
+  // changes: the fields to change, or a function of the current row that returns the new row
   const updateRow = (index, changes) => setRun((current) => ({
     ...current,
-    rows: current.rows.map((row, i) => (i === index ? { ...row, ...changes } : row)),
+    rows: current.rows.map((row, i) => {
+      if (i !== index) return row;
+      return typeof changes === 'function' ? changes(row) : { ...row, ...changes };
+    }),
   }));
 
   const readZip = useMutation({
@@ -144,17 +149,8 @@ export default function BulkLinkSequencingFilesButton() {
     },
     onSuccess: (results) => {
       const matchesByIndex = Object.fromEntries(results.map(({ index, matches }) => [index, matches]));
-      setRun((current) => ({
-        ...current,
-        rows: current.rows.map((row, i) => {
-          const matches = matchesByIndex[i];
-          // Rows that the user changed while matching are left as they are
-          if (!matches?.length || row.skip || row.uid) return row;
-          return matches.length === 1
-            ? { ...row, uid: row.sampleName, sample: null, sequence: matches[0], matchedByRead: true, candidates: [] }
-            : { ...row, uid: row.sampleName, sample: null, sequence: null, matchedByRead: false, candidates: matches };
-        }),
-      }));
+      // Applied to the current rows: those that the user changed while matching are left as they are
+      setRun((current) => ({ ...current, rows: current.rows.map((row, i) => withMatches(row, matchesByIndex[i])) }));
       const matched = results.filter(({ matches }) => matches?.length > 0).length;
       const unreadable = results.filter(({ matches }) => matches === null).map(({ index }) => run.rows[index].sampleName);
       const message = `Matched ${matched} of ${plural(results.length, 'file')} without sample`
@@ -271,14 +267,7 @@ export default function BulkLinkSequencingFilesButton() {
                           <SampleTargetSelect
                             value={row.uid ? { uid: row.uid, sample: row.sample } : null}
                             newUid={row.sampleName}
-                            onChange={(target) => updateRow(i, {
-                              uid: target?.uid ?? null,
-                              sample: target?.sample ?? null,
-                              // A new sample keeps the sequence of the previous sample (existing or new)
-                              ...(target && !target.sample
-                                ? { sequence: row.sample?.sequence ?? row.sequence, ...(row.sample && { matchedByRead: false }) }
-                                : { sequence: null, matchedByRead: false }),
-                            })}
+                            onChange={(target) => updateRow(i, (current) => withTarget(current, target))}
                           />
                         )}
                       </TableCell>
