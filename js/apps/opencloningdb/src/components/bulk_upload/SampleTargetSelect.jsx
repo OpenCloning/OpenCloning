@@ -22,10 +22,11 @@ const sameTarget = (a, b) => a.uid.toLowerCase() === b.uid.toLowerCase() && Bool
  */
 export default function SampleTargetSelect({ value, onChange, newUid }) {
   const { query, autocompleteProps } = useDebouncedSearchQuery(getSearchQuery, { minChars: 1, debounceMs: 300 });
-  const { data: samples = [] } = useQuery(query);
   const typed = autocompleteProps.inputValue.trim();
   // The typed text is the selected value (shown in the field), not a search
-  const searching = typed && !(value && typed === value.uid);
+  const searching = Boolean(typed) && !(value && typed === value.uid);
+  // Only search while the user types: otherwise every row would query the UID of its selected sample
+  const { data: samples = [] } = useQuery({ ...query, enabled: query.enabled && searching });
 
   const options = React.useMemo(() => {
     const found = searching ? samples.map((sample) => ({ uid: sample.uid, sample })) : [];
