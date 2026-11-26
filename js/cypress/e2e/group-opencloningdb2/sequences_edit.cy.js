@@ -409,8 +409,9 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     const sampleInput = (sampleName) => row(sampleName).find('[data-testid="bulk-link-sample-select"] input');
     // The second text input of the row, after the sample
     const sequenceInput = (sampleName) => row(sampleName).find('input[type="text"]').eq(1);
+    // Types over the selected sample, as a user would: clearing the field would unset the sample (and its sequence)
     const chooseSample = (sampleName, typed, option) => {
-      sampleInput(sampleName).clear().type(typed);
+      sampleInput(sampleName).type(`{selectall}${typed}`);
       cy.get('li[role="option"]').contains(option).click();
     };
     const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
@@ -503,9 +504,9 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     row('GB_105355_c1').should('contain', 'Existing sample').and('not.contain', 'Already linked');
     row('GB_105355_c1').find('input[type="checkbox"]').should('be.enabled').and('be.checked');
     cy.get(submit).should('have.text', 'Link 5 files');
-    // A new sample keeps the sequence of the previous one
+    // A new sample keeps the sequence of the previous one (shown with its samples)
     chooseSample('GB_105417_c1', 'GB_105417_c1-bis', 'Create sample "GB_105417_c1-bis"');
-    sequenceInput('GB_105417_c1').should('have.value', 'pJOG173');
+    sequenceInput('GB_105417_c1').should('have.value', 'pJOG173 (GB_105417_c1)');
     row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
     cy.get(submit).should('have.text', 'Link 6 files · create 1 sample');
     cy.get(modal).contains('button', 'Cancel').click();
