@@ -261,7 +261,7 @@ def _bulk_samples(
         for sample in session.scalars(select(SequenceSample).where(SequenceSample.uid_in(workspace_id, sample_uids)))
     }
     # Only real sequences: samples cannot be created for template sequences
-    sequences = {
+    sequence_id2sequence = {
         seq.id: seq
         for seq in session.scalars(
             select(Sequence).where(
@@ -275,19 +275,19 @@ def _bulk_samples(
     samples = []
     for uid, sequence_id in zip(sample_uids, sequence_ids):
         sample = existing.get(uid.lower()) or new_samples.get(uid.lower())
-        if sequence_id is not None and sequence_id not in sequences:
+        if sequence_id is not None and sequence_id not in sequence_id2sequence:
             errors.append(f'Sequence not found: {sequence_id}')
         elif sample is not None:
             if sequence_id is not None and sample.sequence.id != sequence_id:
                 errors.append(
-                    f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequences[sequence_id].name}'
+                    f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequence_id2sequence[sequence_id].name}'
                 )
             elif not isinstance(sample.sequence, Sequence):
                 errors.append(f'Sample {uid} belongs to a template sequence')
         elif sequence_id is None:
             errors.append(f'Sample {uid} does not exist: choose a sequence to create it')
         else:
-            sample = SequenceSample.from_create(uid=uid, sequence=sequences[sequence_id], ctx=ctx)
+            sample = SequenceSample.from_create(uid=uid, sequence=sequence_id2sequence[sequence_id], ctx=ctx)
             new_samples[uid.lower()] = sample
         samples.append(sample)
     return samples, errors
