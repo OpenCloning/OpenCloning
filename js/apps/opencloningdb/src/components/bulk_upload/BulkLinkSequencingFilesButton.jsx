@@ -13,7 +13,7 @@ import { readSequencingFile } from '@opencloning/utils/readNwrite';
 import error2String from '@opencloning/utils/error2String';
 import useAppAlerts from '../../hooks/useAppAlerts';
 import {
-  fastqSampleName, finalFastqFilesFromZip, linkEntries, linkRow, linkRowStatuses, newSampleCount,
+  fastqSampleName, finalFastqFilesFromZip, isAlreadyLinked, linkEntries, linkRow, linkRowStatuses, newSampleCount,
 } from '../../utils/bulk_upload';
 import SampleTargetSelect from './SampleTargetSelect';
 
@@ -53,6 +53,13 @@ function RowStatus({ row, status }) {
   if (status.status === 'no_sample') chips.push(<Chip key="s" size="small" color="warning" label="Choose a sample" />);
   if (status.status === 'no_sequence') chips.push(<Chip key="s" size="small" color="warning" label="Choose a sequence" />);
   if (status.status === 'skip') chips.push(<Chip key="s" size="small" label="Skipped" />);
+  if (status.status === 'already_linked') {
+    chips.push(
+      <Tooltip key="s" title={`${row.uid} already has a sequencing file called ${row.file.name}. Choose another sample to link it.`}>
+        <Chip size="small" label="Already linked" />
+      </Tooltip>,
+    );
+  }
   if (row.matchedByRead && status.status === 'new') {
     chips.push(<Chip key="m" size="small" variant="outlined" label="Matched by read" />);
   }
@@ -191,10 +198,11 @@ export default function BulkLinkSequencingFilesButton() {
   }
 
   const statuses = run ? linkRowStatuses(run.rows) : [];
-  const linkedCount = statuses.filter(({ status }) => status !== 'skip').length;
+  const linkedCount = run ? linkEntries(run.rows).length : 0;
   const newSamples = run ? newSampleCount(run.rows) : 0;
   const blocked = statuses.some(({ blocking }) => blocking);
   const unresolved = statuses.filter(({ status }) => status === 'no_sample').length;
+  const alreadyLinked = statuses.filter(({ status }) => status === 'already_linked').length;
   const busy = link.isPending || findMatches.isPending;
 
   return (
@@ -228,7 +236,8 @@ export default function BulkLinkSequencingFilesButton() {
           <Stack spacing={2} sx={{ minHeight: 0 }}>
             <Typography data-testid="bulk-link-sequencing-files-count">
               {plural(run.rows.length, '.final.fastq file')} in {run.zipName}
-              {' '}({statuses.filter(({ status }) => status === 'existing').length} with an existing sample of the same name).
+              {' '}({statuses.filter(({ status }) => status === 'existing' || status === 'already_linked').length} with an
+              {' '}existing sample of the same name{alreadyLinked > 0 && `, ${alreadyLinked} already linked`}).
             </Typography>
             <Typography variant="body2">
               Each file goes to the sample whose UID is its sample name. For the others, search an existing sample, or
@@ -250,9 +259,9 @@ export default function BulkLinkSequencingFilesButton() {
                     <TableRow key={row.sampleName} data-testid="bulk-link-row" data-sample-name={row.sampleName}>
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={!row.skip}
+                          checked={!row.skip && !isAlreadyLinked(row)}
                           onChange={(event) => updateRow(i, { skip: !event.target.checked })}
-                          disabled={busy}
+                          disabled={busy || isAlreadyLinked(row)}
                           slotProps={{ input: { 'aria-label': `Link ${row.sampleName}` } }}
                         />
                       </TableCell>
@@ -265,8 +274,10 @@ export default function BulkLinkSequencingFilesButton() {
                             onChange={(target) => updateRow(i, {
                               uid: target?.uid ?? null,
                               sample: target?.sample ?? null,
-                              // A new sample keeps the sequence chosen for the previous new sample
-                              ...((target?.sample || !target) && { sequence: null, matchedByRead: false }),
+                              // A new sample keeps the sequence of the previous sample (existing or new)
+                              ...(target && !target.sample
+                                ? { sequence: row.sample?.sequence ?? row.sequence, ...(row.sample && { matchedByRead: false }) }
+                                : { sequence: null, matchedByRead: false }),
                             })}
                           />
                         )}

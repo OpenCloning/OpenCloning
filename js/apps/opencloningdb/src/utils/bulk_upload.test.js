@@ -4,6 +4,7 @@ import { TextReader } from '@zip.js/zip.js';
 import { getZipFileBlob } from '@opencloning/utils/readNwrite';
 import {
   finalFastqFilesFromZip,
+  isAlreadyLinked,
   linkEntries,
   linkRow,
   linkRowStatuses,
@@ -173,5 +174,31 @@ describe('rows to link sequencing files', () => {
       ['NEW', '2', 'A1.final.fastq'],
     ]);
     expect(newSampleCount(rows)).toBe(1);
+  });
+
+  it('does not link a file again to a sample that already has a file with its name', () => {
+    const withFile = { ...existing, sequencing_files: [{ id: 1, original_name: 'S1.final.fastq' }] };
+    const rows = [
+      // Same file name: already linked
+      linkRow(file('S1'), withFile),
+      // Another file of the same sample: linked, and not a duplicate of the already linked one
+      { ...linkRow(file('A1')), uid: 'S1', sample: withFile },
+      // Skipped wins over already linked
+      { ...linkRow(file('S1')), uid: 'S1', sample: withFile, skip: true },
+      // Changing the sample of an already linked file links it again
+      { ...linkRow(file('S1'), withFile), uid: 'NEW', sample: null, sequence: pJOG684 },
+    ];
+    expect(isAlreadyLinked(rows[0])).toBe(true);
+    expect(isAlreadyLinked(rows[1])).toBe(false);
+    expect(linkRowStatuses(rows)).toEqual([
+      { status: 'already_linked', duplicates: [], conflict: false, blocking: false },
+      { status: 'existing', duplicates: [], conflict: false, blocking: false },
+      { status: 'skip', duplicates: [], conflict: false, blocking: false },
+      { status: 'new', duplicates: [], conflict: false, blocking: false },
+    ]);
+    expect(linkEntries(rows).map(({ sampleUid, file: f }) => [sampleUid, f.name])).toEqual([
+      ['S1', 'A1.final.fastq'],
+      ['NEW', 'S1.final.fastq'],
+    ]);
   });
 });

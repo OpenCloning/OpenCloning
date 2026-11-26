@@ -279,10 +279,17 @@ export const linkRow = (file, sample = null) => ({
   skip: false,
 });
 
+/** The existing sample of the row already has a sequencing file with the name of the file. */
+export const isAlreadyLinked = (row) => Boolean(row.sample?.sequencing_files?.some(({ original_name: name }) => name === row.file.name));
+
+/** The file of the row is linked when submitting: not skipped, and not already linked to its sample. */
+const isLinked = (row) => !row.skip && !isAlreadyLinked(row);
+
 /**
  * Status of each row: { status, duplicates, conflict, blocking }
- * - status: 'skip', 'existing' (existing sample), 'new' (new sample with its sequence), 'no_sample' (no sample
- *   chosen), 'no_sequence' (new sample without sequence)
+ * - status: 'skip', 'already_linked' (the existing sample already has the file, not linked again), 'existing'
+ *   (existing sample), 'new' (new sample with its sequence), 'no_sample' (no sample chosen), 'no_sequence' (new
+ *   sample without sequence)
  * - duplicates: sample names of the other rows that link a file to the same sample (allowed, e.g. two reads of
  *   the same colony, but flagged in case it is a mistake)
  * - conflict: the rows that create this new sample give it different sequences
@@ -291,7 +298,7 @@ export const linkRow = (file, sample = null) => ({
 export function linkRowStatuses(rows) {
   const byUid = {};
   rows.forEach((row) => {
-    if (!row.skip && row.uid) {
+    if (isLinked(row) && row.uid) {
       const key = row.uid.toLowerCase();
       byUid[key] = [...(byUid[key] ?? []), row];
     }
@@ -299,6 +306,9 @@ export function linkRowStatuses(rows) {
   return rows.map((row) => {
     if (row.skip) {
       return { status: 'skip', duplicates: [], conflict: false, blocking: false };
+    }
+    if (isAlreadyLinked(row)) {
+      return { status: 'already_linked', duplicates: [], conflict: false, blocking: false };
     }
     if (!row.uid) {
       return { status: 'no_sample', duplicates: [], conflict: false, blocking: true };
@@ -318,7 +328,7 @@ export function linkRowStatuses(rows) {
 /** The rows that are linked, as [{ sampleUid, sequenceId, file }], sequenceId '' for existing samples. */
 export function linkEntries(rows) {
   return rows
-    .filter((row) => !row.skip)
+    .filter(isLinked)
     .map((row) => ({ sampleUid: row.uid, sequenceId: row.sample ? '' : String(row.sequence?.id ?? ''), file: row.file }));
 }
 

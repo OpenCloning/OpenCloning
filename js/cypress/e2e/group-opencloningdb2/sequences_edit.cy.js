@@ -489,6 +489,28 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.closeDbAlerts();
     cy.get(modal).should('not.exist');
 
+    // Opening the run again: the files already linked to their sample cannot be linked again, unless another sample
+    // is chosen
+    readSequencingRun().then((entries) => selectZip('seed_sequencing_run.zip', entries));
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+      .should('have.text', '10 .final.fastq files in seed_sequencing_run.zip (6 with an existing sample of the same name, 6 already linked).');
+    ['seqcheck_circular_1-sample', 'GB_105355_c1', 'GB_105417_c1'].forEach((sampleName) => {
+      row(sampleName).should('contain', 'Already linked');
+      row(sampleName).find('input[type="checkbox"]').should('be.disabled').and('not.be.checked');
+    });
+    cy.get(submit).should('have.text', 'Link 4 files');
+    chooseSample('GB_105355_c1', 'GB_105355_c2', 'GB_105355_c2 · pJOG684');
+    row('GB_105355_c1').should('contain', 'Existing sample').and('not.contain', 'Already linked');
+    row('GB_105355_c1').find('input[type="checkbox"]').should('be.enabled').and('be.checked');
+    cy.get(submit).should('have.text', 'Link 5 files');
+    // A new sample keeps the sequence of the previous one
+    chooseSample('GB_105417_c1', 'GB_105417_c1-bis', 'Create sample "GB_105417_c1-bis"');
+    sequenceInput('GB_105417_c1').should('have.value', 'pJOG173');
+    row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
+    cy.get(submit).should('have.text', 'Link 6 files · create 1 sample');
+    cy.get(modal).contains('button', 'Cancel').click();
+    cy.get(modal).should('not.exist');
+
     // The files are linked to the samples
     const sampleFiles = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`).find('[data-testid="sequencing-file-row"]');
     cy.get('tbody tr button').contains('pREX0008').click();
