@@ -83,7 +83,8 @@ class SequenceSampleCreate(ApiModel):
 
 
 class SequenceSampleUpdate(ApiModel):
-    """Rename a sample and/or change its location (an empty location clears it).
+    """Rename a sample and/or change its location. An empty location clears it; a missing or null field is left
+    unchanged (so that dumping a model with its defaults does not clear the location).
     To point a sample to another sequence, use the reassign endpoint."""
 
     uid: StrippedStr | None = Field(default=None, min_length=1)
@@ -295,7 +296,7 @@ class LineCreate(ApiModel):
 
 
 class LineUpdate(ApiModel):
-    uid: StrippedStr | None = None
+    uid: StrippedStr | None = Field(default=None, min_length=1)
     allele_ids: list[int] | None = None
     plasmid_ids: list[int] | None = None
     parent_ids: list[int] | None = None

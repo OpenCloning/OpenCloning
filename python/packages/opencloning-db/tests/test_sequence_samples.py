@@ -266,6 +266,11 @@ def test_patch_sequence_sample_owner_ok(seq_samples_client):
         'location': 'box 1',
     }
 
+    # null leaves the location unchanged (e.g. a client dumping a model with its defaults)
+    response = c.patch(f"/sequence_samples/{stored_uid}", headers=headers, json={'location': None})
+    assert response.status_code == 200
+    assert response.json()['location'] == 'box 1'
+
     # Renaming keeps the location, changing only the case is allowed
     response = c.patch(f"/sequence_samples/{stored_uid}", headers=headers, json={'uid': stored_uid.lower()})
     assert response.status_code == 200

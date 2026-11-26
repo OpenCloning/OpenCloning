@@ -165,7 +165,7 @@ def patch_sequence_sample(
         if body.uid.lower() != ps.uid.lower() and _uid_taken(session, workspace_id, body.uid):
             raise HTTPException(status_code=409, detail=f"UID '{body.uid}' already exists")
         ps.uid = body.uid
-    if 'location' in body.model_fields_set:
+    if body.location is not None:
         ps.location = body.location or None
     session.commit()
     session.refresh(ps)

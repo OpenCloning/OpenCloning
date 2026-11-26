@@ -594,6 +594,19 @@ def test_patch_line_uid_success(lines_client):
     assert response.json()['uid'] == 'L-W1-RENAMED'
 
 
+@readonly_db
+@pytest.mark.parametrize('uid', ['', '   '])
+def test_patch_line_uid_empty_422(lines_client, uid):
+    """A line UID cannot be set to an empty (or whitespace-only) string."""
+    c = lines_client['client']
+    response = c.patch(
+        f"/lines/{lines_client['line_w1_id']}",
+        headers=workspace_headers(lines_client['token_owner_w1'], lines_client['w1']),
+        json={'uid': uid},
+    )
+    assert response.status_code == 422
+
+
 def test_patch_line_uid_duplicate_409(lines_client):
     """PATCH uid to one already used by another line (case-insensitive) returns 409."""
     c = lines_client['client']
