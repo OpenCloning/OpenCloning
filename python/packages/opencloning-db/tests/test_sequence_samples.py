@@ -589,3 +589,145 @@ def test_sequence_samples_filters(seq_samples_client):
     assert uids(sequence_id=seq_samples_client['seq_w1_id']) == ['S-W1']
     assert uids(sequence_types='plasmid') == []
     assert uids(created_by='nobody') == []
+
+
+# --- Bulk linking of sequencing files ---
+
+
+def _post_bulk_sequencing_files(ctx, rows, token_key='token_owner_w1', sample_uids=None):
+    """rows: [(sample_uid, sequence, file_name)], all files have the same dummy content. sequence is the key of
+    the sequence id in ctx, or the value to submit as is if it is not a key (e.g. '' for existing samples)."""
+    return ctx['client'].post(
+        '/sequence_samples/sequencing_files/bulk',
+        headers=workspace_headers(ctx[token_key], ctx['w1']),
+        data={
+            'sample_uids': sample_uids if sample_uids is not None else [uid for uid, _, _ in rows],
+            'sequence_ids': [str(ctx.get(sequence, sequence)) for _, sequence, _ in rows],
+        },
+        files=[('files', (file_name, b'@r\nACGT\n+\nIIII\n', 'application/octet-stream')) for *_, file_name in rows],
+    )
+
+
+def _sequencing_files(ctx, seq_id):
+    """(sample uid, file name) of the sequencing files of a sequence."""
+    r = ctx['client'].get(
+        f'/sequences/{seq_id}/sequencing_files', headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    return sorted((f['sample_uid'], f['original_name']) for f in r.json())
+
+
+@pytest.fixture
+def bulk_ctx(seq_samples_client):
+    """seq_samples_client, with a sequencing file already linked to the sample S-W1."""
+    ctx = seq_samples_client
+    headers = workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    assert _upload(ctx['client'], headers, ctx['sample_w1_uid'], 'hello_world.txt').status_code == 200
+    return ctx
+
+
+def test_post_sequence_samples_sequencing_files_bulk(bulk_ctx):
+    ctx = bulk_ctx
+    rows = [
+        # Existing sample, with or without its sequence id, case-insensitive UID
+        ('S-W1', 'seq_w1_id', 'A1-P1.final.fastq'),
+        ('s-w1', '', 'A1-P1-2.final.fastq'),
+        # New sample, created once for both files
+        ('NEW-SAMPLE', 'seq_w1_actual_id', 'A1-P1.final.fastq'),
+        ('NEW-SAMPLE', '', 'A1-P1-2.final.fastq'),
+    ]
+    r = _post_bulk_sequencing_files(ctx, rows)
+    assert r.status_code == 200, r.text
+    assert r.json() == {'created': 4, 'created_samples': 1}
+    assert _sequencing_files(ctx, ctx['seq_w1_id']) == [
+        ('S-W1', 'A1-P1-2.final.fastq'),
+        ('S-W1', 'A1-P1.final.fastq'),
+        ('S-W1', 'hello_world.txt'),
+    ]
+    assert _sequencing_files(ctx, ctx['seq_w1_actual_id']) == [
+        ('NEW-SAMPLE', 'A1-P1-2.final.fastq'),
+        ('NEW-SAMPLE', 'A1-P1.final.fastq'),
+    ]
+
+    # Submitting again fails, as the samples already have files with those names
+    r = _post_bulk_sequencing_files(ctx, rows[:2])
+    assert r.status_code == 400
+    assert r.json()['detail'] == (
+        'S-W1 already has a sequencing file called A1-P1-2.final.fastq; '
+        'S-W1 already has a sequencing file called A1-P1.final.fastq'
+    )
+
+
+@pytest.mark.parametrize(
+    'rows, sample_uids, detail',
+    [
+        (
+            [('S-W1', '', 'a.fastq')],
+            ['S-W1', 'OTHER'],
+            'Submit one sample UID (and one sequence ID, possibly empty) per file',
+        ),
+        ([(' ', 'seq_w1_actual_id', 'a.fastq')], None, 'Sample UIDs cannot be empty'),
+        ([('NEW-1', 'not_an_id', 'a.fastq')], None, 'Sequence IDs must be integers (or empty)'),
+        (
+            [
+                ('NEW-1', '999999', 'a.fastq'),
+                # Template sequences cannot have samples created this way
+                ('NEW-2', 'template_w1_id', 'b.fastq'),
+                ('NEW-3', '', 'c.fastq'),
+                ('S-W1', 'seq_w1_actual_id', 'd.fastq'),
+                # Two files for the same new sample, with different sequences
+                ('NEW-4', 'seq_w1_actual_id', 'e.fastq'),
+                ('new-4', 'seq_w1_id', 'f.fastq'),
+            ],
+            None,
+            'Sample NEW-3 does not exist: choose a sequence to create it; '
+            'Sample S-W1 belongs to sequence seq-w1, not seq-w1-actual; '
+            'Sample new-4 belongs to sequence seq-w1-actual, not seq-w1; '
+            'Sequence not found: {template_w1_id}; Sequence not found: 999999',
+        ),
+        (
+            # Samples and sequences of other workspaces are not found
+            [('S-W2', '', 'a.fastq'), ('NEW-1', 'seq_w2_id', 'b.fastq')],
+            None,
+            'Sample S-W2 does not exist: choose a sequence to create it; Sequence not found: {seq_w2_id}',
+        ),
+        (
+            [('S-W1', '', 'hello_world.txt')],
+            None,
+            'S-W1 already has a sequencing file called hello_world.txt',
+        ),
+        (
+            [('NEW-SAMPLE', 'seq_w1_actual_id', 'a.fastq'), ('NEW-SAMPLE', '', 'a.fastq')],
+            None,
+            'NEW-SAMPLE already has a sequencing file called a.fastq',
+        ),
+    ],
+)
+def test_post_sequence_samples_sequencing_files_bulk_errors(bulk_ctx, rows, sample_uids, detail):
+    ctx = bulk_ctx
+    r = _post_bulk_sequencing_files(ctx, rows, sample_uids=sample_uids)
+    assert r.status_code == 400
+    assert r.json()['detail'] == detail.format(**ctx)
+    # Nothing was linked or created
+    assert _sequencing_files(ctx, ctx['seq_w1_id']) == [('S-W1', 'hello_world.txt')]
+    assert _sequencing_files(ctx, ctx['seq_w1_actual_id']) == []
+    r = ctx['client'].get(
+        '/sequence_samples', params={'uid': 'new'}, headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    assert r.json()['items'] == []
+
+
+def test_post_sequence_samples_sequencing_files_bulk_unnamed_file(bulk_ctx):
+    ctx = bulk_ctx
+    body, content_type = unnamed_file_multipart({'sample_uids': 'S-W1', 'sequence_ids': ''})
+    r = ctx['client'].post(
+        '/sequence_samples/sequencing_files/bulk',
+        headers={**workspace_headers(ctx['token_owner_w1'], ctx['w1']), **content_type},
+        content=body,
+    )
+    assert r.status_code == 400
+    assert r.json()['detail'] == 'Sequencing files must have a name'
+
+
+def test_post_sequence_samples_sequencing_files_bulk_viewer_forbidden(bulk_ctx):
+    r = _post_bulk_sequencing_files(bulk_ctx, [('S-W1', '', 'a.fastq')], 'token_viewer_w1')
+    assert r.status_code == 403
