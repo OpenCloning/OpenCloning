@@ -280,6 +280,8 @@ class TestMigration_3c5e8f1a9b27:
             self._insert_sample(conn, seq_id=101, workspace_id=1, uid='only-sample')
             self._insert_files(conn, 101, 'a1.ab1', 'a2.ab1')
             # No sample: placeholder, its uid is already taken
+            # we create a smaple in 104 that has the name that would have been
+            # generated automatically if 102 had no samples
             self._insert_sample(conn, seq_id=104, workspace_id=1, uid='Unassigned-102')
             self._insert_files(conn, 102, 'b.ab1')
             # Several samples: by uid in the file name (longest match), else placeholder

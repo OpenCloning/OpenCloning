@@ -33,7 +33,8 @@ def _free_uid(candidate: str, used: set[str]) -> str:
 
 
 def _sample_for_file(file_name: str, samples: list[tuple[int, str]]) -> int | None:
-    """Id of the sample whose uid is the longest one contained in *file_name* (case-insensitive),
+    """Tries to link a sample with a filename, if the sample uid is contain within the filename.
+    Returns the id of the sample whose uid is the longest one contained in *file_name* (case-insensitive),
     None if no uid is contained or several uids of the same length are."""
     name = file_name.lower()
     matches = [(len(uid), sample_id) for sample_id, uid in samples if uid.lower() in name]
@@ -57,7 +58,9 @@ def _assign_files_to_samples(conn) -> None:
     for workspace_id, uid in conn.execute(text('SELECT workspace_id, uid FROM sequence_sample')):
         used_uids.setdefault(workspace_id, set()).add(uid.lower())
 
+    # Iterate over sequences
     for sequence_id, files in files_by_sequence.items():
+        # Get samples associated with this sequence
         samples = conn.execute(
             text("""
                 SELECT ss.id, ss.uid
@@ -68,12 +71,17 @@ def _assign_files_to_samples(conn) -> None:
             {'sequence_id': sequence_id},
         ).fetchall()
 
+        # maps each sequencing file's id to the id of the sample it should move to
+        # samples are tuples (id, uid)
         if len(samples) == 1:
+            # If only a single sample exist, we will associate the sequencing data with that sample
             placement = {file_id: samples[0][0] for file_id, _ in files}
         else:
+            # If there is a file name that contains the sample uid, take that one
             placement = {file_id: _sample_for_file(name, samples) for file_id, name in files}
 
         if any(sample_id is None for sample_id in placement.values()):
+            # If any unassigned, create a single sample unassigned-<sequence-id> with all sequencing files attached to it
             workspace_id, created_by_id = conn.execute(
                 text('SELECT workspace_id, created_by_id FROM input_entity WHERE id = :id'),
                 {'id': sequence_id},
@@ -98,6 +106,7 @@ def _assign_files_to_samples(conn) -> None:
                 file_id: placeholder_id if sample_id is None else sample_id for file_id, sample_id in placement.items()
             }
 
+        # Assign the sequencing files to the samples
         for file_id, sample_id in placement.items():
             conn.execute(
                 text('UPDATE sequencing_file SET sequence_instance_id = :sample_id WHERE id = :file_id'),
@@ -128,6 +137,7 @@ def upgrade() -> None:
     # Sequencing files: from sequences to sequence instances
     op.add_column('sequencing_file', sa.Column('sequence_instance_id', sa.Integer(), nullable=True))
     _assign_files_to_samples(conn)
+    # Make the column not-nullable after assignment
     op.alter_column('sequencing_file', 'sequence_instance_id', nullable=False)
     op.create_foreign_key(
         'sequencing_file_sequence_instance_id_fkey',
