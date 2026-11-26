@@ -2,14 +2,13 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Typography, CircularProgress, Alert } from '@mui/material';
-import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
+import { openCloningDBHttpClient, endpoints, SampleUidLabel } from '@opencloning/opencloningdb';
 import ResourceDetailHeader from '../components/ResourceDetailHeader';
 import SequenceTable from '../components/SequenceTable';
 import DetailPageSection from '../components/DetailPageSection';
 import PageContainer from '../components/PageContainer';
 import TopButtonSection from '../components/TopButtonSection';
 import AddToCloningButton from '../components/AddToCloningButton';
-import SampleUidBadge from '../components/SampleUidBadge';
 import EditPrimerNameAndUid from '../components/EditPrimerNameAndUid';
 import DeleteResourceButton from '../components/DeleteResourceButton';
 import useAppAlerts from '../hooks/useAppAlerts';
@@ -57,7 +56,7 @@ function PrimerDetailPage() {
     <PageContainer>
       <ResourceDetailHeader
         title={primer.name}
-        afterTitle={primer.uid ? <SampleUidBadge uid={primer.uid} /> : <span><i>No UID</i></span>}
+        afterTitle={primer.uid ? <SampleUidLabel uid={primer.uid} /> : <span><i>No UID</i></span>}
         tags={primer.tags}
         onBack={() => navigate('/primers')}
         backTitle="Back to Primers"

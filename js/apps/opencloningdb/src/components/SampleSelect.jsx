@@ -1,15 +1,8 @@
 import React from 'react';
 import { QuerySelect, useDebouncedSearchQuery } from '@opencloning/ui';
-import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
+import { sampleSearchQuery } from '../utils/sample_queries';
 
-const getSearchQuery = (filter) => (uid) => ({
-  queryKey: ['sequence_samples', { uid }],
-  queryFn: async () => {
-    const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, { params: { uid } });
-    return data.items;
-  },
-  select: (samples) => samples.filter(filter),
-});
+const getSearchQuery = (filter) => (uid) => ({ ...sampleSearchQuery(uid), select: (samples) => samples.filter(filter) });
 
 /** Pick one sample of the workspace by UID, among the samples for which filter(sample) is true. */
 function SampleSelect({ value, onChange, label = 'Search UIDs', filter = () => true }) {

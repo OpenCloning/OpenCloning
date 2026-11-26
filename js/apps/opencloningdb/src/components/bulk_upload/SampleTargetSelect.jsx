@@ -2,16 +2,8 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { AddCircle as AddCircleIcon } from '@mui/icons-material';
-import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import { useDebouncedSearchQuery } from '@opencloning/ui';
-
-const getSearchQuery = (uid) => ({
-  queryKey: ['sequence_samples', { uid }],
-  queryFn: async () => {
-    const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, { params: { uid } });
-    return data.items;
-  },
-});
+import { sampleSearchQuery } from '../../utils/sample_queries';
 
 const sameTarget = (a, b) => a.uid.toLowerCase() === b.uid.toLowerCase() && Boolean(a.sample) === Boolean(b.sample);
 
@@ -21,7 +13,7 @@ const sameTarget = (a, b) => a.uid.toLowerCase() === b.uid.toLowerCase() && Bool
  * sample null for a new sample.
  */
 export default function SampleTargetSelect({ value, onChange, newUid }) {
-  const { query, autocompleteProps } = useDebouncedSearchQuery(getSearchQuery, { minChars: 1, debounceMs: 300 });
+  const { query, autocompleteProps } = useDebouncedSearchQuery(sampleSearchQuery, { minChars: 1, debounceMs: 300 });
   const typed = autocompleteProps.inputValue.trim();
   // The typed text is the selected value (shown in the field), not a search
   const searching = Boolean(typed) && !(value && typed === value.uid);

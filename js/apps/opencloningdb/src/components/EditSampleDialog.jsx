@@ -4,18 +4,11 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewSampleUID from './NewSampleUID';
 import useSampleMutation from '../hooks/useSampleMutation';
 
-/** Rename a sample and / or change its location. */
-function EditSampleDialog({ sample, open, onClose }) {
+// Inside the dialog, so that its state starts from the sample each time the dialog opens
+function EditSampleForm({ sample, onClose }) {
   const [uid, setUid] = React.useState(sample.uid);
   const [uidChecking, setUidChecking] = React.useState(false);
   const [location, setLocation] = React.useState(sample.location ?? '');
-
-  React.useEffect(() => {
-    if (open) {
-      setUid(sample.uid);
-      setLocation(sample.location ?? '');
-    }
-  }, [open, sample]);
 
   const editMutation = useSampleMutation({
     mutationFn: async () => {
@@ -31,7 +24,7 @@ function EditSampleDialog({ sample, open, onClose }) {
   const canSubmit = uid.length > 0 && !uidChecking && !unchanged && !editMutation.isPending;
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} data-testid="edit-sample-dialog">
+    <>
       <DialogTitle>Edit sample {sample.uid}</DialogTitle>
       <DialogContent>
         <FormControl fullWidth sx={{ mt: 1 }}>
@@ -58,6 +51,15 @@ function EditSampleDialog({ sample, open, onClose }) {
           {editMutation.isPending ? 'Saving…' : 'Save'}
         </Button>
       </DialogActions>
+    </>
+  );
+}
+
+/** Rename a sample and / or change its location. */
+function EditSampleDialog({ sample, open, onClose }) {
+  return (
+    <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} data-testid="edit-sample-dialog">
+      <EditSampleForm sample={sample} onClose={onClose} />
     </Dialog>
   );
 }

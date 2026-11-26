@@ -4,7 +4,7 @@ import { SequenceLink } from './EntityLinks';
 import TagChipList from './TagChipList';
 import SequenceTypeChip from './SequenceTypeChip';
 import SelectAllCheckbox from './SelectAllCheckbox';
-import SampleUidBadge from './SampleUidBadge';
+import { SampleUidLabel } from '@opencloning/opencloningdb';
 
 function SequenceTableRow({ seq, withCheckbox, showSampleUids, showType, showCreatedBy, showCreatedAt, selectedIds, toggleRow }) {
   return (
@@ -22,7 +22,7 @@ function SequenceTableRow({ seq, withCheckbox, showSampleUids, showType, showCre
         <TableCell>
           {seq.sample_uids?.length > 0 ? (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {seq.sample_uids.map((uid) => <SampleUidBadge key={uid} uid={uid} />)}
+              {seq.sample_uids.map((uid) => <SampleUidLabel key={uid} uid={uid} />)}
             </Box>
           ) : '—'}
         </TableCell>

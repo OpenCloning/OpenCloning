@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@mui/material';
 import { useHref, useNavigate } from 'react-router-dom';
-import { sampleUidBadgeSx } from './SampleUidBadge';
+import { sampleUidLabelSx } from '@opencloning/opencloningdb';
 
 /** Link to a page of the app, if newTab is true it opens in a new tab (e.g. from a modal, to keep its state). */
 function NavigateLink({ to, children, sx, newTab = false }) {
@@ -51,7 +51,7 @@ export function LineLink({ id, uid, sx, newTab }) {
       to={`/lines/${id}`}
       newTab={newTab}
       sx={{
-        ...sampleUidBadgeSx,
+        ...sampleUidLabelSx,
         textDecoration: 'none',
         '&:hover': { bgcolor: 'action.selected' },
         ...sx,

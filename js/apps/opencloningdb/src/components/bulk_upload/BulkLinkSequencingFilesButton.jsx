@@ -16,16 +16,17 @@ import {
   fastqSampleName, finalFastqFilesFromZip, isAlreadyLinked, linkEntries, linkRow, linkRowStatuses, newSampleCount,
   withMatches, withTarget,
 } from '../../utils/bulk_upload';
+import { sampleSearchQuery } from '../../utils/sample_queries';
 import SampleTargetSelect from './SampleTargetSelect';
 
 /** Samples can only be created for real sequences, not templates. */
 const isRealSequence = (sequence) => sequence.type === 'sequence';
 
 /** The sample whose UID is the sample name of the file (case-insensitive), null if there is none. */
-async function sampleWithSameName(file) {
+async function sampleWithSameName(queryClient, file) {
   const sampleName = fastqSampleName(file);
-  const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, { params: { uid: sampleName } });
-  return data.items.find(({ uid }) => uid.toLowerCase() === sampleName.toLowerCase()) ?? null;
+  const samples = await queryClient.fetchQuery(sampleSearchQuery(sampleName));
+  return samples.find(({ uid }) => uid.toLowerCase() === sampleName.toLowerCase()) ?? null;
 }
 
 /**
@@ -130,7 +131,7 @@ export default function BulkLinkSequencingFilesButton() {
   const readZip = useMutation({
     mutationFn: async (zipFile) => {
       const files = await finalFastqFilesFromZip(zipFile);
-      const samples = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, sampleWithSameName);
+      const samples = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, (file) => sampleWithSameName(queryClient, file));
       const rows = files.map((file, i) => linkRow(file, samples[i])).sort((a, b) => a.sampleName.localeCompare(b.sampleName));
       return { zipName: zipFile.name, rows };
     },

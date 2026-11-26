@@ -4,24 +4,13 @@ import { openCloningDBHttpClient, endpoints, SequenceSelect } from '@opencloning
 import SampleSelect from './SampleSelect';
 import useSampleMutation from '../hooks/useSampleMutation';
 
-/**
- * Move a sample (and its sequencing files) to another sequence, e.g. a sample planned as one sequence that turned
- * out to be another one when sequenced.
- * With sample, the sample is fixed and the user picks the target sequence; without it, the user picks a sample
- * of another sequence to move it to sequenceId.
- */
-function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
+// Inside the dialog, so that its state is reset when the dialog closes
+function TransferSampleForm({ sequenceId, onClose, sample }) {
   const [selectedSample, setSelectedSample] = React.useState(null);
   const [targetSequence, setTargetSequence] = React.useState(null);
 
   const movedSample = sample ?? selectedSample;
   const target = sample ? targetSequence : { id: sequenceId };
-
-  const handleClose = () => {
-    setSelectedSample(null);
-    setTargetSequence(null);
-    onClose();
-  };
 
   const transferMutation = useSampleMutation({
     mutationFn: async () => {
@@ -30,13 +19,13 @@ function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
       return data;
     },
     successMessage: 'UID transferred successfully',
-    onSuccess: handleClose,
+    onSuccess: onClose,
   });
 
   const excludeOwnSamples = React.useCallback((s) => s.sequence_id !== sequenceId, [sequenceId]);
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} data-testid="transfer-sample-dialog">
+    <>
       <DialogTitle>
         {sample ? `Move sample ${sample.uid} to another sequence` : 'Transfer UID from another sequence to this sequence'}
       </DialogTitle>
@@ -56,7 +45,7 @@ function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button
           variant="contained"
           onClick={() => transferMutation.mutate()}
@@ -65,6 +54,20 @@ function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
           {transferMutation.isPending ? 'Transferring…' : 'Confirm'}
         </Button>
       </DialogActions>
+    </>
+  );
+}
+
+/**
+ * Move a sample (and its sequencing files) to another sequence, e.g. a sample planned as one sequence that turned
+ * out to be another one when sequenced.
+ * With sample, the sample is fixed and the user picks the target sequence; without it, the user picks a sample
+ * of another sequence to move it to sequenceId.
+ */
+function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
+  return (
+    <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} data-testid="transfer-sample-dialog">
+      <TransferSampleForm sequenceId={sequenceId} onClose={onClose} sample={sample} />
     </Dialog>
   );
 }
