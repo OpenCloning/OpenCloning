@@ -3,11 +3,11 @@
 from typing import Annotated, List
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from opencloning.endpoints.endpoint_utils import read_upload_with_limit
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 
 from opencloning_db.apimodels import (
@@ -28,6 +28,7 @@ from opencloning_db.db import create_sequencing_file
 from opencloning_db.models import (
     BaseSequence,
     InputEntity,
+    Sequence,
     SequenceSample,
     SequenceType,
     SequencingFile,
@@ -50,11 +51,7 @@ router = APIRouter(tags=['sequence_samples'])
 
 def _uid_taken(session, workspace_id: int, uid: str) -> bool:
     return (
-        session.scalar(
-            select(SequenceSample.id)
-            .where(SequenceSample.uid_workspace_id == workspace_id, func.lower(SequenceSample.uid) == uid.lower())
-            .limit(1)
-        )
+        session.scalar(select(SequenceSample.id).where(SequenceSample.uid_in(workspace_id, [uid])).limit(1))
         is not None
     )
 
@@ -239,7 +236,9 @@ def post_sequence_sample_sequencing_files(
     max_size_mb = get_config().max_sequencing_file_size_mb
     # Read all files first, so that nothing is created if any file is too large
     contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
-    names = [upload.filename or 'unnamed' for upload in files]
+    names = [upload.filename for upload in files]
+    if not all(names):
+        raise HTTPException(status_code=400, detail='Sequencing files must have a name')
     taken = {f.original_name for f in ps.sequencing_files}
     conflicts = sorted({name for i, name in enumerate(names) if name in taken or name in names[:i]})
     if conflicts:
@@ -250,6 +249,94 @@ def post_sequence_sample_sequencing_files(
     session.add_all(created)
     session.commit()
     return [sequencing_file_ref(f) for f in created]
+
+
+def _bulk_samples(
+    session, ctx, sample_uids: list[str], sequence_ids: list[int | None]
+) -> tuple[list[SequenceSample], list[str]]:
+    """The sample each file goes to (existing ones, or new ones of the given sequence), and the errors."""
+    workspace_id = ctx.workspace_id
+    existing = {
+        sample.uid.lower(): sample
+        for sample in session.scalars(select(SequenceSample).where(SequenceSample.uid_in(workspace_id, sample_uids)))
+    }
+    # Only real sequences: samples cannot be created for template sequences
+    sequences = {
+        seq.id: seq
+        for seq in session.scalars(
+            select(Sequence).where(
+                Sequence.workspace_id == workspace_id, Sequence.id.in_({i for i in sequence_ids if i is not None})
+            )
+        )
+    }
+
+    errors = []
+    new_samples: dict[str, SequenceSample] = {}
+    samples = []
+    for uid, sequence_id in zip(sample_uids, sequence_ids):
+        sample = existing.get(uid.lower()) or new_samples.get(uid.lower())
+        if sequence_id is not None and sequence_id not in sequences:
+            errors.append(f'Sequence not found: {sequence_id}')
+        elif sample is not None:
+            if sequence_id is not None and sample.sequence.id != sequence_id:
+                errors.append(
+                    f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequences[sequence_id].name}'
+                )
+            elif not isinstance(sample.sequence, Sequence):
+                errors.append(f'Sample {uid} belongs to a template sequence')
+        elif sequence_id is None:
+            errors.append(f'Sample {uid} does not exist: choose a sequence to create it')
+        else:
+            sample = SequenceSample.from_create(uid=uid, sequence=sequences[sequence_id], ctx=ctx)
+            new_samples[uid.lower()] = sample
+        samples.append(sample)
+    return samples, errors
+
+
+@router.post('/sequence_samples/sequencing_files/bulk')
+def post_sequence_samples_sequencing_files_bulk(
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+    sample_uids: List[str] = Form(...),
+    sequence_ids: List[str] = Form(default_factory=list),
+    files: List[UploadFile] = File(...),
+):
+    """Link sequencing files to samples in bulk: files[i] is linked to the sample sample_uids[i]. If that sample
+    does not exist, it is created for the sequence with id sequence_ids[i]. If the sample exists, sequence_ids[i]
+    can be empty, otherwise it must be the id of the sequence of the sample. Several files can go to the same
+    sample, also to a new one. Nothing is linked or created if there is any error."""
+    _, session, workspace_id = ctx.destructure()
+    sample_uids = [uid.strip() for uid in sample_uids]
+    sequence_ids = [i.strip() for i in sequence_ids] or [''] * len(sample_uids)
+    if not (len(sample_uids) == len(sequence_ids) == len(files)):
+        raise HTTPException(400, 'Submit one sample UID (and one sequence ID, possibly empty) per file')
+    if any(not uid for uid in sample_uids):
+        raise HTTPException(400, 'Sample UIDs cannot be empty')
+    if any(i and not i.isdigit() for i in sequence_ids):
+        raise HTTPException(400, 'Sequence IDs must be integers (or empty)')
+    if any(not upload.filename for upload in files):
+        raise HTTPException(400, 'Sequencing files must have a name')
+    sequence_ids = [int(i) if i else None for i in sequence_ids]
+    max_size_mb = get_config().max_sequencing_file_size_mb
+    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
+
+    samples, errors = _bulk_samples(session, ctx, sample_uids, sequence_ids)
+    if not errors:
+        # Pairs of sample and file name, to ensure that the same file is not added twice
+        taken = {(id(sample), f.original_name) for sample in samples for f in sample.sequencing_files}
+        for sample, upload in zip(samples, files):
+            key = (id(sample), upload.filename)
+            if key in taken:
+                errors.append(f'{sample.uid} already has a sequencing file called {upload.filename}')
+            taken.add(key)
+    if errors:
+        session.rollback()
+        raise HTTPException(400, '; '.join(sorted(set(errors))))
+
+    for sample, upload, content in zip(samples, files, contents):
+        session.add(create_sequencing_file(sample, content, upload.filename))
+    created_samples = len({id(sample) for sample in samples if sample.id is None})
+    session.commit()
+    return {'created': len(files), 'created_samples': created_samples}
 
 
 @router.delete('/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)

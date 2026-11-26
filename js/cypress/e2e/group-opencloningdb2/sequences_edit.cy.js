@@ -415,7 +415,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       cy.get('li[role="option"]').contains(option).click();
     };
     const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
-    cy.intercept('POST', Cypress.getDbURL(endpoints.sequencingFilesBulk)).as('bulkLinkSequencingFiles');
+    cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSamplesSequencingFilesBulk)).as('bulkLinkSequencingFiles');
     cy.e2eLogin('/sequences?name=pREX0008', 'bootstrap+clerk_test@example.com', 'password');
 
     // A zip without .final.fastq files shows an error, and no modal

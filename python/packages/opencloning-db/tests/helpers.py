@@ -78,6 +78,22 @@ def post_sequencing_file_upload(
     )
 
 
+def unnamed_file_multipart(fields: dict[str, str] | None = None) -> tuple[bytes, dict[str, str]]:
+    """Multipart body with one file in ``files`` sent with ``filename=""`` (httpx drops empty file names), and
+    the form fields given. Returns the body and its Content-Type header."""
+    boundary = 'test-boundary'
+    parts = [
+        f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'
+        for name, value in (fields or {}).items()
+    ]
+    parts.append(
+        f'--{boundary}\r\nContent-Disposition: form-data; name="files"; filename=""\r\n'
+        'Content-Type: application/octet-stream\r\n\r\n@r\nACGT\n+\nIIII\n\r\n'
+    )
+    body = (''.join(parts) + f'--{boundary}--\r\n').encode()
+    return body, {'Content-Type': f'multipart/form-data; boundary={boundary}'}
+
+
 def assert_get_missing_workspace_header_422(client, path: str, token: str) -> None:
     """GET with bearer only (no X-Workspace-Id) returns 422."""
     r = client.get(path, headers=bearer_headers(token))

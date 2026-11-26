@@ -169,7 +169,7 @@ export default function BulkLinkSequencingFilesButton() {
         formData.append('sequence_ids', sequenceId);
         formData.append('files', file);
       });
-      const { data } = await openCloningDBHttpClient.post(endpoints.sequencingFilesBulk, formData, {
+      const { data } = await openCloningDBHttpClient.post(endpoints.sequenceSamplesSequencingFilesBulk, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return data;

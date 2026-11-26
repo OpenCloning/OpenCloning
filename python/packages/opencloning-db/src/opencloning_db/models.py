@@ -22,6 +22,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    and_,
     event,
     select,
     text,
@@ -705,6 +706,12 @@ class SequenceSample(SequenceInstance):
             uid_workspace_id=ctx.workspace_id,
             created_by_id=ctx.user.id,
         )
+
+    @classmethod
+    def uid_in(cls, workspace_id: int, uids: list[str]):
+        """Filter for the samples of the workspace with any of the given UIDs, which are case-insensitive (as in
+        the unique index)."""
+        return and_(cls.uid_workspace_id == workspace_id, func.lower(cls.uid).in_({uid.lower() for uid in uids}))
 
 
 class SequenceInLine(SequenceInstance):

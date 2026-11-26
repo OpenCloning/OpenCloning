@@ -45,6 +45,7 @@ from .helpers import (
     attach_standard_tokens,
     bearer_headers,
     post_sequencing_file_upload,
+    unnamed_file_multipart,
     seed_standard_users,
     workspace_headers,
 )
@@ -2311,7 +2312,7 @@ def _post_bulk_sequencing_files(ctx, rows, token_key='token_owner_w1', sample_ui
     """rows: [(sample_uid, sequence, file_name)], all files have the same dummy content. sequence is the key of
     the sequence id in ctx, or the value to submit as is if it is not a key (e.g. '' for existing samples)."""
     return ctx['client'].post(
-        '/sequences/sequencing_files/bulk',
+        '/sequence_samples/sequencing_files/bulk',
         headers=workspace_headers(ctx[token_key], ctx['w1']),
         data={
             'sample_uids': sample_uids if sample_uids is not None else [uid for uid, _, _ in rows],
@@ -2329,7 +2330,7 @@ def _sequencing_files(ctx, seq_id):
     return sorted((f['sample_uid'], f['original_name']) for f in r.json())
 
 
-def test_post_sequencing_files_bulk(sequences_client):
+def test_post_sequence_samples_sequencing_files_bulk(sequences_client):
     ctx = sequences_client
     rows = [
         # Existing sample, with or without its sequence id, case-insensitive UID
@@ -2400,7 +2401,7 @@ def test_post_sequencing_files_bulk(sequences_client):
         ),
     ],
 )
-def test_post_sequencing_files_bulk_errors(sequences_client, rows, sample_uids, detail):
+def test_post_sequence_samples_sequencing_files_bulk_errors(sequences_client, rows, sample_uids, detail):
     ctx = sequences_client
     r = _post_bulk_sequencing_files(ctx, rows, sample_uids=sample_uids)
     assert r.status_code == 400
@@ -2412,6 +2413,18 @@ def test_post_sequencing_files_bulk_errors(sequences_client, rows, sample_uids, 
         assert session.scalar(select(SequenceSample).where(SequenceSample.uid.ilike('NEW%'))) is None
 
 
-def test_post_sequencing_files_bulk_viewer_forbidden(sequences_client):
+def test_post_sequence_samples_sequencing_files_bulk_unnamed_file(sequences_client):
+    ctx = sequences_client
+    body, content_type = unnamed_file_multipart({'sample_uids': 'SEQFILE-SAMPLE', 'sequence_ids': ''})
+    r = ctx['client'].post(
+        '/sequence_samples/sequencing_files/bulk',
+        headers={**workspace_headers(ctx['token_owner_w1'], ctx['w1']), **content_type},
+        content=body,
+    )
+    assert r.status_code == 400
+    assert r.json()['detail'] == 'Sequencing files must have a name'
+
+
+def test_post_sequence_samples_sequencing_files_bulk_viewer_forbidden(sequences_client):
     r = _post_bulk_sequencing_files(sequences_client, [('SEQFILE-SAMPLE', '', 'a.fastq')], 'token_viewer_w1')
     assert r.status_code == 403

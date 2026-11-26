@@ -13,6 +13,7 @@ from .helpers import (
     assert_get_unauthenticated_401,
     attach_standard_tokens,
     seed_standard_users,
+    unnamed_file_multipart,
     workspace_headers,
 )
 
@@ -556,6 +557,12 @@ def test_sample_sequencing_files(seq_samples_client):
         json={'uid': 'template-sample', 'sequence_id': seq_samples_client['template_w1_id']},
     )
     assert _upload(c, headers, 'template-sample', 'c.ab1').status_code == 404
+
+    # Files must have a name
+    body, content_type = unnamed_file_multipart()
+    r = c.post(f'/sequence_samples/{uid}/sequencing_files', headers={**headers, **content_type}, content=body)
+    assert r.status_code == 400
+    assert r.json()['detail'] == 'Sequencing files must have a name'
 
     # Delete
     assert c.delete(f'/sequencing_files/{file_id}', headers=headers).status_code == 204
