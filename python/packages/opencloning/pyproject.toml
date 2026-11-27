@@ -9,7 +9,7 @@ requires-python = ">=3.12,<4"
 dependencies = [
     "beautifulsoup4>=4.15.0,<5",
     "biopython>=1.87",
-    "certifi>=2026.10.18",
+    "certifi>=2026.11.20",
     "fastapi>=0.162.7",
     "httpx2>=2.16.0",
     "networkx>=3.6.1",
