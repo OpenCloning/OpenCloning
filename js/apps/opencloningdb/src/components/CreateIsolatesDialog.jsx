@@ -5,7 +5,6 @@ import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewLineUID from './NewLineUID';
 import UidRowsForm from './UidRowsForm';
 import useUidRows from '../hooks/useUidRows';
-import { getAlleleSequencesInLine, getPlasmidSequencesInLine } from '../utils/models_utils';
 import useAppAlerts from '../hooks/useAppAlerts';
 
 // Inside the dialog, so that its state is reset when the dialog closes
@@ -15,19 +14,10 @@ function CreateIsolatesForm({ line, onClose }) {
   const uidRows = useUidRows();
 
   const createMutation = useMutation({
+    // The backend copies the line as it is stored, and creates all the lines or none
     mutationFn: async (uids) => {
-      const body = {
-        allele_ids: getAlleleSequencesInLine(line).map((a) => a.id),
-        plasmid_ids: getPlasmidSequencesInLine(line).map((p) => p.id),
-        parent_ids: line.parent_ids,
-      };
-      const created = [];
-      // Sequential, so that if one fails the ones before it are created
-      for (const uid of uids) {
-        const { data } = await openCloningDBHttpClient.post(endpoints.postLine, { ...body, uid });
-        created.push(data);
-      }
-      return created;
+      const { data } = await openCloningDBHttpClient.post(endpoints.lineCopies(line.id), { uids });
+      return data;
     },
     onSuccess: (created) => {
       addAlert({ message: `${created.length} line(s) created: ${created.map((l) => l.uid).join(', ')}`, severity: 'success' });
@@ -40,6 +30,8 @@ function CreateIsolatesForm({ line, onClose }) {
         queryClient.invalidateQueries({ queryKey: ['line', parentId] });
         queryClient.invalidateQueries({ queryKey: ['lineChildren', parentId] });
       }
+      // The sequences of the line are now in more lines
+      queryClient.invalidateQueries({ queryKey: ['sequence'] });
     },
   });
 
@@ -49,7 +41,8 @@ function CreateIsolatesForm({ line, onClose }) {
       <DialogTitle>Create more isolates of {line.uid}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          The new lines will have the same parents, alleles and plasmids as {line.uid}.
+          The new lines will have the same parents, alleles and plasmids as {line.uid}. Tags and sequencing files are
+          not copied.
         </Typography>
         <UidRowsForm
           uidRows={uidRows}

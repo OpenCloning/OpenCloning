@@ -295,6 +295,12 @@ class LineCreate(ApiModel):
     parent_ids: list[int] = []
 
 
+class LineCopiesCreate(ApiModel):
+    """UIDs of the lines to create as copies of a line, one per UID."""
+
+    uids: list[Annotated[StrippedStr, Field(min_length=1)]] = Field(min_length=1)
+
+
 class LineUpdate(ApiModel):
     uid: StrippedStr | None = Field(default=None, min_length=1)
     allele_ids: list[int] | None = None

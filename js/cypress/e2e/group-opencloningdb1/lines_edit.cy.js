@@ -193,11 +193,11 @@ describe('Actions that can be perfomed by an edit user on the Lines page', () =>
       cy.setInputValue('Line UID 2', 'isolate-2', 'div');
       cy.contains('Duplicate UIDs').should('not.exist');
 
-      cy.intercept('POST', Cypress.getDbURL(endpoints.postLine)).as('postLine');
+      cy.intercept('POST', Cypress.getDbURL(endpoints.lineCopies('*'))).as('postLineCopies');
       cy.get('button').contains('Create 2 lines').click();
     });
-    cy.wait('@postLine');
-    cy.wait('@postLine');
+    // A single request creates all the lines
+    cy.wait('@postLineCopies').its('request.body').should('deep.equal', { uids: ['isolate-1', 'isolate-2'] });
     cy.dbAlertExists('2 line(s) created: isolate-1, isolate-2');
     cy.closeDbAlerts();
     cy.get('[data-testid="create-isolates-dialog"]').should('not.exist');

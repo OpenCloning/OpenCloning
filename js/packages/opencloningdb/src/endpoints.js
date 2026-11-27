@@ -32,6 +32,7 @@ const endpoints = {
   lines: '/lines',
   line: (id) => `/lines/${e(id)}`,
   lineChildren: (id) => `/lines/${e(id)}/children`,
+  lineCopies: (id) => `/lines/${e(id)}/copies`,
   lineTags: (id) => `/lines/${e(id)}/tags`,
   inputEntityTags: (id) => `/input_entities/${e(id)}/tags`,
   postLine: '/lines',
