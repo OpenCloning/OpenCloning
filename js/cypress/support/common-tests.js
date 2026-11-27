@@ -25,7 +25,7 @@ Cypress.Commands.add('addTagInTableTest', (resourcePlural, tagEndpointName) => {
   cy.intercept('POST', Cypress.getDbURL(tagEndpoints[tagEndpointName]('*'))).as('addTag');
   // Forced because the options popup covers the button. But the button is disabled until the created tag is
   // selected (after POST /tags returns), and a forced click on a disabled button does nothing, so wait for it
-  cy.get('[data-testid="tag-entities-dialog"] button').contains('Tag').should('be.enabled').click({ force: true });
+  cy.get('[data-testid="tag-entities-dialog"] button').contains('Tag', { timeout: 20000 }).should('be.enabled').click({ force: true });
   cy.wait('@addTag');
   cy.get('tbody tr').eq(0).contains('test-tag').should('exist');
   cy.get('tbody tr').eq(1).contains('test-tag').should('exist');

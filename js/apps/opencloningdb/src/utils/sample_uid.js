@@ -7,6 +7,9 @@ const isControlCharacter = (char) => char.charCodeAt(0) < 32 || char.charCodeAt(
  */
 export function sampleUidError(uid) {
   const trimmed = uid.trim();
+  if (!trimmed) {
+    return 'A UID cannot be empty';
+  }
   if (trimmed === '.' || trimmed === '..' || /[/\\]/.test(trimmed) || [...trimmed].some(isControlCharacter)) {
     return 'A UID cannot be "." or "..", or contain "/", "\\" or control characters';
   }

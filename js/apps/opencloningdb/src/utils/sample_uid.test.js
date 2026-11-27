@@ -7,8 +7,8 @@ describe('sampleUidError', () => {
     });
   });
 
-  it('rejects "." and "..", slashes and control characters', () => {
-    ['.', '..', ' .. ', 'a/b', 'S-W1/sequencing_files', 'a\\b', 'a\nb', 'a\u0000b', 'a\u007fb'].forEach((uid) => {
+  it('rejects empty UIDs, "." and "..", slashes and control characters', () => {
+    ['', '   ', '.', '..', ' .. ', 'a/b', 'S-W1/sequencing_files', 'a\\b', 'a\nb', 'a\u0000b', 'a\u007fb'].forEach((uid) => {
       expect(sampleUidError(uid)).toMatch(/^A UID cannot be/);
     });
   });
