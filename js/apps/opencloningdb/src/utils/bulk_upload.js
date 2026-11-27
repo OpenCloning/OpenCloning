@@ -318,18 +318,20 @@ export function withMatches(row, matches) {
 /** The existing sample of the row already has a sequencing file with the name of the file. */
 export const isAlreadyLinked = (row) => Boolean(row.sample?.sequencing_files?.some(({ original_name: name }) => name === row.file.name));
 
-/** The file of the row is linked when submitting: not skipped, and not already linked to its sample. */
+/** The file of the row is to be linked: not skipped, and not already linked to its sample. */
 const isLinked = (row) => !row.skip && !isAlreadyLinked(row);
 
 /**
- * Status of each row: { status, duplicates, conflict, blocking }
+ * Status of each row: { status, duplicates, conflict, waitingFor, blocking }
  * - status: 'skip', 'already_linked' (the existing sample already has the file, not linked again), 'existing'
  *   (existing sample), 'new' (new sample with its sequence), 'no_sample' (no sample chosen), 'no_sequence' (new
  *   sample without sequence)
  * - duplicates: sample names of the other rows that link a file to the same sample (allowed, e.g. two reads of
  *   the same colony, but flagged in case it is a mistake)
  * - conflict: the rows that create this new sample give it different sequences
- * - blocking: the files cannot be linked until this is fixed
+ * - waitingFor: sample names of the other rows that create this new sample without a sequence. A new sample is
+ *   created with all its files at once, otherwise the rows left would create a sample that already exists
+ * - blocking: the file is not linked until this is fixed (the other files can be)
  */
 export function linkRowStatuses(rows) {
   // A Map, as a UID can be any string (e.g. 'constructor', which a plain object already has)
@@ -342,34 +344,53 @@ export function linkRowStatuses(rows) {
   });
   return rows.map((row) => {
     if (row.skip) {
-      return { status: 'skip', duplicates: [], conflict: false, blocking: false };
+      return { status: 'skip', duplicates: [], conflict: false, waitingFor: [], blocking: false };
     }
     if (isAlreadyLinked(row)) {
-      return { status: 'already_linked', duplicates: [], conflict: false, blocking: false };
+      return { status: 'already_linked', duplicates: [], conflict: false, waitingFor: [], blocking: false };
     }
     if (!row.uid) {
-      return { status: 'no_sample', duplicates: [], conflict: false, blocking: true };
+      return { status: 'no_sample', duplicates: [], conflict: false, waitingFor: [], blocking: true };
     }
     const sameUid = byUid.get(row.uid.toLowerCase());
     const duplicates = sameUid.filter((other) => other !== row).map((other) => other.sampleName);
     if (row.sample) {
-      return { status: 'existing', duplicates, conflict: false, blocking: false };
+      return { status: 'existing', duplicates, conflict: false, waitingFor: [], blocking: false };
     }
     const sequenceIds = new Set(sameUid.filter((other) => !other.sample && other.sequence).map((other) => other.sequence.id));
     const conflict = sequenceIds.size > 1;
     const status = row.sequence ? 'new' : 'no_sequence';
-    return { status, duplicates, conflict, blocking: conflict || status === 'no_sequence' };
+    const waitingFor = sameUid.filter((other) => other !== row && !other.sequence).map((other) => other.sampleName);
+    return { status, duplicates, conflict, waitingFor, blocking: conflict || status === 'no_sequence' || waitingFor.length > 0 };
   });
+}
+
+/** The rows that are linked when submitting: with a sample (and the sequence of a new one), and nothing to fix. */
+export function readyRows(rows) {
+  const statuses = linkRowStatuses(rows);
+  return rows.filter((_row, i) => ['existing', 'new'].includes(statuses[i].status) && !statuses[i].blocking);
 }
 
 /** The rows that are linked, as [{ sampleUid, sequenceId, file }], sequenceId '' for existing samples. */
 export function linkEntries(rows) {
-  return rows
-    .filter(isLinked)
-    .map((row) => ({ sampleUid: row.uid, sequenceId: row.sample ? '' : String(row.sequence?.id ?? ''), file: row.file }));
+  return readyRows(rows)
+    .map((row) => ({ sampleUid: row.uid, sequenceId: row.sample ? '' : String(row.sequence.id), file: row.file }));
 }
 
 /** Number of samples that linking the rows creates. */
 export function newSampleCount(rows) {
-  return new Set(rows.filter((row) => !row.skip && row.uid && !row.sample).map((row) => row.uid.toLowerCase())).size;
+  return new Set(readyRows(rows).filter((row) => !row.sample).map((row) => row.uid.toLowerCase())).size;
+}
+
+/**
+ * The rows as they are first shown: the ones without sample (to fill in) first, then the ones with a sample, then
+ * the ones already linked, by sample name. They are not sorted again, so that rows do not move while filling them.
+ */
+export function sortLinkRows(rows) {
+  const statuses = linkRowStatuses(rows);
+  const rank = { no_sample: 0, already_linked: 2 };
+  return rows
+    .map((row, i) => ({ row, rank: rank[statuses[i].status] ?? 1 }))
+    .sort((a, b) => a.rank - b.rank || a.row.sampleName.localeCompare(b.row.sampleName))
+    .map(({ row }) => row);
 }

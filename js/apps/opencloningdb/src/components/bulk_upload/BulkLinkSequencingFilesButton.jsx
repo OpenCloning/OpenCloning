@@ -14,7 +14,7 @@ import error2String from '@opencloning/utils/error2String';
 import useAppAlerts from '../../hooks/useAppAlerts';
 import {
   fastqSampleName, finalFastqFilesFromZip, isAlreadyLinked, linkEntries, linkRow, linkRowStatuses, newSampleCount,
-  withMatches, withTarget,
+  sortLinkRows, withMatches, withTarget,
 } from '../../utils/bulk_upload';
 import { fetchSampleByUid } from '../../utils/sample_queries';
 import SampleTargetSelect from './SampleTargetSelect';
@@ -59,6 +59,13 @@ function RowStatus({ row, status }) {
   }
   if (status.conflict) {
     chips.push(<Chip key="c" size="small" color="error" label="Same new sample, different sequences" />);
+  }
+  if (status.status === 'new' && status.waitingFor.length > 0) {
+    chips.push(
+      <Tooltip key="w" title="A new sample is created with all its files: choose their sequence to link them together">
+        <Chip size="small" color="warning" label={`Waiting for ${status.waitingFor.join(', ')}`} />
+      </Tooltip>,
+    );
   }
   if (status.duplicates.length > 0) {
     chips.push(<Chip key="d" size="small" color="warning" variant="outlined" label={`Also used for ${status.duplicates.join(', ')}`} />);
@@ -132,8 +139,9 @@ export default function BulkLinkSequencingFilesButton() {
       const files = await finalFastqFilesFromZip(zipFile);
       // The sample whose UID is the sample name of the file, if any
       const samples = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, (file) => fetchSampleByUid(fastqSampleName(file)));
-      const rows = files.map((file, i) => linkRow(file, samples[i])).sort((a, b) => a.sampleName.localeCompare(b.sampleName));
-      return { zipName: zipFile.name, rows };
+      // Sorted only here, so that rows do not move while the user fills them in
+      const rows = sortLinkRows(files.map((file, i) => linkRow(file, samples[i])));
+      return { zipName: zipFile.name, fileCount: rows.length, rows };
     },
     onSuccess: (data) => (data.rows.length > 0
       ? setRun(data)
@@ -161,10 +169,13 @@ export default function BulkLinkSequencingFilesButton() {
     onError: addErrorAlert,
   });
 
+  // Links the rows that are ready. They are removed, and the others stay to be filled in (the modal closes when
+  // there are no files left to link)
   const link = useMutation({
     mutationFn: async () => {
+      const entries = linkEntries(run.rows);
       const formData = new FormData();
-      linkEntries(run.rows).forEach(({ sampleUid, sequenceId, file }) => {
+      entries.forEach(({ sampleUid, sequenceId, file }) => {
         formData.append('sample_uids', sampleUid);
         formData.append('sequence_ids', sequenceId);
         formData.append('files', file);
@@ -172,13 +183,21 @@ export default function BulkLinkSequencingFilesButton() {
       const { data } = await openCloningDBHttpClient.post(endpoints.sequenceSamplesSequencingFilesBulk, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return data;
+      return { ...data, linkedFiles: new Set(entries.map(({ file }) => file)) };
     },
-    onSuccess: ({ created, created_samples: createdSamples }) => {
-      const newSamples = createdSamples > 0 ? `, ${plural(createdSamples, 'new sample')}` : '';
-      addAlert({ message: `Linked ${plural(created, 'sequencing file')} successfully${newSamples}`, severity: 'success' });
+    onSuccess: ({ created, created_samples: createdSamples, linkedFiles }) => {
       ['sequence', 'sequences', 'sequence_samples', 'sequence_sample'].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
-      closeModal();
+      // The rows cannot change while linking, so run.rows are the rows that were submitted
+      const rows = run.rows.filter((row) => !linkedFiles.has(row.file));
+      const left = linkRowStatuses(rows).filter(({ status }) => status !== 'skip' && status !== 'already_linked').length;
+      const newSamples = createdSamples > 0 ? `, ${plural(createdSamples, 'new sample')}` : '';
+      const filesLeft = left > 0 ? `. ${plural(left, 'file')} left` : '';
+      addAlert({ message: `Linked ${plural(created, 'sequencing file')} successfully${newSamples}${filesLeft}`, severity: 'success' });
+      if (left > 0) {
+        setRun({ ...run, rows });
+      } else {
+        closeModal();
+      }
     },
   });
 
@@ -195,7 +214,8 @@ export default function BulkLinkSequencingFilesButton() {
   const statuses = run ? linkRowStatuses(run.rows) : [];
   const linkedCount = run ? linkEntries(run.rows).length : 0;
   const newSamples = run ? newSampleCount(run.rows) : 0;
-  const blocked = statuses.some(({ blocking }) => blocking);
+  const toComplete = statuses.filter(({ blocking }) => blocking).length;
+  const skipped = statuses.filter(({ status }) => status === 'skip').length;
   const unresolved = statuses.filter(({ status }) => status === 'no_sample').length;
   const alreadyLinked = statuses.filter(({ status }) => status === 'already_linked').length;
   const busy = link.isPending || findMatches.isPending;
@@ -233,13 +253,17 @@ export default function BulkLinkSequencingFilesButton() {
         {run && (
           <Stack spacing={2} sx={{ minHeight: 0 }}>
             <Typography data-testid="bulk-link-sequencing-files-count">
-              {plural(run.rows.length, '.final.fastq file')} in {run.zipName}
+              {run.rows.length < run.fileCount
+                ? `${run.rows.length} of ${plural(run.fileCount, '.final.fastq file')} left`
+                : plural(run.rows.length, '.final.fastq file')}
+              {' '}in {run.zipName}
               {' '}({statuses.filter(({ status }) => status === 'existing' || status === 'already_linked').length} with an
               {' '}existing sample of the same name{alreadyLinked > 0 && `, ${alreadyLinked} already linked`}).
             </Typography>
             <Typography variant="body2">
               Each file goes to the sample whose UID is its sample name. For the others, search an existing sample, or
-              create a new one and choose its sequence. Uncheck a file to skip it.
+              create a new one and choose its sequence. Uncheck a file to skip it. The files that are ready can be
+              linked while you complete the others.
             </Typography>
             <TableContainer sx={{ minHeight: 0, overflow: 'auto' }}>
               <Table size="small" stickyHeader>
@@ -282,7 +306,15 @@ export default function BulkLinkSequencingFilesButton() {
               </Table>
             </TableContainer>
             {link.error && <Alert severity="error">{error2String(link.error)}</Alert>}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ mr: 'auto' }} data-testid="bulk-link-sequencing-files-summary">
+                {[
+                  `Ready: ${linkedCount}`,
+                  toComplete > 0 && `To complete: ${toComplete}`,
+                  skipped > 0 && `Skipped: ${skipped}`,
+                  alreadyLinked > 0 && `Already linked: ${alreadyLinked}`,
+                ].filter(Boolean).join(' · ')}
+              </Typography>
               <Tooltip title="For the files without sample: find sequences without samples that are exactly the read (whole-plasmid sequencing only)">
                 <span>
                   <Button variant="outlined" onClick={() => findMatches.mutate()} disabled={busy || unresolved === 0}>
@@ -291,17 +323,17 @@ export default function BulkLinkSequencingFilesButton() {
                 </span>
               </Tooltip>
               <Button variant="outlined" color="error" onClick={closeModal} disabled={busy}>
-                Cancel
+                {run.rows.length < run.fileCount ? 'Close' : 'Cancel'}
               </Button>
               <Button
                 variant="contained"
                 onClick={() => link.mutate()}
-                disabled={busy || blocked || linkedCount === 0}
+                disabled={busy || linkedCount === 0}
                 data-testid="bulk-link-sequencing-files-submit"
               >
                 {link.isPending
                   ? <CircularProgress size={24} />
-                  : `Link ${plural(linkedCount, 'file')}${newSamples > 0 ? ` · create ${plural(newSamples, 'sample')}` : ''}`}
+                  : `Link ${plural(linkedCount, 'ready file')}${newSamples > 0 ? ` · create ${plural(newSamples, 'sample')}` : ''}`}
               </Button>
             </Box>
           </Stack>

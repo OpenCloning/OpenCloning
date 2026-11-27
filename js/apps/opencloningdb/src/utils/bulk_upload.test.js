@@ -11,6 +11,8 @@ import {
   newSampleCount,
   prepareLineRowsForValidation,
   prepareTemplateSequenceRowsForValidation,
+  readyRows,
+  sortLinkRows,
   splitSpaceSeparatedField,
   withMatches,
   withTarget,
@@ -138,11 +140,11 @@ describe('rows to link sequencing files', () => {
       { ...linkRow(file('A4')), skip: true },
     ];
     expect(linkRowStatuses(rows)).toEqual([
-      { status: 'existing', duplicates: [], conflict: false, blocking: false },
-      { status: 'no_sample', duplicates: [], conflict: false, blocking: true },
-      { status: 'new', duplicates: [], conflict: false, blocking: false },
-      { status: 'no_sequence', duplicates: [], conflict: false, blocking: true },
-      { status: 'skip', duplicates: [], conflict: false, blocking: false },
+      { status: 'existing', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'no_sample', duplicates: [], conflict: false, waitingFor: [], blocking: true },
+      { status: 'new', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'no_sequence', duplicates: [], conflict: false, waitingFor: [], blocking: true },
+      { status: 'skip', duplicates: [], conflict: false, waitingFor: [], blocking: false },
     ]);
   });
 
@@ -162,7 +164,8 @@ describe('rows to link sequencing files', () => {
     const statuses = linkRowStatuses(rows);
     expect(statuses.map(({ duplicates }) => duplicates)).toEqual([['S1-again'], ['S1'], ['A2'], ['A1'], ['B2'], ['B1'], []]);
     expect(statuses.map(({ blocking }) => blocking)).toEqual([false, false, false, false, true, true, false]);
-    expect(newSampleCount(rows)).toBe(2);
+    // OTHER is not created until its conflict is fixed
+    expect(newSampleCount(rows)).toBe(1);
   });
 
   it('accepts UIDs that are names of object properties', () => {
@@ -170,11 +173,34 @@ describe('rows to link sequencing files', () => {
     expect(linkRowStatuses(rows).map(({ status }) => status)).toEqual(['new', 'new']);
   });
 
-  it('gives the sample UIDs and sequence IDs to submit', () => {
+  it('a new sample is not ready until all its files have its sequence', () => {
+    const rows = [
+      { ...linkRow(file('A1')), uid: 'NEW', sequence: pJOG684 },
+      { ...linkRow(file('A2')), uid: 'new' },
+      { ...linkRow(file('B1')), uid: 'OTHER', sequence: pJOG684 },
+    ];
+    const statuses = linkRowStatuses(rows);
+    expect(statuses.map(({ status }) => status)).toEqual(['new', 'no_sequence', 'new']);
+    expect(statuses.map(({ waitingFor }) => waitingFor)).toEqual([['A2'], [], []]);
+    expect(statuses.map(({ blocking }) => blocking)).toEqual([true, true, false]);
+    expect(readyRows(rows)).toEqual([rows[2]]);
+    expect(newSampleCount(rows)).toBe(1);
+  });
+
+  it('sorts the rows without sample first, then by sample name', () => {
+    const withFile = { ...existing, sequencing_files: [{ id: 1, original_name: 'A0.final.fastq' }] };
+    const rows = [linkRow(file('A0'), withFile), linkRow(file('S1'), existing), linkRow(file('B1')), linkRow(file('A1'))];
+    expect(sortLinkRows(rows).map(({ sampleName }) => sampleName)).toEqual(['A1', 'B1', 'S1', 'A0']);
+  });
+
+  it('gives the sample UIDs and sequence IDs to submit, only of the rows that are ready', () => {
     const rows = [
       linkRow(file('S1'), existing),
       { ...linkRow(file('A1')), uid: 'NEW', sequence: pJOG684 },
       { ...linkRow(file('A2')), skip: true },
+      // Not ready: they are not submitted
+      linkRow(file('A3')),
+      { ...linkRow(file('A4')), uid: 'NO-SEQUENCE' },
     ];
     expect(linkEntries(rows).map(({ sampleUid, sequenceId, file: f }) => [sampleUid, sequenceId, f.name])).toEqual([
       ['S1', '', 'S1.final.fastq'],
@@ -198,10 +224,10 @@ describe('rows to link sequencing files', () => {
     expect(isAlreadyLinked(rows[0])).toBe(true);
     expect(isAlreadyLinked(rows[1])).toBe(false);
     expect(linkRowStatuses(rows)).toEqual([
-      { status: 'already_linked', duplicates: [], conflict: false, blocking: false },
-      { status: 'existing', duplicates: [], conflict: false, blocking: false },
-      { status: 'skip', duplicates: [], conflict: false, blocking: false },
-      { status: 'new', duplicates: [], conflict: false, blocking: false },
+      { status: 'already_linked', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'existing', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'skip', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'new', duplicates: [], conflict: false, waitingFor: [], blocking: false },
     ]);
     expect(linkEntries(rows).map(({ sampleUid, file: f }) => [sampleUid, f.name])).toEqual([
       ['S1', 'A1.final.fastq'],

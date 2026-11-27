@@ -414,6 +414,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
   it('can bulk link sequencing files', () => {
     const modal = '[data-testid="bulk-link-sequencing-files-modal"]';
     const submit = '[data-testid="bulk-link-sequencing-files-submit"]';
+    const summary = '[data-testid="bulk-link-sequencing-files-summary"]';
     const row = (sampleName) => cy.get(`[data-testid="bulk-link-row"][data-sample-name="${sampleName}"]`);
     const sampleInput = (sampleName) => row(sampleName).find('[data-testid="bulk-link-sample-select"] input');
     // The second text input of the row, after the sample
@@ -446,7 +447,9 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     row('seqcheck_circular_1-sample').should('contain', 'Existing sample');
     row('seqcheck_circular_2-sample').should('contain', 'Existing sample');
     row('GB_105355_c1').should('contain', 'Choose a sample');
-    cy.get(submit).should('be.disabled').and('have.text', 'Link 10 files');
+    // The files with a sample can be linked already
+    cy.get(summary).should('have.text', 'Ready: 3 · To complete: 7');
+    cy.get(submit).should('be.enabled').and('have.text', 'Link 3 ready files');
 
     // Find exact matches: the two reads of pJOG684 (no samples) become new samples of it. The exact read of
     // pREX0008 is not matched, as it already has samples
@@ -471,31 +474,54 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     sampleInput('GB_105417_c1').click();
     cy.get('li[role="option"]').contains('Create sample "GB_105417_c1"').click();
     row('GB_105417_c1').should('contain', 'Choose a sequence');
-    cy.get(submit).should('be.disabled');
     row('GB_105417_c1').within(() => cy.setAutocompleteValue('Sequence', 'pJOG173', 'div', false));
     row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
 
-    // Skip a file
-    row('empty_well').find('input[type="checkbox"]').uncheck();
-    row('empty_well').should('contain', 'Skipped');
+    // Another file of the same new sample, without sequence: a new sample is created with all its files, so the
+    // first one waits for it
+    chooseSample('empty_well', 'GB_105417_c1', 'Create sample "GB_105417_c1"');
+    row('empty_well').should('contain', 'Choose a sequence');
+    row('GB_105417_c1').should('contain', 'Waiting for empty_well');
+    cy.get(summary).should('have.text', 'Ready: 8 · To complete: 2');
 
-    cy.get(submit).should('have.text', 'Link 9 files · create 3 samples').click();
+    // The files that are ready are linked and removed, the others stay
+    cy.get(submit).should('have.text', 'Link 8 ready files · create 2 samples').click();
     cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
       expect(request.headers['content-type']).to.include('multipart/form-data');
       const body = decodeBody(request.body);
       expect(body).to.not.include('empty_well');
+      expect(body).to.not.include('GB_105417_c1');
       expect(body).to.not.include('sequence_names');
-      expect(body.match(/name="files"/g)).to.have.length(9);
-      ['TN9W63_1', 'TN9W63_2', 'GB_105355_c1', 'GB_105417_c1'].forEach((name) => {
+      expect(body.match(/name="files"/g)).to.have.length(8);
+      ['TN9W63_1', 'TN9W63_2', 'GB_105355_c1'].forEach((name) => {
         expect(body).to.include(`name="files"; filename="${name}.final.fastq"`);
       });
-      ['example_sequencing-sample', 'seqcheck_circular_3-sample', 'GB_105355_c2', 'GB_105417_c1'].forEach((uid) => {
+      ['example_sequencing-sample', 'seqcheck_circular_3-sample', 'GB_105355_c2'].forEach((uid) => {
         expect(body).to.match(new RegExp(`name="sample_uids"\\r\\n\\r\\n${uid}\\r\\n`));
       });
       expect(response.statusCode).to.equal(200);
-      expect(response.body).to.deep.equal({ created: 9, created_samples: 3 });
+      expect(response.body).to.deep.equal({ created: 8, created_samples: 2 });
     });
-    cy.dbAlertExists('Linked 9 sequencing files successfully, 3 new samples');
+    cy.dbAlertExists('Linked 8 sequencing files successfully, 2 new samples. 2 files left');
+    cy.closeDbAlerts();
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+      .should('have.text', '2 of 10 .final.fastq files left in seed_sequencing_run.zip (0 with an existing sample of the same name).');
+    row('TN9W63_1').should('not.exist');
+    cy.get(modal).contains('button', 'Close').should('exist');
+
+    // Skipping the other file makes the new sample ready. When no files are left to link, the modal closes
+    row('empty_well').find('input[type="checkbox"]').uncheck();
+    row('empty_well').should('contain', 'Skipped');
+    row('GB_105417_c1').should('not.contain', 'Waiting for');
+    cy.get(summary).should('have.text', 'Ready: 1 · Skipped: 1');
+    cy.get(submit).should('have.text', 'Link 1 ready file · create 1 sample').click();
+    cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
+      const body = decodeBody(request.body);
+      expect(body.match(/name="files"/g)).to.have.length(1);
+      expect(body).to.include('name="files"; filename="GB_105417_c1.final.fastq"');
+      expect(response.body).to.deep.equal({ created: 1, created_samples: 1 });
+    });
+    cy.dbAlertExists('Linked 1 sequencing file successfully, 1 new sample');
     cy.closeDbAlerts();
     cy.get(modal).should('not.exist');
 
@@ -508,16 +534,16 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       row(sampleName).should('contain', 'Already linked');
       row(sampleName).find('input[type="checkbox"]').should('be.disabled').and('not.be.checked');
     });
-    cy.get(submit).should('have.text', 'Link 4 files');
+    cy.get(submit).should('be.disabled').and('have.text', 'Link 0 ready files');
     chooseSample('GB_105355_c1', 'GB_105355_c2', 'GB_105355_c2 · pJOG684');
     row('GB_105355_c1').should('contain', 'Existing sample').and('not.contain', 'Already linked');
     row('GB_105355_c1').find('input[type="checkbox"]').should('be.enabled').and('be.checked');
-    cy.get(submit).should('have.text', 'Link 5 files');
+    cy.get(submit).should('have.text', 'Link 1 ready file');
     // A new sample keeps the sequence of the previous one (shown with its samples)
     chooseSample('GB_105417_c1', 'GB_105417_c1-bis', 'Create sample "GB_105417_c1-bis"');
     sequenceInput('GB_105417_c1').should('have.value', 'pJOG173 (GB_105417_c1)');
     row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
-    cy.get(submit).should('have.text', 'Link 6 files · create 1 sample');
+    cy.get(submit).should('have.text', 'Link 2 ready files · create 1 sample');
     cy.get(modal).contains('button', 'Cancel').click();
     cy.get(modal).should('not.exist');
 
