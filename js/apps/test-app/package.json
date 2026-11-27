@@ -10,7 +10,7 @@
     "preview": "yarn run -T vite preview"
   },
   "dependencies": {
-    "@mui/material": "^9.5.0",
+    "@mui/material": "^9.6.0",
     "@opencloning/store": "workspace:*",
     "@opencloning/ui": "workspace:*",
     "react": "^18.3.1",
