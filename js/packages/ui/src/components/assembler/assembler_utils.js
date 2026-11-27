@@ -3,7 +3,7 @@ import { getComplementSequenceString, getAminoAcidFromSequenceTriplet, getDigest
 import { allSimplePaths } from 'graphology-simple-path';
 import { openCycleAtNode } from './graph_utils';
 import { arcLength, goesAroundOrigin } from './syntax_layout';
-import { downloadBlob, formatStateForJsonExport, getZipFileBlob } from '@opencloning/utils/readNwrite';
+import { downloadBlob, formatStateForJsonExport, getZipFileBlob, prettyPrintJson } from '@opencloning/utils/readNwrite';
 import { getGraftSequenceId } from '@opencloning/utils/network';
 import { TextReader} from '@zip.js/zip.js';
 import { editGenbankSequenceNameFromTextContent } from '@opencloning/utils';
@@ -257,7 +257,7 @@ export function getCloningStrategyFilesFromAssembler({ requestedAssemblies, appI
     const jsonContent = formatStateForJsonExport({...requestedAssembly, appInfo});
     return {
       name: `${name}.json`,
-      content: JSON.stringify(jsonContent, null, 2),
+      content: prettyPrintJson(jsonContent),
       finalSequence,
     };
   });

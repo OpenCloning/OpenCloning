@@ -3,6 +3,7 @@ export { openCloningDBHttpClient, setUnauthorizedHandler, setHttpClientTokenGett
 export { default as SampleUidLabel, sampleUidLabelSx } from './SampleUidLabel.jsx';
 export { SEQUENCE_TYPE_LABELS } from './sequenceTypes.js';
 export { default as endpoints } from './endpoints.js';
+export { default as databaseSequenceToHistoryFile } from './databaseSequenceToHistoryFile.js';
 export { default as SequenceSelect } from './SequenceSelect.jsx';
 export { default as TagMultiSelect } from './TagMultiSelect.jsx';
 export { default as SequenceTypeSelect } from './SequenceTypeSelect.jsx';

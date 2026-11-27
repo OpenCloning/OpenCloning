@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import SubmitButtonBackendAPI from '../form/SubmitButtonBackendAPI';
 import LabelWithTooltip from '../form/LabelWithTooltip';
 import useCloningHistoryLoader from '../../hooks/useCloningHistoryLoader';
+import { fileUploadRequest } from '@opencloning/utils/readNwrite';
 
 const fileFormatToExtension = {
   genbank: 'gb',
@@ -43,23 +44,23 @@ function SourceFile({ source, requestStatus, sendSourceRequest }) {
         });
       }
 
-      const prepared = await loadHistoryFromFile(files[0], { onError: reportError });
-      if (!prepared) {
+      const validated = await loadHistoryFromFile(files[0], { onError: reportError });
+      if (!validated) {
         return;
       }
 
-      if (hasOutput && !prepared.canGraft) {
+      if (hasOutput && !validated.canGraft) {
         setAlert({ message: 'Cannot graft cloning strategy as it does not converge on a single sequence, you can load it on a source without outputs', severity: 'error' });
         return;
       }
 
-      const graft = hasOutput && prepared.canGraft;
+      const graft = hasOutput && validated.canGraft;
       try {
         const applyOptions = { source, onError: reportError };
         if (graft) {
-          await prepared.graft(applyOptions);
+          await validated.graft(applyOptions);
         } else {
-          await prepared.merge(applyOptions);
+          await validated.merge(applyOptions);
         }
       } catch {
         // Error already reported via onError; state restored in applyCloningStrategy
@@ -72,14 +73,10 @@ function SourceFile({ source, requestStatus, sendSourceRequest }) {
         return;
       }
     }
-    const requestData = new FormData();
-    requestData.append('file', files[0]);
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-      params: { circularize, sequence_file_format: fileFormat || null, ...coordinates },
-    };
+    const { requestData, config } = fileUploadRequest(
+      files[0],
+      { circularize, sequence_file_format: fileFormat || null, ...coordinates },
+    );
     sendSourceRequest({ endpoint: 'read_from_file', requestData, config, source });
   };
 

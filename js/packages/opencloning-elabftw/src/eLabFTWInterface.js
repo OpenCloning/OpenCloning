@@ -7,6 +7,7 @@ import { eLabFTWHttpClient, writeHeaders, readHeaders, baseUrl, getELabFTWVersio
 import { getFileFromELabFTW, error2String, getPrimerSequenceFromExtraFields } from './utils';
 import LoadHistoryComponent from './LoadHistoryComponent';
 import { encodePathSegment } from '@opencloning/utils/urlUtils';
+import { formatStateForJsonExport } from '@opencloning/utils/readNwrite';
 
 async function deleteResource(resourceId) {
   const url = `/api/v2/items/${encodePathSegment(resourceId)}`;
@@ -96,8 +97,7 @@ async function submitSequenceToDatabase({ submissionData: { title, categoryId, p
    * @returns {Promise<Object>}
    */
 
-  const { sources, primers, sequences, appInfo } = substate;
-  const { backendVersion, schemaVersion, frontendVersion } = appInfo;
+  const { sources, primers, sequences } = substate;
 
   const sequence2export = sequences.find((e) => e.id === id);
   const parentSource = sources.find((s) => s.id === id);
@@ -150,14 +150,7 @@ async function submitSequenceToDatabase({ submissionData: { title, categoryId, p
       primersCopy.find((p) => p.id === localId).database_id = dbId;
     });
 
-    const cloningStrategy = {
-      sources,
-      primers: primersCopy,
-      sequences,
-      backend_version: backendVersion,
-      schema_version: schemaVersion,
-      frontend_version: frontendVersion,
-    };
+    const cloningStrategy = formatStateForJsonExport({ ...substate, primers: primersCopy });
 
     // Add the sequence and history files to the resource
     stage = 'uploading sequence file';
