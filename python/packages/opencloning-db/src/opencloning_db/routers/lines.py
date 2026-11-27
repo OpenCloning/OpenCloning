@@ -166,7 +166,7 @@ def get_line_subquery(line_id_col, sequence_type: SequenceType, name: str) -> Se
         .where(
             SequenceInLine.line_id == line_id_col,
             BaseSequence.sequence_type == sequence_type,
-            BaseSequence.name.ilike(f"%{name}%"),
+            BaseSequence.name.icontains(name, autoescape=True),
         )
     )
     return subq
@@ -214,9 +214,11 @@ def get_lines(
             subq = get_line_subquery(Line.id, SequenceType.plasmid, plasmid_bit)
             query = query.where(exists(subq))
     if uid is not None:
-        query = query.where(Line.uid.ilike(f"%{uid}%"))
+        query = query.where(Line.uid.icontains(uid, autoescape=True))
     if created_by is not None:
-        query = query.join(User, User.id == Line.created_by_id).where(User.display_name.ilike(f"%{created_by}%"))
+        query = query.join(User, User.id == Line.created_by_id).where(
+            User.display_name.icontains(created_by, autoescape=True)
+        )
     query = query.order_by(Line.id.desc())
     return paginate(session, query, transformer=lambda items: [line_ref(line) for line in items])
 

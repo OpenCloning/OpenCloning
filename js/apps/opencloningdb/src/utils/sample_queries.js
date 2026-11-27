@@ -1,7 +1,12 @@
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
+import { sampleUidError } from './sample_uid';
 
 /** The sample whose UID is uid (case-insensitive), with its sequence and files, or null if there is none. */
 export async function fetchSampleByUid(uid) {
+  // No sample can have an invalid UID, and the request would go to another route (e.g. 'S1/sequencing_files')
+  if (sampleUidError(uid)) {
+    return null;
+  }
   try {
     const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSample(uid));
     return data;

@@ -36,6 +36,7 @@ from opencloning_db.models import (
     User,
     WorkspaceRole,
     require_real_sequence,
+    validate_sample_uid,
 )
 from opencloning_db.workspace_deps import (
     WorkspaceContext,
@@ -95,20 +96,20 @@ def get_sequence_samples(
         .where(SequenceSample.uid_workspace_id == workspace_id)
     )
     if uid is not None:
-        query = query.where(SequenceSample.uid.ilike(f"%{uid}%"))
+        query = query.where(SequenceSample.uid.icontains(uid, autoescape=True))
     if location is not None:
-        query = query.where(SequenceSample.location.ilike(f"%{location}%"))
+        query = query.where(SequenceSample.location.icontains(location, autoescape=True))
     if sequence_id is not None:
         query = query.where(SequenceSample.sequence_id == sequence_id)
     if name is not None:
-        query = query.where(BaseSequence.name.ilike(f"%{name}%"))
+        query = query.where(BaseSequence.name.icontains(name, autoescape=True))
     if sequence_types:
         query = query.where(BaseSequence.sequence_type.in_(sequence_types))
     if tags:
         query = query.where(BaseSequence.tags.any(and_(Tag.id.in_(tags), Tag.workspace_id == workspace_id)))
     if created_by is not None:
         query = query.join(User, User.id == SequenceSample.created_by_id).where(
-            User.display_name.ilike(f"%{created_by}%")
+            User.display_name.icontains(created_by, autoescape=True)
         )
     query = query.order_by(SequenceSample.id.desc())
     return paginate(
@@ -252,6 +253,14 @@ def post_sequence_sample_sequencing_files(
     return [sequencing_file_ref(f) for f in created]
 
 
+def _sample_uid_error(uid: str) -> str | None:
+    try:
+        validate_sample_uid(uid)
+    except ValueError as e:
+        return str(e)
+    return None
+
+
 def _bulk_samples(
     session, ctx, sample_uids: list[str], sequence_ids: list[int | None]
 ) -> tuple[list[SequenceSample], list[str]]:
@@ -287,6 +296,8 @@ def _bulk_samples(
                 errors.append(f'Sample {uid} belongs to a template sequence')
         elif sequence_id is None:
             errors.append(f'Sample {uid} does not exist: choose a sequence to create it')
+        elif (uid_error := _sample_uid_error(uid)) is not None:
+            errors.append(uid_error)
         else:
             sample = SequenceSample.from_create(uid=uid, sequence=sequence_id2sequence[sequence_id], ctx=ctx)
             new_samples[uid.lower()] = sample

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field, field_validator
+from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, EmailStr, Field, field_validator
 
 import opencloning_linkml.datamodel.models as opencloning_models
 from opencloning.pydantic_models import MAX_PRIMER_LENGTH
@@ -17,6 +17,7 @@ from opencloning_db.models import (
     SequenceSample,
     SequencingFile,
     WorkspaceRole,
+    validate_sample_uid,
 )
 
 
@@ -27,6 +28,7 @@ def _strip_str(v: object) -> object:
 
 
 StrippedStr = Annotated[str, BeforeValidator(_strip_str)]
+SampleUid = Annotated[StrippedStr, AfterValidator(validate_sample_uid)]
 
 
 class ApiModel(BaseModel):
@@ -77,7 +79,7 @@ class WorkspaceMemberAdd(ApiModel):
 
 # --- Sequence sample ---
 class SequenceSampleCreate(ApiModel):
-    uid: StrippedStr
+    uid: SampleUid
     sequence_id: int
     location: StrippedStr | None = None
 
@@ -87,7 +89,7 @@ class SequenceSampleUpdate(ApiModel):
     unchanged (so that dumping a model with its defaults does not clear the location).
     To point a sample to another sequence, use the reassign endpoint."""
 
-    uid: StrippedStr | None = Field(default=None, min_length=1)
+    uid: SampleUid | None = Field(default=None, min_length=1)
     location: StrippedStr | None = None
 
 

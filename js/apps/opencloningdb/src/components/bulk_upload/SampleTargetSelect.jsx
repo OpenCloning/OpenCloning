@@ -4,6 +4,10 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { useDebouncedSearchQuery } from '@opencloning/ui';
 import { sampleSearchQuery } from '../../utils/sample_queries';
+import { sampleUidError } from '../../utils/sample_uid';
+
+// A new sample cannot be created with an invalid UID
+const optionError = (option) => (option.sample ? '' : sampleUidError(option.uid));
 
 const sameTarget = (a, b) => a.uid.toLowerCase() === b.uid.toLowerCase() && Boolean(a.sample) === Boolean(b.sample);
 
@@ -38,6 +42,7 @@ export default function SampleTargetSelect({ value, onChange, newUid }) {
       getOptionLabel={(option) => option.uid}
       getOptionKey={(option) => `${option.sample ? 'existing' : 'new'}-${option.uid}`}
       isOptionEqualToValue={sameTarget}
+      getOptionDisabled={(option) => Boolean(optionError(option))}
       renderOption={({ key, ...props }, option) => (
         <Box component="li" key={key} {...props}>
           {option.sample
@@ -46,6 +51,7 @@ export default function SampleTargetSelect({ value, onChange, newUid }) {
               <>
                 <AddCircleIcon color="success" fontSize="small" sx={{ mr: 1 }} />
                 Create sample &quot;{option.uid}&quot;
+                {optionError(option) && ` (${optionError(option)})`}
               </>
             )}
         </Box>

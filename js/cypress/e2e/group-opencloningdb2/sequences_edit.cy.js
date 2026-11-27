@@ -143,6 +143,11 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       cy.get('[aria-label="Add new UIDs"]').click();
       cy.get('[data-testid="create-sequence-sample-uid-dialog"]').should('be.visible');
       cy.get('[data-testid="create-sequence-sample-uid-dialog"]').within(() => {
+        // UIDs go in URL paths, so they cannot contain '/' (it would point the request to another route)
+        cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('new_sample_uid/sequencing_files');
+        cy.contains('A UID cannot be "." or "..", or contain "/"').should('exist');
+        cy.get('button').contains('Create').should('be.disabled');
+        cy.get('label').contains('Sample UID 1').siblings('div').find('input').clear();
         cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('new_sample_uid');
         cy.get('button').contains('Add another UID').click();
         cy.get('label').contains('Sample UID 2').siblings('div').find('input').type('new_sample_uid2');
@@ -157,6 +162,10 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       // Can rename it and set its location
       sampleBlock('new_sample_uid2').find('[aria-label="Edit UID and location"]').click();
       cy.get('[data-testid="edit-sample-dialog"]').within(() => {
+        cy.get('label').contains('Sample UID').siblings('div').find('input').clear();
+        cy.get('label').contains('Sample UID').siblings('div').find('input').type('..');
+        cy.contains('A UID cannot be "." or ".."').should('exist');
+        cy.get('button').contains('Save').should('be.disabled');
         cy.get('label').contains('Sample UID').siblings('div').find('input').clear();
         cy.get('label').contains('Sample UID').siblings('div').find('input').type('renamed_uid');
         cy.get('[data-testid="edit-sample-location"]').type('-80 box 3');

@@ -660,6 +660,20 @@ class SequenceInstance(Base):
     }
 
 
+_SAMPLE_UID_FORBIDDEN = re.compile(r'[/\\\x00-\x1f\x7f]')
+
+
+def validate_sample_uid(uid: str) -> str:
+    """Check that a sample UID can be used as a URL path segment (/sequence_samples/{uid}): the server decodes
+    %2F before routing, so a '/' would point the request to another route, and the client refuses '.' and '..'.
+    Raises ValueError if not."""
+    if not uid or uid in ('.', '..') or _SAMPLE_UID_FORBIDDEN.search(uid):
+        raise ValueError(
+            f"Invalid sample UID {uid!r}: it cannot be '.' or '..', or contain '/', '\\' or control characters"
+        )
+    return uid
+
+
 class SequenceSample(SequenceInstance):
     """
     A physical lab sample with a user-defined UID pointing to the sequence the
@@ -706,6 +720,10 @@ class SequenceSample(SequenceInstance):
             uid_workspace_id=ctx.workspace_id,
             created_by_id=ctx.user.id,
         )
+
+    @validates('uid')
+    def _validate_uid(self, key, value: str) -> str:
+        return validate_sample_uid(value)
 
     @classmethod
     def uid_in(cls, workspace_id: int, uids: list[str]):

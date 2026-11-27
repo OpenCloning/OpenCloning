@@ -113,7 +113,7 @@ def get_sequences(
     if sequence_types is not None and len(sequence_types) > 0:
         query = query.where(BaseSequence.sequence_type.in_(sequence_types))
     if name is not None:
-        query = query.where(BaseSequence.name.ilike(f"%{name}%"))
+        query = query.where(BaseSequence.name.icontains(name, autoescape=True))
     if uid is not None:
         # This creates a boolean filter by including 1 if the sequence has a sample with the given uid
         subq = (
@@ -121,7 +121,7 @@ def get_sequences(
             .select_from(SequenceSample)
             .where(
                 SequenceSample.sequence_id == BaseSequence.id,
-                SequenceSample.uid.ilike(f"%{uid}%"),
+                SequenceSample.uid.icontains(uid, autoescape=True),
                 SequenceSample.uid_workspace_id == workspace_id,
             )
         )
@@ -139,7 +139,7 @@ def get_sequences(
         query = query.where(exists(subq))
     if created_by is not None:
         query = query.join(User, User.id == BaseSequence.created_by_id).where(
-            User.display_name.ilike(f"%{created_by}%")
+            User.display_name.icontains(created_by, autoescape=True)
         )
     query = query.order_by(BaseSequence.id.desc())
     return paginate(session, query)

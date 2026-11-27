@@ -1,10 +1,16 @@
 import React from 'react';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import { TextFieldQueryValidated } from '@opencloning/ui';
+import { sampleUidError } from '../utils/sample_uid';
 
 const getSampleUIDExistsErrorQuery = (value, excludeUid) => ({
   queryKey: ['sequence_sample', value, { excludeUid: excludeUid ?? '' }],
   queryFn: async () => {
+    // Checked before the request, as an invalid UID would make it go to another route (or not be sent)
+    const formatError = sampleUidError(value);
+    if (formatError) {
+      return formatError;
+    }
     // Renaming a sample to its own uid (e.g. changing the case) is allowed
     if (excludeUid && value.toLowerCase() === excludeUid.toLowerCase()) {
       return '';

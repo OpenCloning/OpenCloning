@@ -220,6 +220,31 @@ def test_post_sequence_sample_owner_ok(seq_samples_client):
     assert response.json()['uid'] == 'S-NEW-OWNER'
 
 
+INVALID_SAMPLE_UIDS = ['a/b', 'S-W1/sequencing_files', 'a\\b', '.', '..', 'a\nb', 'a\x00b']
+
+
+@readonly_db
+@pytest.mark.parametrize('uid', INVALID_SAMPLE_UIDS)
+def test_post_sequence_sample_invalid_uid_422(seq_samples_client, uid):
+    """UIDs go in URL paths: the server decodes %2F before routing, so '/' would reach another route."""
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    response = c.post(
+        '/sequence_samples', headers=headers, json={'uid': uid, 'sequence_id': seq_samples_client['seq_w1_id']}
+    )
+    assert response.status_code == 422, response.text
+    assert 'Invalid sample UID' in response.text
+    response = c.patch(f"/sequence_samples/{seq_samples_client['sample_w1_uid']}", headers=headers, json={'uid': uid})
+    assert response.status_code == 422, response.text
+    assert 'Invalid sample UID' in response.text
+
+
+@pytest.mark.parametrize('uid', INVALID_SAMPLE_UIDS)
+def test_sequence_sample_model_rejects_invalid_uid(uid):
+    with pytest.raises(ValueError, match='Invalid sample UID'):
+        SequenceSample(uid=uid)
+
+
 @readonly_db
 def test_post_sequence_sample_wrong_workspace_sequence_rejected(
     seq_samples_client,
@@ -595,6 +620,12 @@ def test_sequence_samples_filters(seq_samples_client):
     assert uids(sequence_types='plasmid') == []
     assert uids(created_by='nobody') == []
 
+    # % and _ are not LIKE wildcards
+    c.post('/sequence_samples', headers=headers, json={'uid': 'S_W1%', 'sequence_id': seq_samples_client['seq_w1_id']})
+    assert uids(uid='s_') == ['S_W1%']
+    assert uids(uid='%') == ['S_W1%']
+    assert uids(uid='S-W1') == ['S-W1']
+
 
 # --- Bulk linking of sequencing files ---
 
@@ -694,6 +725,12 @@ def test_post_sequence_samples_sequencing_files_bulk(bulk_ctx):
             [('S-W2', '', 'a.fastq'), ('NEW-1', 'seq_w2_id', 'b.fastq')],
             None,
             'Sample S-W2 does not exist: choose a sequence to create it; Sequence not found: {seq_w2_id}',
+        ),
+        (
+            [('a/b', 'seq_w1_actual_id', 'a.fastq'), ('..', 'seq_w1_actual_id', 'b.fastq')],
+            None,
+            "Invalid sample UID '..': it cannot be '.' or '..', or contain '/', '\\' or control characters; "
+            "Invalid sample UID 'a/b': it cannot be '.' or '..', or contain '/', '\\' or control characters",
         ),
         (
             [('S-W1', '', 'hello_world.txt')],

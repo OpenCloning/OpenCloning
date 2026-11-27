@@ -154,13 +154,15 @@ def get_primers(
     if tags:
         query = query.where(InputEntity.tags.any(and_(Tag.id.in_(tags), Tag.workspace_id == workspace_id)))
     if name is not None:
-        query = query.where(Primer.name.ilike(f"%{name}%"))
+        query = query.where(Primer.name.icontains(name, autoescape=True))
     if uid is not None:
-        query = query.where(Primer.uid.ilike(f"%{uid}%"))
+        query = query.where(Primer.uid.icontains(uid, autoescape=True))
     if has_uid is True:
         query = query.where(Primer.uid.isnot(None))
     if created_by is not None:
-        query = query.join(User, User.id == Primer.created_by_id).where(User.display_name.ilike(f"%{created_by}%"))
+        query = query.join(User, User.id == Primer.created_by_id).where(
+            User.display_name.icontains(created_by, autoescape=True)
+        )
     query = query.order_by(Primer.id.desc())
     return paginate(session, query)
 
