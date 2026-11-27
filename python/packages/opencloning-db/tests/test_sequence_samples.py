@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from opencloning_db.context import WriteContext
-from opencloning_db.models import Sequence, SequenceSample, SequenceType, TemplateSequence, User
+from opencloning_db.models import Sequence, SequenceSample, SequenceType, Tag, TemplateSequence, User
 
 from .helpers import (
     assert_get_invalid_workspace_id_422,
@@ -83,7 +83,14 @@ def _seed_seq_samples_context(engine):
         )
         w1_ctx = WriteContext(user=session.get(User, ctx['owner_w1_id']), workspace_id=ctx['w1'])
         template_w1 = TemplateSequence.from_create(name='template-w1', sequence_type=SequenceType.allele, ctx=w1_ctx)
-        session.add_all([seq_w1_actual, template_w1])
+        # Tags of the sequences, to filter samples by
+        tag_w1 = Tag(name='sample-tag-w1', workspace_id=ctx['w1'])
+        tag_w1_actual = Tag(name='sample-tag-w1-actual', workspace_id=ctx['w1'])
+        tag_w2 = Tag(name='sample-tag-w2', workspace_id=ctx['w2'])
+        seq_w1.tags.append(tag_w1)
+        seq_w1_actual.tags.append(tag_w1_actual)
+        seq_w2.tags.append(tag_w2)
+        session.add_all([seq_w1_actual, template_w1, tag_w1, tag_w1_actual, tag_w2])
         session.commit()
 
         ctx.update(
@@ -93,6 +100,9 @@ def _seed_seq_samples_context(engine):
                 'sample_w1_uid': sample_w1.uid,
                 'seq_w1_actual_id': seq_w1_actual.id,
                 'template_w1_id': template_w1.id,
+                'tag_w1_id': tag_w1.id,
+                'tag_w1_actual_id': tag_w1_actual.id,
+                'tag_w2_id': tag_w2.id,
             }
         )
     return ctx
@@ -619,6 +629,15 @@ def test_sequence_samples_filters(seq_samples_client):
     assert uids(sequence_id=seq_samples_client['seq_w1_id']) == ['S-W1']
     assert uids(sequence_types='plasmid') == []
     assert uids(created_by='nobody') == []
+    # Tags of the sequence: any of the given tags
+    tag_w1, tag_w1_actual = seq_samples_client['tag_w1_id'], seq_samples_client['tag_w1_actual_id']
+    assert uids(tags=tag_w1_actual) == ['S-ACTUAL']
+    assert uids(tags=tag_w1) == ['S-W1']
+    assert uids(tags=[tag_w1, tag_w1_actual]) == ['S-ACTUAL', 'S-W1']
+    assert uids(tags=tag_w1_actual, location='freezer') == ['S-ACTUAL']
+    assert uids(tags=tag_w1, location='freezer') == []
+    # A tag of another workspace matches nothing
+    assert uids(tags=seq_samples_client['tag_w2_id']) == []
 
     # % and _ are not LIKE wildcards
     c.post('/sequence_samples', headers=headers, json={'uid': 'S_W1%', 'sequence_id': seq_samples_client['seq_w1_id']})

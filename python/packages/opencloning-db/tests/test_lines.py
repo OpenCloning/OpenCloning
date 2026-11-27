@@ -485,6 +485,30 @@ def test_post_line_copies_none_created_on_conflict(lines_client):
         assert c.post(url, headers=headers, json=body).status_code == 422
 
 
+def test_post_line_copies_uid_taken_at_commit_409(lines_client, monkeypatch):
+    """If a UID is taken after the check (race), the commit fails with 409 and no line is created."""
+    c = lines_client['client']
+    headers = workspace_headers(lines_client['token_owner_w1'], lines_client['w1'])
+    original_commit = Session.commit
+
+    def commit_after_uid_taken(self):
+        # Another request creates a line with one of the UIDs just before this commit
+        self.add(Line(workspace_id=lines_client['w1'], uid='l-race-2', created_by_id=lines_client['owner_w1_id']))
+        return original_commit(self)
+
+    monkeypatch.setattr(Session, 'commit', commit_after_uid_taken)
+    response = c.post(
+        f"/lines/{lines_client['line_seeded_parented_id']}/copies",
+        headers=headers,
+        json={'uids': ['L-RACE-1', 'L-RACE-2']},
+    )
+    monkeypatch.undo()
+
+    assert response.status_code == 409
+    assert response.json()['detail'] == 'A line UID already exists'
+    assert c.get('/lines', headers=headers, params={'uid': 'L-RACE'}).json()['items'] == []
+
+
 @readonly_db
 def test_post_line_copies_viewer_forbidden(lines_client):
     c = lines_client['client']
