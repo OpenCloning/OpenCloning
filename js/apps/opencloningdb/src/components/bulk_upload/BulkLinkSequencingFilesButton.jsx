@@ -66,7 +66,7 @@ function RowStatus({ row, status }) {
   return <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>{chips}</Stack>;
 }
 
-function SequenceCell({ row, onChange }) {
+function SequenceCell({ row, onChange, disabled }) {
   if (!row.uid || row.skip) {
     return null;
   }
@@ -81,6 +81,7 @@ function SequenceCell({ row, onChange }) {
         value={row.sequence}
         onChange={(sequence) => onChange({ sequence, matchedByRead: false })}
         filter={isRealSequence}
+        disabled={disabled}
         size="small"
         sx={{ minWidth: 240 }}
       />
@@ -88,7 +89,13 @@ function SequenceCell({ row, onChange }) {
         <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
           <Typography variant="caption">{plural(row.candidates.length, 'sequence')} match the read:</Typography>
           {row.candidates.map((sequence) => (
-            <Chip key={sequence.id} size="small" label={sequence.name} onClick={() => onChange({ sequence, matchedByRead: true })} />
+            <Chip
+              key={sequence.id}
+              size="small"
+              label={sequence.name}
+              disabled={disabled}
+              onClick={() => onChange({ sequence, matchedByRead: true })}
+            />
           ))}
         </Stack>
       )}
@@ -192,6 +199,9 @@ export default function BulkLinkSequencingFilesButton() {
   const unresolved = statuses.filter(({ status }) => status === 'no_sample').length;
   const alreadyLinked = statuses.filter(({ status }) => status === 'already_linked').length;
   const busy = link.isPending || findMatches.isPending;
+  // The request is made from the rows when it starts, so they cannot change while it runs. They can while
+  // matching, the matches are applied to the current rows.
+  const linking = link.isPending;
 
   return (
     <>
@@ -259,11 +269,12 @@ export default function BulkLinkSequencingFilesButton() {
                           <SampleTargetSelect
                             value={row.uid ? { uid: row.uid, sample: row.sample } : null}
                             newUid={row.sampleName}
+                            disabled={linking}
                             onChange={(target) => updateRow(i, (current) => withTarget(current, target))}
                           />
                         )}
                       </TableCell>
-                      <TableCell><SequenceCell row={row} onChange={(changes) => updateRow(i, changes)} /></TableCell>
+                      <TableCell><SequenceCell row={row} onChange={(changes) => updateRow(i, changes)} disabled={linking} /></TableCell>
                       <TableCell><RowStatus row={row} status={statuses[i]} /></TableCell>
                     </TableRow>
                   ))}

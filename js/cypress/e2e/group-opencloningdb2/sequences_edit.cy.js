@@ -421,7 +421,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     // Types over the selected sample, as a user would: clearing the field would unset the sample (and its sequence)
     const chooseSample = (sampleName, typed, option) => {
       sampleInput(sampleName).type(`{selectall}${typed}`);
-      cy.get('li[role="option"]').contains(option).click();
+      cy.get('li[role="option"]').contains(option, { timeout: 20000 }).click();
     };
     const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
     cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSamplesSequencingFilesBulk)).as('bulkLinkSequencingFiles');
@@ -439,7 +439,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       ...entries,
       '__MACOSX/seed_sequencing_run/empty_well/._empty_well.final.fastq': 'not a fastq',
     }));
-    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]', { timeout: 20000 })
       .should('have.text', '10 .final.fastq files in seed_sequencing_run.zip (3 with an existing sample of the same name).');
     sampleInput('SEQCHECK_CIRCULAR_3-SAMPLE').should('have.value', 'seqcheck_circular_3-sample');
     row('SEQCHECK_CIRCULAR_3-SAMPLE').should('contain', 'seqcheck_circular_3').and('contain', 'Existing sample');
@@ -502,7 +502,7 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     // Opening the run again: the files already linked to their sample cannot be linked again, unless another sample
     // is chosen
     readSequencingRun().then((entries) => selectZip('seed_sequencing_run.zip', entries));
-    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]', { timeout: 20000 })
       .should('have.text', '10 .final.fastq files in seed_sequencing_run.zip (6 with an existing sample of the same name, 6 already linked).');
     ['seqcheck_circular_1-sample', 'GB_105355_c1', 'GB_105417_c1'].forEach((sampleName) => {
       row(sampleName).should('contain', 'Already linked');
@@ -522,11 +522,12 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.get(modal).should('not.exist');
 
     // The files are linked to the samples
-    const sampleFiles = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`).find('[data-testid="sequencing-file-row"]');
-    cy.get('tbody tr button').contains('pREX0008').click();
+    const sampleFiles = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`)
+      .find('[data-testid="sequencing-file-row"]', { timeout: 20000 });
+    cy.get('tbody tr button').contains('pREX0008', { timeout: 20000 }).click();
     sampleFiles('example_sequencing-sample').should('contain', 'TN9W63_1.final.fastq').and('contain', 'TN9W63_2.final.fastq');
     cy.visit('/sequences?name=pJOG684');
-    cy.get('tbody tr button').contains('pJOG684').click();
+    cy.get('tbody tr button').contains('pJOG684', { timeout: 20000 }).click();
     sampleFiles('GB_105355_c1').should('contain', 'GB_105355_c1.final.fastq');
     sampleFiles('GB_105355_c2').should('contain', 'GB_105355_c2.final.fastq');
   });

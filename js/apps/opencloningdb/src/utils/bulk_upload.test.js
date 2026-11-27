@@ -165,6 +165,11 @@ describe('rows to link sequencing files', () => {
     expect(newSampleCount(rows)).toBe(2);
   });
 
+  it('accepts UIDs that are names of object properties', () => {
+    const rows = ['constructor', '__proto__'].map((uid) => ({ ...linkRow(file(uid)), uid, sequence: pJOG684 }));
+    expect(linkRowStatuses(rows).map(({ status }) => status)).toEqual(['new', 'new']);
+  });
+
   it('gives the sample UIDs and sequence IDs to submit', () => {
     const rows = [
       linkRow(file('S1'), existing),

@@ -703,7 +703,8 @@ def get_sequences_by_seguid(
     _, session, workspace_id = ctx.destructure()
     stmt = _seguid_query(seguid, workspace_id)
     if without_samples:
-        stmt = stmt.where(~exists().where(SequenceSample.sequence_id == Sequence.id))
+        # Selecting the entity joins sequence_sample, so that other instances (e.g. in lines) are not samples
+        stmt = stmt.where(~select(SequenceSample.id).where(SequenceSample.sequence_id == Sequence.id).exists())
     return [sequence_ref(seq) for seq in session.scalars(stmt).all()]
 
 

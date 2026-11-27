@@ -16,7 +16,7 @@ const sameTarget = (a, b) => a.uid.toLowerCase() === b.uid.toLowerCase() && Bool
  * (with the sample name of the file, newUid, if nothing is typed). value and onChange use { uid, sample },
  * sample null for a new sample.
  */
-export default function SampleTargetSelect({ value, onChange, newUid }) {
+export default function SampleTargetSelect({ value, onChange, newUid, disabled = false }) {
   const { query, autocompleteProps } = useDebouncedSearchQuery(sampleSearchQuery, { minChars: 1, debounceMs: 300 });
   const typed = autocompleteProps.inputValue.trim();
   // The typed text is the selected value (shown in the field), not a search
@@ -36,6 +36,7 @@ export default function SampleTargetSelect({ value, onChange, newUid }) {
       {...autocompleteProps}
       size="small"
       sx={{ minWidth: 240 }}
+      disabled={disabled}
       options={options}
       value={value}
       onChange={(_event, option) => onChange(option)}

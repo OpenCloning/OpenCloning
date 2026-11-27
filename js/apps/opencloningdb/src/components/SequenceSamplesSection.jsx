@@ -28,8 +28,8 @@ import useAppAlerts from '../hooks/useAppAlerts';
 
 const { submitSequencingFileToDatabase } = OpenCloningDBInterface;
 
-// Samples of a sequence are expected to be few, they are all shown
-const MAX_SAMPLES = 100;
+// Samples of a sequence are expected to be few, they are all shown (in pages of the maximum size of the API)
+const SAMPLES_PAGE_SIZE = 100;
 
 // The tooltip labels the span (aria-label), which also works when the button is disabled
 function SmallAction({ title, onClick, icon, disabled = false, ...rest }) {
@@ -143,10 +143,18 @@ function SequenceSamplesSection({ sequenceId, isTemplateSequence = false, onSeeA
   const samplesQuery = useQuery({
     queryKey: ['sequence', sequenceId, 'samples'],
     queryFn: async () => {
-      const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, {
-        params: { sequence_id: sequenceId, size: MAX_SAMPLES },
-      });
-      return data.items;
+      const samples = [];
+      let total;
+      for (let page = 1; total === undefined || samples.length < total; page += 1) {
+        const { data } = await openCloningDBHttpClient.get(endpoints.sequenceSamples, {
+          params: { sequence_id: sequenceId, page, size: SAMPLES_PAGE_SIZE },
+        });
+        samples.push(...data.items);
+        total = data.total;
+        // Samples deleted while paging: the total cannot be reached
+        if (data.items.length < SAMPLES_PAGE_SIZE) break;
+      }
+      return samples;
     },
   });
   const samples = samplesQuery.data ?? [];
@@ -184,7 +192,12 @@ function SequenceSamplesSection({ sequenceId, isTemplateSequence = false, onSeeA
         </QueryStatusWrapper>
       </DetailPageSection>
       <CreateSampleDialog sequenceId={sequenceId} open={createOpen} onClose={() => setCreateOpen(false)} />
-      <TransferSampleDialog sequenceId={sequenceId} open={transferOpen} onClose={() => setTransferOpen(false)} />
+      <TransferSampleDialog
+        sequenceId={sequenceId}
+        isTemplateSequence={isTemplateSequence}
+        open={transferOpen}
+        onClose={() => setTransferOpen(false)}
+      />
     </>
   );
 }

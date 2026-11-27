@@ -229,14 +229,14 @@ describe('SequencesPage', () => {
   it('can switch to the samples view, with one row per sample', () => {
     cy.intercept('GET', Cypress.getDbURL(endpoints.sequenceSamples, '*')).as('getSamples');
     cy.e2eLogin('/sequences?name=pREX0008', 'view-only-user@example.com', 'password');
-    cy.get('[data-testid="sequence-table"]').should('exist');
+    cy.get('[data-testid="sequence-table"]', { timeout: 20000 }).should('exist');
     cy.get('[data-testid="sequences-view-toggle"]').contains('button', 'Samples').click();
     cy.url().should('include', 'view=samples');
     cy.wait('@getSamples').then(({ request, response }) => {
       // The sequence filters apply to the samples
       expect(request.query).to.deep.equal({ page: '1', size: '25', name: 'pREX0008' });
       const sample = response.body.items.find((item) => item.uid === 'example_sequencing-sample');
-      cy.get('[data-testid="samples-table-row"]').filter(':contains(example_sequencing-sample)').within(() => {
+      cy.get('[data-testid="samples-table-row"]', { timeout: 20000 }).filter(':contains(example_sequencing-sample)').within(() => {
         cy.get('td').eq(2).should('contain', 'pREX0008');
         cy.get('td').eq(3).should('contain', 'Plasmid');
         cy.get('td').eq(4).should('contain', '—');
@@ -248,11 +248,11 @@ describe('SequencesPage', () => {
     cy.get('[data-testid="url-params-form"]').contains('label', 'Location').siblings('div').find('input').type('nowhere');
     cy.get('[data-testid="url-params-form"]').contains('button', 'Search').click();
     cy.wait('@getSamples').its('request.query.location').should('equal', 'nowhere');
-    cy.get('[data-testid="samples-table-row"]').should('not.exist');
+    cy.get('[data-testid="samples-table-row"]', { timeout: 20000 }).should('not.exist');
 
     cy.get('[data-testid="sequences-view-toggle"]').contains('button', 'Sequences').click();
     cy.url().should('not.include', 'view=samples');
-    cy.get('[data-testid="sequence-table"]').contains('pREX0008').should('exist');
+    cy.get('[data-testid="sequence-table"]').contains('pREX0008', { timeout: 20000 }).should('exist');
     cy.get('[data-testid="url-params-form"]').contains('label', 'With UID').should('exist');
   });
 

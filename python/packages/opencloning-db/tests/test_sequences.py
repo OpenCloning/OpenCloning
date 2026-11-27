@@ -980,6 +980,24 @@ def test_get_sequences_by_seguid_without_samples(sequences_client):
     assert seq_id not in ids(True)
 
 
+def test_get_sequences_by_seguid_without_samples_in_line(sequences_client):
+    """A sequence that is only in a line has no samples (both are sequence instances)."""
+    c = sequences_client['client']
+    headers = workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1'])
+    seq_id = sequences_client['seq_patch_linear_id']
+    with Session(sequences_client['engine']) as session:
+        seguid = session.get(Sequence, seq_id).seguid
+        line = Line(workspace_id=sequences_client['w1'], uid='L-SEGUID', created_by_id=sequences_client['owner_w1_id'])
+        session.add(line)
+        session.flush()
+        session.add(SequenceInLine(sequence_id=seq_id, line_id=line.id))
+        session.commit()
+
+    r = c.get(f'/sequences/by-seguid/{seguid}', headers=headers, params={'without_samples': True})
+    assert r.status_code == 200
+    assert seq_id in {item['id'] for item in r.json()}
+
+
 @readonly_db
 def test_get_sequences_by_seguid_unknown_empty(sequences_client):
     c = sequences_client['client']

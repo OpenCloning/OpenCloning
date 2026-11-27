@@ -84,13 +84,16 @@ function SequenceDetailPage() {
   });
   const { data: primers } = primersQuery;
 
-  const { data: sequencingFiles = [] } = sequencingFilesQuery;
   const { parentSequences, parentSource, sequenceModel, sequenceInDb, children, sequenceLines = [], isTemplateSequence } = React.useMemo(() => data ?? {}, [data]);
   const sequenceData = React.useMemo(() => sequenceModel ? convertToTeselaJson(sequenceModel) : null, [sequenceModel]);
   const tags = React.useMemo(() => sequenceInDb?.tags ?? [], [sequenceInDb]);
 
   const handleSeeAlignmentsMutation = useMutation({
     mutationFn: async () => {
+      // If the files could not be retrieved, try again (and show why it failed), rather than align no files
+      const sequencingFiles = sequencingFilesQuery.isSuccess
+        ? sequencingFilesQuery.data
+        : (await sequencingFilesQuery.refetch({ throwOnError: true })).data;
       const parsedFiles = await Promise.all(sequencingFiles.map(async (file) => {
         const { teselaJson: fileContent } = await readSequencingFile(await file.getFile());
         return { fileName: file.name, fileContent };

@@ -5,7 +5,7 @@ import SampleSelect from './SampleSelect';
 import useSampleMutation from '../hooks/useSampleMutation';
 
 // Inside the dialog, so that its state is reset when the dialog closes
-function TransferSampleForm({ sequenceId, onClose, sample }) {
+function TransferSampleForm({ sequenceId, isTemplateSequence, onClose, sample }) {
   const [selectedSample, setSelectedSample] = React.useState(null);
   const [targetSequence, setTargetSequence] = React.useState(null);
 
@@ -22,7 +22,13 @@ function TransferSampleForm({ sequenceId, onClose, sample }) {
     onSuccess: onClose,
   });
 
-  const excludeOwnSamples = React.useCallback((s) => s.sequence_id !== sequenceId, [sequenceId]);
+  // The backend does not allow samples with sequencing files to point to a template sequence
+  const sampleFilter = React.useCallback(
+    (s) => s.sequence_id !== sequenceId && !(isTemplateSequence && s.sequencing_files.length > 0),
+    [sequenceId, isTemplateSequence],
+  );
+  const hasFiles = sample?.sequencing_files.length > 0;
+  const sequenceFilter = React.useMemo(() => (hasFiles ? (s) => s.type === 'sequence' : undefined), [hasFiles]);
 
   return (
     <>
@@ -32,8 +38,8 @@ function TransferSampleForm({ sequenceId, onClose, sample }) {
       <DialogContent>
         <FormControl fullWidth sx={{ mt: 1 }}>
           {sample
-            ? <SequenceSelect multiple={false} label="Sequence" value={targetSequence} onChange={setTargetSequence} />
-            : <SampleSelect value={selectedSample} onChange={setSelectedSample} filter={excludeOwnSamples} />}
+            ? <SequenceSelect multiple={false} label="Sequence" value={targetSequence} onChange={setTargetSequence} filter={sequenceFilter} />
+            : <SampleSelect value={selectedSample} onChange={setSelectedSample} filter={sampleFilter} />}
         </FormControl>
         {movedSample && target && (
           <Typography sx={{ mt: 2 }}>
@@ -63,11 +69,12 @@ function TransferSampleForm({ sequenceId, onClose, sample }) {
  * out to be another one when sequenced.
  * With sample, the sample is fixed and the user picks the target sequence; without it, the user picks a sample
  * of another sequence to move it to sequenceId.
+ * Samples with sequencing files cannot point to a template sequence, so that combination is not offered.
  */
-function TransferSampleDialog({ sequenceId, open, onClose, sample = null }) {
+function TransferSampleDialog({ sequenceId, isTemplateSequence = false, open, onClose, sample = null }) {
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} data-testid="transfer-sample-dialog">
-      <TransferSampleForm sequenceId={sequenceId} onClose={onClose} sample={sample} />
+      <TransferSampleForm sequenceId={sequenceId} isTemplateSequence={isTemplateSequence} onClose={onClose} sample={sample} />
     </Dialog>
   );
 }

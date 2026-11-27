@@ -332,11 +332,12 @@ const isLinked = (row) => !row.skip && !isAlreadyLinked(row);
  * - blocking: the files cannot be linked until this is fixed
  */
 export function linkRowStatuses(rows) {
-  const byUid = {};
+  // A Map, as a UID can be any string (e.g. 'constructor', which a plain object already has)
+  const byUid = new Map();
   rows.forEach((row) => {
     if (isLinked(row) && row.uid) {
       const key = row.uid.toLowerCase();
-      byUid[key] = [...(byUid[key] ?? []), row];
+      byUid.set(key, [...(byUid.get(key) ?? []), row]);
     }
   });
   return rows.map((row) => {
@@ -349,7 +350,7 @@ export function linkRowStatuses(rows) {
     if (!row.uid) {
       return { status: 'no_sample', duplicates: [], conflict: false, blocking: true };
     }
-    const sameUid = byUid[row.uid.toLowerCase()];
+    const sameUid = byUid.get(row.uid.toLowerCase());
     const duplicates = sameUid.filter((other) => other !== row).map((other) => other.sampleName);
     if (row.sample) {
       return { status: 'existing', duplicates, conflict: false, blocking: false };

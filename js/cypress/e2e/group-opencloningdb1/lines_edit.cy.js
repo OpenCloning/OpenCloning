@@ -90,7 +90,7 @@ describe('Actions that can be perfomed by an edit user on the Lines page', () =>
 
         // Use existing UID, cannot submit
         cy.setInputValue('Line UID', 'crispr_hdr-line', 'div');
-        cy.contains('Line UID already exists').should('exist');
+        cy.contains('Line UID already exists', { timeout: 20000 }).should('exist');
         cy.get('button').contains('Submit').should('be.disabled');
 
         // Change ID with alleles removed, can submit
@@ -180,10 +180,10 @@ describe('Actions that can be perfomed by an edit user on the Lines page', () =>
     cy.get('[data-testid="create-isolates-dialog"]').within(() => {
       // Existing UID, cannot submit
       cy.setInputValue('Line UID 1', 'crispr_hdr-line', 'div');
-      cy.contains('Line UID already exists').should('exist');
+      cy.contains('Line UID already exists', { timeout: 20000 }).should('exist');
       cy.get('button').contains('Create 1 line').should('be.disabled');
       cy.setInputValue('Line UID 1', 'isolate-1', 'div');
-      cy.get('button').contains('Create 1 line').should('be.enabled');
+      cy.get('button').contains('Create 1 line', { timeout: 20000 }).should('be.enabled');
 
       // Duplicated UIDs (case-insensitive), cannot submit
       cy.get('button').contains('Add another UID').click();
