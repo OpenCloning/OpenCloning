@@ -42,7 +42,7 @@
     "devDependencies": {
         "@clerk/testing": "patch:@clerk/testing@npm%3A2.2.37#~/.yarn/patches/@clerk-testing-npm-2.2.37-69582bb577.patch",
         "@cypress/code-coverage": "^4.1.3",
-        "@cypress/react": "^9.0.2",
+        "@cypress/react": "^10.0.1",
         "@eslint/js": "^10.0.1",
         "@tanstack/react-query": "^5.107.1",
         "@testing-library/react": "^14.3.1",
