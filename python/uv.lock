@@ -1143,7 +1143,7 @@ wheels = [
 
 [[package]]
 name = "opencloning"
-version = "2.2.2"
+version = "3.0.0"
 source = { editable = "packages/opencloning" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1198,7 +1198,7 @@ requires-dist = [
 
 [[package]]
 name = "opencloning-cli"
-version = "2.2.2"
+version = "3.0.0"
 source = { editable = "packages/opencloning-cli" }
 dependencies = [
     { name = "opencloning-db" },
@@ -1213,7 +1213,7 @@ requires-dist = [
 
 [[package]]
 name = "opencloning-db"
-version = "2.2.2"
+version = "3.0.0"
 source = { editable = "packages/opencloning-db" }
 dependencies = [
     { name = "alembic" },
