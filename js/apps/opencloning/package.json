@@ -16,7 +16,7 @@
         "@opencloning/store": "workspace:*",
         "@opencloning/ui": "workspace:*",
         "@opencloning/utils": "workspace:*",
-        "react": "^18.3.1",
+        "react": "^19.3.1",
         "react-dom": "^18.3.1",
         "react-redux": "^9.3.1"
     }
