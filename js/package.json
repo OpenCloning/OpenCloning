@@ -45,7 +45,7 @@
         "@cypress/react": "^10.0.1",
         "@eslint/js": "^10.0.1",
         "@tanstack/react-query": "^5.108.4",
-        "@testing-library/react": "^14.3.1",
+        "@testing-library/react": "^16.3.3",
         "@vitejs/plugin-react": "^6.3.0",
         "@vitest/coverage-istanbul": "^5.1.1",
         "@vitest/coverage-v8": "^5.1.1",
