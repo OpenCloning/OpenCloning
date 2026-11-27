@@ -277,7 +277,7 @@ def delete_sequence(
     sequence_id: int,
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
-    """Delete a sequence with no children, not present in any strain, and that no sample was moved away from.
+    """Delete a sequence with no children and not present in any line.
 
     Linked sequence samples and their sequencing files are removed via ORM cascade
     """

@@ -138,15 +138,16 @@ def post_sequence_sample(
     return SequenceSampleCreated(id=ps.id, uid=ps.uid)
 
 
-@router.get('/sequence_samples/{uid}', response_model=SequenceSampleRead)
+@router.get('/sequence_samples/{uid}', response_model=SequenceSampleWithSequence)
 def get_sequence_sample(
     uid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
 ):
-    """Get a sequence sample by its user-defined UID."""
+    """Get a sequence sample by its user-defined UID (case-insensitive), with its sequence and sequencing files
+    (without content)."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.viewer)
-    return sequence_sample_read(ps)
+    return sequence_sample_with_sequence(ps)
 
 
 @router.patch('/sequence_samples/{uid}', response_model=SequenceSampleRead)
@@ -199,7 +200,7 @@ def delete_sequence_sample(
     uid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
-    """Delete a sequence sample, with its sequencing files and history."""
+    """Delete a sequence sample, with its sequencing files."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
     sequence_id = ps.sequence_id

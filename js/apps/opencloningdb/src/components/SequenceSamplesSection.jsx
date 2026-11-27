@@ -164,7 +164,8 @@ function SequenceSamplesSection({ sequenceId, isTemplateSequence = false, onSeeA
             {hasFiles && onSeeAlignments && (
               <DetailPageSectionAction
                 icon={alignmentLoading ? <CircularProgress size={24} /> : <VisibilityIcon />}
-                onClick={onSeeAlignments}
+                // Not while the files are loading: it would align the files that were there before
+                onClick={alignmentLoading ? undefined : onSeeAlignments}
                 title="See alignments"
               />
             )}

@@ -16,34 +16,26 @@ import {
   fastqSampleName, finalFastqFilesFromZip, isAlreadyLinked, linkEntries, linkRow, linkRowStatuses, newSampleCount,
   withMatches, withTarget,
 } from '../../utils/bulk_upload';
-import { sampleSearchQuery } from '../../utils/sample_queries';
+import { fetchSampleByUid } from '../../utils/sample_queries';
 import SampleTargetSelect from './SampleTargetSelect';
 
 /** Samples can only be created for real sequences, not templates. */
 const isRealSequence = (sequence) => sequence.type === 'sequence';
 
-/** The sample whose UID is the sample name of the file (case-insensitive), null if there is none. */
-async function sampleWithSameName(queryClient, file) {
-  const sampleName = fastqSampleName(file);
-  const samples = await queryClient.fetchQuery(sampleSearchQuery(sampleName));
-  return samples.find(({ uid }) => uid.toLowerCase() === sampleName.toLowerCase()) ?? null;
-}
-
 /**
  * The sequences without samples that are the read of the file circularised (whole-plasmid sequencing), or null if
- * the file cannot be read.
+ * the file cannot be read or checked (so that one file does not stop the others).
  */
 async function exactMatches(backendHttpClient, file) {
-  let teselaJson;
   try {
-    ({ teselaJson } = await readSequencingFile(file));
+    const { teselaJson } = await readSequencingFile(file);
+    const { data: seguid } = await backendHttpClient.post('seguid', { sequence: teselaJson.sequence, circular: true });
+    const { data } = await openCloningDBHttpClient.get(endpoints.sequencesBySeguid(seguid), { params: { without_samples: true } });
+    return data;
   } catch {
     // Reported in the summary of the matches
     return null;
   }
-  const { data: seguid } = await backendHttpClient.post('seguid', { sequence: teselaJson.sequence, circular: true });
-  const { data } = await openCloningDBHttpClient.get(endpoints.sequencesBySeguid(seguid), { params: { without_samples: true } });
-  return data;
 }
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -131,7 +123,8 @@ export default function BulkLinkSequencingFilesButton() {
   const readZip = useMutation({
     mutationFn: async (zipFile) => {
       const files = await finalFastqFilesFromZip(zipFile);
-      const samples = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, (file) => sampleWithSameName(queryClient, file));
+      // The sample whose UID is the sample name of the file, if any
+      const samples = await runWithConcurrency(files, MAX_CONCURRENT_CHECKS, (file) => fetchSampleByUid(fastqSampleName(file)));
       const rows = files.map((file, i) => linkRow(file, samples[i])).sort((a, b) => a.sampleName.localeCompare(b.sampleName));
       return { zipName: zipFile.name, rows };
     },
@@ -153,9 +146,9 @@ export default function BulkLinkSequencingFilesButton() {
       // Applied to the current rows: those that the user changed while matching are left as they are
       setRun((current) => ({ ...current, rows: current.rows.map((row, i) => withMatches(row, matchesByIndex[i])) }));
       const matched = results.filter(({ matches }) => matches?.length > 0).length;
-      const unreadable = results.filter(({ matches }) => matches === null).map(({ index }) => run.rows[index].sampleName);
+      const failed = results.filter(({ matches }) => matches === null).map(({ index }) => run.rows[index].sampleName);
       const message = `Matched ${matched} of ${plural(results.length, 'file')} without sample`
-        + (unreadable.length > 0 ? `. Could not read: ${unreadable.join(', ')}` : '');
+        + (failed.length > 0 ? `. Could not check: ${failed.join(', ')}` : '');
       addAlert({ message, severity: matched > 0 ? 'success' : 'info' });
     },
     onError: addErrorAlert,
@@ -177,9 +170,7 @@ export default function BulkLinkSequencingFilesButton() {
     onSuccess: ({ created, created_samples: createdSamples }) => {
       const newSamples = createdSamples > 0 ? `, ${plural(createdSamples, 'new sample')}` : '';
       addAlert({ message: `Linked ${plural(created, 'sequencing file')} successfully${newSamples}`, severity: 'success' });
-      queryClient.invalidateQueries({ queryKey: ['sequence'] });
-      queryClient.invalidateQueries({ queryKey: ['sequences'] });
-      queryClient.invalidateQueries({ queryKey: ['sequence_samples'] });
+      ['sequence', 'sequences', 'sequence_samples', 'sequence_sample'].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
       closeModal();
     },
   });

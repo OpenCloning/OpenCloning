@@ -108,12 +108,11 @@ function sequencesOfSamples(samples) {
   });
 }
 
-function SequencesPage() {
+function SequencesPageContent({ view }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const view = parseSequencesView(searchParams);
   const filters = useMemo(
     () => parseSequenceParams(searchParams),
     [searchParams],
@@ -136,8 +135,7 @@ function SequencesPage() {
       });
       return res;
     },
-    // Keep the previous page while loading, but not the data of the other view (rows have another shape)
-    placeholderData: (previousData, previousQuery) => (previousQuery?.queryKey[0] === queryKey ? keepPreviousData(previousData) : undefined),
+    placeholderData: keepPreviousData,
   });
 
   const items = data?.items ?? [];
@@ -155,8 +153,6 @@ function SequencesPage() {
     } else {
       next.delete('view');
     }
-    setPage(0);
-    clearSelection();
     setSearchParams(next);
   };
 
@@ -234,6 +230,14 @@ function SequencesPage() {
       </TableContainer>
     </PageContainer>
   );
+}
+
+// Keyed by the view, so that the page and the selection are reset when the view changes (also with the browser
+// history): the rows of the two views have another shape, and sample and sequence ids are not the same ids
+function SequencesPage() {
+  const [searchParams] = useSearchParams();
+  const view = parseSequencesView(searchParams);
+  return <SequencesPageContent key={view} view={view} />;
 }
 
 export default SequencesPage;

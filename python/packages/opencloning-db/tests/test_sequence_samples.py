@@ -518,7 +518,12 @@ def test_reassign_sequence_sample_moves_files(seq_samples_client):
 
     # The sequence the sample was moved from can be deleted
     assert c.delete(f'/sequences/{planned}', headers=headers).status_code == 200
-    assert c.get(f'/sequence_samples/{uid}', headers=headers).status_code == 200
+    # The sample is found by its UID in any case, with its sequence and files
+    r = c.get(f'/sequence_samples/{uid.swapcase()}', headers=headers)
+    assert r.status_code == 200
+    assert r.json()['uid'] == uid
+    assert r.json()['sequence']['id'] == actual
+    assert [f['original_name'] for f in r.json()['sequencing_files']] == ['a.ab1', 'b.ab1']
 
 
 @readonly_db
