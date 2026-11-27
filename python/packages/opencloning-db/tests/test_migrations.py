@@ -213,3 +213,127 @@ class TestMigration_8deebdee4ca0:
                         INSERT INTO line (workspace_id, uid, created_by_id)
                         VALUES (1, 'Strain-A', 1)
                         """))
+
+
+class TestMigration_3c5e8f1a9b27:
+    """Sequencing files move from sequences to samples."""
+
+    def _insert_sequence(self, conn, *, seq_id: int, workspace_id: int, user_id: int) -> None:
+        conn.execute(
+            text("""
+                INSERT INTO input_entity (id, workspace_id, type, name, created_by_id)
+                VALUES (:id, :workspace_id, 'sequence', :name, :user_id)
+                """),
+            {'id': seq_id, 'workspace_id': workspace_id, 'name': f'seq-{seq_id}', 'user_id': user_id},
+        )
+        conn.execute(text("INSERT INTO base_sequence (id, sequence_type) VALUES (:id, 'plasmid')"), {'id': seq_id})
+        conn.execute(
+            text("""
+                INSERT INTO sequence (id, overhang_crick_3prime, overhang_watson_3prime, seguid, file_content)
+                VALUES (:id, 0, 0, :seguid, '')
+                """),
+            {'id': seq_id, 'seguid': f'SEG{seq_id}'},
+        )
+
+    def _insert_sample(self, conn, *, seq_id: int, workspace_id: int, uid: str) -> int:
+        sample_id = conn.execute(
+            text("INSERT INTO sequence_instance (sequence_id, type) VALUES (:id, 'sequence_sample') RETURNING id"),
+            {'id': seq_id},
+        ).scalar_one()
+        conn.execute(
+            text('INSERT INTO sequence_sample (id, workspace_id, uid) VALUES (:id, :workspace_id, :uid)'),
+            {'id': sample_id, 'workspace_id': workspace_id, 'uid': uid},
+        )
+        return sample_id
+
+    def _insert_files(self, conn, seq_id: int, *names: str) -> None:
+        for name in names:
+            conn.execute(
+                text("""
+                    INSERT INTO sequencing_file (sequence_id, original_name, file_content)
+                    VALUES (:seq_id, :name, 'x')
+                    """),
+                {'seq_id': seq_id, 'name': name},
+            )
+
+    def _files(self, conn) -> dict[str, str]:
+        """{file name: sample uid}"""
+        return dict(conn.execute(text("""
+                    SELECT sf.original_name, ss.uid
+                    FROM sequencing_file sf JOIN sequence_sample ss ON ss.id = sf.sequence_instance_id
+                    """)).fetchall())
+
+    def test_sequencing_files_to_samples(self, postgres_test_engine_write):
+        engine = postgres_test_engine_write
+        downgrade_to(engine, 'eae106d3b1d2')
+
+        with engine.begin() as conn:
+            user_id = conn.execute(text("""
+                    INSERT INTO "user" (email, display_name, is_instance_admin)
+                    VALUES ('migration@test.com', 'Migr', false)
+                    RETURNING id
+                    """)).scalar_one()
+            conn.execute(text("INSERT INTO workspace (id, name) VALUES (1, 'ws')"))
+            for seq_id in (101, 102, 103, 104):
+                self._insert_sequence(conn, seq_id=seq_id, workspace_id=1, user_id=user_id)
+            # One sample: all files go to it
+            self._insert_sample(conn, seq_id=101, workspace_id=1, uid='only-sample')
+            self._insert_files(conn, 101, 'a1.ab1', 'a2.ab1')
+            # No sample: placeholder, its uid is already taken
+            # we create a smaple in 104 that has the name that would have been
+            # generated automatically if 102 had no samples
+            self._insert_sample(conn, seq_id=104, workspace_id=1, uid='Unassigned-102')
+            self._insert_files(conn, 102, 'b.ab1')
+            # Several samples: by uid in the file name (longest match), else placeholder
+            self._insert_sample(conn, seq_id=103, workspace_id=1, uid='clone-1')
+            self._insert_sample(conn, seq_id=103, workspace_id=1, uid='clone-10')
+            self._insert_files(conn, 103, 'CLONE-10_run.ab1', 'clone-1_run.ab1', 'other.ab1')
+
+        migrate_to(engine, '3c5e8f1a9b27')
+
+        with engine.begin() as conn:
+            assert self._files(conn) == {
+                'a1.ab1': 'only-sample',
+                'a2.ab1': 'only-sample',
+                'b.ab1': 'unassigned-102-1',
+                'CLONE-10_run.ab1': 'clone-10',
+                'clone-1_run.ab1': 'clone-1',
+                'other.ab1': 'unassigned-103',
+            }
+            placeholder_seq, created_by = conn.execute(text("""
+                    SELECT si.sequence_id, ss.created_by_id
+                    FROM sequence_sample ss JOIN sequence_instance si ON si.id = ss.id
+                    WHERE ss.uid = 'unassigned-103'
+                    """)).one()
+            assert (placeholder_seq, created_by) == (103, user_id)
+            assert (
+                conn.execute(
+                    text('SELECT count(*) FROM sequence_sample WHERE created_by_id = :u'), {'u': user_id}
+                ).scalar_one()
+                == conn.execute(text('SELECT count(*) FROM sequence_sample')).scalar_one()
+            )
+
+            # A file with the same name in another sample of the same sequence
+            clone_1 = conn.execute(text("SELECT id FROM sequence_sample WHERE uid = 'clone-1'")).scalar_one()
+            conn.execute(
+                text("""
+                    INSERT INTO sequencing_file (sequence_instance_id, original_name, file_content)
+                    VALUES (:id, 'other.ab1', 'x')
+                    """),
+                {'id': clone_1},
+            )
+
+        downgrade_to(engine, 'eae106d3b1d2')
+
+        with engine.connect() as conn:
+            files = sorted(conn.execute(text('SELECT sequence_id, original_name FROM sequencing_file')).fetchall())
+        assert files == [
+            (101, 'a1.ab1'),
+            (101, 'a2.ab1'),
+            (102, 'b.ab1'),
+            (103, 'CLONE-10_run.ab1'),
+            # Renamed, the file of the placeholder sample keeps the name
+            (103, 'clone-1_other.ab1'),
+            (103, 'clone-1_run.ab1'),
+            (103, 'other.ab1'),
+        ]

@@ -1,31 +1,14 @@
-import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
-import useAppAlerts from './useAppAlerts';
-import error2String from '@opencloning/utils/error2String';
-
+import useSampleMutation from './useSampleMutation';
 
 function useDeleteSequenceUIDMutation() {
-  const queryClient = useQueryClient();
-  const { addAlert } = useAppAlerts();
-  const deleteSequenceUIDMutation = useMutation({
+  return useSampleMutation({
     mutationFn: async (uid) => {
       const { data: resp } = await openCloningDBHttpClient.delete(endpoints.sequenceSample(uid));
       return resp.data;
     },
-    onSuccess: (data) => {
-      const sequenceId = data.sequence_id;
-      const uid = data.uid;
-      queryClient.invalidateQueries({ queryKey: ['sequence_samples', {uid}] });
-      queryClient.invalidateQueries({ queryKey: ['sequence_sample', uid] });
-      queryClient.invalidateQueries({ queryKey: ['sequence', sequenceId, 'cloning_strategy'] });
-      addAlert({ message: `UID ${uid} deleted successfully`, severity: 'success' });
-    },
-    onError: (error) => {
-      addAlert({ message: error2String(error), severity: 'error' });
-    },
+    successMessage: ({ uid }) => `UID ${uid} deleted successfully`,
   });
-  return deleteSequenceUIDMutation;
 }
 
 export default useDeleteSequenceUIDMutation;

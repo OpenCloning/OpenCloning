@@ -84,10 +84,11 @@ def _add_sequencing_check_examples(session: Session, ctx: WriteContext, workspac
             pydna_opencloning_models.CloningStrategy.from_dseqrecords([dseqr]), session, ctx=ctx
         )[0][-1]
         sequence.tags.append(tag)
+        sample = SequenceSample.from_create(uid=f'{name}-sample', sequence=sequence, ctx=ctx)
         for file_name, content in files.items():
             if not isinstance(content, bytes):
                 content = content.format('fasta').encode()
-            session.add(create_sequencing_file(sequence, content, file_name))
+            session.add(create_sequencing_file(sample, content, file_name))
 
 
 def load_seed_data(engine: Engine) -> None:
@@ -103,7 +104,7 @@ def load_seed_data(engine: Engine) -> None:
 
     with Session(engine) as session:
         last_seq = None
-        sequencing_sequence = None
+        sequencing_sample = None
         # Dummy user and workspace for development purposes (without access)
         other_workspace_user = User(
             email='other-workspace-user@example.com',
@@ -179,15 +180,10 @@ def load_seed_data(engine: Engine) -> None:
             for seq in sequences:
                 seq.tags.append(tag)
             last_seq = sequences[-1]
+            sample = SequenceSample.from_create(uid=f"{tag_name}-sample", sequence=last_seq, ctx=seed_ctx)
+            session.add(sample)
             if cloning_strategy.description == 'sequencing':
-                sequencing_sequence = last_seq
-            session.add(
-                SequenceSample(
-                    uid=f"{tag_name}-sample",
-                    sequence_id=last_seq.id,
-                    uid_workspace_id=workspace.id,
-                )
-            )
+                sequencing_sample = sample
 
         # Find the primer that is used for testing, and add a uid to it
         test_primer = session.scalar(select(Primer).where(Primer.name == 'fwd_restriction_then_ligation'))
@@ -201,7 +197,7 @@ def load_seed_data(engine: Engine) -> None:
             with open(file, 'rb') as f:
                 content = f.read()
             file_name = os.path.basename(file)
-            session.add(create_sequencing_file(sequencing_sequence, content, file_name))
+            session.add(create_sequencing_file(sequencing_sample, content, file_name))
 
         # Add golden braid plasmids from genbank files, tagged with 'golden-braid'
         golden_braid_tag = Tag(name='golden-braid', workspace_id=workspace.id)
@@ -223,13 +219,6 @@ def load_seed_data(engine: Engine) -> None:
         pydantic_primer = opencloning_models.Primer(id=0, name='no_source_primer', sequence='GGTTaaCCaaa')
         no_source_primer = Primer.from_pydantic(pydantic_primer, ctx=seed_ctx)
         session.add(no_source_primer)
-
-        # seq: Sequence = session.scalar(select(Sequence).where(Sequence.name == 'entry_clone_lacZ'))
-        # pydantic_seq = seq.to_pydantic_sequence()
-        # # Add itself as sequencing data twice, and sample id to the sequence
-        # session.add(create_sequencing_file(seq, pydantic_seq.file_content.encode('utf-8'), 'entry_clone_lacZ.gb'))
-        # session.add(create_sequencing_file(seq, pydantic_seq.file_content.encode('utf-8'), 'entry_clone_lacZ2.gb'))
-        # session.add(SequenceSample(uid='entry_clone_lacZ-sample', sequence_id=seq.id, uid_workspace_id=workspace.id))
 
         # Add a template sequence
         template_sequence = TemplateSequence.from_create(

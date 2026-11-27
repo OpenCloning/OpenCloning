@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field, field_validator
+from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, EmailStr, Field, field_validator
 
 import opencloning_linkml.datamodel.models as opencloning_models
 from opencloning.pydantic_models import MAX_PRIMER_LENGTH
@@ -14,7 +14,10 @@ from opencloning_db.models import (
     Primer,
     Line,
     SequenceInLine,
+    SequenceSample,
+    SequencingFile,
     WorkspaceRole,
+    validate_sample_uid,
 )
 
 
@@ -25,6 +28,7 @@ def _strip_str(v: object) -> object:
 
 
 StrippedStr = Annotated[str, BeforeValidator(_strip_str)]
+SampleUid = Annotated[StrippedStr, AfterValidator(validate_sample_uid)]
 
 
 class ApiModel(BaseModel):
@@ -75,11 +79,21 @@ class WorkspaceMemberAdd(ApiModel):
 
 # --- Sequence sample ---
 class SequenceSampleCreate(ApiModel):
-    uid: StrippedStr
+    uid: SampleUid
     sequence_id: int
+    location: StrippedStr | None = None
 
 
 class SequenceSampleUpdate(ApiModel):
+    """Rename a sample and/or change its location. An empty location clears it; a missing or null field is left
+    unchanged (so that dumping a model with its defaults does not clear the location).
+    To point a sample to another sequence, use the reassign endpoint."""
+
+    uid: SampleUid | None = Field(default=None, min_length=1)
+    location: StrippedStr | None = None
+
+
+class SequenceSampleReassign(ApiModel):
     sequence_id: int
 
 
@@ -87,6 +101,7 @@ class SequenceSampleRead(ApiModel):
     id: int
     uid: str
     sequence_id: int
+    location: str | None = None
 
 
 class SequenceSampleCreated(ApiModel):
@@ -118,6 +133,8 @@ class InputEntityRef(ApiModel):
 class SequencingFileRef(ApiModel):
     id: int
     original_name: str
+    # None for files of instances that are not samples (e.g. sequences in lines)
+    sample_uid: str | None = None
 
 
 # --- Common responses ---
@@ -248,7 +265,11 @@ class SequenceSampleWithSequence(ApiModel):
     id: int
     uid: str
     sequence_id: int
+    location: str | None = None
     sequence: SequenceRef
+    sequencing_files: list[SequencingFileRef] = []
+    created_at: datetime
+    created_by: UserRef
 
 
 # --- Line ---
@@ -276,8 +297,14 @@ class LineCreate(ApiModel):
     parent_ids: list[int] = []
 
 
+class LineCopiesCreate(ApiModel):
+    """UIDs of the lines to create as copies of a line, one per UID."""
+
+    uids: list[Annotated[StrippedStr, Field(min_length=1)]] = Field(min_length=1)
+
+
 class LineUpdate(ApiModel):
-    uid: StrippedStr | None = None
+    uid: StrippedStr | None = Field(default=None, min_length=1)
     allele_ids: list[int] | None = None
     plasmid_ids: list[int] | None = None
     parent_ids: list[int] | None = None
@@ -344,6 +371,31 @@ def sequence_ref(sequence: BaseSequence) -> SequenceRef:
     )
 
 
+def sequencing_file_ref(sequencing_file: SequencingFile) -> SequencingFileRef:
+    return SequencingFileRef(
+        id=sequencing_file.id,
+        original_name=sequencing_file.original_name,
+        sample_uid=sequencing_file.sample_uid,
+    )
+
+
+def sequence_sample_read(sample: SequenceSample) -> SequenceSampleRead:
+    return SequenceSampleRead(id=sample.id, uid=sample.uid, sequence_id=sample.sequence_id, location=sample.location)
+
+
+def sequence_sample_with_sequence(sample: SequenceSample) -> SequenceSampleWithSequence:
+    return SequenceSampleWithSequence(
+        id=sample.id,
+        uid=sample.uid,
+        sequence_id=sample.sequence_id,
+        location=sample.location,
+        sequence=sequence_ref(sample.sequence),
+        sequencing_files=[sequencing_file_ref(f) for f in sample.sequencing_files],
+        created_at=sample.created_at,
+        created_by=_user_ref(sample.created_by),
+    )
+
+
 def primer_ref(primer: Primer) -> PrimerRef:
     return PrimerRef(
         id=primer.id,
@@ -400,6 +452,15 @@ class ExportPrimerRef(ApiModel):
     created_by_id: int
 
 
+class ExportSampleRef(ApiModel):
+    id: int
+    uid: str
+    sequence_id: int
+    location: str | None = None
+    created_at: datetime
+    created_by_id: int
+
+
 class ExportLineRef(ApiModel):
     id: int
     uid: str
@@ -436,6 +497,17 @@ def export_primer_ref(primer: Primer) -> ExportPrimerRef:
     )
 
 
+def export_sample_ref(sample: SequenceSample) -> ExportSampleRef:
+    return ExportSampleRef(
+        id=sample.id,
+        uid=sample.uid,
+        sequence_id=sample.sequence_id,
+        location=sample.location,
+        created_at=sample.created_at,
+        created_by_id=sample.created_by_id,
+    )
+
+
 def export_line_ref(line: Line) -> ExportLineRef:
     return ExportLineRef(
         id=line.id,
@@ -452,6 +524,7 @@ class WorkspaceExport(ApiModel):
     lines: list[ExportLineRef]
     primers: list[ExportPrimerRef]
     sequences: list[ExportSequenceRef]
+    samples: list[ExportSampleRef]
     tags: list[TagRead]
     users: list[UserRef]
     cloning_strategy: opencloning_models.CloningStrategy

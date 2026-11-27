@@ -64,18 +64,34 @@ def workspace_headers(
 
 def post_sequencing_file_upload(
     client,
-    seq_id: int,
+    sample_uid: str,
     token: str,
     workspace_id: int | str,
     filename: str,
     body: bytes,
 ):
-    """POST multipart upload to ``/sequences/{id}/sequencing_files``."""
+    """POST multipart upload to ``/sequence_samples/{uid}/sequencing_files``."""
     return client.post(
-        f"/sequences/{seq_id}/sequencing_files",
+        f"/sequence_samples/{sample_uid}/sequencing_files",
         headers=workspace_headers(token, workspace_id),
         files={'files': (filename, body, 'application/octet-stream')},
     )
+
+
+def unnamed_file_multipart(fields: dict[str, str] | None = None) -> tuple[bytes, dict[str, str]]:
+    """Multipart body with one file in ``files`` sent with ``filename=""`` (httpx drops empty file names), and
+    the form fields given. Returns the body and its Content-Type header."""
+    boundary = 'test-boundary'
+    parts = [
+        f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'
+        for name, value in (fields or {}).items()
+    ]
+    parts.append(
+        f'--{boundary}\r\nContent-Disposition: form-data; name="files"; filename=""\r\n'
+        'Content-Type: application/octet-stream\r\n\r\n@r\nACGT\n+\nIIII\n\r\n'
+    )
+    body = (''.join(parts) + f'--{boundary}--\r\n').encode()
+    return body, {'Content-Type': f'multipart/form-data; boundary={boundary}'}
 
 
 def assert_get_missing_workspace_header_422(client, path: str, token: str) -> None:

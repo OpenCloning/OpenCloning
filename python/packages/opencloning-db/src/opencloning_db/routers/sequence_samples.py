@@ -1,54 +1,120 @@
-"""Sequence sample (lab tracking) endpoints."""
+"""Sequence sample (lab tracking) endpoints, including the sequencing files of the samples."""
 
-from typing import Annotated
+from typing import Annotated, List
+from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
+from opencloning.endpoints.endpoint_utils import read_upload_with_limit
+from sqlalchemy import and_, select
+from sqlalchemy.orm import selectinload
 
 from opencloning_db.apimodels import (
     DeletedResponse,
     SequenceSampleCreate,
     SequenceSampleCreated,
     SequenceSampleRead,
+    SequenceSampleReassign,
     SequenceSampleUpdate,
     SequenceSampleWithSequence,
-    sequence_ref,
+    SequencingFileRef,
+    sequence_sample_read,
+    sequence_sample_with_sequence,
+    sequencing_file_ref,
 )
-from opencloning_db.models import SequenceSample, WorkspaceRole
+from opencloning_db.config import get_config
+from opencloning_db.db import create_sequencing_file
+from opencloning_db.models import (
+    BaseSequence,
+    InputEntity,
+    Sequence,
+    SequenceSample,
+    SequenceType,
+    SequencingFile,
+    Tag,
+    User,
+    WorkspaceRole,
+    require_real_sequence,
+    validate_sample_uid,
+)
 from opencloning_db.workspace_deps import (
     WorkspaceContext,
     get_editor_workspace_ctx,
     get_sequence_in_workspace_for_user,
     get_sequence_sample_in_workspace_for_user,
+    get_sequencing_file_in_workspace_for_user,
     get_viewer_workspace_ctx,
 )
 
 router = APIRouter(tags=['sequence_samples'])
 
 
-@router.get('/sequence_samples', response_model=list[SequenceSampleWithSequence])
+def _uid_taken(session, workspace_id: int, uid: str) -> bool:
+    return (
+        session.scalar(select(SequenceSample.id).where(SequenceSample.uid_in(workspace_id, [uid])).limit(1))
+        is not None
+    )
+
+
+@router.get('/sequence_samples', response_model=Page[SequenceSampleWithSequence])
 def get_sequence_samples(
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
     uid: str | None = Query(
         description='Filter sequence samples by uid (case-insensitive substring match)', default=None
     ),
+    location: str | None = Query(
+        description='Filter sequence samples by location (case-insensitive substring match)', default=None
+    ),
+    sequence_id: int | None = Query(description='Only the samples of this sequence', default=None),
+    name: str | None = Query(
+        description='Filter by the name of the sequence (case-insensitive substring match)', default=None
+    ),
+    sequence_types: list[SequenceType] = Query(description='Filter by the type of the sequence', default_factory=list),
+    tags: list[int] = Query(description='Filter by the tag IDs of the sequence', default_factory=list),
+    created_by: str | None = Query(
+        description='Filter sequence samples by creator display name (case-insensitive substring match)',
+        default=None,
+    ),
 ):
-    """List sequence samples in a workspace (lab samples with user-defined UIDs)."""
-    current_user, session, workspace_id = ctx.destructure()
+    """List sequence samples in a workspace (lab samples with user-defined UIDs), most recent first,
+    with their sequence and sequencing files (without content)."""
+    _, session, workspace_id = ctx.destructure()
 
-    query = session.query(SequenceSample).filter_by(uid_workspace_id=workspace_id)
-    if uid is not None:
-        query = query.filter(SequenceSample.uid.ilike(f"%{uid}%"))
-    records = query.all()
-    return [
-        SequenceSampleWithSequence(
-            id=r.id,
-            uid=r.uid,
-            sequence_id=r.sequence_id,
-            sequence=sequence_ref(r.sequence),
+    query = (
+        select(SequenceSample)
+        .join(BaseSequence, SequenceSample.sequence_id == BaseSequence.id)
+        .options(
+            selectinload(SequenceSample.sequence).options(
+                selectinload(InputEntity.tags),
+                selectinload(BaseSequence.instances),
+                selectinload(InputEntity.created_by),
+            ),
+            selectinload(SequenceSample.sequencing_files),
+            selectinload(SequenceSample.created_by),
         )
-        for r in records
-    ]
+        .where(SequenceSample.uid_workspace_id == workspace_id)
+    )
+    if uid is not None:
+        query = query.where(SequenceSample.uid.icontains(uid, autoescape=True))
+    if location is not None:
+        query = query.where(SequenceSample.location.icontains(location, autoescape=True))
+    if sequence_id is not None:
+        query = query.where(SequenceSample.sequence_id == sequence_id)
+    if name is not None:
+        query = query.where(BaseSequence.name.icontains(name, autoescape=True))
+    if sequence_types:
+        query = query.where(BaseSequence.sequence_type.in_(sequence_types))
+    if tags:
+        query = query.where(BaseSequence.tags.any(and_(Tag.id.in_(tags), Tag.workspace_id == workspace_id)))
+    if created_by is not None:
+        query = query.join(User, User.id == SequenceSample.created_by_id).where(
+            User.display_name.icontains(created_by, autoescape=True)
+        )
+    query = query.order_by(SequenceSample.id.desc())
+    return paginate(
+        session, query, transformer=lambda items: [sequence_sample_with_sequence(sample) for sample in items]
+    )
 
 
 @router.post('/sequence_samples', response_model=SequenceSampleCreated)
@@ -60,38 +126,29 @@ def post_sequence_sample(
     current_user, session, workspace_id = ctx.destructure()
 
     # Validate that the sequence exists and the user has access to it
-    get_sequence_in_workspace_for_user(session, current_user, workspace_id, body.sequence_id, WorkspaceRole.editor)
+    sequence = get_sequence_in_workspace_for_user(
+        session, current_user, workspace_id, body.sequence_id, WorkspaceRole.editor
+    )
 
-    existing = (
-        session.query(SequenceSample)
-        .filter(
-            SequenceSample.uid_workspace_id == workspace_id,
-            func.lower(SequenceSample.uid) == body.uid.lower(),
-        )
-        .first()
-    )
-    if existing:
+    if _uid_taken(session, workspace_id, body.uid):
         raise HTTPException(status_code=409, detail=f"UID '{body.uid}' already exists")
-    ps = SequenceSample(
-        uid=body.uid,
-        sequence_id=body.sequence_id,
-        uid_workspace_id=workspace_id,
-    )
+    ps = SequenceSample.from_create(uid=body.uid, sequence=sequence, location=body.location or None, ctx=ctx)
     session.add(ps)
     session.commit()
     session.refresh(ps)
     return SequenceSampleCreated(id=ps.id, uid=ps.uid)
 
 
-@router.get('/sequence_samples/{uid}', response_model=SequenceSampleRead)
+@router.get('/sequence_samples/{uid}', response_model=SequenceSampleWithSequence)
 def get_sequence_sample(
     uid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
 ):
-    """Get a sequence sample by its user-defined UID."""
+    """Get a sequence sample by its user-defined UID (case-insensitive), with its sequence and sequencing files
+    (without content)."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.viewer)
-    return SequenceSampleRead(id=ps.id, uid=ps.uid, sequence_id=ps.sequence_id)
+    return sequence_sample_with_sequence(ps)
 
 
 @router.patch('/sequence_samples/{uid}', response_model=SequenceSampleRead)
@@ -100,14 +157,43 @@ def patch_sequence_sample(
     body: SequenceSampleUpdate,
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
-    """Update a sequence sample. Use to transfer UID to real sequence after sequencing."""
+    """Rename a sequence sample and/or change its location."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
-    get_sequence_in_workspace_for_user(session, current_user, workspace_id, body.sequence_id, WorkspaceRole.editor)
-    ps.sequence_id = body.sequence_id
+    if body.uid is not None and body.uid != ps.uid:
+        if body.uid.lower() != ps.uid.lower() and _uid_taken(session, workspace_id, body.uid):
+            raise HTTPException(status_code=409, detail=f"UID '{body.uid}' already exists")
+        ps.uid = body.uid
+    if body.location is not None:
+        ps.location = body.location or None
     session.commit()
     session.refresh(ps)
-    return SequenceSampleRead(id=ps.id, uid=ps.uid, sequence_id=ps.sequence_id)
+    return sequence_sample_read(ps)
+
+
+@router.post('/sequence_samples/{uid}/reassign', response_model=SequenceSampleRead)
+def reassign_sequence_sample(
+    uid: str,
+    body: SequenceSampleReassign,
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+):
+    """Point a sample to another sequence (e.g. the sequence found by sequencing it), together with its
+    sequencing files."""
+    current_user, session, workspace_id = ctx.destructure()
+    ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
+    sequence = get_sequence_in_workspace_for_user(
+        session, current_user, workspace_id, body.sequence_id, WorkspaceRole.editor
+    )
+    if sequence.id == ps.sequence_id:
+        raise HTTPException(status_code=400, detail=f"Sample '{ps.uid}' already points to this sequence")
+    if ps.sequencing_files:
+        require_real_sequence(
+            sequence, detail='Samples with sequencing files cannot point to a template sequence.', status_code=400
+        )
+    ps.sequence = sequence
+    session.commit()
+    session.refresh(ps)
+    return sequence_sample_read(ps)
 
 
 @router.delete('/sequence_samples/{uid}', response_model=DeletedResponse)
@@ -115,10 +201,184 @@ def delete_sequence_sample(
     uid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
-    """Delete a sequence sample."""
+    """Delete a sequence sample, with its sequencing files."""
     current_user, session, workspace_id = ctx.destructure()
     ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
     sequence_id = ps.sequence_id
     session.delete(ps)
     session.commit()
     return DeletedResponse(deleted=ps.id, data={'sequence_id': sequence_id, 'uid': uid})
+
+
+# --- Sequencing files ---
+
+
+@router.get('/sequence_samples/{uid}/sequencing_files', response_model=List[SequencingFileRef])
+def get_sequence_sample_sequencing_files(
+    uid: str,
+    ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
+):
+    """List the sequencing files of a sample."""
+    current_user, session, workspace_id = ctx.destructure()
+    ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.viewer)
+    return [sequencing_file_ref(f) for f in ps.sequencing_files]
+
+
+@router.post('/sequence_samples/{uid}/sequencing_files', response_model=List[SequencingFileRef])
+def post_sequence_sample_sequencing_files(
+    uid: str,
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+    files: List[UploadFile] = File(...),
+):
+    """Upload one or more sequencing files of a sample. Nothing is created if any file is too large or
+    the sample already has a file with the same name."""
+    current_user, session, workspace_id = ctx.destructure()
+    ps = get_sequence_sample_in_workspace_for_user(session, current_user, workspace_id, uid, WorkspaceRole.editor)
+    require_real_sequence(ps.sequence, detail='Samples of template sequences cannot have sequencing files.')
+    max_size_mb = get_config().max_sequencing_file_size_mb
+    # Read all files first, so that nothing is created if any file is too large
+    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
+    names = [upload.filename for upload in files]
+    if not all(names):
+        raise HTTPException(status_code=400, detail='Sequencing files must have a name')
+    taken = {f.original_name for f in ps.sequencing_files}
+    conflicts = sorted({name for i, name in enumerate(names) if name in taken or name in names[:i]})
+    if conflicts:
+        raise HTTPException(
+            status_code=409, detail=f"Sample '{ps.uid}' already has sequencing files called {', '.join(conflicts)}"
+        )
+    created = [create_sequencing_file(ps, content, name) for name, content in zip(names, contents)]
+    session.add_all(created)
+    session.commit()
+    return [sequencing_file_ref(f) for f in created]
+
+
+def _sample_uid_error(uid: str) -> str | None:
+    try:
+        validate_sample_uid(uid)
+    except ValueError as e:
+        return str(e)
+    return None
+
+
+def _bulk_samples(
+    session, ctx, sample_uids: list[str], sequence_ids: list[int | None]
+) -> tuple[list[SequenceSample], list[str]]:
+    """The sample each file goes to (existing ones, or new ones of the given sequence), and the errors."""
+    workspace_id = ctx.workspace_id
+    existing = {
+        sample.uid.lower(): sample
+        for sample in session.scalars(select(SequenceSample).where(SequenceSample.uid_in(workspace_id, sample_uids)))
+    }
+    # Only real sequences: samples cannot be created for template sequences
+    sequence_id2sequence = {
+        seq.id: seq
+        for seq in session.scalars(
+            select(Sequence).where(
+                Sequence.workspace_id == workspace_id, Sequence.id.in_({i for i in sequence_ids if i is not None})
+            )
+        )
+    }
+
+    errors = []
+    new_samples: dict[str, SequenceSample] = {}
+    samples = []
+    for uid, sequence_id in zip(sample_uids, sequence_ids):
+        sample = existing.get(uid.lower()) or new_samples.get(uid.lower())
+        if sequence_id is not None and sequence_id not in sequence_id2sequence:
+            errors.append(f'Sequence not found: {sequence_id}')
+        elif sample is not None:
+            if sequence_id is not None and sample.sequence.id != sequence_id:
+                errors.append(
+                    f'Sample {uid} belongs to sequence {sample.sequence.name}, not {sequence_id2sequence[sequence_id].name}'
+                )
+            elif not isinstance(sample.sequence, Sequence):
+                errors.append(f'Sample {uid} belongs to a template sequence')
+        elif sequence_id is None:
+            errors.append(f'Sample {uid} does not exist: choose a sequence to create it')
+        elif (uid_error := _sample_uid_error(uid)) is not None:
+            errors.append(uid_error)
+        else:
+            sample = SequenceSample.from_create(uid=uid, sequence=sequence_id2sequence[sequence_id], ctx=ctx)
+            new_samples[uid.lower()] = sample
+        samples.append(sample)
+    return samples, errors
+
+
+@router.post('/sequence_samples/sequencing_files/bulk')
+def post_sequence_samples_sequencing_files_bulk(
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+    sample_uids: List[str] = Form(...),
+    sequence_ids: List[str] = Form(default_factory=list),
+    files: List[UploadFile] = File(...),
+):
+    """Link sequencing files to samples in bulk: files[i] is linked to the sample sample_uids[i]. If that sample
+    does not exist, it is created for the sequence with id sequence_ids[i]. If the sample exists, sequence_ids[i]
+    can be empty, otherwise it must be the id of the sequence of the sample. Several files can go to the same
+    sample, also to a new one. Nothing is linked or created if there is any error."""
+    _, session, workspace_id = ctx.destructure()
+    sample_uids = [uid.strip() for uid in sample_uids]
+    sequence_ids = [i.strip() for i in sequence_ids] or [''] * len(sample_uids)
+    if not (len(sample_uids) == len(sequence_ids) == len(files)):
+        raise HTTPException(400, 'Submit one sample UID (and one sequence ID, possibly empty) per file')
+    if any(not uid for uid in sample_uids):
+        raise HTTPException(400, 'Sample UIDs cannot be empty')
+    if any(i and not i.isdigit() for i in sequence_ids):
+        raise HTTPException(400, 'Sequence IDs must be integers (or empty)')
+    if any(not upload.filename for upload in files):
+        raise HTTPException(400, 'Sequencing files must have a name')
+    sequence_ids = [int(i) if i else None for i in sequence_ids]
+    max_size_mb = get_config().max_sequencing_file_size_mb
+    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
+
+    samples, errors = _bulk_samples(session, ctx, sample_uids, sequence_ids)
+    if not errors:
+        # Pairs of sample and file name, to ensure that the same file is not added twice
+        taken = {(id(sample), f.original_name) for sample in samples for f in sample.sequencing_files}
+        for sample, upload in zip(samples, files):
+            key = (id(sample), upload.filename)
+            if key in taken:
+                errors.append(f'{sample.uid} already has a sequencing file called {upload.filename}')
+            taken.add(key)
+    if errors:
+        session.rollback()
+        raise HTTPException(400, '; '.join(sorted(set(errors))))
+
+    for sample, upload, content in zip(samples, files, contents):
+        session.add(create_sequencing_file(sample, content, upload.filename))
+    created_samples = len({id(sample) for sample in samples if sample.id is None})
+    session.commit()
+    return {'created': len(files), 'created_samples': created_samples}
+
+
+@router.delete('/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_sequencing_file(
+    file_id: int,
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+):
+    current_user, session, workspace_id = ctx.destructure()
+    db_file = get_sequencing_file_in_workspace_for_user(
+        session, current_user, workspace_id, file_id, WorkspaceRole.editor
+    )
+    session.delete(db_file)
+    session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get('/sequencing_files/{file_id}/download')
+def download_sequencing_file(
+    file_id: int,
+    ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
+):
+    """Download a sequencing file by ID."""
+    current_user, session, workspace_id = ctx.destructure()
+    db_file = get_sequencing_file_in_workspace_for_user(
+        session, current_user, workspace_id, file_id, WorkspaceRole.viewer
+    )
+    # Selecting the column loads it, although it is deferred in the ORM
+    content = session.scalar(select(SequencingFile.file_content).where(SequencingFile.id == file_id))
+    return Response(
+        content=content,
+        media_type='application/octet-stream',
+        headers={'Content-Disposition': f"attachment; filename*=UTF-8''{quote(db_file.original_name, safe='')}"},
+    )

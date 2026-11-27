@@ -2,7 +2,6 @@ import React from 'react';
 import { ConfigProvider } from '@opencloning/ui/providers/ConfigProvider';
 import { convertToTeselaJson } from '@opencloning/utils/readNwrite';
 import SequencingCheckModal from './SequencingCheckModal';
-import { formatSequenceName } from '../common';
 
 const BACKEND_URL = 'http://localhost:8000';
 const testConfig = { backendUrl: BACKEND_URL, showAppBar: false, noExternalRequests: true, enableAssembler: false, enablePlannotate: false };
@@ -19,12 +18,12 @@ const READS = {
 
 /**
  * Return the sequences by tag with their sequencing files, fileIdsBySequenceId maps sequence ids
- * to file ids (missing means no files), files maps file ids to { name }.
+ * to file ids (missing means no files), files maps file ids to { name, sample } (by default the sample is sample-<id>).
  */
 function interceptSequencesWithFiles(stub, fileIdsBySequenceId, files) {
   const body = stub.response.body.map((item) => ({
     ...item,
-    sequencing_files: (fileIdsBySequenceId[item.sequence_ref.id] ?? []).map((id) => ({ id, original_name: files[id].name })),
+    sequencing_files: (fileIdsBySequenceId[item.sequence_ref.id] ?? []).map((id) => ({ id, original_name: files[id].name, sample_uid: files[id].sample ?? `sample-${id}` })),
   }));
   cy.interceptOpenCloningDBStub({ ...stub, response: { ...stub.response, body } }, { alias: 'getSequences' });
 }
@@ -61,10 +60,11 @@ describe('<SequencingCheckModal />', () => {
         1: { name: 'exact.fa', sequence: plasmidBases },
         2: { name: 'mutant.fa', sequence: mutantBases },
         3: { name: 'ase1_read.fa', sequence: 'ACGTACGTAC' },
-        4: { name: 'read_a.fa', sequence: 'AAAAAAAAAA' },
+        // read_a and read_t are files of the same sample
+        4: { name: 'read_a.fa', sequence: 'AAAAAAAAAA', sample: 'shared-sample' },
         5: { name: 'read_c.fa', sequence: 'CCCCCCCCCC' },
         6: { name: 'read_g.fa', sequence: 'GGGGGGGGGG' },
-        7: { name: 'read_t.fa', sequence: 'TTTTTTTTTT' },
+        7: { name: 'read_t.fa', sequence: 'TTTTTTTTTT', sample: 'shared-sample' },
         8: { name: 'broken.fa', sequence: 'ACGTTGCAAC' },
       };
       const filesBySequenceId = { 28: [1, 2], 29: [], 30: [3], 31: [4, 5, 6, 7], 32: [8] };
@@ -125,7 +125,7 @@ describe('<SequencingCheckModal />', () => {
       cy.get('[data-testid="sequencing-check-run-button"]').should('not.be.disabled');
 
       // Sorted: error first, then lowest identity first, no sequencing data last
-      const namesById = Object.fromEntries(stub.response.body.map(({ sequence_ref: ref }) => [ref.id, formatSequenceName(ref)]));
+      const namesById = Object.fromEntries(stub.response.body.map(({ sequence_ref: ref }) => [ref.id, ref.name]));
       const expectedOrder = [32, 28, 30, 31, 29].map((id) => namesById[id]);
       cy.get('[data-testid="sequencing-check-sequence-cell"]').should(($cells) => {
         const cells = $cells.toArray();
@@ -133,16 +133,17 @@ describe('<SequencingCheckModal />', () => {
         expect(cells.map((cell) => cell.rowSpan)).to.deep.equal([1, 2, 1, 4, 1]);
       });
 
-      // Files sorted within each sequence, the exact match was found by seguid
+      // Files grouped by sample and sorted within each sequence (samples by their lowest identity), the exact
+      // match was found by seguid
       const expectedFiles = [
         ['broken.fa', ''],
         ['mutant.fa', '75.00'],
         ['exact.fa', '100.00'],
         ['ase1_read.fa', '80.00'],
         ['read_t.fa', '85.00'],
+        ['read_a.fa', '100.00'],
         ['read_c.fa', '90.00'],
         ['read_g.fa', '90.00'],
-        ['read_a.fa', '100.00'],
       ];
       cy.get('[data-testid="sequencing-check-file-row"]').should(($rows) => {
         const actual = $rows.toArray().map((row) => [
@@ -150,6 +151,12 @@ describe('<SequencingCheckModal />', () => {
           row.querySelector('[data-testid="sequencing-check-identity"]').innerText.trim(),
         ]);
         expect(actual).to.deep.equal(expectedFiles);
+      });
+      // The sample cell spans the rows of the files of that sample
+      cy.get('[data-testid="sequencing-check-sample-cell"]').should(($cells) => {
+        const cells = $cells.toArray();
+        expect(cells.map((cell) => cell.innerText.trim())).to.deep.equal(['sample-8', 'sample-2', 'sample-1', 'sample-3', 'shared-sample', 'sample-5', 'sample-6']);
+        expect(cells.map((cell) => cell.rowSpan)).to.deep.equal([1, 1, 1, 1, 2, 1, 1]);
       });
       cy.get('[data-testid="sequencing-check-file-row"]').first().should('contain', 'Alignment failed');
       cy.get('[data-testid="sequencing-check-file-row"]').eq(1).should('contain', 'Identity below 100%');

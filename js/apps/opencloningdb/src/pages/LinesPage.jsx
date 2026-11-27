@@ -14,7 +14,6 @@ import {
 import { openCloningDBHttpClient, endpoints, TagMultiSelect } from '@opencloning/opencloningdb';
 import { parseLinesParams, applyLinesParamsToSearchParams } from '../utils/query_utils';
 import SearchBarTextField from '../components/SearchBarTextField';
-import useAppAlerts from '../hooks/useAppAlerts';
 import { UrlParamsForm, filterFieldSx } from '../components/urlParamsForm';
 import TagEntitiesButton from '../components/TagEntitiesButton';
 import TopButtonSection from '../components/TopButtonSection';
@@ -26,7 +25,6 @@ import useRowSelection from '../hooks/useRowSelection';
 import error2String from '@opencloning/utils/error2String';
 
 function LinesQueryFields({ pendingParams, setPendingParams }) {
-  const { addErrorAlert } = useAppAlerts();
   return (
     <>
       <SearchBarTextField
@@ -48,7 +46,7 @@ function LinesQueryFields({ pendingParams, setPendingParams }) {
         onChange={(value) => setPendingParams((p) => ({ ...p, plasmid: value }))}
       />
       <TagMultiSelect
-        onCreateError={addErrorAlert}
+        allowCreate={false}
         size="small"
         value={pendingParams.tags ?? []}
         onChange={(value) => setPendingParams((p) => ({ ...p, tags: value }))}

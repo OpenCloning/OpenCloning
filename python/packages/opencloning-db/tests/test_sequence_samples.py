@@ -3,7 +3,8 @@
 import pytest
 from sqlalchemy.orm import Session
 
-from opencloning_db.models import Sequence, SequenceSample, SequenceType
+from opencloning_db.context import WriteContext
+from opencloning_db.models import Sequence, SequenceSample, SequenceType, Tag, TemplateSequence, User
 
 from .helpers import (
     assert_get_invalid_workspace_id_422,
@@ -12,6 +13,7 @@ from .helpers import (
     assert_get_unauthenticated_401,
     attach_standard_tokens,
     seed_standard_users,
+    unnamed_file_multipart,
     workspace_headers,
 )
 
@@ -61,13 +63,34 @@ def _seed_seq_samples_context(engine):
             uid='S-W1',
             sequence_id=seq_w1.id,
             uid_workspace_id=ctx['w1'],
+            created_by_id=ctx['owner_w1_id'],
         )
         sample_w2 = SequenceSample(
             uid='S-W2',
             sequence_id=seq_w2.id,
             uid_workspace_id=ctx['w2'],
+            created_by_id=ctx['owner_w2_id'],
         )
         session.add_all([sample_w1, sample_w2])
+        # Second sequence and template sequence of W1, to reassign samples to
+        seq_w1_actual = Sequence(
+            workspace_id=ctx['w1'],
+            name='seq-w1-actual',
+            file_content='seq_w1_actual.gb',
+            sequence_type=SequenceType.allele,
+            seguid='SEGUID-SEQ-W1-ACTUAL',
+            created_by_id=ctx['owner_w1_id'],
+        )
+        w1_ctx = WriteContext(user=session.get(User, ctx['owner_w1_id']), workspace_id=ctx['w1'])
+        template_w1 = TemplateSequence.from_create(name='template-w1', sequence_type=SequenceType.allele, ctx=w1_ctx)
+        # Tags of the sequences, to filter samples by
+        tag_w1 = Tag(name='sample-tag-w1', workspace_id=ctx['w1'])
+        tag_w1_actual = Tag(name='sample-tag-w1-actual', workspace_id=ctx['w1'])
+        tag_w2 = Tag(name='sample-tag-w2', workspace_id=ctx['w2'])
+        seq_w1.tags.append(tag_w1)
+        seq_w1_actual.tags.append(tag_w1_actual)
+        seq_w2.tags.append(tag_w2)
+        session.add_all([seq_w1_actual, template_w1, tag_w1, tag_w1_actual, tag_w2])
         session.commit()
 
         ctx.update(
@@ -75,6 +98,11 @@ def _seed_seq_samples_context(engine):
                 'seq_w1_id': seq_w1.id,
                 'seq_w2_id': seq_w2.id,
                 'sample_w1_uid': sample_w1.uid,
+                'seq_w1_actual_id': seq_w1_actual.id,
+                'template_w1_id': template_w1.id,
+                'tag_w1_id': tag_w1.id,
+                'tag_w1_actual_id': tag_w1_actual.id,
+                'tag_w2_id': tag_w2.id,
             }
         )
     return ctx
@@ -102,8 +130,13 @@ def test_get_sequence_samples_scoped_to_workspace(seq_samples_client):
     )
     assert response.status_code == 200
     data = response.json()
-    uids = {item['uid'] for item in data}
-    assert uids == {seq_samples_client['sample_w1_uid']}
+    assert data['total'] == 1
+    item = data['items'][0]
+    assert item['uid'] == seq_samples_client['sample_w1_uid']
+    assert item['sequence']['id'] == seq_samples_client['seq_w1_id']
+    assert item['sequencing_files'] == []
+    assert item['location'] is None
+    assert item['created_by']['id'] == seq_samples_client['owner_w1_id']
 
 
 @readonly_db
@@ -117,7 +150,7 @@ def test_get_sequence_samples_uid_filter_case_insensitive(seq_samples_client):
         headers=workspace_headers(tok, w1),
     )
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()['items']
     assert len(data) == 1
     assert data[0]['uid'] == seq_samples_client['sample_w1_uid']
 
@@ -197,6 +230,31 @@ def test_post_sequence_sample_owner_ok(seq_samples_client):
     assert response.json()['uid'] == 'S-NEW-OWNER'
 
 
+INVALID_SAMPLE_UIDS = ['a/b', 'S-W1/sequencing_files', 'a\\b', '.', '..', 'a\nb', 'a\x00b']
+
+
+@readonly_db
+@pytest.mark.parametrize('uid', INVALID_SAMPLE_UIDS)
+def test_post_sequence_sample_invalid_uid_422(seq_samples_client, uid):
+    """UIDs go in URL paths: the server decodes %2F before routing, so '/' would reach another route."""
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    response = c.post(
+        '/sequence_samples', headers=headers, json={'uid': uid, 'sequence_id': seq_samples_client['seq_w1_id']}
+    )
+    assert response.status_code == 422, response.text
+    assert 'Invalid sample UID' in response.text
+    response = c.patch(f"/sequence_samples/{seq_samples_client['sample_w1_uid']}", headers=headers, json={'uid': uid})
+    assert response.status_code == 422, response.text
+    assert 'Invalid sample UID' in response.text
+
+
+@pytest.mark.parametrize('uid', INVALID_SAMPLE_UIDS)
+def test_sequence_sample_model_rejects_invalid_uid(uid):
+    with pytest.raises(ValueError, match='Invalid sample UID'):
+        SequenceSample(uid=uid)
+
+
 @readonly_db
 def test_post_sequence_sample_wrong_workspace_sequence_rejected(
     seq_samples_client,
@@ -224,38 +282,78 @@ def test_patch_sequence_sample_viewer_forbidden(seq_samples_client):
     response = c.patch(
         f"/sequence_samples/{seq_samples_client['sample_w1_uid']}",
         headers=workspace_headers(tok, seq_samples_client['w1']),
-        json={'sequence_id': seq_samples_client['seq_w1_id']},
+        json={'location': 'fridge'},
     )
     assert response.status_code == 403
     assert 'Not allowed' in response.json()['detail']
 
 
 def test_patch_sequence_sample_owner_ok(seq_samples_client):
-    """Owner can PATCH sample to another sequence in same workspace (case-insensitive lookup)."""
+    """Owner can rename a sample and set / clear its location (case-insensitive lookup)."""
     c = seq_samples_client['client']
-    tok = seq_samples_client['token_owner_w1']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
     stored_uid = seq_samples_client['sample_w1_uid']
-    # Move the sample to the same workspace sequence (idempotent-ish).
-    response = c.patch(
-        f"/sequence_samples/{stored_uid.swapcase()}",
-        headers=workspace_headers(tok, seq_samples_client['w1']),
-        json={'sequence_id': seq_samples_client['seq_w1_id']},
-    )
+    response = c.patch(f"/sequence_samples/{stored_uid.swapcase()}", headers=headers, json={'location': ' box 1 '})
     assert response.status_code == 200
-    body = response.json()
-    assert body['uid'] == stored_uid
-    assert body['sequence_id'] == seq_samples_client['seq_w1_id']
+    assert response.json() == {
+        'id': response.json()['id'],
+        'uid': stored_uid,
+        'sequence_id': seq_samples_client['seq_w1_id'],
+        'location': 'box 1',
+    }
+
+    # null leaves the location unchanged (e.g. a client dumping a model with its defaults)
+    response = c.patch(f"/sequence_samples/{stored_uid}", headers=headers, json={'location': None})
+    assert response.status_code == 200
+    assert response.json()['location'] == 'box 1'
+
+    # Renaming keeps the location, changing only the case is allowed
+    response = c.patch(f"/sequence_samples/{stored_uid}", headers=headers, json={'uid': stored_uid.lower()})
+    assert response.status_code == 200
+    assert response.json()['uid'] == stored_uid.lower()
+    assert response.json()['location'] == 'box 1'
+
+    response = c.patch(f"/sequence_samples/{stored_uid}", headers=headers, json={'uid': 'renamed', 'location': ''})
+    assert response.status_code == 200
+    assert response.json()['uid'] == 'renamed'
+    assert response.json()['location'] is None
+    assert c.get(f"/sequence_samples/{stored_uid}", headers=headers).status_code == 404
+
+
+def test_patch_sequence_sample_rename_conflict_409(seq_samples_client):
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    r = c.post(
+        '/sequence_samples', headers=headers, json={'uid': 'other', 'sequence_id': seq_samples_client['seq_w1_id']}
+    )
+    assert r.status_code == 200
+    response = c.patch(
+        f"/sequence_samples/{seq_samples_client['sample_w1_uid']}", headers=headers, json={'uid': 'OTHER'}
+    )
+    assert response.status_code == 409
 
 
 @readonly_db
-def test_patch_sequence_sample_cross_workspace_sequence_rejected(
-    seq_samples_client,
-):
-    """PATCH sample to W2 sequence under W1 header: 403 (not 404)."""
+def test_patch_sequence_sample_cannot_change_sequence(seq_samples_client):
+    """The sequence is changed with the reassign endpoint, not with PATCH."""
     c = seq_samples_client['client']
-    tok = seq_samples_client['token_owner_w1']
     response = c.patch(
         f"/sequence_samples/{seq_samples_client['sample_w1_uid']}",
+        headers=workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1']),
+        json={'sequence_id': seq_samples_client['seq_w1_id']},
+    )
+    assert response.status_code == 422
+
+
+@readonly_db
+def test_reassign_sequence_sample_cross_workspace_sequence_rejected(
+    seq_samples_client,
+):
+    """Reassign sample to W2 sequence under W1 header: 403 (not 404)."""
+    c = seq_samples_client['client']
+    tok = seq_samples_client['token_owner_w1']
+    response = c.post(
+        f"/sequence_samples/{seq_samples_client['sample_w1_uid']}/reassign",
         headers=workspace_headers(tok, seq_samples_client['w1']),
         json={'sequence_id': seq_samples_client['seq_w2_id']},
     )
@@ -415,3 +513,282 @@ def test_delete_sequence_sample_unauthenticated_401(seq_samples_client):
         headers={'X-Workspace-Id': str(seq_samples_client['w1'])},
     )
     assert response.status_code == 401
+
+
+def _upload(client, headers, uid, *names):
+    return client.post(
+        f'/sequence_samples/{uid}/sequencing_files',
+        headers=headers,
+        files=[('files', (name, b'ABIF', 'application/octet-stream')) for name in names],
+    )
+
+
+def test_reassign_sequence_sample_moves_files(seq_samples_client):
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    uid = seq_samples_client['sample_w1_uid']
+    planned, actual = seq_samples_client['seq_w1_id'], seq_samples_client['seq_w1_actual_id']
+    assert _upload(c, headers, uid, 'a.ab1', 'b.ab1').status_code == 200
+
+    r = c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual})
+    assert r.status_code == 200, r.text
+    assert r.json()['sequence_id'] == actual
+
+    # The files follow the sample
+    assert c.get(f'/sequences/{planned}/sequencing_files', headers=headers).json() == []
+    files = c.get(f'/sequences/{actual}/sequencing_files', headers=headers).json()
+    assert [(f['sample_uid'], f['original_name']) for f in files] == [(uid, 'a.ab1'), (uid, 'b.ab1')]
+
+    # Reassigning to the same sequence fails
+    r = c.post(f'/sequence_samples/{uid}/reassign', headers=headers, json={'sequence_id': actual})
+    assert r.status_code == 400
+
+    # Samples with files cannot point to template sequences
+    r = c.post(
+        f'/sequence_samples/{uid}/reassign',
+        headers=headers,
+        json={'sequence_id': seq_samples_client['template_w1_id']},
+    )
+    assert r.status_code == 400
+
+    # The sequence the sample was moved from can be deleted
+    assert c.delete(f'/sequences/{planned}', headers=headers).status_code == 200
+    # The sample is found by its UID in any case, with its sequence and files
+    r = c.get(f'/sequence_samples/{uid.swapcase()}', headers=headers)
+    assert r.status_code == 200
+    assert r.json()['uid'] == uid
+    assert r.json()['sequence']['id'] == actual
+    assert [f['original_name'] for f in r.json()['sequencing_files']] == ['a.ab1', 'b.ab1']
+
+
+@readonly_db
+def test_reassign_sequence_sample_viewer_forbidden(seq_samples_client):
+    c = seq_samples_client['client']
+    r = c.post(
+        f"/sequence_samples/{seq_samples_client['sample_w1_uid']}/reassign",
+        headers=workspace_headers(seq_samples_client['token_viewer_w1'], seq_samples_client['w1']),
+        json={'sequence_id': seq_samples_client['seq_w1_actual_id']},
+    )
+    assert r.status_code == 403
+
+
+def test_sample_sequencing_files(seq_samples_client):
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    uid = seq_samples_client['sample_w1_uid']
+
+    r = _upload(c, headers, uid, 'a.ab1')
+    assert r.status_code == 200
+    file_id = r.json()[0]['id']
+    assert c.get(f'/sequence_samples/{uid}/sequencing_files', headers=headers).json() == r.json()
+
+    # Same name twice, in the sample or in the request
+    assert _upload(c, headers, uid, 'a.ab1').status_code == 409
+    assert _upload(c, headers, uid, 'b.ab1', 'b.ab1').status_code == 409
+
+    # Listed with the sample
+    items = c.get('/sequence_samples', headers=headers).json()['items']
+    assert [f['original_name'] for f in items[0]['sequencing_files']] == ['a.ab1']
+
+    # Samples of template sequences cannot have files
+    c.post(
+        '/sequence_samples',
+        headers=headers,
+        json={'uid': 'template-sample', 'sequence_id': seq_samples_client['template_w1_id']},
+    )
+    assert _upload(c, headers, 'template-sample', 'c.ab1').status_code == 404
+
+    # Files must have a name
+    body, content_type = unnamed_file_multipart()
+    r = c.post(f'/sequence_samples/{uid}/sequencing_files', headers={**headers, **content_type}, content=body)
+    assert r.status_code == 400
+    assert r.json()['detail'] == 'Sequencing files must have a name'
+
+    # Delete
+    assert c.delete(f'/sequencing_files/{file_id}', headers=headers).status_code == 204
+    assert c.get(f'/sequencing_files/{file_id}/download', headers=headers).status_code == 404
+
+
+def test_sequence_samples_filters(seq_samples_client):
+    c = seq_samples_client['client']
+    headers = workspace_headers(seq_samples_client['token_owner_w1'], seq_samples_client['w1'])
+    c.post(
+        '/sequence_samples',
+        headers=headers,
+        json={'uid': 'S-ACTUAL', 'sequence_id': seq_samples_client['seq_w1_actual_id'], 'location': 'Freezer A'},
+    )
+
+    def uids(**params):
+        r = c.get('/sequence_samples', headers=headers, params=params)
+        assert r.status_code == 200, r.text
+        return [item['uid'] for item in r.json()['items']]
+
+    assert uids() == ['S-ACTUAL', 'S-W1']
+    assert uids(location='freezer') == ['S-ACTUAL']
+    assert uids(name='actual') == ['S-ACTUAL']
+    assert uids(sequence_id=seq_samples_client['seq_w1_id']) == ['S-W1']
+    assert uids(sequence_types='plasmid') == []
+    assert uids(created_by='nobody') == []
+    # Tags of the sequence: any of the given tags
+    tag_w1, tag_w1_actual = seq_samples_client['tag_w1_id'], seq_samples_client['tag_w1_actual_id']
+    assert uids(tags=tag_w1_actual) == ['S-ACTUAL']
+    assert uids(tags=tag_w1) == ['S-W1']
+    assert uids(tags=[tag_w1, tag_w1_actual]) == ['S-ACTUAL', 'S-W1']
+    assert uids(tags=tag_w1_actual, location='freezer') == ['S-ACTUAL']
+    assert uids(tags=tag_w1, location='freezer') == []
+    # A tag of another workspace matches nothing
+    assert uids(tags=seq_samples_client['tag_w2_id']) == []
+
+    # % and _ are not LIKE wildcards
+    c.post('/sequence_samples', headers=headers, json={'uid': 'S_W1%', 'sequence_id': seq_samples_client['seq_w1_id']})
+    assert uids(uid='s_') == ['S_W1%']
+    assert uids(uid='%') == ['S_W1%']
+    assert uids(uid='S-W1') == ['S-W1']
+
+
+# --- Bulk linking of sequencing files ---
+
+
+def _post_bulk_sequencing_files(ctx, rows, token_key='token_owner_w1', sample_uids=None):
+    """rows: [(sample_uid, sequence, file_name)], all files have the same dummy content. sequence is the key of
+    the sequence id in ctx, or the value to submit as is if it is not a key (e.g. '' for existing samples)."""
+    return ctx['client'].post(
+        '/sequence_samples/sequencing_files/bulk',
+        headers=workspace_headers(ctx[token_key], ctx['w1']),
+        data={
+            'sample_uids': sample_uids if sample_uids is not None else [uid for uid, _, _ in rows],
+            'sequence_ids': [str(ctx.get(sequence, sequence)) for _, sequence, _ in rows],
+        },
+        files=[('files', (file_name, b'@r\nACGT\n+\nIIII\n', 'application/octet-stream')) for *_, file_name in rows],
+    )
+
+
+def _sequencing_files(ctx, seq_id):
+    """(sample uid, file name) of the sequencing files of a sequence."""
+    r = ctx['client'].get(
+        f'/sequences/{seq_id}/sequencing_files', headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    return sorted((f['sample_uid'], f['original_name']) for f in r.json())
+
+
+@pytest.fixture
+def bulk_ctx(seq_samples_client):
+    """seq_samples_client, with a sequencing file already linked to the sample S-W1."""
+    ctx = seq_samples_client
+    headers = workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    assert _upload(ctx['client'], headers, ctx['sample_w1_uid'], 'hello_world.txt').status_code == 200
+    return ctx
+
+
+def test_post_sequence_samples_sequencing_files_bulk(bulk_ctx):
+    ctx = bulk_ctx
+    rows = [
+        # Existing sample, with or without its sequence id, case-insensitive UID
+        ('S-W1', 'seq_w1_id', 'A1-P1.final.fastq'),
+        ('s-w1', '', 'A1-P1-2.final.fastq'),
+        # New sample, created once for both files
+        ('NEW-SAMPLE', 'seq_w1_actual_id', 'A1-P1.final.fastq'),
+        ('NEW-SAMPLE', '', 'A1-P1-2.final.fastq'),
+    ]
+    r = _post_bulk_sequencing_files(ctx, rows)
+    assert r.status_code == 200, r.text
+    assert r.json() == {'created': 4, 'created_samples': 1}
+    assert _sequencing_files(ctx, ctx['seq_w1_id']) == [
+        ('S-W1', 'A1-P1-2.final.fastq'),
+        ('S-W1', 'A1-P1.final.fastq'),
+        ('S-W1', 'hello_world.txt'),
+    ]
+    assert _sequencing_files(ctx, ctx['seq_w1_actual_id']) == [
+        ('NEW-SAMPLE', 'A1-P1-2.final.fastq'),
+        ('NEW-SAMPLE', 'A1-P1.final.fastq'),
+    ]
+
+    # Submitting again fails, as the samples already have files with those names
+    r = _post_bulk_sequencing_files(ctx, rows[:2])
+    assert r.status_code == 400
+    assert r.json()['detail'] == (
+        'S-W1 already has a sequencing file called A1-P1-2.final.fastq; '
+        'S-W1 already has a sequencing file called A1-P1.final.fastq'
+    )
+
+
+@pytest.mark.parametrize(
+    'rows, sample_uids, detail',
+    [
+        (
+            [('S-W1', '', 'a.fastq')],
+            ['S-W1', 'OTHER'],
+            'Submit one sample UID (and one sequence ID, possibly empty) per file',
+        ),
+        ([(' ', 'seq_w1_actual_id', 'a.fastq')], None, 'Sample UIDs cannot be empty'),
+        ([('NEW-1', 'not_an_id', 'a.fastq')], None, 'Sequence IDs must be integers (or empty)'),
+        (
+            [
+                ('NEW-1', '999999', 'a.fastq'),
+                # Template sequences cannot have samples created this way
+                ('NEW-2', 'template_w1_id', 'b.fastq'),
+                ('NEW-3', '', 'c.fastq'),
+                ('S-W1', 'seq_w1_actual_id', 'd.fastq'),
+                # Two files for the same new sample, with different sequences
+                ('NEW-4', 'seq_w1_actual_id', 'e.fastq'),
+                ('new-4', 'seq_w1_id', 'f.fastq'),
+            ],
+            None,
+            'Sample NEW-3 does not exist: choose a sequence to create it; '
+            'Sample S-W1 belongs to sequence seq-w1, not seq-w1-actual; '
+            'Sample new-4 belongs to sequence seq-w1-actual, not seq-w1; '
+            'Sequence not found: {template_w1_id}; Sequence not found: 999999',
+        ),
+        (
+            # Samples and sequences of other workspaces are not found
+            [('S-W2', '', 'a.fastq'), ('NEW-1', 'seq_w2_id', 'b.fastq')],
+            None,
+            'Sample S-W2 does not exist: choose a sequence to create it; Sequence not found: {seq_w2_id}',
+        ),
+        (
+            [('a/b', 'seq_w1_actual_id', 'a.fastq'), ('..', 'seq_w1_actual_id', 'b.fastq')],
+            None,
+            "Invalid sample UID '..': it cannot be '.' or '..', or contain '/', '\\' or control characters; "
+            "Invalid sample UID 'a/b': it cannot be '.' or '..', or contain '/', '\\' or control characters",
+        ),
+        (
+            [('S-W1', '', 'hello_world.txt')],
+            None,
+            'S-W1 already has a sequencing file called hello_world.txt',
+        ),
+        (
+            [('NEW-SAMPLE', 'seq_w1_actual_id', 'a.fastq'), ('NEW-SAMPLE', '', 'a.fastq')],
+            None,
+            'NEW-SAMPLE already has a sequencing file called a.fastq',
+        ),
+    ],
+)
+def test_post_sequence_samples_sequencing_files_bulk_errors(bulk_ctx, rows, sample_uids, detail):
+    ctx = bulk_ctx
+    r = _post_bulk_sequencing_files(ctx, rows, sample_uids=sample_uids)
+    assert r.status_code == 400
+    assert r.json()['detail'] == detail.format(**ctx)
+    # Nothing was linked or created
+    assert _sequencing_files(ctx, ctx['seq_w1_id']) == [('S-W1', 'hello_world.txt')]
+    assert _sequencing_files(ctx, ctx['seq_w1_actual_id']) == []
+    r = ctx['client'].get(
+        '/sequence_samples', params={'uid': 'new'}, headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
+    )
+    assert r.json()['items'] == []
+
+
+def test_post_sequence_samples_sequencing_files_bulk_unnamed_file(bulk_ctx):
+    ctx = bulk_ctx
+    body, content_type = unnamed_file_multipart({'sample_uids': 'S-W1', 'sequence_ids': ''})
+    r = ctx['client'].post(
+        '/sequence_samples/sequencing_files/bulk',
+        headers={**workspace_headers(ctx['token_owner_w1'], ctx['w1']), **content_type},
+        content=body,
+    )
+    assert r.status_code == 400
+    assert r.json()['detail'] == 'Sequencing files must have a name'
+
+
+def test_post_sequence_samples_sequencing_files_bulk_viewer_forbidden(bulk_ctx):
+    r = _post_bulk_sequencing_files(bulk_ctx, [('S-W1', '', 'a.fastq')], 'token_viewer_w1')
+    assert r.status_code == 403

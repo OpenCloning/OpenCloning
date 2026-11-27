@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy import Select, and_, exists, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
 from opencloning_db.bulk_validation import bulk_commit_or_conflict, bulk_conflict_response, frequency_duplicates
@@ -14,6 +15,7 @@ from opencloning_db.apimodels import (
     LineBulkRow,
     LineBulkSequenceNameFlag,
     LineBulkSubmission,
+    LineCopiesCreate,
     LineCreate,
     LineRef,
     LineUpdate,
@@ -164,7 +166,7 @@ def get_line_subquery(line_id_col, sequence_type: SequenceType, name: str) -> Se
         .where(
             SequenceInLine.line_id == line_id_col,
             BaseSequence.sequence_type == sequence_type,
-            BaseSequence.name.ilike(f"%{name}%"),
+            BaseSequence.name.icontains(name, autoescape=True),
         )
     )
     return subq
@@ -212,9 +214,11 @@ def get_lines(
             subq = get_line_subquery(Line.id, SequenceType.plasmid, plasmid_bit)
             query = query.where(exists(subq))
     if uid is not None:
-        query = query.where(Line.uid.ilike(f"%{uid}%"))
+        query = query.where(Line.uid.icontains(uid, autoescape=True))
     if created_by is not None:
-        query = query.join(User, User.id == Line.created_by_id).where(User.display_name.ilike(f"%{created_by}%"))
+        query = query.join(User, User.id == Line.created_by_id).where(
+            User.display_name.icontains(created_by, autoescape=True)
+        )
     query = query.order_by(Line.id.desc())
     return paginate(session, query, transformer=lambda items: [line_ref(line) for line in items])
 
@@ -300,6 +304,47 @@ def post_line(
     session.commit()
     session.refresh(line)
     return line_ref(line)
+
+
+@router.post('/lines/{line_id}/copies', response_model=list[LineRef])
+def post_line_copies(
+    line_id: int,
+    body: LineCopiesCreate,
+    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
+):
+    """Create lines with the same parents, alleles and plasmids as a line, one per UID (e.g. other isolates of the
+    same transformation or cross). All the lines are created, or none. Tags and sequencing files are not copied."""
+    current_user, session, workspace_id = ctx.destructure()
+    line = get_line_in_workspace_for_user(session, current_user, workspace_id, line_id, WorkspaceRole.editor)
+
+    repeated = frequency_duplicates([uid.lower() for uid in body.uids])
+    if repeated:
+        raise HTTPException(status_code=400, detail=f"Repeated line UIDs: {', '.join(sorted(repeated))}")
+    existing = session.scalars(
+        select(Line.uid).where(
+            Line.workspace_id == workspace_id, func.lower(Line.uid).in_(uid.lower() for uid in body.uids)
+        )
+    ).all()
+    if existing:
+        raise HTTPException(status_code=409, detail=f"Line UIDs already exist: {', '.join(sorted(existing))}")
+
+    copies = []
+    for uid in body.uids:
+        copy = Line.from_create(uid=uid, ctx=ctx)
+        copy.parents = list(line.parents)
+        # New instances of the same sequences (with the same number of copies), without their sequencing files
+        copy.sequences_in_line = [SequenceInLine(sequence=sil.sequence) for sil in line.sequences_in_line]
+        copies.append(copy)
+    session.add_all(copies)
+    try:
+        session.commit()
+    except IntegrityError:
+        # A UID was taken after the check above
+        session.rollback()
+        raise HTTPException(status_code=409, detail='A line UID already exists') from None
+    for copy in copies:
+        session.refresh(copy)
+    return [line_ref(copy) for copy in copies]
 
 
 @router.post('/lines/validate-upload', response_model=list[LineBulkRow])

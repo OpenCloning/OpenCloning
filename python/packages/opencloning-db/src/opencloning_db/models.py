@@ -22,6 +22,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    and_,
     event,
     select,
     text,
@@ -245,6 +246,11 @@ class BaseSequence(InputEntity):
     def sample_uids(self) -> List[str]:
         return [s.uid for s in self.instances if isinstance(s, SequenceSample)]
 
+    @property
+    def sequencing_files(self) -> List['SequencingFile']:
+        """Sequencing files of all the instances that point to the sequence, sorted by id."""
+        return sorted((f for instance in self.instances for f in instance.sequencing_files), key=lambda f: f.id)
+
     def to_pydantic_sequence(self) -> opencloning_models.Sequence:
         raise NotImplementedError('to_pydantic_sequence is not implemented for BaseSequence')
 
@@ -261,9 +267,6 @@ class Sequence(BaseSequence):
     seguid: Mapped[str] = mapped_column(nullable=False)
 
     file_content: Mapped[str] = mapped_column(Text, nullable=False, deferred=True)
-    sequencing_files: Mapped[List['SequencingFile']] = relationship(
-        back_populates='sequence', cascade='all, delete-orphan'
-    )
 
     __mapper_args__ = {
         'polymorphic_identity': 'sequence',
@@ -608,18 +611,28 @@ def _to_db_input(
 
 
 class SequencingFile(Base):
+    """
+    Sequencing data of a concrete instance of a sequence (a sample, or a sequence in a line), not of the
+    theoretical sequence: the files follow the instance when it is re-pointed to another sequence.
+    """
+
     __tablename__ = 'sequencing_file'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    sequence_id: Mapped[int] = mapped_column(ForeignKey('sequence.id'), nullable=False)
+    sequence_instance_id: Mapped[int] = mapped_column(ForeignKey('sequence_instance.id'), nullable=False)
     original_name: Mapped[str] = mapped_column()
     file_content: Mapped[bytes] = mapped_column(LargeBinary, nullable=False, deferred=True)
 
-    sequence: Mapped['Sequence'] = relationship(back_populates='sequencing_files')
+    instance: Mapped['SequenceInstance'] = relationship(back_populates='sequencing_files')
 
     __table_args__ = (
-        UniqueConstraint('sequence_id', 'original_name', name='uq_sequencefile_sequenceid_originalname'),
+        UniqueConstraint('sequence_instance_id', 'original_name', name='uq_sequencingfile_instanceid_originalname'),
     )
+
+    @property
+    def sample_uid(self) -> Optional[str]:
+        """UID of the sample the file belongs to, None if the instance is not a sample."""
+        return self.instance.uid if isinstance(self.instance, SequenceSample) else None
 
 
 class SequenceInstance(Base):
@@ -637,6 +650,9 @@ class SequenceInstance(Base):
     type: Mapped[str] = mapped_column()
 
     sequence: Mapped['BaseSequence'] = relationship(back_populates='instances')
+    sequencing_files: Mapped[List['SequencingFile']] = relationship(
+        back_populates='instance', cascade='all, delete-orphan', order_by='SequencingFile.id'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -644,12 +660,25 @@ class SequenceInstance(Base):
     }
 
 
+_SAMPLE_UID_FORBIDDEN = re.compile(r'[/\\\x00-\x1f\x7f]')
+
+
+def validate_sample_uid(uid: str) -> str:
+    """Check that a sample UID can be used as a URL path segment (/sequence_samples/{uid}): the server decodes
+    %2F before routing, so a '/' would point the request to another route, and the client refuses '.' and '..'.
+    Raises ValueError if not."""
+    if not uid or uid in ('.', '..') or _SAMPLE_UID_FORBIDDEN.search(uid):
+        raise ValueError(
+            f"Invalid sample UID {uid!r}: it cannot be '.' or '..', or contain '/', '\\' or control characters"
+        )
+    return uid
+
+
 class SequenceSample(SequenceInstance):
     """
     A physical lab sample with a user-defined UID pointing to the sequence the
     user considers correct. UID is assigned before sequencing; after sequencing
-    it can be re-pointed to a corrected sequence by updating sequence_id on the
-    parent SequenceInstance row.
+    it can be re-pointed to a corrected sequence.
     """
 
     __tablename__ = 'sequence_sample'
@@ -659,10 +688,48 @@ class SequenceSample(SequenceInstance):
     # Duplicates the owning sequence workspace to support workspace-scoped UID uniqueness.
     uid_workspace_id: Mapped[int] = mapped_column('workspace_id', ForeignKey('workspace.id'), nullable=False)
     uid: Mapped[str] = mapped_column()
+    # Free text, where the sample is stored
+    location: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+
+    created_by: Mapped['User'] = relationship(foreign_keys=[created_by_id])
 
     __mapper_args__ = {
         'polymorphic_identity': 'sequence_sample',
     }
+
+    @classmethod
+    def from_create(
+        cls,
+        *,
+        uid: str,
+        sequence: 'BaseSequence',
+        ctx: WriteContext,
+        location: Optional[str] = None,
+    ) -> Self:
+        """Build a SequenceSample of *sequence* from request-body fields and a write context."""
+        return cls(
+            uid=uid,
+            sequence=sequence,
+            location=location,
+            uid_workspace_id=ctx.workspace_id,
+            created_by_id=ctx.user.id,
+        )
+
+    @validates('uid')
+    def _validate_uid(self, key, value: str) -> str:
+        return validate_sample_uid(value)
+
+    @classmethod
+    def uid_in(cls, workspace_id: int, uids: list[str]):
+        """Filter for the samples of the workspace with any of the given UIDs, which are case-insensitive (as in
+        the unique index)."""
+        return and_(cls.uid_workspace_id == workspace_id, func.lower(cls.uid).in_({uid.lower() for uid in uids}))
 
 
 class SequenceInLine(SequenceInstance):

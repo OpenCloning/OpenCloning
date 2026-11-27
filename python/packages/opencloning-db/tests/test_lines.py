@@ -440,6 +440,98 @@ def test_post_line_with_parent_ids_ok(lines_client):
     assert response.json()['parent_ids'] == [lines_client['line_w1_id']]
 
 
+def test_post_line_copies_ok(lines_client):
+    """Copies have the parents and sequences of the line (new instances), but not its tags."""
+    c = lines_client['client']
+    headers = workspace_headers(lines_client['token_owner_w1'], lines_client['w1'])
+    source_id = lines_client['line_seeded_parented_id']
+    # Tag the source line, to check that tags are not copied
+    tag_body = {'tag_id': lines_client['tag_filter_id']}
+    assert c.post(f'/lines/{source_id}/tags', headers=headers, json=tag_body).status_code == 200
+    source = c.get(f'/lines/{source_id}', headers=headers).json()
+
+    response = c.post(f'/lines/{source_id}/copies', headers=headers, json={'uids': ['L-COPY-1', ' L-COPY-2 ']})
+    assert response.status_code == 200, response.text
+    copies = response.json()
+    assert [copy['uid'] for copy in copies] == ['L-COPY-1', 'L-COPY-2']
+    source_sequence_ids = sorted(sil['sequence']['id'] for sil in source['sequences_in_line'])
+    source_instance_ids = {sil['id'] for sil in source['sequences_in_line']}
+    for copy in copies:
+        assert copy['parent_ids'] == [lines_client['line_w1_id']]
+        assert sorted(sil['sequence']['id'] for sil in copy['sequences_in_line']) == source_sequence_ids
+        assert not source_instance_ids & {sil['id'] for sil in copy['sequences_in_line']}
+        assert copy['tags'] == []
+    # The source line is not changed
+    assert c.get(f'/lines/{source_id}', headers=headers).json()['sequences_in_line'] == source['sequences_in_line']
+
+
+def test_post_line_copies_none_created_on_conflict(lines_client):
+    """If a UID is taken or repeated, no line is created."""
+    c = lines_client['client']
+    headers = workspace_headers(lines_client['token_owner_w1'], lines_client['w1'])
+    url = f"/lines/{lines_client['line_seeded_parented_id']}/copies"
+
+    response = c.post(url, headers=headers, json={'uids': ['L-NEW-A', 'l-w1']})
+    assert response.status_code == 409
+    assert response.json()['detail'] == 'Line UIDs already exist: L-W1'
+
+    response = c.post(url, headers=headers, json={'uids': ['L-NEW-A', 'l-new-a']})
+    assert response.status_code == 400
+    assert response.json()['detail'] == 'Repeated line UIDs: l-new-a'
+
+    assert c.get('/lines', headers=headers, params={'uid': 'L-NEW-A'}).json()['items'] == []
+
+    for body in ({'uids': []}, {'uids': ['  ']}):
+        assert c.post(url, headers=headers, json=body).status_code == 422
+
+
+def test_post_line_copies_uid_taken_at_commit_409(lines_client, monkeypatch):
+    """If a UID is taken after the check (race), the commit fails with 409 and no line is created."""
+    c = lines_client['client']
+    headers = workspace_headers(lines_client['token_owner_w1'], lines_client['w1'])
+    original_commit = Session.commit
+
+    def commit_after_uid_taken(self):
+        # Another request creates a line with one of the UIDs just before this commit
+        self.add(Line(workspace_id=lines_client['w1'], uid='l-race-2', created_by_id=lines_client['owner_w1_id']))
+        return original_commit(self)
+
+    monkeypatch.setattr(Session, 'commit', commit_after_uid_taken)
+    response = c.post(
+        f"/lines/{lines_client['line_seeded_parented_id']}/copies",
+        headers=headers,
+        json={'uids': ['L-RACE-1', 'L-RACE-2']},
+    )
+    monkeypatch.undo()
+
+    assert response.status_code == 409
+    assert response.json()['detail'] == 'A line UID already exists'
+    assert c.get('/lines', headers=headers, params={'uid': 'L-RACE'}).json()['items'] == []
+
+
+@readonly_db
+def test_post_line_copies_viewer_forbidden(lines_client):
+    c = lines_client['client']
+    response = c.post(
+        f"/lines/{lines_client['line_w1_id']}/copies",
+        headers=workspace_headers(lines_client['token_viewer_w1'], lines_client['w1']),
+        json={'uids': ['L-COPY-VIEWER']},
+    )
+    assert response.status_code == 403
+
+
+@readonly_db
+def test_post_line_copies_forbidden_cross_workspace(lines_client):
+    """A line of another workspace cannot be copied."""
+    c = lines_client['client']
+    response = c.post(
+        f"/lines/{lines_client['line_w1_id']}/copies",
+        headers=workspace_headers(lines_client['token_owner_w2'], lines_client['w2']),
+        json={'uids': ['L-COPY-W2']},
+    )
+    assert response.status_code == 403
+
+
 @readonly_db
 def test_patch_line_viewer_forbidden(lines_client):
     """Viewer cannot PATCH line fields."""
@@ -592,6 +684,19 @@ def test_patch_line_uid_success(lines_client):
     )
     assert response.status_code == 200
     assert response.json()['uid'] == 'L-W1-RENAMED'
+
+
+@readonly_db
+@pytest.mark.parametrize('uid', ['', '   '])
+def test_patch_line_uid_empty_422(lines_client, uid):
+    """A line UID cannot be set to an empty (or whitespace-only) string."""
+    c = lines_client['client']
+    response = c.patch(
+        f"/lines/{lines_client['line_w1_id']}",
+        headers=workspace_headers(lines_client['token_owner_w1'], lines_client['w1']),
+        json={'uid': uid},
+    )
+    assert response.status_code == 422
 
 
 def test_patch_line_uid_duplicate_409(lines_client):

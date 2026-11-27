@@ -12,10 +12,20 @@ from opencloning_db.apimodels import (
     WorkspaceExport,
     export_line_ref,
     export_primer_ref,
+    export_sample_ref,
     export_sequence_ref,
 )
 from opencloning_db.db import build_workspace_cloning_strategy
-from opencloning_db.models import BaseSequence, InputEntity, Line, Primer, Tag, User, WorkspaceMembership
+from opencloning_db.models import (
+    BaseSequence,
+    InputEntity,
+    Line,
+    Primer,
+    SequenceSample,
+    Tag,
+    User,
+    WorkspaceMembership,
+)
 from opencloning_db.workspace_deps import WorkspaceContext, get_viewer_workspace_ctx
 
 router = APIRouter(tags=['export'])
@@ -25,7 +35,7 @@ router = APIRouter(tags=['export'])
 def export_workspace(
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
 ):
-    """Export all lines, primers, sequences, tags, and workspace members as API references."""
+    """Export all lines, primers, sequences, samples, tags, and workspace members as API references."""
     _, session, workspace_id = ctx.destructure()
 
     lines = session.scalars(
@@ -57,6 +67,12 @@ def export_workspace(
         .order_by(BaseSequence.id.desc())
     ).all()
 
+    samples = session.scalars(
+        select(SequenceSample)
+        .where(SequenceSample.uid_workspace_id == workspace_id)
+        .order_by(SequenceSample.id.desc())
+    ).all()
+
     tags = session.scalars(select(Tag).where(Tag.workspace_id == workspace_id).order_by(Tag.id.asc())).all()
 
     users = session.scalars(
@@ -70,6 +86,7 @@ def export_workspace(
         lines=[export_line_ref(line) for line in lines],
         primers=[export_primer_ref(primer) for primer in primers],
         sequences=[export_sequence_ref(sequence) for sequence in sequences],
+        samples=[export_sample_ref(sample) for sample in samples],
         tags=[TagRead(id=tag.id, name=tag.name) for tag in tags],
         users=[UserRef(id=user.id, display_name=user.display_name) for user in users],
         cloning_strategy=build_workspace_cloning_strategy(session, ctx, sequences),

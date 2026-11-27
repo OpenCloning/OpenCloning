@@ -12,7 +12,8 @@
     "body": [
       {
         "id": 16,
-        "original_name": "run.ab1"
+        "original_name": "run.ab1",
+        "sample_uid": "stub-sample"
       }
     ],
     "headers": {

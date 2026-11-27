@@ -113,12 +113,15 @@ describe('getSequencingFiles', () => {
     const files = await OpenCloningDBInterface.getSequencingFiles(sequenceId);
 
     expect(files).toHaveLength(1);
-    expect(files[0].id).toBe(listStub.response.body[0].id);
-    expect(files[0].name).toBe(listStub.response.body[0].original_name);
+    const { id, original_name: originalName, sample_uid: sampleUid } = listStub.response.body[0];
+    expect(files[0].id).toBe(id);
+    // Prefixed with the sample uid, files of different samples can have the same name
+    expect(files[0].name).toBe(`${sampleUid}_${originalName}`);
+    expect(files[0].sampleUid).toBe(sampleUid);
 
     const downloadedFile = await files[0].getFile();
     expect(downloadedFile).toBeInstanceOf(File);
-    expect(downloadedFile.name).toBe(listStub.response.body[0].original_name);
+    expect(downloadedFile.name).toBe(`${sampleUid}_${originalName}`);
     const downloadedText = await file2base64(downloadedFile);
     expect(downloadedText).toBe(downloadStub.response.body);
   });

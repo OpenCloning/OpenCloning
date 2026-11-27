@@ -2,15 +2,12 @@
 
 import warnings
 from typing import Annotated, List
-from urllib.parse import quote
 from opencloning.dna_functions import read_dsrecord_from_json
 from opencloning.app_settings import settings
 from opencloning.endpoints.endpoint_utils import read_upload_with_limit
 from opencloning.pydantic_models import BaseCloningStrategy
-from opencloning_db.config import get_config
 import opencloning_linkml.datamodel.models as opencloning_models
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Response
-from fastapi import status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 
 from opencloning_db.models import BaseSequence
 from pydna.utils import location_boundaries
@@ -45,14 +42,15 @@ from opencloning_db.apimodels import (
     line_ref,
     primer_ref,
     sequence_ref,
+    sequencing_file_ref,
 )
-from opencloning_db.db import cloning_strategy_to_db, create_sequencing_file, get_cloning_strategy_from_db
+from opencloning_db.db import cloning_strategy_to_db, get_cloning_strategy_from_db
 from opencloning_db.models import (
     InputEntity,
     Primer,
     Sequence,
     SequenceInLine,
-    SequencingFile,
+    SequenceInstance,
     Source,
     SequenceType,
     Tag,
@@ -115,7 +113,7 @@ def get_sequences(
     if sequence_types is not None and len(sequence_types) > 0:
         query = query.where(BaseSequence.sequence_type.in_(sequence_types))
     if name is not None:
-        query = query.where(BaseSequence.name.ilike(f"%{name}%"))
+        query = query.where(BaseSequence.name.icontains(name, autoescape=True))
     if uid is not None:
         # This creates a boolean filter by including 1 if the sequence has a sample with the given uid
         subq = (
@@ -123,7 +121,7 @@ def get_sequences(
             .select_from(SequenceSample)
             .where(
                 SequenceSample.sequence_id == BaseSequence.id,
-                SequenceSample.uid.ilike(f"%{uid}%"),
+                SequenceSample.uid.icontains(uid, autoescape=True),
                 SequenceSample.uid_workspace_id == workspace_id,
             )
         )
@@ -141,7 +139,7 @@ def get_sequences(
         query = query.where(exists(subq))
     if created_by is not None:
         query = query.join(User, User.id == BaseSequence.created_by_id).where(
-            User.display_name.ilike(f"%{created_by}%")
+            User.display_name.icontains(created_by, autoescape=True)
         )
     query = query.order_by(BaseSequence.id.desc())
     return paginate(session, query)
@@ -190,7 +188,7 @@ def get_text_file_sequences(
         selectinload(Sequence.instances),
         selectinload(Sequence.created_by),
         # file_content of the sequencing files is deferred, so only their id and name are loaded
-        selectinload(Sequence.sequencing_files),
+        selectinload(Sequence.instances).selectinload(SequenceInstance.sequencing_files),
         undefer(Sequence.file_content),
     ).order_by(Sequence.id)
     db_sequences = session.scalars(query).all()
@@ -207,10 +205,7 @@ def get_text_file_sequences(
         SequenceWithTextFile(
             sequence_ref=sequence_ref(s),
             sequence=s.to_pydantic_sequence(),
-            sequencing_files=[
-                SequencingFileRef(id=f.id, original_name=f.original_name)
-                for f in sorted(s.sequencing_files, key=lambda f: f.id)
-            ],
+            sequencing_files=[sequencing_file_ref(f) for f in s.sequencing_files],
         )
         for s in db_sequences
     ]
@@ -282,9 +277,9 @@ def delete_sequence(
     sequence_id: int,
     ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
 ):
-    """Delete a sequence with no children and not present in any strain.
+    """Delete a sequence with no children and not present in any line.
 
-    Linked sequence samples and sequencing files are removed via ORM cascade
+    Linked sequence samples and their sequencing files are removed via ORM cascade
     """
 
     current_user, session, workspace_id = ctx.destructure()
@@ -400,10 +395,7 @@ def get_sequence_by_uid(
         select(Sequence)
         .where(Sequence.workspace_id == workspace_id)
         .join(SequenceSample, SequenceSample.sequence_id == Sequence.id)
-        .where(
-            func.lower(SequenceSample.uid) == uid.lower(),
-            SequenceSample.uid_workspace_id == workspace_id,
-        )
+        .where(SequenceSample.uid_in(workspace_id, [uid]))
         .options(
             selectinload(InputEntity.tags),
             selectinload(Sequence.instances),
@@ -702,6 +694,7 @@ def post_cloning_strategy_bulk(
 def get_sequences_by_seguid(
     seguid: str,
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
+    without_samples: bool = Query(description='Only the sequences that have no samples', default=False),
 ):
     """
     Look up all sequences with the given SEGUID.
@@ -709,6 +702,9 @@ def get_sequences_by_seguid(
     """
     _, session, workspace_id = ctx.destructure()
     stmt = _seguid_query(seguid, workspace_id)
+    if without_samples:
+        # Selecting the entity joins sequence_sample, so that other instances (e.g. in lines) are not samples
+        stmt = stmt.where(~select(SequenceSample.id).where(SequenceSample.sequence_id == Sequence.id).exists())
     return [sequence_ref(seq) for seq in session.scalars(stmt).all()]
 
 
@@ -809,132 +805,13 @@ def get_sequence_sequencing_files(
     sequence_id: int,
     ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
 ):
-    """List all sequencing files linked to a sequence."""
+    """List the sequencing files of all the samples of a sequence. Files are uploaded to samples."""
     current_user, session, workspace_id = ctx.destructure()
     db_sequence = get_sequence_in_workspace_for_user(
         session, current_user, workspace_id, sequence_id, WorkspaceRole.viewer
     )
     db_sequence = require_real_sequence(db_sequence, detail='sequencing_files endpoint only supports real sequences.')
-    return [SequencingFileRef(id=f.id, original_name=f.original_name) for f in db_sequence.sequencing_files]
-
-
-@router.post('/sequences/{sequence_id}/sequencing_files', response_model=List[SequencingFileRef])
-def post_sequence_sequencing_files(
-    sequence_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
-    files: List[UploadFile] = File(...),
-):
-    """Upload one or more sequencing files and link them to a sequence."""
-    current_user, session, workspace_id = ctx.destructure()
-    db_sequence = get_sequence_in_workspace_for_user(
-        session, current_user, workspace_id, sequence_id, WorkspaceRole.editor
-    )
-    db_sequence = require_real_sequence(db_sequence, detail='sequencing_files endpoint only supports real sequences.')
-    max_size_mb = get_config().max_sequencing_file_size_mb
-    # Read all files first, so that nothing is created if any file is too large
-    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
-    created = []
-    for upload, content in zip(files, contents):
-        sf = create_sequencing_file(
-            sequence=db_sequence,
-            file_content=content,
-            original_name=upload.filename or 'unnamed',
-        )
-        session.add(sf)
-        session.flush()
-        created.append(SequencingFileRef(id=sf.id, original_name=sf.original_name))
-
-    session.commit()
-    return created
-
-
-@router.post('/sequences/sequencing_files/bulk')
-def post_sequencing_files_bulk(
-    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
-    sequence_names: List[str] = Form(...),
-    files: List[UploadFile] = File(...),
-):
-    """Link sequencing files to sequences in bulk: files[i] is linked to the sequence called sequence_names[i]
-    (the first one if several sequences have that name). Nothing is linked if there is any error."""
-    _, session, workspace_id = ctx.destructure()
-    if len(sequence_names) != len(files):
-        raise HTTPException(400, 'Submit one sequence name per file')
-    max_size_mb = get_config().max_sequencing_file_size_mb
-    contents = [read_upload_with_limit(upload, max_size_mb) for upload in files]
-
-    sequences = {}
-    for seq in session.scalars(
-        select(Sequence)
-        .where(Sequence.workspace_id == workspace_id, Sequence.name.in_(sequence_names))
-        .order_by(Sequence.id)
-    ):
-        sequences.setdefault(seq.name, seq)
-    missing_names = sorted(set(sequence_names) - sequences.keys())
-    if missing_names:
-        raise HTTPException(400, f'Sequences not found: {", ".join(missing_names)}')
-
-    # Tuples of sequence_id, sequencing_file names to ensure that the same file is not
-    # added twice
-    taken = set(
-        session.execute(
-            select(SequencingFile.sequence_id, SequencingFile.original_name).where(
-                SequencingFile.sequence_id.in_([s.id for s in sequences.values()])
-            )
-        ).all()
-    )
-    conflicts = []
-    for name, upload in zip(sequence_names, files):
-        key = (sequences[name].id, upload.filename)
-        if key in taken:
-            conflicts.append(f'{name} already has a sequencing file called {upload.filename}')
-        taken.add(key)
-    if conflicts:
-        raise HTTPException(400, '; '.join(sorted(set(conflicts))))
-
-    for name, upload, content in zip(sequence_names, files, contents):
-        session.add(create_sequencing_file(sequences[name], content, upload.filename))
-    session.commit()
-    return {'created': len(files)}
-
-
-@router.delete('/sequences/{sequence_id}/sequencing_files/{file_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_sequence_sequencing_file(
-    sequence_id: int,
-    file_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(get_editor_workspace_ctx)],
-):
-    current_user, session, workspace_id = ctx.destructure()
-    get_sequence_in_workspace_for_user(session, current_user, workspace_id, sequence_id, WorkspaceRole.editor)
-    db_file = session.scalar(
-        select(SequencingFile).where(SequencingFile.id == file_id, SequencingFile.sequence_id == sequence_id)
-    )
-    if db_file is None:
-        raise HTTPException(status_code=404, detail='Sequencing file not found')
-    session.delete(db_file)
-    session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.get('/sequencing_files/{file_id}/download')
-def download_sequencing_file(
-    file_id: int,
-    ctx: Annotated[WorkspaceContext, Depends(get_viewer_workspace_ctx)],
-):
-    """Download a sequencing file by ID."""
-    current_user, session, workspace_id = ctx.destructure()
-    db_file = session.scalar(
-        select(SequencingFile).where(SequencingFile.id == file_id).options(undefer(SequencingFile.file_content))
-    )
-    if db_file is None:
-        raise HTTPException(status_code=404, detail='Sequencing file not found')
-    get_sequence_in_workspace_for_user(session, current_user, workspace_id, db_file.sequence_id, WorkspaceRole.viewer)
-    original_name = db_file.original_name
-
-    return Response(
-        content=db_file.file_content,
-        media_type='application/octet-stream',
-        headers={'Content-Disposition': f"attachment; filename*=UTF-8''{quote(original_name, safe='')}"},
-    )
+    return [sequencing_file_ref(f) for f in db_sequence.sequencing_files]
 
 
 @router.post('/sequences', response_model=CloningStrategyResponse)

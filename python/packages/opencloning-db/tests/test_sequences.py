@@ -93,8 +93,17 @@ def _seed_sequences_context(engine, config):
             uid='UID-W1',
             sequence_id=seq_w1.id,
             uid_workspace_id=w1,
+            created_by_id=ctx['owner_w1_id'],
         )
         session.add(sample_w1)
+        session.add(
+            SequenceSample(
+                uid='UID-W2',
+                sequence_id=seq_w2.id,
+                uid_workspace_id=w2,
+                created_by_id=ctx['owner_w2_id'],
+            )
+        )
 
         cloning_strategy_to_db(cs_pcr, session, ctx=w1_ctx)
         cloning_strategy_to_db(cs_gateway_BP, session, ctx=w1_ctx)
@@ -124,6 +133,7 @@ def _seed_sequences_context(engine, config):
                 uid='FILTER-UID-99',
                 sequence_id=pcr_product.id,
                 uid_workspace_id=w1,
+                created_by_id=ctx['owner_w1_id'],
             )
         )
 
@@ -157,7 +167,10 @@ def _seed_sequences_context(engine, config):
         )
         session.add(seq_with_sequencing_file)
         session.flush()
-        sequencing_file = create_sequencing_file(seq_with_sequencing_file, b'hello_world', 'hello_world.txt')
+        sequencing_sample = SequenceSample.from_create(
+            uid='SEQFILE-SAMPLE', sequence=seq_with_sequencing_file, ctx=w1_ctx
+        )
+        sequencing_file = create_sequencing_file(sequencing_sample, b'hello_world', 'hello_world.txt')
         session.add(sequencing_file)
 
         template_sequence = TemplateSequence.from_create(
@@ -180,6 +193,7 @@ def _seed_sequences_context(engine, config):
                 'seq_w1_id': seq_w1.id,
                 'seq_w2_id': seq_w2.id,
                 'uid_w1': sample_w1.uid,
+                'uid_w2': 'UID-W2',
                 'w1_sequence_ids': w1_ids,
                 'w2_sequence_ids': w2_ids,
                 'pcr_template_id': pcr_template.id,
@@ -200,6 +214,7 @@ def _seed_sequences_context(engine, config):
                 'seq_with_origin_spanning_feature_rc_id': seq_with_origin_spanning_feature_rc.id,
                 'seq_with_sequencing_file_id': seq_with_sequencing_file.id,
                 'sequencing_file_id': sequencing_file.id,
+                'sequencing_sample_uid': sequencing_sample.uid,
                 'template_sequence_id': template_sequence_id,
             }
         )
@@ -274,6 +289,7 @@ def test_get_sequences_filter_instantiated_true(sequences_client):
         sequences_client['pcr_template_id'],
         sequences_client['seq_w1_id'],
         sequences_client['pcr_product_id'],
+        sequences_client['seq_with_sequencing_file_id'],
     } == ids
 
 
@@ -341,7 +357,11 @@ def test_get_sequences_filter_has_uid(sequences_client):
     )
     assert r.status_code == 200
     ids = {item['id'] for item in r.json()['items']}
-    assert {sequences_client['seq_w1_id'], sequences_client['pcr_product_id']} == ids
+    assert {
+        sequences_client['seq_w1_id'],
+        sequences_client['pcr_product_id'],
+        sequences_client['seq_with_sequencing_file_id'],
+    } == ids
 
 
 @readonly_db
@@ -504,7 +524,7 @@ def test_delete_sequence_owner_removes_sample_and_files(sequences_client):
 
     sequencing_file_ids = []
     for file_name, payload in [('attached-1.ab1', b'ABIF-1'), ('attached-2.ab1', b'ABIF-2')]:
-        up = post_sequencing_file_upload(c, sid, tok, wid, file_name, payload)
+        up = post_sequencing_file_upload(c, sequences_client['uid_w1'], tok, wid, file_name, payload)
         assert up.status_code == 200
         sequencing_file_ids.append(up.json()[0]['id'])
 
@@ -939,6 +959,45 @@ def test_get_sequences_by_seguid_known(sequences_client):
     assert sequences_client['pcr_product_id'] in ids
 
 
+def test_get_sequences_by_seguid_without_samples(sequences_client):
+    c = sequences_client['client']
+    headers = workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1'])
+    # A sequence without samples
+    seq_id = sequences_client['seq_patch_linear_id']
+    with Session(sequences_client['engine']) as session:
+        seguid = session.get(Sequence, seq_id).seguid
+
+    def ids(without_samples):
+        r = c.get(f'/sequences/by-seguid/{seguid}', headers=headers, params={'without_samples': without_samples})
+        assert r.status_code == 200
+        return {item['id'] for item in r.json()}
+
+    assert seq_id in ids(False)
+    assert seq_id in ids(True)
+    r = c.post('/sequence_samples', headers=headers, json={'uid': 'PATCH-SAMPLE', 'sequence_id': seq_id})
+    assert r.status_code == 200, r.text
+    assert seq_id in ids(False)
+    assert seq_id not in ids(True)
+
+
+def test_get_sequences_by_seguid_without_samples_in_line(sequences_client):
+    """A sequence that is only in a line has no samples (both are sequence instances)."""
+    c = sequences_client['client']
+    headers = workspace_headers(sequences_client['token_owner_w1'], sequences_client['w1'])
+    seq_id = sequences_client['seq_patch_linear_id']
+    with Session(sequences_client['engine']) as session:
+        seguid = session.get(Sequence, seq_id).seguid
+        line = Line(workspace_id=sequences_client['w1'], uid='L-SEGUID', created_by_id=sequences_client['owner_w1_id'])
+        session.add(line)
+        session.flush()
+        session.add(SequenceInLine(sequence_id=seq_id, line_id=line.id))
+        session.commit()
+
+    r = c.get(f'/sequences/by-seguid/{seguid}', headers=headers, params={'without_samples': True})
+    assert r.status_code == 200
+    assert seq_id in {item['id'] for item in r.json()}
+
+
 @readonly_db
 def test_get_sequences_by_seguid_unknown_empty(sequences_client):
     c = sequences_client['client']
@@ -1331,7 +1390,11 @@ def test_get_text_file_sequences_include_sequencing_files(sequences_client):
     files_by_id = {item['sequence_ref']['id']: item['sequencing_files'] for item in r.json()}
     assert files_by_id == {
         sequences_client['seq_with_sequencing_file_id']: [
-            {'id': sequences_client['sequencing_file_id'], 'original_name': 'hello_world.txt'}
+            {
+                'id': sequences_client['sequencing_file_id'],
+                'original_name': 'hello_world.txt',
+                'sample_uid': 'SEQFILE-SAMPLE',
+            }
         ],
         sequences_client['pcr_product_id']: [],
     }
@@ -1590,12 +1653,12 @@ def test_post_sequencing_files_owner_ok(sequences_client):
     tok = sequences_client['token_owner_w1']
     wid = sequences_client['w1']
     sid = sequences_client['seq_w1_id']
-    up = post_sequencing_file_upload(c, sid, tok, wid, 'run.ab1', b'ABIFDATA')
+    up = post_sequencing_file_upload(c, sequences_client['uid_w1'], tok, wid, 'run.ab1', b'ABIFDATA')
     assert up.status_code == 200
     data = up.json()
     assert len(data) == 1
     assert data[0]['original_name'] == 'run.ab1'
-    assert set(data[0]) == {'id', 'original_name'}
+    assert data[0] == {'id': data[0]['id'], 'original_name': 'run.ab1', 'sample_uid': 'UID-W1'}
 
     listed = c.get(
         f"/sequences/{sid}/sequencing_files",
@@ -1613,7 +1676,7 @@ def test_post_sequencing_files_viewer_forbidden(sequences_client):
     c = sequences_client['client']
     r = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_viewer_w1'],
         sequences_client['w1'],
         'nope.ab1',
@@ -1629,7 +1692,7 @@ def test_post_sequencing_files_non_member_forbidden(sequences_client):
     c = sequences_client['client']
     r = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_owner_w2'],
         sequences_client['w1'],
         'nope.ab1',
@@ -1641,18 +1704,18 @@ def test_post_sequencing_files_non_member_forbidden(sequences_client):
 
 @readonly_db
 def test_post_sequencing_files_workspace_mismatch_404(sequences_client):
-    """W2 sequence id with W1 header returns 404 on upload."""
+    """W2 sample uid with W1 header returns 404 on upload."""
     c = sequences_client['client']
     r = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w2_id'],
+        sequences_client['uid_w2'],
         sequences_client['token_owner_both'],
         sequences_client['w1'],
         'x.ab1',
         b'x',
     )
     assert r.status_code == 404
-    assert r.json()['detail'] == 'BaseSequence not found'
+    assert r.json()['detail'] == 'Sequence sample not found'
 
 
 def test_get_sequence_sequencing_files_viewer_ok(sequences_client):
@@ -1664,7 +1727,7 @@ def test_get_sequence_sequencing_files_viewer_ok(sequences_client):
     sid = sequences_client['seq_w1_id']
     up = post_sequencing_file_upload(
         c,
-        sid,
+        sequences_client['uid_w1'],
         owner,
         wid,
         'viewer-list.ab1',
@@ -1700,13 +1763,12 @@ def test_delete_sequencing_file_owner_204(sequences_client):
     c = sequences_client['client']
     tok = sequences_client['token_owner_w1']
     wid = sequences_client['w1']
-    sid = sequences_client['seq_w1_id']
-    up = post_sequencing_file_upload(c, sid, tok, wid, 'del.ab1', b'DEL')
+    up = post_sequencing_file_upload(c, sequences_client['uid_w1'], tok, wid, 'del.ab1', b'DEL')
     assert up.status_code == 200
     file_id = up.json()[0]['id']
 
     r = c.delete(
-        f"/sequences/{sid}/sequencing_files/{file_id}",
+        f"/sequencing_files/{file_id}",
         headers=workspace_headers(tok, wid),
     )
     assert r.status_code == 204
@@ -1718,34 +1780,31 @@ def test_delete_sequencing_file_viewer_forbidden(sequences_client):
     owner = sequences_client['token_owner_w1']
     viewer = sequences_client['token_viewer_w1']
     wid = sequences_client['w1']
-    sid = sequences_client['seq_w1_id']
-    up = post_sequencing_file_upload(c, sid, owner, wid, 'v-del.ab1', b'V')
+    up = post_sequencing_file_upload(c, sequences_client['uid_w1'], owner, wid, 'v-del.ab1', b'V')
     assert up.status_code == 200
     file_id = up.json()[0]['id']
 
     r = c.delete(
-        f"/sequences/{sid}/sequencing_files/{file_id}",
+        f"/sequencing_files/{file_id}",
         headers=workspace_headers(viewer, wid),
     )
     assert r.status_code == 403
     assert 'Not allowed' in r.json()['detail']
 
 
-def test_delete_sequencing_file_wrong_sequence_404(sequences_client):
-    """File belongs to W1 sequence; DELETE under W2 path returns 404."""
+def test_delete_sequencing_file_wrong_workspace_404(sequences_client):
+    """File belongs to a W1 sample; DELETE with the W2 header returns 404."""
     c = sequences_client['client']
     tok_w1 = sequences_client['token_owner_w1']
     both = sequences_client['token_owner_both']
     w1 = sequences_client['w1']
     w2 = sequences_client['w2']
-    sid1 = sequences_client['seq_w1_id']
-    sid2 = sequences_client['seq_w2_id']
-    up = post_sequencing_file_upload(c, sid1, tok_w1, w1, 'wrongseq.ab1', b'W')
+    up = post_sequencing_file_upload(c, sequences_client['uid_w1'], tok_w1, w1, 'wrongseq.ab1', b'W')
     assert up.status_code == 200
     file_id = up.json()[0]['id']
 
     r = c.delete(
-        f"/sequences/{sid2}/sequencing_files/{file_id}",
+        f"/sequencing_files/{file_id}",
         headers=workspace_headers(both, w2),
     )
     assert r.status_code == 404
@@ -1757,7 +1816,7 @@ def test_download_sequencing_file_ok(sequences_client):
     payload = b'DOWNLOAD-BYTES-123'
     up = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_owner_w1'],
         sequences_client['w1'],
         'dl.ab1',
@@ -1794,7 +1853,7 @@ def test_download_sequencing_file_zz_forbidden_cross_workspace(sequences_client)
     tok = sequences_client['token_owner_w2']
     uploaded = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_owner_w1'],
         sequences_client['w1'],
         'test.ab1',
@@ -1848,7 +1907,7 @@ def test_download_sequencing_file_no_workspace_header_422(sequences_client):
     c = sequences_client['client']
     uploaded = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_owner_w1'],
         sequences_client['w1'],
         'f.ab1',
@@ -1867,11 +1926,11 @@ def test_download_sequencing_file_no_workspace_header_422(sequences_client):
 
 
 def test_download_sequencing_file_wrong_workspace_404(sequences_client):
-    """W1 file id with W2 header: 404 (sequence not in selected workspace)."""
+    """W1 file id with W2 header: 404 (file not in selected workspace)."""
     c = sequences_client['client']
     uploaded = post_sequencing_file_upload(
         c,
-        sequences_client['seq_w1_id'],
+        sequences_client['uid_w1'],
         sequences_client['token_owner_w1'],
         sequences_client['w1'],
         'w.ab1',
@@ -1888,7 +1947,7 @@ def test_download_sequencing_file_wrong_workspace_404(sequences_client):
         ),
     )
     assert download.status_code == 404
-    assert download.json()['detail'] == 'BaseSequence not found'
+    assert download.json()['detail'] == 'Sequencing file not found'
 
 
 @readonly_db
@@ -2233,7 +2292,7 @@ def test_post_sequencing_files_too_large(sequences_client):
     sid = sequences_client['seq_w1_id']
     small_limit_config = get_config().model_copy(update={'max_sequencing_file_size_mb': 1})
     with patch.object(app_config, 'config', small_limit_config):
-        up = post_sequencing_file_upload(c, sid, tok, wid, 'big.ab1', b'A' * (1024 * 1024 + 1))
+        up = post_sequencing_file_upload(c, sequences_client['uid_w1'], tok, wid, 'big.ab1', b'A' * (1024 * 1024 + 1))
     assert up.status_code == 413
     listed = c.get(f"/sequences/{sid}/sequencing_files", headers=workspace_headers(tok, wid))
     assert listed.json() == []
@@ -2264,86 +2323,3 @@ def test_post_cloning_strategy_long_primer(sequences_client):
         json={'sources': [], 'sequences': [], 'primers': [{'id': 1, 'name': 'p', 'sequence': 'A' * 1001}]},
     )
     assert r.status_code == 422
-
-
-def _post_bulk_sequencing_files(ctx, pairs, token_key='token_owner_w1', sequence_names=None):
-    """pairs: [(sequence_name, file_name)], all files have the same dummy content."""
-    return ctx['client'].post(
-        '/sequences/sequencing_files/bulk',
-        headers=workspace_headers(ctx[token_key], ctx['w1']),
-        data={'sequence_names': sequence_names if sequence_names is not None else [name for name, _ in pairs]},
-        files=[('files', (file_name, b'@r\nACGT\n+\nIIII\n', 'application/octet-stream')) for _, file_name in pairs],
-    )
-
-
-def _sequencing_file_names(ctx, seq_id):
-    r = ctx['client'].get(
-        f'/sequences/{seq_id}/sequencing_files', headers=workspace_headers(ctx['token_owner_w1'], ctx['w1'])
-    )
-    return sorted(f['original_name'] for f in r.json())
-
-
-def test_post_sequencing_files_bulk(sequences_client):
-    ctx = sequences_client
-    pairs = [
-        ('seq_with_sequencing_file', 'A1-P1.final.fastq'),
-        ('seq_with_sequencing_file', 'A1-P1-2.final.fastq'),
-        ('patch-linear-target', 'A1-P1.final.fastq'),
-    ]
-    r = _post_bulk_sequencing_files(ctx, pairs)
-    assert r.status_code == 200, r.text
-    assert r.json() == {'created': 3}
-    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == [
-        'A1-P1-2.final.fastq',
-        'A1-P1.final.fastq',
-        'hello_world.txt',
-    ]
-    assert _sequencing_file_names(ctx, ctx['seq_patch_linear_id']) == ['A1-P1.final.fastq']
-
-    # Submitting again fails, as the sequences already have files with those names
-    r = _post_bulk_sequencing_files(ctx, pairs[:2])
-    assert r.status_code == 400
-    assert r.json()['detail'] == (
-        'seq_with_sequencing_file already has a sequencing file called A1-P1-2.final.fastq; '
-        'seq_with_sequencing_file already has a sequencing file called A1-P1.final.fastq'
-    )
-
-
-@pytest.mark.parametrize(
-    'pairs, sequence_names, detail',
-    [
-        (
-            [('seq_with_sequencing_file', 'a.fastq')],
-            ['seq_with_sequencing_file', 'patch-linear-target'],
-            'Submit one sequence name per file',
-        ),
-        (
-            [('missing', 'a.fastq'), ('template_sequence', 'b.fastq'), ('seq_with_sequencing_file', 'c.fastq')],
-            None,
-            'Sequences not found: missing, template_sequence',
-        ),
-        (
-            [('seq_with_sequencing_file', 'hello_world.txt')],
-            None,
-            'seq_with_sequencing_file already has a sequencing file called hello_world.txt',
-        ),
-        (
-            [('patch-linear-target', 'a.fastq'), ('patch-linear-target', 'a.fastq')],
-            None,
-            'patch-linear-target already has a sequencing file called a.fastq',
-        ),
-    ],
-)
-def test_post_sequencing_files_bulk_errors(sequences_client, pairs, sequence_names, detail):
-    ctx = sequences_client
-    r = _post_bulk_sequencing_files(ctx, pairs, sequence_names=sequence_names)
-    assert r.status_code == 400
-    assert r.json()['detail'] == detail
-    # Nothing was linked
-    assert _sequencing_file_names(ctx, ctx['seq_with_sequencing_file_id']) == ['hello_world.txt']
-    assert _sequencing_file_names(ctx, ctx['seq_patch_linear_id']) == []
-
-
-def test_post_sequencing_files_bulk_viewer_forbidden(sequences_client):
-    r = _post_bulk_sequencing_files(sequences_client, [('seq_with_sequencing_file', 'a.fastq')], 'token_viewer_w1')
-    assert r.status_code == 403

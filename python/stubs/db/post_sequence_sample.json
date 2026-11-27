@@ -1,0 +1,25 @@
+{
+  "body": {
+    "location": "box 1",
+    "sequence_id": 61,
+    "uid": "stub-sample"
+  },
+  "endpoint": "/db/sequence_samples",
+  "headers": {
+    "authorization": "Bearer __TEST_TOKEN__",
+    "x-workspace-id": "1"
+  },
+  "method": "POST",
+  "name": "post_sequence_sample",
+  "params": null,
+  "response": {
+    "body": {
+      "id": 43,
+      "uid": "stub-sample"
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "status_code": 200
+  }
+}

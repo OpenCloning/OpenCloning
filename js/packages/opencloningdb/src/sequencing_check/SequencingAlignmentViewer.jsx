@@ -11,8 +11,9 @@ import useSequencingQueries from './useSequencingQueries';
 /**
  * Alignment of one sequencing file to its sequence, shown in the SequenceViewer with the alignment tab selected.
  * sequence is an item of the output of GetSequencesInBulkComponent, file a sequencing file of that sequence.
+ * height is the height of the viewer in pixels.
  */
-export default function SequencingAlignmentViewer({ sequence, file, onClose }) {
+export default function SequencingAlignmentViewer({ sequence, file, onClose, height }) {
   const sequenceData = React.useMemo(() => convertToTeselaJson(sequence.textFileSequence), [sequence]);
 
   // Shared with the sequencing check, so files that were already aligned are not aligned again
@@ -38,12 +39,13 @@ export default function SequencingAlignmentViewer({ sequence, file, onClose }) {
         </Tooltip>
       </Box>
       {isPending && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        // Same height as the viewer, so that the table above does not jump when it is loaded
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height }}>
           <CircularProgress />
         </Box>
       )}
       {error && <Alert severity="error">Could not align the sequencing file: {error2String(error)}</Alert>}
-      {alignmentData && <SequenceViewer sequenceData={sequenceData} alignmentData={alignmentData} readOnly />}
+      {alignmentData && <SequenceViewer sequenceData={sequenceData} alignmentData={alignmentData} readOnly height={height} />}
     </Box>
   );
 }

@@ -22,6 +22,7 @@ from opencloning_db.models import (
     Primer,
     Sequence,
     Source,
+    SequenceInstance,
     SequencingFile,
     Tag,
     WorkspaceRole,
@@ -59,13 +60,13 @@ def get_engine(config: Config):
 
 
 def create_sequencing_file(
-    sequence: 'Sequence',
+    instance: SequenceInstance,
     file_content: bytes,
     original_name: str,
 ) -> SequencingFile:
-    """Create a SequencingFile row backed directly by database storage."""
+    """Create a SequencingFile row of a sequence instance (e.g. a sample), backed directly by database storage."""
     return SequencingFile(
-        sequence=sequence,
+        instance=instance,
         original_name=original_name,
         file_content=file_content,
     )

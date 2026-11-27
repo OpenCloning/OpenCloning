@@ -7,6 +7,9 @@ import SequencingCheckTable from './SequencingCheckTable';
 import SequencingAlignmentViewer from './SequencingAlignmentViewer';
 import useSequencingCheck from './useSequencingCheck';
 
+// Height of the alignment viewer, about half of the window (the editor is at least 400px high)
+const alignmentViewerHeight = () => Math.max(400, Math.round(window.innerHeight * 0.5));
+
 function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenceName }) {
   const { rows, run, isRunning, progress } = useSequencingCheck(sequences);
   // { sequence, file } of the alignment shown below the table, null if none
@@ -19,9 +22,12 @@ function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenc
         Each sequencing file is aligned to its sequence (exact matches are detected without aligning).
         Sequences are sorted by percentage identity, lowest first.
       </Typography>
-      {/* Scrolls when the alignment is shown, so that the buttons stay visible */}
-      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-        <BulkTableContainer>
+      {/*
+        The table scrolls on its own, taking the height left by the alignment viewer (if shown). Everything scrolls
+        together only if the window is too short for both, so that the buttons stay visible.
+      */}
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <BulkTableContainer sx={{ maxHeight: 'none', flex: '1 1 auto', minHeight: 150 }}>
           <SequencingCheckTable
             rows={rows}
             renderSequenceName={renderSequenceName}
@@ -35,6 +41,7 @@ function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenc
             sequence={selectedAlignment.sequence}
             file={selectedAlignment.file}
             onClose={() => setSelectedAlignment(null)}
+            height={alignmentViewerHeight()}
           />
         )}
       </Box>
@@ -60,10 +67,13 @@ function SequencingCheckResults({ sequences, onPickOtherSequences, renderSequenc
   );
 }
 
+// The samples are shown with each sequencing file, so the sequence names go without them
+const sequenceNameOnly = ({ id, name }) => name || `Sequence ${id}`;
+
 function SequencingCheckContent({ renderSequenceName }) {
   const [sequences, setSequences] = React.useState(null);
   if (sequences === null) {
-    return <GetSequencesInBulkComponent onSequencesLoaded={setSequences} />;
+    return <GetSequencesInBulkComponent onSequencesLoaded={setSequences} formatName={sequenceNameOnly} />;
   }
   return (
     <SequencingCheckResults
@@ -79,9 +89,12 @@ function SequencingCheckContent({ renderSequenceName }) {
  * renderSequenceName(sequence) can be passed to render the sequence names (e.g. as links), sequence is
  * an item of the output of GetSequencesInBulkComponent ({ databaseId, name, ... }).
  */
+// Bigger than the other bulk modals, to fit the table and the alignment viewer
+const modalSx = { width: 'min(1800px, 98vw)', maxHeight: '94vh', my: '3vh' };
+
 export default function SequencingCheckModal({ open, onClose, renderSequenceName }) {
   return (
-    <BulkUploadModal open={open} onClose={onClose} title="Check sequencing files" dataTestId="sequencing-check-modal">
+    <BulkUploadModal open={open} onClose={onClose} title="Check sequencing files" dataTestId="sequencing-check-modal" sx={modalSx}>
       <SequencingCheckContent renderSequenceName={renderSequenceName} />
     </BulkUploadModal>
   );

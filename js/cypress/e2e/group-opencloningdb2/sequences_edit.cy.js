@@ -1,3 +1,4 @@
+import { BlobWriter, TextReader, ZipWriter } from '@zip.js/zip.js';
 import endpoints from '../../../packages/opencloningdb/src/endpoints';
 
 const bulkSequenceFiles = [
@@ -8,6 +9,40 @@ const bulkSequenceFiles = [
   'repeated_1.gb',
   'repeated_2.gb',
 ].map((file) => `cypress/test_files/bulk_sequence_submit/${file}`);
+
+const SEQUENCING_RUN = 'cypress/test_files/bulk_sequencing_files/seed_sequencing_run';
+// See the README.md of SEQUENCING_RUN
+const SEQUENCING_RUN_SAMPLES = [
+  'seqcheck_circular_1-sample', 'SEQCHECK_CIRCULAR_3-SAMPLE', 'seqcheck_circular_2-sample', 'colony_L2', 'TN9W63_1',
+  'TN9W63_2', 'GB_105355_c1', 'GB_105355_c2', 'GB_105417_c1', 'empty_well',
+];
+
+/** { path in the zip: content } of the files of the fake sequencing run, as the provider zips them. */
+function readSequencingRun() {
+  const entries = {};
+  SEQUENCING_RUN_SAMPLES.forEach((sample) => {
+    ['final.fastq', 'stats'].forEach((extension) => {
+      cy.readFile(`${SEQUENCING_RUN}/${sample}/${sample}.${extension}`).then((content) => {
+        entries[`seed_sequencing_run/${sample}/${sample}.${extension}`] = content;
+      });
+    });
+  });
+  return cy.wrap(entries);
+}
+
+/** Select a zip with the given { path: content } in the zip input of "Link sequencing files". */
+function selectZip(fileName, entries) {
+  cy.wrap(null).then(async () => {
+    const writer = new ZipWriter(new BlobWriter('application/zip'));
+    for (const [path, content] of Object.entries(entries)) {
+      await writer.add(path, new TextReader(content));
+    }
+    const blob = await writer.close();
+    return Cypress.Buffer.from(await blob.arrayBuffer());
+  }).then((contents) => {
+    cy.get('[data-testid="bulk-link-sequencing-files-zip-input"]').selectFile({ contents, fileName }, { force: true });
+  });
+}
 
 describe('Actions that can be perfomed by an edit user on the Sequences page', () => {
   afterEach(() => {
@@ -39,36 +74,52 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
   it('can remove and add tags from the detail page', () => {
     cy.addTagInDetailPageTest('sequences', 'pREX0008', 'example_sequencing');
   });
-  it('can add and remove sequencing files from the detail page', () => {
+  it('can add and remove sequencing files of samples from the detail page', () => {
     const sequenceName = 'pREX0008';
+    const sampleBlock = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`);
     cy.intercept('GET', Cypress.getDbURL(endpoints.sequences, '*')).as('getSequences');
     cy.e2eLogin(`/sequences?name=pREX0008`, 'bootstrap+clerk_test@example.com', 'password');
     cy.wait('@getSequences').then(({ response }) => {
       const sequence = response.body.items.find((item) => item.name === sequenceName);
-      cy.intercept('GET', Cypress.getDbURL(endpoints.sequenceSequencingFiles(sequence.id))).as('getSequenceSequencingFiles');
+      cy.intercept('GET', Cypress.getDbURL(endpoints.sequenceSamples, '*')).as('getSamples');
       cy.get('tbody tr button').contains(sequenceName).click();
-      cy.wait('@getSequenceSequencingFiles').then(({ response }) => {
-        const sequencingFiles = response.body;
-        const sequencingFile = sequencingFiles[0];
-        cy.intercept('DELETE', Cypress.getDbURL(endpoints.sequenceSequencingFileDelete(sequence.id, sequencingFile.id))).as('deleteSequencingFile');
-        cy.get('[data-testid="sequencing-file-row"]').filter(`:contains(${sequencingFile.original_name})`).within(() => {
+      cy.wait('@getSamples').then(({ request, response }) => {
+        expect(request.url).to.contain(`sequence_id=${sequence.id}`);
+        const sample = response.body.items.find((item) => item.uid === 'example_sequencing-sample');
+        const sequencingFile = sample.sequencing_files[0];
+        cy.intercept('DELETE', Cypress.getDbURL(endpoints.sequencingFile(sequencingFile.id))).as('deleteSequencingFile');
+        sampleBlock(sample.uid).find('[data-testid="sequencing-file-row"]').filter(`:contains(${sequencingFile.original_name})`).within(() => {
           cy.get('[aria-label="Delete"]').click();
         });
         cy.wait('@deleteSequencingFile');
         cy.get('[data-testid="sequencing-file-row"]').contains(sequencingFile.original_name).should('not.exist');
         cy.dbAlertExists('Sequencing file deleted successfully');
         cy.closeDbAlerts();
-        cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSequencingFiles(sequence.id))).as('addSequencingFile');
-        cy.get('[aria-label="Add sequencing files"]').siblings('input').selectFile('cypress/test_files/dummy_sequencing.fasta', { force: true });
+
+        // Upload to the sample
+        cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSampleSequencingFiles(sample.uid))).as('addSequencingFile');
+        sampleBlock(sample.uid).find('input[type="file"]').selectFile('cypress/test_files/dummy_sequencing.fasta', { force: true });
         cy.wait('@addSequencingFile');
         cy.dbAlertExists('Sequencing files submitted successfully');
-        cy.get('[data-testid="sequencing-file-row"]').contains('dummy_sequencing.fasta').should('exist');
+        cy.closeDbAlerts();
+        sampleBlock(sample.uid).find('[data-testid="sequencing-file-row"]').contains('dummy_sequencing.fasta').should('exist');
 
+        // A new sample, with a location
+        cy.get('[aria-label="Add new UIDs"]').click();
+        cy.get('[data-testid="create-sequence-sample-uid-dialog"]').within(() => {
+          cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('clone-2');
+          cy.get('[data-testid="create-sample-location"]').type('box 7');
+          cy.get('button').contains('Create').should('be.enabled').click();
+        });
+        cy.dbAlertExists('1 sample UID(s) created successfully');
+        cy.closeDbAlerts();
+        sampleBlock('clone-2').find('[data-testid="sample-block-location"]').should('contain', 'Location: box 7');
       });
     });
   });
-  it('can add and remove sample UIDs from the detail page', () => {
+  it('can add, edit, transfer and remove sample UIDs from the detail page', () => {
     const sequenceName = 'pREX0008';
+    const sampleBlock = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`);
     cy.intercept('GET', Cypress.getDbURL(endpoints.sequences, '*')).as('getSequences');
     cy.e2eLogin(`/sequences?name=pREX0008`, 'bootstrap+clerk_test@example.com', 'password');
     cy.wait('@getSequences').then(({ response }) => {
@@ -76,11 +127,11 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       cy.get('tbody tr button').contains(sequenceName).click();
       cy.get('[data-testid="sequence-samples-section"]').contains('cre_lox_recombination-sample').should('not.exist');
       cy.get('[data-testid="sequence-samples-section"]').contains('example_sequencing-sample').should('exist');
-      cy.intercept('PATCH', Cypress.getDbURL(endpoints.sequenceSample('cre_lox_recombination-sample'))).as('transferSample');
+      cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSampleReassign('cre_lox_recombination-sample'))).as('transferSample');
       cy.get('[aria-label="Transfer UID from another sequence"]').click();
       cy.setAutocompleteValue('Search UIDs', 'cre_lox_recombination-sample', 'body', false);
       cy.contains('Are you sure you want to transfer UID cre_lox_recombination-sample from sequence reconstituted_locus to this one').should('exist');
-      cy.contains('Confirm').click();
+      cy.get('[data-testid="transfer-sample-dialog"]').contains('button', 'Confirm').click();
       cy.wait('@transferSample').then(({ request }) => {
         expect(request.body).to.deep.equal({ sequence_id: sequence.id });
       });
@@ -92,26 +143,63 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
       cy.get('[aria-label="Add new UIDs"]').click();
       cy.get('[data-testid="create-sequence-sample-uid-dialog"]').should('be.visible');
       cy.get('[data-testid="create-sequence-sample-uid-dialog"]').within(() => {
-        cy.get('input').type('new_sample_uid');
+        // UIDs go in URL paths, so they cannot contain '/' (it would point the request to another route)
+        cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('new_sample_uid/sequencing_files');
+        cy.contains('A UID cannot be "." or "..", or contain "/"').should('exist');
+        cy.get('button').contains('Create').should('be.disabled');
+        cy.get('label').contains('Sample UID 1').siblings('div').find('input').clear();
+        cy.get('label').contains('Sample UID 1').siblings('div').find('input').type('new_sample_uid');
         cy.get('button').contains('Add another UID').click();
-        cy.get('input').last().type('new_sample_uid2');
-        cy.get('button').contains('Create').click();
+        cy.get('label').contains('Sample UID 2').siblings('div').find('input').type('new_sample_uid2');
+        cy.get('button').contains('Create').should('be.enabled').click();
       });
 
-      cy.get('[data-testid="sequence-samples-section"]').contains('new_sample_uid').should('exist');
-      cy.get('[data-testid="sequence-samples-section"]').contains('new_sample_uid2').should('exist');
+      sampleBlock('new_sample_uid').should('exist');
+      sampleBlock('new_sample_uid2').should('exist');
       cy.dbAlertExists('2 sample UID(s) created successfully');
       cy.closeDbAlerts();
 
-      // Can delete it
-      cy.get('[data-testid="sample-uid-badge-with-delete"]').contains('new_sample_uid2').within(() => {
-        cy.get('svg').click();
+      // Can rename it and set its location
+      sampleBlock('new_sample_uid2').find('[aria-label="Edit UID and location"]').click();
+      cy.get('[data-testid="edit-sample-dialog"]').within(() => {
+        cy.get('label').contains('Sample UID').siblings('div').find('input').clear();
+        cy.get('label').contains('Sample UID').siblings('div').find('input').type('..');
+        cy.contains('A UID cannot be "." or ".."').should('exist');
+        cy.get('button').contains('Save').should('be.disabled');
+        cy.get('label').contains('Sample UID').siblings('div').find('input').clear();
+        cy.get('label').contains('Sample UID').siblings('div').find('input').type('renamed_uid');
+        cy.get('[data-testid="edit-sample-location"]').type('-80 box 3');
+        cy.get('button').contains('Save').should('be.enabled').click();
       });
-      cy.dbAlertExists('UID new_sample_uid2 deleted successfully');
+      cy.dbAlertExists('Sample updated successfully');
       cy.closeDbAlerts();
-      cy.get('[data-testid="sample-uid-badge-with-delete"]').contains('new_sample_uid').should('exist');
-      cy.get('[data-testid="sample-uid-badge-with-delete"]').contains('new_sample_uid2').should('not.exist');
+      sampleBlock('renamed_uid').find('[data-testid="sample-block-location"]').should('contain', '-80 box 3');
+
+      // Can delete it
+      sampleBlock('renamed_uid').find('[aria-label="Delete sample"]').click();
+      cy.get('button').contains(/^Delete$/).click();
+      cy.dbAlertExists('UID renamed_uid deleted successfully');
+      cy.closeDbAlerts();
+      sampleBlock('new_sample_uid').should('exist');
+      cy.get('[data-testid="sample-block-uid"]').contains('renamed_uid').should('not.exist');
     });
+  });
+  it('can move a sample to another sequence, with its sequencing files', () => {
+    cy.e2eLogin('/sequences?name=pREX0008', 'bootstrap+clerk_test@example.com', 'password');
+    cy.get('tbody tr button').contains('pREX0008').click();
+    cy.get('[data-testid="sample-block"]').filter(':contains(example_sequencing-sample)').find('[aria-label="Move to another sequence"]').click();
+    cy.get('[data-testid="transfer-sample-dialog"]').within(() => {
+      cy.setAutocompleteValue('Sequence', 'pFA6a-5FLAG', 'div', false);
+      cy.contains('to sequence pFA6a-5FLAG').should('exist');
+      cy.contains('button', 'Confirm').click();
+    });
+    cy.dbAlertExists('UID transferred successfully');
+    cy.closeDbAlerts();
+    cy.get('[data-testid="sequence-samples-section"]').contains('example_sequencing-sample').should('not.exist');
+    cy.visit('/sequences?name=pFA6a-5FLAG');
+    cy.get('tbody tr button').contains('pFA6a-5FLAG').click();
+    cy.get('[data-testid="sequence-header"]').contains('pFA6a-5FLAG').should('exist');
+    cy.get('[data-testid="sample-block"]').filter(':contains(example_sequencing-sample)').find('[data-testid="sequencing-file-row"]').should('have.length.greaterThan', 0);
   });
   it('can change name but not sequence type in circular sequence', () => {
 
@@ -324,68 +412,150 @@ describe('Actions that can be perfomed by an edit user on the Sequences page', (
     cy.closeDbAlerts();
   });
   it('can bulk link sequencing files', () => {
-    const bulkDir = 'cypress/test_files/bulk_sequencing_files';
-    const zipInput = '[data-testid="bulk-link-sequencing-files-zip-input"]';
-    const tableInput = '[data-testid="bulk-link-sequencing-files-table-input"]';
     const modal = '[data-testid="bulk-link-sequencing-files-modal"]';
+    const submit = '[data-testid="bulk-link-sequencing-files-submit"]';
+    const summary = '[data-testid="bulk-link-sequencing-files-summary"]';
+    const row = (sampleName) => cy.get(`[data-testid="bulk-link-row"][data-sample-name="${sampleName}"]`);
+    const sampleInput = (sampleName) => row(sampleName).find('[data-testid="bulk-link-sample-select"] input');
+    // The second text input of the row, after the sample
+    const sequenceInput = (sampleName) => row(sampleName).find('input[type="text"]').eq(1);
+    // Types over the selected sample, as a user would: clearing the field would unset the sample (and its sequence)
+    const chooseSample = (sampleName, typed, option) => {
+      sampleInput(sampleName).type(`{selectall}${typed}`);
+      cy.get('li[role="option"]').contains(option, { timeout: 20000 }).click();
+    };
     const decodeBody = (body) => (typeof body === 'string' ? body : new TextDecoder().decode(body));
-    cy.intercept('POST', Cypress.getDbURL(endpoints.sequencingFilesBulk)).as('bulkLinkSequencingFiles');
+    cy.intercept('POST', Cypress.getDbURL(endpoints.sequenceSamplesSequencingFilesBulk)).as('bulkLinkSequencingFiles');
     cy.e2eLogin('/sequences?name=pREX0008', 'bootstrap+clerk_test@example.com', 'password');
-    cy.get('[data-testid="bulk-link-sequencing-files-button"]').should('exist');
 
     // A zip without .final.fastq files shows an error, and no modal
-    cy.get(zipInput).selectFile(`${bulkDir}/no_final_fastq.zip`, { force: true });
+    selectZip('no_final_fastq.zip', { 'bulk_sample1.fastq': '@r\nACGT\n+\nIIII\n' });
     cy.dbAlertExists('No .final.fastq files found in no_final_fastq.zip');
     cy.closeDbAlerts();
     cy.get(modal).should('not.exist');
 
-    // Only the .final.fastq files are read (not the .stats or the __MACOSX copies), and the sample
-    // that matches a sequence of the workspace (A1-P1 is a rotation of seqcheck_circular_1) is pre-filled
-    cy.get(zipInput).selectFile(`${bulkDir}/sequencing_run.zip`, { force: true });
-    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
-      .should('contain.text', 'Found 2 .final.fastq files in sequencing_run.zip (1 match an existing sequence exactly).');
-    cy.get(modal).contains('button', 'Download sample table').click();
-    cy.readFile('cypress/downloads/sequencing_run_samples.tsv')
-      .should('equal', 'sample_name\tsequence_name\nA1-P1\tseqcheck_circular_1\nB2-P1\t\n');
+    // Only the .final.fastq files are read (not the .stats or the __MACOSX copies). The files whose sample name is
+    // the UID of a sample (case-insensitive) go to that sample
+    readSequencingRun().then((entries) => selectZip('seed_sequencing_run.zip', {
+      ...entries,
+      '__MACOSX/seed_sequencing_run/empty_well/._empty_well.final.fastq': 'not a fastq',
+    }));
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]', { timeout: 20000 })
+      .should('have.text', '10 .final.fastq files in seed_sequencing_run.zip (3 with an existing sample of the same name).');
+    sampleInput('SEQCHECK_CIRCULAR_3-SAMPLE').should('have.value', 'seqcheck_circular_3-sample');
+    row('SEQCHECK_CIRCULAR_3-SAMPLE').should('contain', 'seqcheck_circular_3').and('contain', 'Existing sample');
+    row('seqcheck_circular_1-sample').should('contain', 'Existing sample');
+    row('seqcheck_circular_2-sample').should('contain', 'Existing sample');
+    row('GB_105355_c1').should('contain', 'Choose a sample');
+    // The files with a sample can be linked already
+    cy.get(summary).should('have.text', 'Ready: 3 · To complete: 7');
+    cy.get(submit).should('be.enabled').and('have.text', 'Link 3 ready files');
 
-    // Samples that are not in the zip are caught before submitting
-    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sample.tsv`, { force: true });
-    cy.get(modal).contains('Samples not found in the zip file: Z9-P9');
+    // Find exact matches: the two reads of pJOG684 (no samples) become new samples of it. The exact read of
+    // pREX0008 is not matched, as it already has samples
+    cy.get(modal).contains('button', 'Find exact matches').click();
+    cy.dbAlertExists('Matched 2 of 7 files without sample');
+    cy.closeDbAlerts();
+    ['GB_105355_c1', 'GB_105355_c2'].forEach((sampleName) => {
+      sampleInput(sampleName).should('have.value', sampleName);
+      sequenceInput(sampleName).should('have.value', 'pJOG684');
+      row(sampleName).should('contain', 'New sample').and('contain', 'Matched by read');
+    });
+    row('TN9W63_1').should('contain', 'Choose a sample');
 
-    // Errors from the backend are shown in the modal, and the same file can be selected again
-    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sequence.tsv`, { force: true });
-    cy.wait('@bulkLinkSequencingFiles').its('response.statusCode').should('equal', 400);
-    cy.get(modal).contains('Sequences not found: not_a_sequence');
-    cy.get(tableInput).selectFile(`${bulkDir}/samples_unknown_sequence.tsv`, { force: true });
-    cy.wait('@bulkLinkSequencingFiles');
-    cy.get('@bulkLinkSequencingFiles.all').should('have.length', 2);
-    cy.get(modal).contains('Sequences not found: not_a_sequence');
+    // Files with other names go to an existing sample, two of them to the same one (flagged)
+    chooseSample('TN9W63_1', 'example_seq', 'example_sequencing-sample · pREX0008');
+    chooseSample('TN9W63_2', 'example_seq', 'example_sequencing-sample · pREX0008');
+    row('TN9W63_1').should('contain', 'Also used for TN9W63_2');
+    row('TN9W63_2').should('contain', 'Also used for TN9W63_1');
+    chooseSample('colony_L2', 'seqcheck_linear_2', 'seqcheck_linear_2-sample · seqcheck_linear_2');
 
-    // Successful submission, all files are sent in the same request, with their sequence names
-    cy.get(tableInput).selectFile(`${bulkDir}/samples_filled.tsv`, { force: true });
+    // A new sample, with the sample name as UID by default, needs a sequence
+    sampleInput('GB_105417_c1').click();
+    cy.get('li[role="option"]').contains('Create sample "GB_105417_c1"').click();
+    row('GB_105417_c1').should('contain', 'Choose a sequence');
+    row('GB_105417_c1').within(() => cy.setAutocompleteValue('Sequence', 'pJOG173', 'div', false));
+    row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
+
+    // Another file of the same new sample, without sequence: a new sample is created with all its files, so the
+    // first one waits for it
+    chooseSample('empty_well', 'GB_105417_c1', 'Create sample "GB_105417_c1"');
+    row('empty_well').should('contain', 'Choose a sequence');
+    row('GB_105417_c1').should('contain', 'Waiting for empty_well');
+    cy.get(summary).should('have.text', 'Ready: 8 · To complete: 2');
+
+    // The files that are ready are linked and removed, the others stay
+    cy.get(submit).should('have.text', 'Link 8 ready files · create 2 samples').click();
     cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
       expect(request.headers['content-type']).to.include('multipart/form-data');
       const body = decodeBody(request.body);
-      ['A1-P1.final.fastq', 'B2-P1.final.fastq'].forEach((name) => {
-        expect(body).to.include(`name="files"; filename="${name}"`);
+      expect(body).to.not.include('empty_well');
+      expect(body).to.not.include('GB_105417_c1');
+      expect(body).to.not.include('sequence_names');
+      expect(body.match(/name="files"/g)).to.have.length(8);
+      ['TN9W63_1', 'TN9W63_2', 'GB_105355_c1'].forEach((name) => {
+        expect(body).to.include(`name="files"; filename="${name}.final.fastq"`);
       });
-      ['seqcheck_circular_1', 'pREX0008'].forEach((name) => {
-        expect(body).to.match(new RegExp(`name="sequence_names"\\r\\n\\r\\n${name}\\r\\n`));
+      ['example_sequencing-sample', 'seqcheck_circular_3-sample', 'GB_105355_c2'].forEach((uid) => {
+        expect(body).to.match(new RegExp(`name="sample_uids"\\r\\n\\r\\n${uid}\\r\\n`));
       });
       expect(response.statusCode).to.equal(200);
-      expect(response.body).to.deep.equal({ created: 2 });
+      expect(response.body).to.deep.equal({ created: 8, created_samples: 2 });
     });
-    cy.dbAlertExists('Linked 2 sequencing files successfully');
+    cy.dbAlertExists('Linked 8 sequencing files successfully, 2 new samples. 2 files left');
+    cy.closeDbAlerts();
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]')
+      .should('have.text', '2 of 10 .final.fastq files left in seed_sequencing_run.zip (0 with an existing sample of the same name).');
+    row('TN9W63_1').should('not.exist');
+    cy.get(modal).contains('button', 'Close').should('exist');
+
+    // Skipping the other file makes the new sample ready. When no files are left to link, the modal closes
+    row('empty_well').find('input[type="checkbox"]').uncheck();
+    row('empty_well').should('contain', 'Skipped');
+    row('GB_105417_c1').should('not.contain', 'Waiting for');
+    cy.get(summary).should('have.text', 'Ready: 1 · Skipped: 1');
+    cy.get(submit).should('have.text', 'Link 1 ready file · create 1 sample').click();
+    cy.wait('@bulkLinkSequencingFiles').then(({ request, response }) => {
+      const body = decodeBody(request.body);
+      expect(body.match(/name="files"/g)).to.have.length(1);
+      expect(body).to.include('name="files"; filename="GB_105417_c1.final.fastq"');
+      expect(response.body).to.deep.equal({ created: 1, created_samples: 1 });
+    });
+    cy.dbAlertExists('Linked 1 sequencing file successfully, 1 new sample');
     cy.closeDbAlerts();
     cy.get(modal).should('not.exist');
 
-    // The files are linked to the sequences
-    cy.get('tbody tr button').contains('pREX0008').click();
-    cy.get('[data-testid="sequencing-file-row"]').contains('B2-P1.final.fastq').should('exist');
-    cy.get('[data-testid="sequencing-file-row"]').contains('A1-P1.final.fastq').should('not.exist');
-    cy.visit('/sequences?name=seqcheck_circular_1');
-    cy.get('tbody tr button').contains('seqcheck_circular_1').click();
-    cy.get('[data-testid="sequencing-file-row"]').contains('A1-P1.final.fastq').should('exist');
+    // Opening the run again: the files already linked to their sample cannot be linked again, unless another sample
+    // is chosen
+    readSequencingRun().then((entries) => selectZip('seed_sequencing_run.zip', entries));
+    cy.get('[data-testid="bulk-link-sequencing-files-count"]', { timeout: 20000 })
+      .should('have.text', '10 .final.fastq files in seed_sequencing_run.zip (6 with an existing sample of the same name, 6 already linked).');
+    ['seqcheck_circular_1-sample', 'GB_105355_c1', 'GB_105417_c1'].forEach((sampleName) => {
+      row(sampleName).should('contain', 'Already linked');
+      row(sampleName).find('input[type="checkbox"]').should('be.disabled').and('not.be.checked');
+    });
+    cy.get(submit).should('be.disabled').and('have.text', 'Link 0 ready files');
+    chooseSample('GB_105355_c1', 'GB_105355_c2', 'GB_105355_c2 · pJOG684');
+    row('GB_105355_c1').should('contain', 'Existing sample').and('not.contain', 'Already linked');
+    row('GB_105355_c1').find('input[type="checkbox"]').should('be.enabled').and('be.checked');
+    cy.get(submit).should('have.text', 'Link 1 ready file');
+    // A new sample keeps the sequence of the previous one (shown with its samples)
+    chooseSample('GB_105417_c1', 'GB_105417_c1-bis', 'Create sample "GB_105417_c1-bis"');
+    sequenceInput('GB_105417_c1').should('have.value', 'pJOG173 (GB_105417_c1)');
+    row('GB_105417_c1').should('contain', 'New sample').and('not.contain', 'Matched by read');
+    cy.get(submit).should('have.text', 'Link 2 ready files · create 1 sample');
+    cy.get(modal).contains('button', 'Cancel').click();
+    cy.get(modal).should('not.exist');
+
+    // The files are linked to the samples
+    const sampleFiles = (uid) => cy.get('[data-testid="sample-block"]').filter(`:contains(${uid})`)
+      .find('[data-testid="sequencing-file-row"]', { timeout: 20000 });
+    cy.get('tbody tr button').contains('pREX0008', { timeout: 20000 }).click();
+    sampleFiles('example_sequencing-sample').should('contain', 'TN9W63_1.final.fastq').and('contain', 'TN9W63_2.final.fastq');
+    cy.visit('/sequences?name=pJOG684');
+    cy.get('tbody tr button').contains('pJOG684', { timeout: 20000 }).click();
+    sampleFiles('GB_105355_c1').should('contain', 'GB_105355_c1.final.fastq');
+    sampleFiles('GB_105355_c2').should('contain', 'GB_105355_c2.final.fastq');
   });
   it('can bulk upload cloning strategies', () => {
     cy.e2eLogin('/sequences', 'bootstrap+clerk_test@example.com', 'password');

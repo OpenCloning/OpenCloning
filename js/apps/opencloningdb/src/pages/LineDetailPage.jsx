@@ -5,6 +5,7 @@ import { Typography, Button, CircularProgress, Alert, Box } from '@mui/material'
 import { openCloningDBHttpClient, endpoints } from '@opencloning/opencloningdb';
 import NewLineUID from '../components/NewLineUID';
 import CreateLineDialog from '../components/CreateLineDialog';
+import CreateIsolatesDialog from '../components/CreateIsolatesDialog';
 import ResourceDetailHeader from '../components/ResourceDetailHeader';
 import SequenceTable from '../components/SequenceTable';
 import LinesTable from '../components/LinesTable';
@@ -25,6 +26,18 @@ function TransformButton({ line }) {
         Transformation
       </Button>
       <CreateLineDialog fixedParents={[line]} open={open} onClose={() => setOpen(false)} />
+    </>
+  );
+}
+
+function MoreIsolatesButton({ line }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <>
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+        More isolates
+      </Button>
+      <CreateIsolatesDialog line={line} open={open} onClose={() => setOpen(false)} />
     </>
   );
 }
@@ -158,6 +171,7 @@ function LineDetailPage() {
 
       <TopButtonSection>
         <TransformButton line={line} />
+        <MoreIsolatesButton line={line} />
         <DeleteResourceButton
           mutation={deleteLineMutation}
           disabledReason={deleteTooltip}

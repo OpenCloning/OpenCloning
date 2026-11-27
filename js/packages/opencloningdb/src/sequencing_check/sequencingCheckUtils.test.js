@@ -130,6 +130,29 @@ describe('buildSortedRows', () => {
     expect(error.status).toBe('error');
   });
 
+  it('groups the files of each sequence by sample, samples sorted by their lowest identity', () => {
+    const groupedFiles = {
+      1: [
+        { id: 1, name: 'a1.fa', sampleUid: 'A' },
+        { id: 2, name: 'b1.fa', sampleUid: 'B' },
+        { id: 3, name: 'a2.fa', sampleUid: 'A' },
+        { id: 4, name: 'no_sample.fa' },
+      ],
+    };
+    const groupedResults = {
+      1: { status: 'aligned', identity: 100 },
+      2: { status: 'aligned', identity: 95 },
+      3: { status: 'aligned', identity: 90 },
+    };
+    const [row] = buildSortedRows([{ databaseId: 1, name: 'seq' }], groupedFiles, groupedResults);
+    expect(row.samples.map(({ sampleUid, files }) => [sampleUid, files.map(({ file }) => file.name)])).toEqual([
+      ['A', ['a2.fa', 'a1.fa']],
+      ['B', ['b1.fa']],
+      [null, ['no_sample.fa']],
+    ]);
+    expect(row.files.map(({ file }) => file.name)).toEqual(['a2.fa', 'a1.fa', 'b1.fa', 'no_sample.fa']);
+  });
+
   it('sets the status of sequences with no files and of sequences whose files are loading', () => {
     const rows = buildSortedRows(sequences, filesBySequenceId, results);
     const noFiles = rows.find((row) => row.sequence.name === 'no files');

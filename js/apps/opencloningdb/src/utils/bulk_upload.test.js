@@ -4,11 +4,18 @@ import { TextReader } from '@zip.js/zip.js';
 import { getZipFileBlob } from '@opencloning/utils/readNwrite';
 import {
   finalFastqFilesFromZip,
-  pairFastqFilesWithSequences,
-  sampleTableTsv,
+  isAlreadyLinked,
+  linkEntries,
+  linkRow,
+  linkRowStatuses,
+  newSampleCount,
   prepareLineRowsForValidation,
   prepareTemplateSequenceRowsForValidation,
+  readyRows,
+  sortLinkRows,
   splitSpaceSeparatedField,
+  withMatches,
+  withTarget,
 } from './bulk_upload';
 
 describe('prepareTemplateSequenceRowsForValidation', () => {
@@ -111,23 +118,154 @@ describe('sequencing run zip files', () => {
     const zip = await runZip(['run1/A1/A1.final.fastq', 'run2/A1/A1.final.fastq']);
     await expect(finalFastqFilesFromZip(zip)).rejects.toThrow('Several files with the same name in the zip file: A1.final.fastq');
   });
+});
 
-  it('builds the sample table and pairs the filled rows with the files', async () => {
-    const files = await finalFastqFilesFromZip(await runZip(runPaths));
-    // Sorted by sample name, whatever the order in the zip
-    expect(sampleTableTsv([...files].reverse())).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
-    expect(sampleTableTsv(files)).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\t\n');
-    expect(sampleTableTsv(files, { 'A1-P1-2': 'pREX0008' })).toBe('sample_name\tsequence_name\nA1-P1\t\nA1-P1-2\tpREX0008\n');
+describe('rows to link sequencing files', () => {
+  const file = (sampleName) => new File(['@r\nACGT\n+\nIIII\n'], `${sampleName}.final.fastq`);
+  const pREX0008 = { id: 1, name: 'pREX0008' };
+  const pJOG684 = { id: 2, name: 'pJOG684' };
+  const existing = { uid: 'S1', sequence_id: 1, sequence: pREX0008 };
 
-    const pairs = pairFastqFilesWithSequences(files, [
-      { sample_name: 'A1-P1', sequence_name: ' pREX0008 ' },
-      { sample_name: 'A1-P1-2', sequence_name: '' },
+  it('starts with the existing sample of the same name, or no sample', () => {
+    expect(linkRow(file('S1'), existing)).toMatchObject({ sampleName: 'S1', uid: 'S1', sample: existing, sequence: pREX0008, skip: false });
+    expect(linkRow(file('A1-P1'))).toMatchObject({ sampleName: 'A1-P1', uid: null, sample: null, candidates: [] });
+  });
+
+  it('gives the status of each row, and what blocks linking', () => {
+    const rows = [
+      linkRow(file('S1'), existing),
+      linkRow(file('A1')),
+      { ...linkRow(file('A2')), uid: 'NEW', sequence: pJOG684 },
+      { ...linkRow(file('A3')), uid: 'other' },
+      { ...linkRow(file('A4')), skip: true },
+    ];
+    expect(linkRowStatuses(rows)).toEqual([
+      { status: 'existing', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'no_sample', duplicates: [], conflict: false, waitingFor: [], blocking: true },
+      { status: 'new', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'no_sequence', duplicates: [], conflict: false, waitingFor: [], blocking: true },
+      { status: 'skip', duplicates: [], conflict: false, waitingFor: [], blocking: false },
     ]);
-    expect(pairs.map(({ sequenceName, file }) => [sequenceName, file.name])).toEqual([['pREX0008', 'A1-P1.final.fastq']]);
+  });
 
-    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'A1-P1', sequence_name: '' }]))
-      .toThrow('No sequence names were filled in the table');
-    expect(() => pairFastqFilesWithSequences(files, [{ sample_name: 'B7', sequence_name: 'pREX0008' }]))
-      .toThrow('Samples not found in the zip file: B7');
+  it('flags rows that link to the same sample, and blocks a new sample with different sequences', () => {
+    const rows = [
+      linkRow(file('S1'), existing),
+      { ...linkRow(file('S1-again')), uid: 's1', sample: existing },
+      // Same new sample (case-insensitive), same sequence: allowed
+      { ...linkRow(file('A1')), uid: 'NEW', sequence: pJOG684 },
+      { ...linkRow(file('A2')), uid: 'new', sequence: pJOG684 },
+      // Same new sample, different sequences
+      { ...linkRow(file('B1')), uid: 'OTHER', sequence: pJOG684 },
+      { ...linkRow(file('B2')), uid: 'OTHER', sequence: pREX0008 },
+      // Skipped rows are not duplicates
+      { ...linkRow(file('B3')), uid: 'OTHER', sequence: pREX0008, skip: true },
+    ];
+    const statuses = linkRowStatuses(rows);
+    expect(statuses.map(({ duplicates }) => duplicates)).toEqual([['S1-again'], ['S1'], ['A2'], ['A1'], ['B2'], ['B1'], []]);
+    expect(statuses.map(({ blocking }) => blocking)).toEqual([false, false, false, false, true, true, false]);
+    // OTHER is not created until its conflict is fixed
+    expect(newSampleCount(rows)).toBe(1);
+  });
+
+  it('accepts UIDs that are names of object properties', () => {
+    const rows = ['constructor', '__proto__'].map((uid) => ({ ...linkRow(file(uid)), uid, sequence: pJOG684 }));
+    expect(linkRowStatuses(rows).map(({ status }) => status)).toEqual(['new', 'new']);
+  });
+
+  it('a new sample is not ready until all its files have its sequence', () => {
+    const rows = [
+      { ...linkRow(file('A1')), uid: 'NEW', sequence: pJOG684 },
+      { ...linkRow(file('A2')), uid: 'new' },
+      { ...linkRow(file('B1')), uid: 'OTHER', sequence: pJOG684 },
+    ];
+    const statuses = linkRowStatuses(rows);
+    expect(statuses.map(({ status }) => status)).toEqual(['new', 'no_sequence', 'new']);
+    expect(statuses.map(({ waitingFor }) => waitingFor)).toEqual([['A2'], [], []]);
+    expect(statuses.map(({ blocking }) => blocking)).toEqual([true, true, false]);
+    expect(readyRows(rows)).toEqual([rows[2]]);
+    expect(newSampleCount(rows)).toBe(1);
+  });
+
+  it('sorts the rows without sample first, then by sample name', () => {
+    const withFile = { ...existing, sequencing_files: [{ id: 1, original_name: 'A0.final.fastq' }] };
+    const rows = [linkRow(file('A0'), withFile), linkRow(file('S1'), existing), linkRow(file('B1')), linkRow(file('A1'))];
+    expect(sortLinkRows(rows).map(({ sampleName }) => sampleName)).toEqual(['A1', 'B1', 'S1', 'A0']);
+  });
+
+  it('gives the sample UIDs and sequence IDs to submit, only of the rows that are ready', () => {
+    const rows = [
+      linkRow(file('S1'), existing),
+      { ...linkRow(file('A1')), uid: 'NEW', sequence: pJOG684 },
+      { ...linkRow(file('A2')), skip: true },
+      // Not ready: they are not submitted
+      linkRow(file('A3')),
+      { ...linkRow(file('A4')), uid: 'NO-SEQUENCE' },
+    ];
+    expect(linkEntries(rows).map(({ sampleUid, sequenceId, file: f }) => [sampleUid, sequenceId, f.name])).toEqual([
+      ['S1', '', 'S1.final.fastq'],
+      ['NEW', '2', 'A1.final.fastq'],
+    ]);
+    expect(newSampleCount(rows)).toBe(1);
+  });
+
+  it('does not link a file again to a sample that already has a file with its name', () => {
+    const withFile = { ...existing, sequencing_files: [{ id: 1, original_name: 'S1.final.fastq' }] };
+    const rows = [
+      // Same file name: already linked
+      linkRow(file('S1'), withFile),
+      // Another file of the same sample: linked, and not a duplicate of the already linked one
+      { ...linkRow(file('A1')), uid: 'S1', sample: withFile },
+      // Skipped wins over already linked
+      { ...linkRow(file('S1')), uid: 'S1', sample: withFile, skip: true },
+      // Changing the sample of an already linked file links it again
+      { ...linkRow(file('S1'), withFile), uid: 'NEW', sample: null, sequence: pJOG684 },
+    ];
+    expect(isAlreadyLinked(rows[0])).toBe(true);
+    expect(isAlreadyLinked(rows[1])).toBe(false);
+    expect(linkRowStatuses(rows)).toEqual([
+      { status: 'already_linked', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'existing', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'skip', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+      { status: 'new', duplicates: [], conflict: false, waitingFor: [], blocking: false },
+    ]);
+    expect(linkEntries(rows).map(({ sampleUid, file: f }) => [sampleUid, f.name])).toEqual([
+      ['S1', 'A1.final.fastq'],
+      ['NEW', 'S1.final.fastq'],
+    ]);
+  });
+
+  it('changes the sample of a row, keeping the sequence for a new sample', () => {
+    const other = { uid: 'S2', sequence_id: 2, sequence: pJOG684 };
+    const atExisting = linkRow(file('S1'), existing);
+    // Another existing sample: its sequence
+    expect(withTarget(atExisting, { uid: 'S2', sample: other })).toMatchObject({ uid: 'S2', sample: other, sequence: pJOG684 });
+    // A new sample: the sequence of the existing sample
+    const atNew = withTarget(atExisting, { uid: 'NEW', sample: null });
+    expect(atNew).toMatchObject({ uid: 'NEW', sample: null, sequence: pREX0008, matchedByRead: false });
+    expect(linkRowStatuses([atNew])[0].status).toBe('new');
+    // Renaming a new sample matched by read keeps the match
+    const matched = { ...linkRow(file('A1')), uid: 'A1', sequence: pJOG684, matchedByRead: true };
+    expect(withTarget(matched, { uid: 'A1-bis', sample: null })).toMatchObject({ uid: 'A1-bis', sequence: pJOG684, matchedByRead: true });
+    // Choosing an existing sample, or none, drops the match
+    expect(withTarget(matched, { uid: 'S1', sample: existing })).toMatchObject({ sequence: pREX0008, matchedByRead: false });
+    expect(withTarget(matched, null)).toMatchObject({ uid: null, sample: null, sequence: null, matchedByRead: false });
+  });
+
+  it('applies the sequences that match the read to rows without sample', () => {
+    const row = linkRow(file('A1'));
+    expect(withMatches(row, [pJOG684])).toMatchObject({ uid: 'A1', sample: null, sequence: pJOG684, matchedByRead: true, candidates: [] });
+    expect(withMatches(row, [pJOG684, pREX0008]))
+      .toMatchObject({ uid: 'A1', sequence: null, matchedByRead: false, candidates: [pJOG684, pREX0008] });
+    // No matches, unreadable file, or rows that have a sample or are skipped: unchanged
+    const unchanged = [
+      [row, []],
+      [row, null],
+      [row, undefined],
+      [linkRow(file('S1'), existing), [pJOG684]],
+      [{ ...row, uid: 'NEW' }, [pJOG684]],
+      [{ ...row, skip: true }, [pJOG684]],
+    ];
+    unchanged.forEach(([r, matches]) => expect(withMatches(r, matches)).toBe(r));
   });
 });

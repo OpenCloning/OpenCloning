@@ -46,7 +46,8 @@ async function submitPrimerToDatabase({ submissionData, primer }) {
   return response.data.id;
 }
 
-async function submitSequencingFileToDatabase({ databaseId, sequencingFiles }) {
+/** Upload sequencing files to a sample (sequencing data belongs to samples, not to sequences). */
+async function submitSequencingFileToDatabase({ sampleUid, sequencingFiles }) {
   const formData = new FormData();
   sequencingFiles.forEach((file) => {
     if (file) {
@@ -56,7 +57,7 @@ async function submitSequencingFileToDatabase({ databaseId, sequencingFiles }) {
 
   try {
     const resp = await openCloningDBHttpClient.post(
-      endpoints.sequenceSequencingFiles(databaseId),
+      endpoints.sequenceSampleSequencingFiles(sampleUid),
       formData,
       {
         headers: {
@@ -72,13 +73,17 @@ async function submitSequencingFileToDatabase({ databaseId, sequencingFiles }) {
 }
 
 /**
- * A sequencing file { id, name, getFile } from its reference in the API ({ id, original_name }),
- * getFile is async and downloads the file content (as a File).
+ * A sequencing file { id, name, sampleUid, getFile } from its reference in the API ({ id, original_name, sample_uid }),
+ * getFile is async and downloads the file content (as a File called name).
+ * With prefixWithSample, the name starts with the sample uid, so that files of different samples of the same
+ * sequence have different names.
  */
-export function sequencingFileFromRef({ id, original_name: name }) {
+export function sequencingFileFromRef({ id, original_name: originalName, sample_uid: sampleUid = null }, { prefixWithSample = false } = {}) {
+  const name = prefixWithSample && sampleUid ? `${sampleUid}_${originalName}` : originalName;
   return {
     id,
     name,
+    sampleUid,
     getFile: async () => {
       const downloadResp = await openCloningDBHttpClient.get(endpoints.sequencingFileDownload(id), {
         responseType: 'blob',
@@ -89,10 +94,11 @@ export function sequencingFileFromRef({ id, original_name: name }) {
 }
 
 async function getSequencingFiles(databaseId) {
-  // Returns array of { id, name, getFile } where getFile is async and returns the file content
+  // Returns array of { id, name, sampleUid, getFile } where getFile is async and returns the file content.
+  // The files of all the samples of the sequence, their names are prefixed with the sample uid.
   try {
     const resp = await openCloningDBHttpClient.get(endpoints.sequenceSequencingFiles(databaseId));
-    return (resp.data || []).map(sequencingFileFromRef);
+    return (resp.data || []).map((ref) => sequencingFileFromRef(ref, { prefixWithSample: true }));
   } catch (e) {
     console.error(e);
     throw new Error(error2String(e), { cause: e });
@@ -146,7 +152,7 @@ export default {
   omitUnsavedIntermediatesDisclaimer: true,
   // Function to locate a sequence in the database
   locateSequenceInDatabase,
-  // Function to submit sequencing files to the database
+  // Function to submit sequencing files ({ sampleUid, sequencingFiles }) to a sample in the database
   submitSequencingFileToDatabase,
   // Component for loading several sequences at once (e.g. in the assembler), calls
   // onSequencesLoaded with an array of { databaseId, name, textFileSequence }

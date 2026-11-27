@@ -292,7 +292,15 @@ export async function getTeselaJsonFromBase64(ab1Base64, fileName = null) {
   try {
     const blob = base64ToBlob(ab1Base64);
     const results = await (fileName.endsWith('.ab1') ? ab1ToJson(blob) : anyToJson(blob, { fileName }));
-    return results[0].parsedSequence;
+    // The parsers don't throw on invalid files, they return [{ success: false }]
+    const parsedSequence = results?.[0]?.success ? results[0].parsedSequence : null;
+    if (!parsedSequence) {
+      throw new Error('not a valid sequence file');
+    }
+    if (!parsedSequence.sequence) {
+      throw new Error('the file contains no sequence');
+    }
+    return parsedSequence;
   } catch (error) {
     const fileNameError = fileName || 'file';
     throw new Error(`Error parsing ${fileNameError}: ${error.message}`, { cause: error });

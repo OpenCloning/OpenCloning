@@ -50,7 +50,7 @@ export default function useSequencingCheck(sequences) {
   const [results, setResults] = React.useState({});
 
   const filesBySequenceId = React.useMemo(() => Object.fromEntries(
-    sequences.map(({ databaseId, sequencingFiles }) => [databaseId, sequencingFiles.map(sequencingFileFromRef)]),
+    sequences.map(({ databaseId, sequencingFiles }) => [databaseId, sequencingFiles.map((ref) => sequencingFileFromRef(ref))]),
   ), [sequences]);
 
   const references = React.useMemo(() => Object.fromEntries(sequences.map((sequence) => {
